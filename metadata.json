@@ -1,0 +1,6 @@
+{
+  "name": "Fazenda Online",
+  "description": "Sistema completo de gestão rural: pagamentos de funcionários, controle de despesas, estoque de animais e pastos, agendamento de tarefas e relatórios financeiros detalhados.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

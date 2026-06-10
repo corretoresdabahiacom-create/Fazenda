@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  .dark {
+    color-scheme: dark;
+  }
+}
+
+/* Custom dark mode utility adjustments for better global contrast and eye-safe rural visual nights */
+html.dark body {
+  background-color: #121212;
+  color: #f4f4f5;
+}
+
+/* Make cards and panels easily toggle to dark mode */
+html.dark .bg-white {
+  background-color: #1a1a1c !important;
+  color: #f4f4f5 !important;
+  border-color: #27272a !important;
+}
+
+/* Light mode high-contrast text improvements to solve "too light / faint" issues */
+html:not(.dark) .text-\[\#8d8a86\],
+html:not(.dark) .text-zinc-400,
+html:not(.dark) .text-gray-400,
+html:not(.dark) .text-neutral-400 {
+  color: #55524e !important; /* Considerably darker for maximum legibility */
+}
+
+html:not(.dark) .text-\[\#6d6a66\],
+html:not(.dark) .text-zinc-500,
+html:not(.dark) .text-gray-500,
+html:not(.dark) .text-neutral-500 {
+  color: #3b3936 !important; /* Perfect high contrast charcoal text */
+}
+
+html:not(.dark) .text-\[\#2d2a26\] {
+  color: #151413 !important; /* Ultra-deep high readability brown-black */
+}
+
+html.dark .text-gray-900,
+html.dark .text-neutral-900,
+html.dark .text-\[\#2d2a26\] {
+  color: #f4f4f5 !important;
+}
+
+html.dark .text-gray-500,
+html.dark .text-neutral-500,
+html.dark .text-\[\#6d6a66\],
+html.dark .text-\[\#8d8a86\] {
+  color: #a1a1aa !important;
+}
+
+html.dark .bg-\[\#fcfaf7\],
+html.dark .bg-\[\#f5f2ed\],
+html.dark .bg-\[\#f9faf8\] {
+  background-color: #141416 !important;
+  border-color: #27272a !important;
+}
+
+html.dark .border,
+html.dark .border-b,
+html.dark .border-t,
+html.dark .border-r,
+html.dark .border-l {
+  border-color: #27272a !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #202024 !important;
+  color: #f4f4f5 !important;
+  border-color: #2d2d30 !important;
+}
+
+/* Custom shadow adjustments for dark theme */
+html.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4) !important;
+}
+html.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Light Mode Advanced Contrast & WCAG AA improvements for pastel components and light cards */
+html:not(.dark) .bg-emerald-50, 
+html:not(.dark) .bg-emerald-50\/20,
+html:not(.dark) .bg-emerald-50\/30,
+html:not(.dark) .bg-[#3d5a45]\/5,
+html:not(.dark) .bg-amber-50\/40,
+html:not(.dark) .bg-amber-50,
+html:not(.dark) .bg-[#fcfaf7] {
+  color: #1c1b1a !important;
+}
+
+html:not(.dark) .text-amber-800,
+html:not(.dark) .text-amber-900,
+html:not(.dark) .text-[#8a5b00],
+html:not(.dark) .text-amber-700 {
+  color: #6e3d00 !important; /* High contrast dark amber */
+}
+
+html:not(.dark) .text-emerald-800,
+html:not(.dark) .text-emerald-700,
+html:not(.dark) .text-[#3d5a45] {
+  color: #1b3823 !important; /* Rich deep forest green for text */
+}
+
+html:not(.dark) .text-zinc-400,
+html:not(.dark) .text-gray-400,
+html:not(.dark) .text-neutral-400,
+html:not(.dark) .text-[#8d8a86],
+html:not(.dark) .text-zinc-500,
+html:not(.dark) .text-[#6d6a66] {
+  color: #3b3936 !important; /* Deep charcoal text for light mode headers & indicators */
+}
+
+html:not(.dark) .text-zinc-400.font-bold,
+html:not(.dark) .text-zinc-500.font-bold,
+html:not(.dark) .text-[#8d8a86].font-bold,
+html:not(.dark) .text-[#6d6a66].font-bold {
+  color: #272624 !important;
+}
+
+html:not(.dark) .text-xs.font-medium,
+html:not(.dark) .text-sm.font-medium,
+html:not(.dark) .text-xs.font-semibold,
+html:not(.dark) .font-medium,
+html:not(.dark) .font-semibold {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+

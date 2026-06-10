@@ -1,0 +1,219 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // -------------------------------------------------------------------------
+    // HELPER FUNCTIONS
+    // -------------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && (
+        request.auth.uid == userId ||
+        (userId == "fazenda_shared_production_db_v1" && request.auth.token.email_verified == true && (request.auth.token.email == "admin@fazenda.com.br" || request.auth.token.email == "usuario@fazenda.com.br"))
+      );
+    }
+
+    function canWrite(userId) {
+      return isSignedIn() && (
+        request.auth.uid == userId ||
+        (userId == "fazenda_shared_production_db_v1" && request.auth.token.email_verified == true && request.auth.token.email == "admin@fazenda.com.br")
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // -------------------------------------------------------------------------
+    // VALIDATION HELPERS
+    // -------------------------------------------------------------------------
+
+    function isValidUser(data) {
+      return data.farmName is string && data.farmName.size() <= 200
+          && data.city is string && data.city.size() <= 200
+          && (!('customExpenseTypes' in data) || data.customExpenseTypes is list)
+          && (!('farmMapUrl' in data) || data.farmMapUrl is string)
+          && (!('farmMapFileName' in data) || data.farmMapFileName is string)
+          && (!('concludedObligations' in data) || data.concludedObligations is list);
+    }
+
+    function isValidAnimal(data) {
+      return data.id is string
+          && data.type is string
+          && data.category is string
+          && data.quantity is number && data.quantity >= 0
+          && data.lotName is string && data.lotName.size() <= 100
+          && data.entryDate is string
+          && data.currentPastureId is string
+          && data.averageWeight is number && data.averageWeight >= 0
+          && data.costs is number && data.costs >= 0;
+    }
+
+    function isValidPasture(data) {
+      return data.id is string
+          && data.number is string
+          && data.name is string && data.name.size() <= 100
+          && data.grassTypes is list
+          && data.capacityAguas is number && data.capacityAguas >= 0
+          && data.capacitySeca is number && data.capacitySeca >= 0
+          && data.size is number && data.size >= 0;
+    }
+
+    function isValidExpense(data) {
+      return data.id is string
+          && data.date is string
+          && data.type is string
+          && data.description is string && data.description.size() <= 200
+          && data.value is number && data.value >= 0;
+    }
+
+    function isValidPayment(data) {
+      return data.id is string
+          && data.date is string
+          && data.employeeName is string && data.employeeName.size() <= 100
+          && data.role is string
+          && data.paymentType is string
+          && data.totalValue is number && data.totalValue >= 0;
+    }
+
+    function isValidTask(data) {
+      return data.id is string
+          && data.title is string && data.title.size() <= 200
+          && data.dueDate is string
+          && data.completed is bool
+          && data.priority is string;
+    }
+
+    function isValidTransaction(data) {
+      return data.id is string
+          && data.date is string
+          && data.animalId is string
+          && data.type is string
+          && data.quantity is number && data.quantity >= 0
+          && data.price is number && data.price >= 0;
+    }
+
+    function isValidInventory(data) {
+      return data.id is string
+          && data.name is string && data.name.size() <= 100
+          && data.category is string
+          && data.quantity is number && data.quantity >= 0
+          && data.unit is string
+          && data.lastUpdated is string;
+    }
+
+    function isValidEmployee(data) {
+      return data.id is string
+          && data.name is string && data.name.size() <= 150
+          && data.role is string
+          && data.status is string
+          && data.admissionDate is string;
+    }
+
+    function isValidFixedExpense(data) {
+      return data.id is string
+          && data.description is string && data.description.size() <= 200
+          && data.dueDate is string
+          && data.value is number && data.value >= 0
+          && data.expenseType is string;
+    }
+
+    function isValidWeighingSheet(data) {
+      return data.id is string
+          && data.name is string && data.name.size() <= 100
+          && data.date is string
+          && data.rows is list
+          && (!('notes' in data) || data.notes is string);
+    }
+
+    // -------------------------------------------------------------------------
+    // MATCH BLOCKS
+    // -------------------------------------------------------------------------
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if canWrite(userId) && isValidUser(incoming());
+      allow update: if canWrite(userId) && isValidUser(incoming());
+
+      match /animals/{animalId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(animalId) && isValidAnimal(incoming());
+        allow update: if canWrite(userId) && isValidAnimal(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /pastures/{pastureId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(pastureId) && isValidPasture(incoming());
+        allow update: if canWrite(userId) && isValidPasture(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /expenses/{expenseId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(expenseId) && isValidExpense(incoming());
+        allow update: if canWrite(userId) && isValidExpense(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /payments/{paymentId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(paymentId) && isValidPayment(incoming());
+        allow update: if canWrite(userId) && isValidPayment(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /tasks/{taskId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(taskId) && isValidTask(incoming());
+        allow update: if canWrite(userId) && isValidTask(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /transactions/{transactionId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(transactionId) && isValidTransaction(incoming());
+        allow update: if canWrite(userId) && isValidTransaction(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /inventory/{itemId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(itemId) && isValidInventory(incoming());
+        allow update: if canWrite(userId) && isValidInventory(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /employees/{employeeId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(employeeId) && isValidEmployee(incoming());
+        allow update: if canWrite(userId) && isValidEmployee(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /fixedExpenses/{fixedExpenseId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(fixedExpenseId) && isValidFixedExpense(incoming());
+        allow update: if canWrite(userId) && isValidFixedExpense(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /weighingSheets/{sheetId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(sheetId) && isValidWeighingSheet(incoming());
+        allow update: if canWrite(userId) && isValidWeighingSheet(incoming());
+        allow delete: if canWrite(userId);
+      }
+    }
+  }
+}

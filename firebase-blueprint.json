@@ -1,0 +1,237 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and farm settings",
+      "type": "object",
+      "properties": {
+        "farmName": { "type": "string" },
+        "city": { "type": "string" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "customExpenseTypes": { "type": "array", "items": { "type": "string" } },
+        "concludedObligations": { "type": "array", "items": { "type": "string" } },
+        "farmMapUrl": { "type": "string" },
+        "farmMapFileName": { "type": "string" }
+      },
+      "required": ["farmName", "city"]
+    },
+    "Animal": {
+      "title": "Animal",
+      "description": "Animal lot data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "category": { "type": "string" },
+        "breed": { "type": "string" },
+        "ownerName": { "type": "string" },
+        "quantity": { "type": "number" },
+        "lotName": { "type": "string" },
+        "formerOwnerName": { "type": "string" },
+        "formerOwnerCity": { "type": "string" },
+        "formerOwnerPhone": { "type": "string" },
+        "purchaseDate": { "type": "string" },
+        "entryDate": { "type": "string" },
+        "currentPastureId": { "type": "string" },
+        "pastureHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pastureId": { "type": "string" },
+              "date": { "type": "string" }
+            }
+          }
+        },
+        "pastureForecast": { "type": "string" },
+        "exitForecast": { "type": "string" },
+        "exitDate": { "type": "string" },
+        "averageWeight": { "type": "number" },
+        "aiTechnicalNote": { "type": "string" },
+        "aiConfidence": { "type": "number" },
+        "arrobaValue": { "type": "number" },
+        "costs": { "type": "number" },
+        "profit": { "type": "number" },
+        "rentValue": { "type": "number" },
+        "paymentDate": { "type": "string" },
+        "revenue": { "type": "number" }
+      },
+      "required": ["id", "type", "category", "quantity", "lotName", "entryDate", "currentPastureId", "averageWeight", "costs"]
+    },
+    "Pasture": {
+      "title": "Pasture",
+      "description": "Pasture data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "number": { "type": "string" },
+        "name": { "type": "string" },
+        "grassTypes": { "type": "array", "items": { "type": "string" } },
+        "capacityAguas": { "type": "number" },
+        "capacitySeca": { "type": "number" },
+        "size": { "type": "number" },
+        "stockingHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string" },
+              "count": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["id", "number", "name", "grassTypes", "capacityAguas", "capacitySeca", "size"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Financial expense",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "type": { "type": "string" },
+        "description": { "type": "string" },
+        "provider": { "type": "string" },
+        "value": { "type": "number" },
+        "observation": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "date", "type", "description", "value"]
+    },
+    "EmployeePayment": {
+      "title": "Employee Payment",
+      "description": "Payment to employees/laborers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "employeeName": { "type": "string" },
+        "role": { "type": "string" },
+        "paymentType": { "type": "string" },
+        "dailyQuantity": { "type": "number" },
+        "dailyValue": { "type": "number" },
+        "totalValue": { "type": "number" },
+        "observation": { "type": "string" }
+      },
+      "required": ["id", "date", "employeeName", "role", "paymentType", "totalValue"]
+    },
+    "FarmTask": {
+      "title": "Farm Task",
+      "description": "Task to be performed",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "priority": { "type": "string" }
+      },
+      "required": ["id", "title", "dueDate", "completed", "priority"]
+    },
+    "TransactionHistory": {
+      "title": "Transaction History",
+      "description": "Buy/Sell history",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "animalId": { "type": "string" },
+        "type": { "type": "string" },
+        "quantity": { "type": "number" },
+        "price": { "type": "number" }
+      },
+      "required": ["id", "date", "animalId", "type", "quantity", "price"]
+    },
+    "InventoryItem": {
+      "title": "Inventory Item",
+      "description": "Supply or equipment in stock",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string" },
+        "lastUpdated": { "type": "string" }
+      },
+      "required": ["id", "name", "category", "quantity", "unit", "lastUpdated"]
+    },
+    "Employee": {
+      "title": "Employee",
+      "description": "Employee file card description",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "admissionDate": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "name", "role", "admissionDate", "status"]
+    },
+    "FixedExpense": {
+      "title": "Fixed Expense",
+      "description": "Fixed recurring expense description",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "description": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "value": { "type": "number" },
+        "expenseType": { "type": "string" }
+      },
+      "required": ["id", "description", "dueDate", "value", "expenseType"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Store user profile and farm settings"
+    },
+    "/users/{userId}/animals/{animalId}": {
+      "schema": "Animal",
+      "description": "Subcollection for animals"
+    },
+    "/users/{userId}/pastures/{pastureId}": {
+      "schema": "Pasture",
+      "description": "Subcollection for pastures"
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Subcollection for expenses"
+    },
+    "/users/{userId}/payments/{paymentId}": {
+      "schema": "EmployeePayment",
+      "description": "Subcollection for employee payments"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "FarmTask",
+      "description": "Subcollection for tasks"
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": "TransactionHistory",
+      "description": "Subcollection for transaction history"
+    },
+    "/users/{userId}/inventory/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "Subcollection for inventory items"
+    },
+    "/users/{userId}/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Subcollection for employees"
+    },
+    "/users/{userId}/fixedExpenses/{fixedExpenseId}": {
+      "schema": "FixedExpense",
+      "description": "Subcollection for fixed expenses"
+    }
+  }
+}
