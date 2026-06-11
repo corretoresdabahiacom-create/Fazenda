@@ -2,8 +2,5 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fazenda-digital-app",
   "pages_build_output_dir": "dist",
-  "compatibility_date": "2026-06-07",
-  "vars": {
-    "GEMINI_API_KEY": "YOUR_GEMINI_API_KEY_HERE"
-  }
+  "compatibility_date": "2026-06-07"
 }
