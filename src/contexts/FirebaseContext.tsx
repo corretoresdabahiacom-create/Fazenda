@@ -464,24 +464,24 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const loginWithGoogle = async () => {
     setLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);const result = await signInWithPopup(auth, googleProvider);
-
-      console.log('GOOGLE LOGIN OK');
-      console.log(result.user);
-      const u = result.user;
-      setUser(u);
-      const defaultRole = 'admin';
-      setUserRole(defaultRole);
-      localStorage.setItem('gestao_fazenda_user_role', defaultRole);
-      setIsDemoMode(false);
-      localStorage.removeItem('gestao_fazenda_is_demo');
-      localStorage.removeItem('gestao_fazenda_custom_user');
-      setLoading(false);
+        const result = await signInWithPopup(auth, googleProvider);
+        console.log('GOOGLE LOGIN OK');
+        console.log(result.user);
+        const u = result.user;
+        setUser(u);
+        const defaultRole = 'admin';
+        setUserRole(defaultRole);
+        localStorage.setItem('gestao_fazenda_user_role', defaultRole);
+        setIsDemoMode(false);
+        localStorage.removeItem('gestao_fazenda_is_demo');
+        localStorage.removeItem('gestao_fazenda_custom_user');
+        setLoading(false);
     } catch (err: any) {
-      setLoading(false);
-      throw err;
+        console.error('Google login error:', err);
+        setLoading(false);
+        throw err;
     }
-  };
+};
 
   const sendPasswordReset = async (email: string) => {
     try {
