@@ -24,9 +24,9 @@ const app = initializeApp(firebaseConfig);
 // Configuração robusta de cache offline local persistente usando IndexedDB
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager()
-  })
-}, firebaseConfig.firestoreDatabaseId);
+    tabManager: persistentMultipleTabManager(),
+  }),
+});
 
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();

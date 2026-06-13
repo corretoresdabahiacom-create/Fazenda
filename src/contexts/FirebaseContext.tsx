@@ -402,6 +402,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } else {
       try {
         const credential = await signInWithEmailAndPassword(auth, email, pass);
+
+        console.log('LOGIN OK');
+        console.log('UID:', credential.user.uid);
+        console.log('EMAIL:', credential.user.email);
         const u = credential.user;
         setUser(u);
         const defaultRole = 'admin';
@@ -460,7 +464,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const loginWithGoogle = async () => {
     setLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);const result = await signInWithPopup(auth, googleProvider);
+
+      console.log('GOOGLE LOGIN OK');
+      console.log(result.user);
       const u = result.user;
       setUser(u);
       const defaultRole = 'admin';
