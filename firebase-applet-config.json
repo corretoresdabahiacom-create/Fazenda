@@ -1,9 +1,8 @@
 {
   "projectId": "fazenda-online-4a6a6",
   "appId": "1:459270761665:web:bcfe341adbc4086a4c7840",
-  "apiKey": "AIzaSyA1G7PxzrK8e_eUHSIhyKnQxzrk9DYGLZfU",
+  "apiKey": "AIzaSyA1G7Pxzk8e_eUHSIhyKnQxzrk9DYGLZfU",
   "authDomain": "fazenda-online-4a6a6.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-2b3ac47a-8172-426f-a2a5-c848844ff479",
   "storageBucket": "fazenda-online-4a6a6.firebasestorage.app",
   "messagingSenderId": "459270761665",
   "measurementId": "G-S7Q6JHRB7K"
