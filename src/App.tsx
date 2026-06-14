@@ -758,13 +758,47 @@ export default function App() {
           </div>
         </header>
 
-        {/* Permission restriction Banner */}
-        {userRole === 'user' && (
-          <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs py-2 px-4 md:px-6 flex items-center gap-2">
-            <span>⚠️</span>
-            <span><strong>Acesso Limitado:</strong> Você está conectado com um perfil de acesso limitado. Adições, edições e exclusões de registros estão desativadas.</span>
+{/* Permission Restriction Banner - Modern Card Style */}
+{userRole === 'user' && (
+  <div className="mx-4 md:mx-6 mt-3 mb-2">
+    <div className="relative overflow-hidden rounded-xl bg-white dark:bg-zinc-800/50 border border-amber-200 dark:border-amber-800/30 shadow-sm">
+      {/* Decorative bar */}
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"></div>
+      
+      <div className="pl-4 pr-4 py-3 md:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+              <svg className="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </div>
           </div>
-        )}
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-amber-700 dark:text-amber-300">Acesso Limitado</span>
+              <span className="hidden sm:inline text-gray-300 dark:text-gray-600 text-xs">•</span>
+              <span className="text-[11px] text-gray-500 dark:text-gray-400">Modo de visualização ativo</span>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed">
+              Edições, adições e exclusões de registros estão desativadas neste perfil.
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex-shrink-0">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-zinc-700/50 rounded-full">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400"></div>
+            <span className="text-[9px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              Somente Leitura
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
         {/* Dynamic Warning Alert Bar */}
         {activeAlertsCount > 0 && (
