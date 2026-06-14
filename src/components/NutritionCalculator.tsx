@@ -145,9 +145,9 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
       {/* Introduction Card */}
       <div className="bg-white dark:bg-zinc-900 border border-[#e5e0d8] dark:border-zinc-800 p-6 md:p-8 rounded-3xl shadow-xs relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-emerald-800 dark:text-[#5fa875]">
+          <div className="flex items-center gap-2 text-[#3d5a45] dark:text-[#5fa875]">
             <Leaf size={24} className="animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 rounded-full">Inteligência Nutricional</span>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-[#3d5a45]/10 dark:bg-[#5fa875]/20 px-2 py-0.5 rounded-full">Inteligência Nutricional</span>
           </div>
           <h2 className="font-serif italic text-2xl font-black text-[#3d5a45] dark:text-[#5fa875]">Calculadora de Nutrição Animal</h2>
           <p className="text-xs text-[#8d8a86] dark:text-zinc-400 max-w-xl leading-relaxed">
@@ -156,7 +156,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
         </div>
         
         <div className="bg-[#fcfaf7] dark:bg-zinc-800/80 px-4 py-3 border border-[#e5e0d8] dark:border-zinc-700 rounded-2xl flex items-center gap-3 w-full md:w-auto">
-          <Dumbbell className="text-emerald-700" size={20} />
+          <Dumbbell className="text-[#3d5a45]" size={20} />
           <div>
             <span className="text-[9px] font-black uppercase text-[#8d8a86] block">Estimativa GMD Gado</span>
             <span className="text-xs font-black text-[#2d2a26] dark:text-zinc-200">{nutritionParameters.estimatedGmdGrams}</span>
@@ -201,7 +201,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                     Lote Cadastrado nos Pastos
                   </label>
                   <select
-                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border rounded-xl font-bold text-xs"
+                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border rounded-xl font-bold text-xs focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                     value={selectedLotId}
                     onChange={(e) => setSelectedLotId(e.target.value)}
                   >
@@ -215,7 +215,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                 </div>
 
                 {activeLot && (
-                  <div className="p-4 bg-emerald-50/20 border border-emerald-100 rounded-2xl space-y-2">
+                  <div className="p-4 bg-[#3d5a45]/5 border border-[#3d5a45]/10 rounded-2xl space-y-2">
                     <span className="text-[9px] font-black uppercase text-[#3d5a45] tracking-wider block">Metadados Recuperados do Lote</span>
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>
@@ -232,7 +232,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                       </div>
                       <div>
                         <span className="text-[9px] text-zinc-400 block">Peso Médio Atual (kg):</span>
-                        <span className="font-extrabold text-emerald-800 dark:text-emerald-500">{activeLot.averageWeight} kg</span>
+                        <span className="font-extrabold text-[#3d5a45] dark:text-[#5fa875]">{activeLot.averageWeight} kg</span>
                       </div>
                     </div>
                   </div>
@@ -246,7 +246,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                     Categoria Animal
                   </label>
                   <select
-                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border rounded-xl font-bold text-xs"
+                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border rounded-xl font-bold text-xs focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                     value={manualCategory}
                     onChange={(e) => setManualCategory(e.target.value as any)}
                   >
@@ -266,7 +266,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                       <Scale className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
                       <input
                         type="number"
-                        className="w-full pl-8 pr-2 py-1.5 bg-white dark:bg-zinc-800 border rounded-xl font-bold text-xs"
+                        className="w-full pl-8 pr-2 py-1.5 bg-white dark:bg-zinc-800 border rounded-xl font-bold text-xs focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                         value={manualWeight}
                         onChange={(e) => setManualWeight(Math.max(10, parseInt(e.target.value) || 0))}
                       />
@@ -278,7 +278,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                     </label>
                     <input
                       type="number"
-                      className="w-full px-3 py-1.5 bg-white dark:bg-zinc-800 border rounded-xl font-bold text-xs"
+                      className="w-full px-3 py-1.5 bg-white dark:bg-zinc-800 border rounded-xl font-bold text-xs focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                       value={manualQuantity}
                       onChange={(e) => setManualQuantity(Math.max(1, parseInt(e.target.value) || 0))}
                     />
@@ -309,7 +309,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                   onClick={() => setSeason('rainy')}
                   className={`py-3 px-4 rounded-2xl border text-xs font-black transition-all text-center flex flex-col items-center justify-center gap-1 ${
                     season === 'rainy' 
-                      ? 'border-emerald-400 bg-emerald-50/40 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-400' 
+                      ? 'border-[#3d5a45] bg-[#3d5a45]/10 text-[#3d5a45] dark:bg-[#5fa875]/20 dark:text-[#5fa875]' 
                       : 'border-zinc-200 dark:border-zinc-800 text-zinc-500'
                   }`}
                 >
@@ -340,8 +340,8 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
               {/* Mineral result */}
-              <div className="p-5 bg-emerald-50/30 border border-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/10 rounded-2xl space-y-2 relative overflow-hidden">
-                <span className="text-[9px] font-black uppercase text-emerald-800 dark:text-[#5fa875] block">Sal / Suplemento Mineral</span>
+              <div className="p-5 bg-[#3d5a45]/5 border border-[#3d5a45]/10 dark:border-[#5fa875]/20 dark:bg-[#5fa875]/5 rounded-2xl space-y-2 relative overflow-hidden">
+                <span className="text-[9px] font-black uppercase text-[#3d5a45] dark:text-[#5fa875] block">Sal / Suplemento Mineral</span>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-3xl font-black text-[#3d5a45] dark:text-[#5fa875]">
                     {nutritionParameters.mineralPerDayHeadG}g
@@ -357,7 +357,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
               </div>
 
               {/* Protein result */}
-              <div className="p-5 bg-[#3d5a45]/5 dark:bg-[#3d5a45]/15 border border-emerald-100 dark:border-zinc-800 rounded-2xl space-y-2 relative overflow-hidden">
+              <div className="p-5 bg-[#3d5a45]/5 dark:bg-[#3d5a45]/15 border border-[#3d5a45]/10 dark:border-zinc-800 rounded-2xl space-y-2 relative overflow-hidden">
                 <span className="text-[9px] font-black uppercase text-[#3d5a45] dark:text-[#5fa875] block">Suplementação Proteica</span>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-3xl font-black text-[#3d5a45] dark:text-[#5fa875]">
@@ -375,14 +375,14 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
             </div>
 
             {/* Total Herd Demands in Kg & Sacks */}
-            <div className="border hover:border-emerald-100 p-5 rounded-2xl bg-[#fcfaf7] dark:bg-zinc-800/40 space-y-4">
+            <div className="border hover:border-[#3d5a45]/20 p-5 rounded-2xl bg-[#fcfaf7] dark:bg-zinc-800/40 space-y-4">
               <span className="text-[9px] font-black uppercase text-[#8d8a86] tracking-wider block">Consumo Agregado p/ o Lote Inteiro ({currentQuantity} cab.)</span>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <span className="text-[10px] text-zinc-400 font-bold block">Demanda Mineral Diária:</span>
                   <span className="text-base font-black text-slate-800 dark:text-zinc-100">{nutritionParameters.dailyMineralLotKg.toFixed(1)} kg/dia</span>
-                  <div className="flex items-center gap-1 bg-white/60 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border w-fit text-[9px] font-black text-rose-800">
+                  <div className="flex items-center gap-1 bg-white/60 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border w-fit text-[9px] font-black text-[#3d5a45]">
                     <ShoppingBag size={10} /> {nutritionParameters.sacksPerMonthMineral} sacas de 30kg / mês
                   </div>
                 </div>
@@ -390,7 +390,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                 <div className="space-y-1">
                   <span className="text-[10px] text-zinc-400 font-bold block">Demanda Proteica Diária:</span>
                   <span className="text-base font-black text-slate-800 dark:text-zinc-100">{nutritionParameters.dailyProteinLotKg.toFixed(1)} kg/dia</span>
-                  <div className="flex items-center gap-1 bg-white/60 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border w-fit text-[9px] font-black text-rose-800">
+                  <div className="flex items-center gap-1 bg-white/60 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border w-fit text-[9px] font-black text-[#3d5a45]">
                     <ShoppingBag size={10} /> {nutritionParameters.sacksPerMonthProtein} sacas de 30kg / mês
                   </div>
                 </div>
@@ -430,7 +430,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                     <div className="text-right">
                       {daysLeft > 0 ? (
                         <span className={`px-2 py-0.5 rounded-full font-black text-[9px] uppercase ${
-                          daysLeft < 7 ? 'bg-rose-100 text-rose-800' : 'bg-green-100 text-green-800'
+                          daysLeft < 7 ? 'bg-rose-100 text-rose-800' : 'bg-[#3d5a45]/10 text-[#3d5a45]'
                         }`}>
                           Dura {daysLeft} dias de trato
                         </span>

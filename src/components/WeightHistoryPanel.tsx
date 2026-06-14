@@ -149,8 +149,8 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
   const hasNoHistory = !animal.weightHistory || animal.weightHistory.length === 0;
 
   return (
-    <div className="mt-4 p-4 border border-emerald-100 bg-[#f9faf8] dark:bg-zinc-900/60 dark:border-zinc-800 rounded-2xl animate-fade-in space-y-4">
-      <div className="flex justify-between items-center pb-2 border-b border-emerald-100/40 dark:border-zinc-800">
+    <div className="mt-4 p-4 border border-[#3d5a45]/20 bg-[#f9faf8] dark:bg-zinc-900/60 dark:border-zinc-800 rounded-2xl animate-fade-in space-y-4">
+      <div className="flex justify-between items-center pb-2 border-b border-[#3d5a45]/10 dark:border-zinc-800">
         <h4 className="text-xs font-black uppercase text-[#3d5a45] dark:text-[#5fa875] tracking-wider flex items-center gap-1.5">
           <TrendingUp size={15} /> Evolução Histórica de Peso
         </h4>
@@ -158,7 +158,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
           <button
             onClick={handleSeedMockHistory}
             disabled={isSeeding}
-            className="text-[9px] px-2 py-0.5 bg-[#3d5a45]/10 text-[#3d5a45] dark:bg-[#5fa875]/20 dark:text-[#5fa875] rounded hover:bg-[#3d5a45]/20 transition-all font-black select-none pointer-events-auto"
+            className="btn-outline text-[9px] px-2 py-0.5 disabled:opacity-50"
           >
             {isSeeding ? 'Confirmando...' : 'Gerar Histórico Realista'}
           </button>
@@ -181,7 +181,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
             <Tooltip 
               contentStyle={{ 
                 backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                borderColor: '#10b981', 
+                borderColor: '#3d5a45', 
                 borderRadius: '8px',
                 fontSize: '11px',
                 fontWeight: 'bold',
@@ -193,17 +193,17 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
             <Line 
               type="monotone" 
               dataKey="peso" 
-              stroke="#10b981" 
+              stroke="#3d5a45" 
               strokeWidth={3} 
               activeDot={{ r: 6 }} 
-              dot={{ r: 3, stroke: '#10b981', strokeWidth: 1, fill: '#fff' }}
+              dot={{ r: 3, stroke: '#3d5a45', strokeWidth: 1, fill: '#fff' }}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       {userRole !== 'user' && (
-        <form onSubmit={handleAddWeighing} className="pt-2 border-t border-emerald-100/40 dark:border-zinc-805 space-y-2">
+        <form onSubmit={handleAddWeighing} className="pt-2 border-t border-[#3d5a45]/10 dark:border-zinc-800 space-y-2">
           <span className="text-[9px] font-black uppercase text-[#8d8a86] tracking-wider block">Registrar Nova Pesagem (Nivelamento Balança)</span>
           <div className="flex gap-2 flex-wrap sm:flex-nowrap">
             <div className="flex-1 min-w-[120px] relative">
@@ -233,7 +233,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
             <button 
               type="submit"
               disabled={isSeeding}
-              className="px-4 py-1.5 bg-[#3d5a45] hover:bg-[#2e4535] dark:bg-[#10b981] dark:hover:bg-[#059669] text-white rounded-xl text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1 cursor-pointer pointer-events-auto"
+              className="btn-primary px-4 py-1.5 text-xs flex items-center justify-center gap-1 disabled:opacity-50"
             >
               <Plus size={14} /> Lançar
             </button>

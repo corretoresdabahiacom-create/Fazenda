@@ -191,7 +191,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
       {settings.farmName && (
         <div className="bg-white p-4 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-wrap items-center gap-6">
           <div className="flex items-center gap-3 pr-6 border-r border-[#e5e0d8]">
-            <div className="bg-green-50 p-2 rounded-xl">
+            <div className="bg-[#3d5a45]/10 p-2 rounded-xl">
               <MapIcon className="text-[#3d5a45]" size={20} />
             </div>
             <div>
@@ -224,7 +224,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
             </button>
             <button 
               onClick={() => setSeason('seca')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${season === 'seca' ? 'bg-orange-600 text-white shadow-sm' : ''}`}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${season === 'seca' ? 'btn-primary' : ''}`}
             >
               <ThermometerSun size={14} /> Seca
             </button>
@@ -248,7 +248,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           <button 
             type="button"
             onClick={() => setIsAIScanning(true)}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#fcfaf7] text-[#3d5a45] border border-[#3d5a45] px-6 py-2.5 rounded-xl font-bold hover:bg-[#3d5a45] hover:text-white transition-all shadow-sm text-sm"
+            className="btn-outline flex-1 md:flex-none flex items-center justify-center gap-2 text-sm"
           >
             <Camera size={18} />
             Escanear Pasto
@@ -259,7 +259,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
               setFormData({ number: '', name: '', grassTypes: [], capacityAguas: 0, capacitySeca: 0, size: 0 });
               setIsFormOpen(true);
             }}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#3d5a45] text-white px-6 py-2.5 rounded-xl font-bold hover:bg-[#2d4233] transition-colors shadow-sm text-sm"
+            className="btn-primary flex-1 md:flex-none flex items-center justify-center gap-2 text-sm"
           >
             <Plus size={18} />
             Cadastrar Pasto
@@ -315,13 +315,13 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 {/* Grass types bullets */}
                 <div className="flex flex-wrap gap-1">
                   {pasture.grassTypes.map(t => (
-                    <span key={t} className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-green-50 text-green-800 border border-green-200">
+                    <span key={t} className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-[#3d5a45]/10 text-[#3d5a45] border border-[#3d5a45]/20">
                       🌿 {t}
                     </span>
                   ))}
                   {pasture.purpose && (
                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${
-                      pasture.purpose === 'engorda' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+                      pasture.purpose === 'engorda' ? 'bg-[#3d5a45]/10 text-[#3d5a45] border-[#3d5a45]/20' :
                       pasture.purpose === 'manutenção' ? 'bg-blue-50 text-blue-800 border-blue-200' :
                       'bg-purple-50 text-purple-800 border-purple-200'
                     }`}>
@@ -475,7 +475,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1.5 block">Gramíneas (Marque)</label>
                 <div className="grid grid-cols-3 gap-2">
                   {PASTURE_TYPES.map(type => (
-                    <label key={type} className={`flex items-center gap-2 p-2 rounded-xl border border-[#e5e0d8] hover:bg-[#fcfaf7] cursor-pointer transition-colors ${formData.grassTypes?.includes(type) ? 'bg-green-50/50 border-green-200' : ''}`}>
+                    <label key={type} className={`flex items-center gap-2 p-2 rounded-xl border border-[#e5e0d8] hover:bg-[#fcfaf7] cursor-pointer transition-colors ${formData.grassTypes?.includes(type) ? 'bg-[#3d5a45]/10 border-[#3d5a45]/30' : ''}`}>
                       <input 
                         type="checkbox"
                         className="rounded text-[#3d5a45] focus:ring-[#3d5a45]"
@@ -508,7 +508,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div>
                     <label className="text-[9px] font-bold uppercase text-[#8d8a86] mb-1 block">Loteamento Previsto</label>
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-bold text-slate-800"
+                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-bold text-slate-800 focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                       value={estimatorParams.animalCategory}
                       onChange={(e) => setEstimatorParams({...estimatorParams, animalCategory: e.target.value})}
                     >
@@ -522,7 +522,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div>
                     <label className="text-[9px] font-bold uppercase text-[#8d8a86] mb-1 block">Objetivo Produtivo</label>
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-bold text-slate-800"
+                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-bold text-slate-800 focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                       value={estimatorParams.objective}
                       onChange={(e) => setEstimatorParams({...estimatorParams, objective: e.target.value})}
                     >
@@ -539,14 +539,14 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     type="button" 
                     disabled={isEstimatingCapacity}
                     onClick={handleEstimatePastureCapacity}
-                    className="flex items-center gap-1.5 bg-[#3d5a45] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#2c4031] disabled:opacity-50 transition-all active:scale-95 shadow-sm"
+                    className="btn-primary flex items-center gap-1.5 px-4 py-2 text-xs disabled:opacity-50"
                   >
                     <Activity size={12} /> {isEstimatingCapacity ? 'Analisando Embrapa...' : 'Simular Capacidades com IA'}
                   </button>
                 </div>
 
                 {capacityJustification && (
-                  <div className="p-3 bg-white border border-[#e5e0d8] rounded-xl text-[10px] text-emerald-950 font-medium leading-tight select-none">
+                  <div className="p-3 bg-white border border-[#e5e0d8] rounded-xl text-[10px] text-[#3d5a45] font-medium leading-tight select-none">
                     <p className="flex items-start gap-1"><AlertCircle size={12} className="text-[#3d5a45] shrink-0 mt-0.5" /> {capacityJustification}</p>
                   </div>
                 )}
@@ -565,11 +565,11 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block font-bold text-orange-600">Capacidade Máxima Seca</label>
+                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block font-bold text-[#3d5a45]">Capacidade Máxima Seca</label>
                   <input 
                     required
                     type="number" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-black text-sm text-orange-600"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-black text-sm text-[#3d5a45]"
                     value={formData.capacitySeca || ''}
                     onChange={(e) => setFormData({...formData, capacitySeca: Number(e.target.value)})}
                   />
@@ -580,13 +580,13 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 <button 
                   type="button" 
                   onClick={() => setIsFormOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
+                  className="btn-outline flex-1"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-[#3d5a45] font-bold text-white hover:bg-[#2d4233] transition-colors shadow-md"
+                  className="btn-primary flex-1"
                 >
                   Salvar Pasto
                 </button>

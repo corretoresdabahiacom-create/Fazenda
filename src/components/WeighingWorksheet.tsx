@@ -467,7 +467,7 @@ export default function WeighingWorksheet() {
                     />
                     <button 
                       onClick={() => setIsEditingName(false)}
-                      className="p-1 px-2.5 bg-[#3d5a45] text-white text-xs font-black rounded-lg hover:bg-opacity-90 flex items-center gap-1"
+                      className="btn-primary p-1 px-2.5 text-xs"
                     >
                       <Check size={14} /> OK
                     </button>
@@ -527,8 +527,7 @@ export default function WeighingWorksheet() {
 
               <button 
                 onClick={handleExportCSV}
-                className="bg-[#f5f2ed] text-[#8d8a86] hover:text-[#3d5a45] border border-[#e5e0d8] hover:border-[#3d5a45]/30 px-3 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition-all"
-                title="Exportar planilha"
+                className="btn-outline px-3 py-2.5 text-xs"
               >
                 <FileDown size={14} /> Exportar
               </button>
@@ -536,7 +535,7 @@ export default function WeighingWorksheet() {
               <button 
                 onClick={handleSaveSheet}
                 disabled={saveStatus === 'saving'}
-                className="bg-[#3d5a45] text-white hover:bg-[#2d4333] px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition-all shadow-sm"
+                className="btn-primary px-4 py-2.5 text-xs disabled:opacity-50"
               >
                 <Save size={14} />
                 {saveStatus === 'saving' ? 'Salvando...' : saveStatus === 'saved' ? 'Salvo!' : 'Salvar no Servidor'}
@@ -573,7 +572,7 @@ export default function WeighingWorksheet() {
                     <th style={colStyles[6]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Valor parcial/ animal</th>
                     <th style={colStyles[7]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Total Geral</th>
                     <th style={colStyles[8]} className="p-4"></th>
-                  </tr>
+                  </table>
                 </thead>
                 <tbody>
                   <AnimatePresence initial={false}>
@@ -602,7 +601,7 @@ export default function WeighingWorksheet() {
                                />
                                <span className="text-[10px] uppercase font-black text-[#8d8a86]">cab.</span>
                              </div>
-                           </td>
+                            </td>
 
                            {/* Peso kg */}
                            <td style={colStyles[1]} className="p-3 text-center align-middle">
@@ -618,22 +617,22 @@ export default function WeighingWorksheet() {
                                />
                                <span className="text-[10px] uppercase font-black text-[#8d8a86]">kg</span>
                              </div>
-                           </td>
+                            </td>
 
                            {/* Peso (kg)/ Animal */}
                            <td style={colStyles[2]} className="p-3 text-center font-mono text-sm text-[#3d5a45] font-semibold whitespace-nowrap align-middle">
                              {averageWeight.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 5 })} kg
-                           </td>
+                            </td>
 
                            {/* Divisão por 15 (Calculado gado @ - NÃO EDITÁVEL AS REQUESTED!) */}
                            <td style={colStyles[3]} className="p-3 text-center font-mono text-sm text-[#3d5a45] font-semibold whitespace-nowrap align-middle">
                              {divisionBy15.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 5 })} @
-                           </td>
+                            </td>
 
                            {/* Parcial de Arroba por Animal */}
                            <td style={colStyles[4]} className="p-3 text-center font-mono text-sm text-[#3d5a45] font-semibold whitespace-nowrap align-middle">
                              {parcialArrobaAnimal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 5 })} @
-                           </td>
+                            </td>
 
                            {/* Valor Arroba R$ */}
                            <td style={colStyles[5]} className="p-3 text-center align-middle">
@@ -649,17 +648,17 @@ export default function WeighingWorksheet() {
                                  onKeyDown={handleInputKeyDown}
                                />
                              </div>
-                           </td>
+                            </td>
 
                            {/* Valor parcial/ animal - CENTER ALIGNED! */}
                            <td style={colStyles[6]} className="p-3 text-center font-mono text-sm text-[#3d5a45] font-bold whitespace-nowrap align-middle">
                              {valorParcialAnimal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
-                           </td>
+                            </td>
 
                            {/* Parcial Total - CENTER ALIGNED! */}
                            <td style={colStyles[7]} className="p-3 text-center font-mono text-sm text-[#2d2a26] font-black whitespace-nowrap align-middle">
                              {parcialTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
-                           </td>
+                            </td>
 
                            {/* Excluir linha */}
                            <td style={colStyles[8]} className="p-3 text-center align-middle">
@@ -670,7 +669,7 @@ export default function WeighingWorksheet() {
                              >
                                <Trash2 size={14} />
                              </button>
-                           </td>
+                            </td>
                          </motion.tr>
                        );
                      })}
@@ -768,7 +767,7 @@ export default function WeighingWorksheet() {
             <div className="p-5 bg-[#fcfaf7] border-t border-[#e5e0d8] flex items-center justify-between">
               <button 
                 onClick={handleAddRow}
-                className="bg-white hover:bg-[#3d5a45]/5 text-[#3d5a45] border border-[#3d5a45]/20 hover:border-[#3d5a45] px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 hover:shadow-xs active:scale-95 transition-all"
+                className="btn-outline px-4 py-2.5 text-xs"
               >
                 <Plus size={14} /> Adicionar Nova Linha
               </button>
@@ -807,7 +806,7 @@ export default function WeighingWorksheet() {
           <div className="flex items-center justify-between bg-white border border-[#e5e0d8] rounded-3xl p-4 px-6 shadow-xs">
             <button 
               onClick={() => setActiveTab('sheets')}
-              className="text-[#6d6a66] hover:text-[#3d5a45] hover:bg-[#f5f2ed] border border-[#e5e0d8] rounded-xl px-4 py-2 font-black text-xs active:scale-95 transition-all"
+              className="btn-outline px-4 py-2 text-xs"
             >
               ← Voltar para Minhas Planilhas
             </button>
@@ -815,7 +814,7 @@ export default function WeighingWorksheet() {
             {activeSheetId && activeSheetId !== 'temp' && (
               <button 
                 onClick={() => handleDeleteSheet(activeSheetId)}
-                className="text-red-500 hover:bg-red-50 hover:text-red-650 border border-red-200 hover:border-red-300 rounded-xl px-4 py-2 font-black text-xs active:scale-95 transition-all flex items-center gap-1.5"
+                className="btn-outline text-red-500 hover:bg-red-50 hover:text-red-600 border-red-200 text-xs flex items-center gap-1.5"
               >
                 <Trash2 size={14} /> Excluir Planilha
               </button>
@@ -854,14 +853,14 @@ export default function WeighingWorksheet() {
                 <button
                   type="button"
                   onClick={() => setDeletingSheetId(null)}
-                  className="px-4 py-2 text-xs font-black text-[#6d6a66] hover:bg-[#f5f2ed] border border-[#e5e0d8] rounded-xl active:scale-95 transition-all"
+                  className="btn-outline px-4 py-2 text-xs"
                 >
                   Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmDeleteSheet}
-                  className="px-4 py-2 text-xs font-black text-white bg-red-500 hover:bg-red-600 rounded-xl shadow-sm active:scale-95 transition-all"
+                  className="btn-primary px-4 py-2 text-xs bg-red-500 hover:bg-red-600"
                 >
                   Excluir Planilha
                 </button>

@@ -105,13 +105,13 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
             {/* Content List */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {/* FCM / Web Push Notification Manager Card */}
-              <div className="p-4 bg-emerald-50/20 border border-emerald-100 rounded-2xl space-y-3">
+              <div className="p-4 bg-[#3d5a45]/5 border border-[#3d5a45]/10 rounded-2xl space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-emerald-800 dark:text-[#5fa875] font-extrabold text-[10px] uppercase">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="flex items-center gap-1.5 text-[#3d5a45] dark:text-[#5fa875] font-extrabold text-[10px] uppercase">
+                    <span className="w-2 h-2 rounded-full bg-[#3d5a45] animate-pulse" />
                     Alertas Push (FCM / Browser)
                   </div>
-                  <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-100/50 dark:bg-emerald-900/50 px-1.5 py-0.5 rounded">
+                  <span className="text-[9px] font-mono font-bold text-[#3d5a45] bg-[#3d5a45]/10 dark:bg-[#5fa875]/20 px-1.5 py-0.5 rounded">
                     {notificationState.permission === 'granted' ? 'ATIVADO' : 'PENDENTE'}
                   </span>
                 </div>
@@ -124,7 +124,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
                   {notificationState.permission !== 'granted' ? (
                     <button
                       onClick={handleSubscribeNotifications}
-                      className="text-xs font-black uppercase text-center bg-emerald-700 hover:bg-emerald-800 text-white py-2 rounded-xl shadow-sm transition-all cursor-pointer"
+                      className="btn-primary text-xs uppercase text-center py-2"
                     >
                       🔓 Permitir Notificações FCM
                     </button>
@@ -132,7 +132,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
                     <div className="flex flex-col gap-1.5">
                       <button
                         onClick={handleTestNotification}
-                        className="text-xs font-black uppercase text-center border border-emerald-600 text-emerald-800 dark:text-emerald-400 hover:bg-emerald-50/50 py-1.5 rounded-xl transition-all cursor-pointer"
+                        className="btn-outline text-xs uppercase text-center py-1.5"
                       >
                         🔔 Enviar Notificação de Teste
                       </button>
@@ -148,8 +148,8 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
 
               {alerts.length === 0 ? (
                 <div className="text-center py-12 px-4">
-                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle size={32} className="text-green-600" />
+                  <div className="w-16 h-16 bg-[#3d5a45]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle size={32} className="text-[#3d5a45]" />
                   </div>
                   <h4 className="font-bold text-[#2d2a26] text-sm">Nenhuma obrigação próxima!</h4>
                   <p className="text-xs text-[#8d8a86] mt-1 max-w-[240px] mx-auto leading-relaxed">
@@ -167,7 +167,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
                   </p>
                   <button 
                     onClick={() => setSoftDismissedIds([])}
-                    className="mt-4 text-xs font-bold text-[#3d5a45] hover:underline"
+                    className="btn-ghost mt-4 text-xs"
                     id="reset-hidden-alerts-btn"
                   >
                     Mostrar todos ({alerts.length})
@@ -196,8 +196,8 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
                     badgeClasses = 'bg-amber-100 text-amber-800 border border-amber-200';
                     badgeText = 'VENCE HOJE!';
                   } else {
-                    cardClasses = 'border-l-4 border-l-emerald-600 border border-[#e5e0d8] bg-white hover:border-[#3d5a45]/30 transition-all shadow-sm';
-                    badgeClasses = 'bg-emerald-50 text-emerald-800 border border-emerald-100';
+                    cardClasses = 'border-l-4 border-l-[#3d5a45] border border-[#e5e0d8] bg-white hover:border-[#3d5a45]/30 transition-all shadow-sm';
+                    badgeClasses = 'bg-[#3d5a45]/10 text-[#3d5a45] border border-[#3d5a45]/20';
                     badgeText = `Vence em ${alert.daysRemaining} ${alert.daysRemaining === 1 ? 'dia' : 'dias'}`;
                   }
 
@@ -244,7 +244,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
                             {alert.description}
                           </p>
                           {alert.value !== undefined && (
-                            <p className="text-sm font-black text-red-650 mt-1">
+                            <p className="text-sm font-black text-[#3d5a45] mt-1">
                               R$ {alert.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                             </p>
                           )}
@@ -258,7 +258,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
                       <div className="flex items-center justify-end gap-2 mt-2 pt-3 border-t border-dashed border-[#e5e0d8]">
                         <button
                           onClick={() => handleSoftDismiss(alert.id)}
-                          className="text-xs px-3 py-1.5 border border-[#e5e0d8] hover:bg-[#f5f2ed] rounded-lg font-bold text-[#6d6a66] transition-colors"
+                          className="btn-outline text-xs px-3 py-1.5"
                           id={`soft-close-btn-${alert.id}`}
                         >
                           Fechar
@@ -266,7 +266,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
                         <button
                           onClick={() => handleConclude(alert)}
                           disabled={isProcessing === alert.id}
-                          className="flex items-center gap-1.5 text-xs px-4 py-1.5 bg-[#3d5a45] text-white hover:bg-[#2d4334] rounded-lg font-bold shadow-md transition-all active:scale-95 disabled:opacity-50"
+                          className="btn-primary flex items-center gap-1.5 text-xs px-4 py-1.5 disabled:opacity-50"
                           id={`conclude-btn-${alert.id}`}
                         >
                           {isProcessing === alert.id ? (

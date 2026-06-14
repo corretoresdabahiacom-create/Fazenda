@@ -201,8 +201,8 @@ export default function App() {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-zinc-900">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-600/20 border-t-emerald-600 rounded-full animate-spin" />
-          <p className="text-emerald-700 dark:text-emerald-400 font-bold">Carregando Fazenda...</p>
+          <div className="w-12 h-12 border-4 border-[#3d5a45]/20 border-t-[#3d5a45] rounded-full animate-spin" />
+          <p className="text-[#3d5a45] font-bold">Carregando Fazenda...</p>
         </div>
       </div>
     );
@@ -237,10 +237,10 @@ export default function App() {
         >
           {/* Login form content - same as before */}
           <div className="w-20 h-20 bg-gray-100 dark:bg-zinc-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Beef size={40} className="text-emerald-600 dark:text-emerald-500" />
+            <Beef size={40} className="text-[#3d5a45]" />
           </div>
           
-          <h1 className="font-serif italic font-bold text-3xl text-emerald-700 dark:text-emerald-500 mb-2 text-balance text-center leading-tight">
+          <h1 className="font-serif italic font-bold text-3xl text-[#3d5a45] mb-2 text-balance text-center leading-tight">
             {isRegistering ? 'Criar Nova Conta' : 'Fazenda Online'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm text-center leading-relaxed">
@@ -292,7 +292,7 @@ export default function App() {
                 placeholder="seu-email@fazenda.com.br"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45] focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-sm"
               />
             </div>
             <div>
@@ -307,7 +307,7 @@ export default function App() {
                       setForgotEmail(email);
                       setIsForgotPasswordOpen(true);
                     }}
-                    className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-bold"
+                    className="text-xs text-[#3d5a45] hover:underline font-bold"
                   >
                     Esqueceu a senha?
                   </button>
@@ -320,12 +320,12 @@ export default function App() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-sm pr-16"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45] focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-sm pr-16"
                 />
                 <button
                   type="button"
                   onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#3d5a45] hover:text-[#2d4233]"
                 >
                   {isPasswordVisible ? "Ocultar" : "Mostrar"}
                 </button>
@@ -338,14 +338,14 @@ export default function App() {
                 type="checkbox"
                 checked={acceptedTerms}
                 onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 dark:border-zinc-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                className="mt-1 h-4 w-4 rounded border-gray-300 dark:border-zinc-700 text-[#3d5a45] focus:ring-[#3d5a45] cursor-pointer"
               />
               <label htmlFor="terms-checkbox" className="text-xs text-gray-600 dark:text-gray-400 leading-tight cursor-pointer select-none">
                 Li e aceito expressamente os{' '}
                 <button
                   type="button"
                   onClick={() => setIsTermsOpen(true)}
-                  className="text-emerald-600 dark:text-emerald-400 hover:underline font-bold"
+                  className="text-[#3d5a45] hover:underline font-bold"
                 >
                   Termos e Condições de Uso
                 </button>
@@ -357,8 +357,8 @@ export default function App() {
                disabled={isLoggingIn}
                className={`w-full flex items-center justify-center gap-3 text-white py-3.5 px-6 mt-4 rounded-xl font-bold transition-all shadow-md active:scale-95 ${
                  isLoggingIn 
-                   ? 'bg-emerald-600/60 cursor-not-allowed' 
-                   : 'bg-emerald-600 hover:bg-emerald-700'
+                   ? 'bg-[#3d5a45]/60 cursor-not-allowed' 
+                   : 'bg-[#3d5a45] hover:bg-[#2d4233]'
                }`}
             >
               {isLoggingIn ? (
@@ -387,7 +387,7 @@ export default function App() {
                 setIsRegistering(!isRegistering);
                 setLoginError(null);
               }}
-              className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-bold"
+              className="text-xs text-[#3d5a45] hover:underline font-bold"
             >
               {isRegistering 
                 ? 'Já possui uma conta? Toque para Entrar' 
@@ -438,7 +438,7 @@ export default function App() {
                 }
                 loginAsGuest();
               }}
-              className="w-full flex items-center justify-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 border border-dashed border-emerald-300 dark:border-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-xs cursor-pointer"
+              className="w-full flex items-center justify-center gap-3 bg-[#3d5a45]/10 dark:bg-[#3d5a45]/20 border border-dashed border-[#3d5a45]/50 hover:bg-[#3d5a45]/20 text-[#3d5a45] dark:text-[#5c8a67] py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-xs cursor-pointer"
             >
               Entrar no Modo Convidado (Offline / Teste)
             </button>
@@ -454,7 +454,7 @@ export default function App() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="bg-white dark:bg-zinc-950 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-2xl p-6 max-w-lg w-full max-h-[80vh] flex flex-col text-left"
                 >
-                  <h2 className="font-serif italic font-bold text-2xl text-emerald-700 dark:text-emerald-500 mb-4">Termos e Condições de Uso</h2>
+                  <h2 className="font-serif italic font-bold text-2xl text-[#3d5a45] mb-4">Termos e Condições de Uso</h2>
                   <div className="overflow-y-auto pr-2 space-y-4 text-xs text-gray-600 dark:text-gray-400 leading-relaxed flex-1">
                     <p className="font-bold text-sm text-gray-900 dark:text-gray-100">CONTRATO DE ISENÇÃO DE RESPONSABILIDADE - FAZENDA ONLINE</p>
                     <p><strong>1. Isenção Geral de Responsabilidade:</strong> O Fazenda Online é oferecido aos usuários "como está" e "conforme disponível"...</p>
@@ -463,7 +463,7 @@ export default function App() {
                     <p><strong>4. Aceitação Vinculativa:</strong> Ao concordar eletronicamente com estes termos, você dá plena e irrevogável quitação...</p>
                   </div>
                   <div className="mt-6 flex gap-3 pt-3 border-t border-gray-200 dark:border-zinc-800">
-                    <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs">Aceitar Termos</button>
+                    <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 bg-[#3d5a45] hover:bg-[#2d4233] text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs">Aceitar Termos</button>
                     <button onClick={() => setIsTermsOpen(false)} className="flex-1 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-xl font-semibold transition-all text-xs">Fechar</button>
                   </div>
                 </motion.div>
@@ -481,7 +481,7 @@ export default function App() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="bg-white dark:bg-zinc-950 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-2xl p-6 max-w-sm w-full text-left"
                 >
-                  <h2 className="font-serif italic font-bold text-xl text-emerald-700 dark:text-emerald-500 mb-2">Recuperar Senha</h2>
+                  <h2 className="font-serif italic font-bold text-xl text-[#3d5a45] mb-2">Recuperar Senha</h2>
                   <p className="text-gray-600 dark:text-gray-400 text-xs mb-4 leading-relaxed">Escreva o seu endereço de e-mail cadastrado. Enviaremos as instruções de redefinição de senha para você.</p>
                   {forgotError && <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 text-xs rounded-xl">{forgotError}</div>}
                   {forgotSuccess && <div className="mb-4 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 text-xs rounded-xl font-medium">{forgotSuccess}</div>}
@@ -502,10 +502,10 @@ export default function App() {
                   }} className="space-y-4">
                     <div>
                       <label className="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wider">E-mail Cadastrado</label>
-                      <input type="email" required placeholder="seu-email@fazenda.com.br" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-xs" />
+                      <input type="email" required placeholder="seu-email@fazenda.com.br" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45] focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-xs" />
                     </div>
                     <div className="flex gap-2 pt-2">
-                      <button type="submit" disabled={isSendingReset} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-xl font-bold transition-all text-xs disabled:opacity-50">{isSendingReset ? 'Enviando...' : 'Enviar Link'}</button>
+                      <button type="submit" disabled={isSendingReset} className="flex-1 bg-[#3d5a45] hover:bg-[#2d4233] text-white py-2 px-4 rounded-xl font-bold transition-all text-xs disabled:opacity-50">{isSendingReset ? 'Enviando...' : 'Enviar Link'}</button>
                       <button type="button" onClick={() => { setIsForgotPasswordOpen(false); setForgotSuccess(null); setForgotError(null); }} className="flex-1 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-xl font-semibold transition-all text-xs">Cancelar</button>
                     </div>
                   </form>
@@ -632,7 +632,7 @@ export default function App() {
             <motion.h1 
               initial={false}
               animate={{ opacity: isSidebarOpen ? 1 : 0 }}
-              className="font-serif italic font-bold text-xl text-emerald-700 dark:text-emerald-500 whitespace-nowrap"
+              className="font-serif italic font-bold text-xl text-[#3d5a45] whitespace-nowrap"
             >
               Fazenda Online
             </motion.h1>
@@ -662,7 +662,7 @@ export default function App() {
               onClick={() => handleViewChange(item.id as View)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
                 activeView === item.id 
-                  ? 'bg-emerald-600 dark:bg-emerald-700 text-white shadow-md' 
+                  ? 'bg-[#3d5a45] text-white shadow-md' 
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800'
               }`}
             >
@@ -703,7 +703,7 @@ export default function App() {
               {activeView !== 'dashboard' && (
                 <button 
                   onClick={() => setActiveView('dashboard')}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all group"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#3d5a45]/10 text-[#3d5a45] rounded-full hover:bg-[#3d5a45]/20 transition-all group"
                 >
                   <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
                   <span className="text-xs font-bold">Voltar</span>
@@ -749,7 +749,7 @@ export default function App() {
               {/* Settings Button */}
               <button 
                 onClick={() => setActiveView('settings')}
-                className={`p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 ${activeView === 'settings' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}`}
+                className={`p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 ${activeView === 'settings' ? 'bg-[#3d5a45]/10 text-[#3d5a45]' : 'text-gray-600 dark:text-gray-400'}`}
                 title="Configurações"
               >
                 <Settings size={20} />
@@ -758,47 +758,47 @@ export default function App() {
           </div>
         </header>
 
-{/* Permission Restriction Banner - Modern Card Style */}
-{userRole === 'user' && (
-  <div className="mx-4 md:mx-6 mt-3 mb-2">
-    <div className="relative overflow-hidden rounded-xl bg-white dark:bg-zinc-800/50 border border-amber-200 dark:border-amber-800/30 shadow-sm">
-      {/* Decorative bar */}
-      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"></div>
-      
-      <div className="pl-4 pr-4 py-3 md:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
-              <svg className="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
+        {/* Permission Restriction Banner - Modern Card Style */}
+        {userRole === 'user' && (
+          <div className="mx-4 md:mx-6 mt-3 mb-2">
+            <div className="relative overflow-hidden rounded-xl bg-white dark:bg-zinc-800/50 border border-amber-200 dark:border-amber-800/30 shadow-sm">
+              {/* Decorative bar */}
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"></div>
+              
+              <div className="pl-4 pr-4 py-3 md:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-bold text-amber-700 dark:text-amber-300">Acesso Limitado</span>
+                      <span className="hidden sm:inline text-gray-300 dark:text-gray-600 text-xs">•</span>
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400">Modo de visualização ativo</span>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed">
+                      Edições, adições e exclusões de registros estão desativadas neste perfil.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex-shrink-0">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-zinc-700/50 rounded-full">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#3d5a45]"></div>
+                    <span className="text-[9px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                      Somente Leitura
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-bold text-amber-700 dark:text-amber-300">Acesso Limitado</span>
-              <span className="hidden sm:inline text-gray-300 dark:text-gray-600 text-xs">•</span>
-              <span className="text-[11px] text-gray-500 dark:text-gray-400">Modo de visualização ativo</span>
-            </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed">
-              Edições, adições e exclusões de registros estão desativadas neste perfil.
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex-shrink-0">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-zinc-700/50 rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400"></div>
-            <span className="text-[9px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-              Somente Leitura
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+        )}
 
         {/* Dynamic Warning Alert Bar */}
         {activeAlertsCount > 0 && (

@@ -379,7 +379,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
     doc.setTextColor(120, 120, 120);
     doc.text(`${animals.filter(a => !a.isSold).length} Lotes nos Pastos`, 20, y + 19);
     doc.text(`${tradingAnalysis.soldHeadCounts} Cab. Comercializadas`, 80, y + 19);
-    doc.text(`Lucro Líquido Realizadoizado`, 140, y + 19);
+    doc.text(`Lucro Líquido Realizado`, 140, y + 19);
 
     y += 32;
 
@@ -586,7 +586,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <button 
               onClick={() => setActiveTab('financial')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
-                activeTab === 'financial' ? 'bg-[#3d5a45] text-white shadow-sm' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === 'financial' ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
               }`}
             >
               <Coins size={15} /> 1. Fluxo Financeiro (Geral)
@@ -595,7 +595,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <button 
               onClick={() => setActiveTab('employees')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
-                activeTab === 'employees' ? 'bg-[#3d5a45] text-white shadow-sm' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === 'employees' ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
               }`}
             >
               <Users size={15} /> 2. Despesas de Funcionários
@@ -604,7 +604,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <button 
               onClick={() => setActiveTab('livestock')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
-                activeTab === 'livestock' ? 'bg-[#3d5a45] text-white shadow-sm' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === 'livestock' ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
               }`}
             >
               <Beef size={15} /> 3. Estatísticas de Animais
@@ -613,7 +613,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <button 
               onClick={() => setActiveTab('commercial')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
-                activeTab === 'commercial' ? 'bg-[#3d5a45] text-white shadow-sm' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === 'commercial' ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
               }`}
             >
               <Warehouse size={15} /> 4. Comercialização & Estoque
@@ -623,7 +623,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
         
         <button
           onClick={handleExportPDF}
-          className="px-5 py-3 bg-rose-600 dark:bg-rose-700 hover:bg-rose-700 dark:hover:bg-rose-800 text-white rounded-2xl text-xs font-black uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md select-none w-full lg:w-auto"
+          className="btn-primary px-5 py-3 rounded-2xl flex items-center justify-center gap-2 w-full lg:w-auto"
         >
           <Printer size={15} /> Exportar Relatório PDF
         </button>
@@ -635,19 +635,19 @@ export default function Reports({ payments, expenses, animals, transactions, pas
           <div className="flex items-center gap-2 bg-[#fcfaf7] p-0.5 rounded-xl border">
             <button
               onClick={() => setReportType('monthly')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'monthly' ? 'bg-[#3d5a45] text-white' : 'text-[#8d8a86]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'monthly' ? 'btn-primary' : 'text-[#8d8a86]'}`}
             >
               Mês Completo
             </button>
             <button
               onClick={() => setReportType('daily')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'daily' ? 'bg-[#3d5a45] text-white' : 'text-[#8d8a86]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'daily' ? 'btn-primary' : 'text-[#8d8a86]'}`}
             >
               Resumo Diário
             </button>
             <button
               onClick={() => setReportType('custom')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'custom' ? 'bg-[#3d5a45] text-white' : 'text-[#8d8a86]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'custom' ? 'btn-primary' : 'text-[#8d8a86]'}`}
             >
               Personalizado
             </button>
@@ -657,7 +657,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             {reportType === 'monthly' && (
               <input 
                 type="month" 
-                className="px-4 py-2 bg-[#fcfaf7] border border-[#e5e0d8] rounded-xl font-bold text-xs text-[#3d5a45] focus:outline-none"
+                className="px-4 py-2 bg-[#fcfaf7] border border-[#e5e0d8] rounded-xl font-bold text-xs text-[#3d5a45] focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
               />
@@ -665,7 +665,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             {reportType === 'daily' && (
               <input 
                 type="date" 
-                className="px-4 py-2 bg-[#fcfaf7] border border-[#e5e0d8] rounded-xl font-bold text-xs text-[#3d5a45] focus:outline-none"
+                className="px-4 py-2 bg-[#fcfaf7] border border-[#e5e0d8] rounded-xl font-bold text-xs text-[#3d5a45] focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
               />
@@ -674,14 +674,14 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               <div className="flex items-center gap-2 text-xs">
                 <input 
                   type="date" 
-                  className="px-3 py-1.5 bg-[#fcfaf7] border rounded-xl font-bold"
+                  className="px-3 py-1.5 bg-[#fcfaf7] border rounded-xl font-bold focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
                 <span className="font-bold text-[#8d8a86]">até</span>
                 <input 
                   type="date" 
-                  className="px-3 py-1.5 bg-[#fcfaf7] border rounded-xl font-bold"
+                  className="px-3 py-1.5 bg-[#fcfaf7] border rounded-xl font-bold focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
@@ -719,12 +719,12 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                     <span className="text-2xl font-black text-red-650">R$ {reportData.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     <span className="text-[10px] text-red-850 font-semibold block mt-1">{reportData.countExp + reportData.countPay} notas lançadas</span>
                   </div>
-                  <div className="p-4 bg-emerald-50/40 border border-emerald-100 rounded-2xl">
+                  <div className="p-4 bg-[#3d5a45]/10 border border-[#3d5a45]/20 rounded-2xl">
                     <span className="text-[9px] font-black uppercase text-[#8d8a86] block">Custo rateado por cabeça ativa</span>
-                    <span className="text-2xl font-black text-emerald-800">
+                    <span className="text-2xl font-black text-[#3d5a45]">
                       R$ {animals.length > 0 ? (reportData.total / animals.reduce((a,c) => a + (c.isSold ? 0 : c.quantity), 0)).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) : 0}
                     </span>
-                    <span className="text-[10px] text-emerald-800 font-semibold block mt-1">Dividido por {animals.reduce((a,c) => a + (c.isSold ? 0 : c.quantity), 0)} cabeças ativas</span>
+                    <span className="text-[10px] text-[#3d5a45] font-semibold block mt-1">Dividido por {animals.reduce((a,c) => a + (c.isSold ? 0 : c.quantity), 0)} cabeças ativas</span>
                   </div>
                 </div>
 
@@ -870,18 +870,18 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t-2 border-[#3d5a45] bg-emerald-50/20 p-3 rounded-2xl flex justify-between items-baseline">
-                    <span className="text-xs font-black text-emerald-900">LUCRO LÍQUIDO FINAL:</span>
-                    <span className="font-black text-lg text-emerald-800">
+                  <div className="pt-3 border-t-2 border-[#3d5a45] bg-[#3d5a45]/5 p-3 rounded-2xl flex justify-between items-baseline">
+                    <span className="text-xs font-black text-[#3d5a45]">LUCRO LÍQUIDO FINAL:</span>
+                    <span className="font-black text-lg text-[#3d5a45]">
                       R$ {tradingAnalysis.lucroLiquidoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-orange-50/50 p-5 rounded-3xl border border-orange-100 space-y-3">
-                <span className="text-xs font-black text-orange-850 uppercase block flex items-center gap-1.5"><BadgeInfo size={14} /> Dicas de Caixa</span>
-                <p className="text-[11px] text-orange-950 font-medium leading-relaxed leading-relaxed">Procure manter o custo operacional médio abaixo da proporção mensal ideal. Monitore as pesagens e o ganho médio diário (GMD) do gado para garantir que a taxa de conversão nutricional cubra o caixa!</p>
+              <div className="bg-amber-50/50 p-5 rounded-3xl border border-amber-100 space-y-3">
+                <span className="text-xs font-black text-amber-850 uppercase block flex items-center gap-1.5"><BadgeInfo size={14} /> Dicas de Caixa</span>
+                <p className="text-[11px] text-amber-950 font-medium leading-relaxed leading-relaxed">Procure manter o custo operacional médio abaixo da proporção mensal ideal. Monitore as pesagens e o ganho médio diário (GMD) do gado para garantir que a taxa de conversão nutricional cubra o caixa!</p>
               </div>
             </div>
           </motion.div>
@@ -911,7 +911,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-[#8d8a86] uppercase">Filtrar Colaborador:</span>
                   <select 
-                    className="px-3 py-1.5 border rounded-xl text-xs bg-white font-bold text-slate-800 focus:outline-none"
+                    className="px-3 py-1.5 border rounded-xl text-xs bg-white font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
                     value={focusedEmployeeId}
                     onChange={(e) => setFocusedEmployeeId(e.target.value)}
                   >
@@ -1010,7 +1010,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                   {cattleAnalyticsGrouped.breeds.map(b => (
                     <div key={b.name} className="flex justify-between items-center text-xs py-1.5 border-b border-neutral-50">
                       <span className="font-bold text-slate-800">{b.name}</span>
-                      <span className="font-bold text-slate-800">{b.heads} cab. • <span className="font-black text-red-600">R$ {b.costs.toLocaleString()}</span></span>
+                      <span className="font-bold text-slate-800">{b.heads} cab. • <span className="font-black text-[#3d5a45]">R$ {b.costs.toLocaleString()}</span></span>
                     </div>
                   ))}
                 </div>
@@ -1064,7 +1064,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                         <td className="py-3 text-right font-bold text-slate-800">
                           {a.averageWeight} kg
                         </td>
-                        <td className="py-3 text-right font-black text-emerald-800">
+                        <td className="py-3 text-right font-black text-[#3d5a45]">
                           {a.isSold && a.saleDetails ? (
                             <span>{a.saleDetails.averageWeight} kg</span>
                           ) : (
@@ -1092,12 +1092,12 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             {/* Purchase vs Sales Overheads cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white p-5 rounded-3xl border border-[#e5e0d8] shadow-sm flex items-center gap-4">
-                <div className="p-4 bg-emerald-50 rounded-full text-emerald-800">
+                <div className="p-4 bg-[#3d5a45]/10 rounded-full text-[#3d5a45]">
                   <Coins size={28} />
                 </div>
                 <div>
                   <span className="text-[10px] text-[#8d8a86] uppercase font-black tracking-wider block">Lucro Bruto Total</span>
-                  <span className="text-xl font-black text-emerald-800">R$ {tradingAnalysis.lucroBrutoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  <span className="text-xl font-black text-[#3d5a45]">R$ {tradingAnalysis.lucroBrutoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   <span className="text-[10px] text-[#8d8a86] block mt-0.5">Ciclo total faturado acumulado</span>
                 </div>
               </div>

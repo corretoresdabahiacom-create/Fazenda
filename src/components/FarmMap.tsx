@@ -292,11 +292,11 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
             onClick={() => setActiveSeason('aguas')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
               activeSeason === 'aguas' 
-                ? 'bg-white text-emerald-800 shadow-sm border border-[#e5e0d8]' 
+                ? 'bg-white text-[#3d5a45] shadow-sm border border-[#e5e0d8]' 
                 : 'text-[#6c6964] hover:bg-[#ebe8e2]'
             }`}
           >
-            <CloudRain size={15} className={activeSeason === 'aguas' ? 'text-emerald-600' : ''} />
+            <CloudRain size={15} className={activeSeason === 'aguas' ? 'text-[#3d5a45]' : ''} />
             Estação das Águas
           </button>
           
@@ -304,11 +304,11 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
             onClick={() => setActiveSeason('seca')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
               activeSeason === 'seca' 
-                ? 'bg-white text-orange-800 shadow-sm border border-[#e5e0d8]' 
+                ? 'bg-white text-[#3d5a45] shadow-sm border border-[#e5e0d8]' 
                 : 'text-[#6c6964] hover:bg-[#ebe8e2]'
             }`}
           >
-            <Sun size={15} className={activeSeason === 'seca' ? 'text-orange-600' : ''} />
+            <Sun size={15} className={activeSeason === 'seca' ? 'text-[#3d5a45]' : ''} />
             Estação da Seca
           </button>
         </div>
@@ -332,7 +332,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   setDirectPastureFormOpen(true);
                   setIsWaitingForDirectMapClick(false);
                 }}
-                className="w-full flex items-center justify-center gap-2 bg-[#fcfaf7] text-[#3d5a45] border border-[#3d5a45] py-2 rounded-xl font-bold hover:bg-[#3d5a45] hover:text-white transition-all text-xs cursor-pointer"
+                className="btn-outline w-full flex items-center justify-center gap-2 text-xs"
               >
                 <Plus size={14} /> Numerar Novo Pasto
               </button>
@@ -369,7 +369,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     type="button"
                     disabled={!newDirectNumber.trim()}
                     onClick={() => setIsWaitingForDirectMapClick(true)}
-                    className="w-full bg-[#3d5a45] text-white py-2 rounded-xl font-bold hover:bg-[#2c4031] transition-all text-xs disabled:opacity-50 cursor-pointer"
+                    className="btn-primary w-full text-xs disabled:opacity-50"
                   >
                     📍 Escolher Local no Mapa
                   </button>
@@ -394,7 +394,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
           {/* Occurrence Registration Card */}
           <div className="bg-white border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
             <h2 className="text-sm font-bold text-[#3d5a45] uppercase tracking-wider flex items-center gap-1.5">
-              <span className="text-emerald-700">📍</span> Pin de Ocorrência
+              <span className="text-[#3d5a45]">📍</span> Pin de Ocorrência
             </h2>
             <p className="text-[11px] text-[#6d6a66] leading-relaxed">
               Marque pontos de interesse no mapa, como nascentes, cercas danificadas ou pastos em recuperação.
@@ -406,7 +406,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   setOccurrenceFormOpen(true);
                   setIsWaitingForOccurrenceClick(false);
                 }}
-                className="w-full flex items-center justify-center gap-2 bg-[#fcfaf7] text-[#3d5a45] border border-[#3d5a45] py-2 rounded-xl font-bold hover:bg-[#3d5a45] hover:text-white transition-all text-xs cursor-pointer"
+                className="btn-outline w-full flex items-center justify-center gap-2 text-xs"
               >
                 <Plus size={14} /> Nova Ocorrência
               </button>
@@ -458,7 +458,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     type="button"
                     disabled={!occTitle.trim()}
                     onClick={() => setIsWaitingForOccurrenceClick(true)}
-                    className="w-full bg-[#3d5a45] text-white py-2 rounded-xl font-bold hover:bg-[#2c4031] transition-all text-xs disabled:opacity-50 cursor-pointer"
+                    className="btn-primary w-full text-xs disabled:opacity-50"
                   >
                     📍 Escolher Local no Mapa
                   </button>
@@ -493,7 +493,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
 
             {unmappedPastures.length === 0 ? (
               <div className="text-center py-6 bg-[#fcfaf7] rounded-2xl border border-dashed border-[#e5e0d8]">
-                <Check className="mx-auto text-emerald-500 mb-1" size={18} />
+                <Check className="mx-auto text-[#3d5a45] mb-1" size={18} />
                 <p className="text-xs font-bold text-[#3d5a45]">Tudo Posicionado!</p>
                 <p className="text-[10px] text-[#8d8a86] mt-0.5">Todos os pastos estão mapeados.</p>
               </div>
@@ -504,7 +504,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     key={pasture.id} 
                     className={`p-3 rounded-2xl border transition-all text-left flex items-center justify-between ${
                       positioningPastureId === pasture.id 
-                        ? 'bg-[#3d5a45] text-white border-[#3d5a45] shadow-md ring-2 ring-emerald-600/30' 
+                        ? 'bg-[#3d5a45] text-white border-[#3d5a45] shadow-md ring-2 ring-[#3d5a45]/30' 
                         : 'bg-[#fcfaf7] hover:bg-[#f5f2ed] border-[#e5e0d8]'
                     }`}
                   >
@@ -529,7 +529,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                       className={`text-[10px] font-bold px-3 py-1.5 rounded-lg border transition-all ${
                         positioningPastureId === pasture.id
                           ? 'bg-white text-[#3d5a45] border-white font-black'
-                          : 'bg-white text-[#3d5a45] border-[#e5e0d8] hover:bg-[#fcfaf7]'
+                          : 'btn-outline py-1.5 px-3 text-[10px]'
                       }`}
                     >
                       {positioningPastureId === pasture.id ? 'Fixando...' : 'Mapear'}
@@ -556,14 +556,14 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
               />
 
               {mapFileName ? (
-                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-between">
+                <div className="p-3 bg-[#3d5a45]/10 border border-[#3d5a45]/20 rounded-2xl flex items-center justify-between">
                   <div className="flex items-center gap-2 truncate">
-                    <FileText className="text-emerald-600 shrink-0" size={16} />
-                    <span className="text-xs font-bold text-emerald-800 truncate">{mapFileName}</span>
+                    <FileText className="text-[#3d5a45] shrink-0" size={16} />
+                    <span className="text-xs font-bold text-[#3d5a45] truncate">{mapFileName}</span>
                   </div>
                   <button 
                     onClick={handleClearMapBackground}
-                    className="p-1 hover:bg-emerald-100 text-emerald-800 rounded-lg"
+                    className="p-1 hover:bg-[#3d5a45]/10 text-[#3d5a45] rounded-lg"
                     title="Remover fundo do mapa"
                   >
                     <X size={14} />
@@ -602,8 +602,8 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
           <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#f5f2ed]">
             <div className="flex items-center gap-2">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3d5a45] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#3d5a45]"></span>
               </span>
               <span className="text-xs font-bold text-[#5e5a56]">
                 {isWaitingForOccurrenceClick
@@ -623,7 +623,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   setIsWaitingForDirectMapClick(false);
                   setIsWaitingForOccurrenceClick(false);
                 }}
-                className="flex items-center gap-1 bg-red-100 hover:bg-red-200 text-red-700 font-bold px-3 py-1 text-[10px] rounded-lg border border-red-200 transition-colors uppercase"
+                className="btn-outline flex items-center gap-1 text-[10px] py-1 px-3"
               >
                 Cancelar <X size={12} />
               </button>
@@ -635,7 +635,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
             ref={mapContainerRef}
             onClick={handleMapClick}
             className={`relative flex-1 rounded-2xl border border-[#e5e0d8] shadow-inner overflow-hidden select-none bg-[#f5f2ed] ${
-              (positioningPastureId || isWaitingForDirectMapClick) ? 'cursor-crosshair ring-2 ring-emerald-500/20' : 'cursor-pointer'
+              (positioningPastureId || isWaitingForDirectMapClick) ? 'cursor-crosshair ring-2 ring-[#3d5a45]/20' : 'cursor-pointer'
             }`}
             style={{
               backgroundImage: mapUrl && mapUrl !== 'pdf-placeholder' ? `url(${mapUrl})` : 'none',
@@ -699,15 +699,15 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
               const limit = activeSeason === 'aguas' ? pasture.capacityAguas : pasture.capacitySeca;
               const isOverstocked = count > limit;
               
-              // Purpose color selection
+              // Purpose color selection - usando verde escuro como padrão
               let pinBg = 'bg-[#3d5a45]';
-              let pinBorder = 'border-emerald-200';
+              let pinBorder = 'border-[#3d5a45]/30';
               if (pasture.purpose === 'manutenção') {
-                pinBg = 'bg-blue-600';
-                pinBorder = 'border-blue-200';
+                pinBg = 'bg-[#3d5a45]';
+                pinBorder = 'border-[#3d5a45]/30';
               } else if (pasture.purpose === 'finalização') {
-                pinBg = 'bg-purple-600';
-                pinBorder = 'border-purple-200';
+                pinBg = 'bg-[#3d5a45]';
+                pinBorder = 'border-[#3d5a45]/30';
               }
 
               if (isOverstocked) {
@@ -751,13 +751,13 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
 
             {/* Pins of occurrences */}
             {(farmSettings?.occurrences || []).map((occ: any) => {
-              let pinBg = 'bg-blue-650 border-blue-200';
+              let pinBg = 'bg-[#3d5a45] border-[#3d5a45]/30';
               if (occ.type === 'cerca') {
                 pinBg = 'bg-amber-600 border-amber-200';
               } else if (occ.type === 'recuperacao') {
-                pinBg = 'bg-emerald-650 border-emerald-250';
+                pinBg = 'bg-[#3d5a45] border-[#3d5a45]/30';
               } else if (occ.type === 'outro') {
-                pinBg = 'bg-zinc-650 border-zinc-200';
+                pinBg = 'bg-zinc-600 border-zinc-200';
               }
 
               return (
@@ -793,13 +793,13 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
           <div className="mt-4 flex items-center justify-between text-xs text-[#6d6a66] p-2 hover:bg-[#fcfaf7] rounded-xl">
             <div className="flex flex-wrap gap-4 items-center">
               <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" /> Pasto de Engorda
+                <span className="w-2.5 h-2.5 rounded-full bg-[#3d5a45]" /> Pasto de Engorda
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-600" /> Pasto de Manutenção
+                <span className="w-2.5 h-2.5 rounded-full bg-[#3d5a45]" /> Pasto de Manutenção
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-600" /> Pasto de Finalização
+                <span className="w-2.5 h-2.5 rounded-full bg-[#3d5a45]" /> Pasto de Finalização
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" /> Superlotação Crítica
@@ -823,14 +823,8 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               className="bg-white rounded-3xl border border-[#e5e0d8] shadow-2xl max-w-lg w-full overflow-hidden text-left"
             >
-              {/* Header Colored based on purpose */}
-              <div className={`p-6 text-white relative ${
-                selectedPasture.purpose === 'manutenção' 
-                  ? 'bg-gradient-to-r from-blue-700 to-blue-600' 
-                  : selectedPasture.purpose === 'finalização'
-                  ? 'bg-gradient-to-r from-purple-700 to-purple-600'
-                  : 'bg-gradient-to-r from-emerald-800 to-emerald-700'
-              }`}>
+              {/* Header Colored based on purpose - usando verde escuro padrão */}
+              <div className="p-6 text-white relative bg-gradient-to-r from-[#3d5a45] to-[#2d4a3a]">
                 <button
                   onClick={() => setSelectedPasture(null)}
                   className="absolute right-4 top-4 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-xl transition-all"
@@ -873,7 +867,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                           Taxa de Stocking ({activeSeason === 'aguas' ? 'Estação Águas' : 'Estação Seca'})
                         </span>
                         <span className={`font-black uppercase px-2 py-0.5 rounded text-[10px] ${
-                          isExceeded ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-850'
+                          isExceeded ? 'bg-red-100 text-red-800' : 'bg-[#3d5a45]/10 text-[#3d5a45]'
                         }`}>
                           {isExceeded ? 'Superlotado' : 'Estável'}
                         </span>
@@ -893,7 +887,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                       <div className="space-y-1">
                         <div className="w-full h-3 bg-[#e5e0d8] rounded-full overflow-hidden flex">
                           <motion.div 
-                            className={`h-full rounded-full ${isExceeded ? 'bg-gradient-to-r from-red-500 to-red-650' : 'bg-emerald-600'}`}
+                            className={`h-full rounded-full ${isExceeded ? 'bg-gradient-to-r from-red-500 to-red-700' : 'bg-[#3d5a45]'}`}
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(pct, 100)}%` }}
                             transition={{ duration: 0.5 }}
@@ -911,21 +905,21 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
 
                 {/* Season limits comparison side by side */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-emerald-50/50 border border-emerald-100 rounded-2xl">
+                  <div className="p-3 bg-[#3d5a45]/5 border border-[#3d5a45]/10 rounded-2xl">
                     <span className="text-[10px] text-[#8d8a86] font-bold uppercase tracking-wider flex items-center gap-1.5">
-                      <CloudRain size={13} className="text-emerald-600" /> Máx. Cap. (Águas)
+                      <CloudRain size={13} className="text-[#3d5a45]" /> Máx. Cap. (Águas)
                     </span>
-                    <p className="text-xl font-serif text-emerald-800 font-bold mt-1">
-                      {selectedPasture.capacityAguas} <span className="text-xs font-sans text-emerald-600">animais</span>
+                    <p className="text-xl font-serif text-[#3d5a45] font-bold mt-1">
+                      {selectedPasture.capacityAguas} <span className="text-xs font-sans text-[#3d5a45]/70">animais</span>
                     </p>
                   </div>
 
-                  <div className="p-3 bg-orange-50/50 border border-orange-100 rounded-2xl">
+                  <div className="p-3 bg-[#3d5a45]/5 border border-[#3d5a45]/10 rounded-2xl">
                     <span className="text-[10px] text-[#8d8a86] font-bold uppercase tracking-wider flex items-center gap-1.5">
-                      <Sun size={13} className="text-orange-600" /> Máx. Cap. (Seca)
+                      <Sun size={13} className="text-[#3d5a45]" /> Máx. Cap. (Seca)
                     </span>
-                    <p className="text-xl font-serif text-orange-850 font-bold mt-1">
-                      {selectedPasture.capacitySeca} <span className="text-xs font-sans text-orange-600">animais</span>
+                    <p className="text-xl font-serif text-[#3d5a45] font-bold mt-1">
+                      {selectedPasture.capacitySeca} <span className="text-xs font-sans text-[#3d5a45]/70">animais</span>
                     </p>
                   </div>
                 </div>
@@ -994,14 +988,14 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
               <div className="p-6 bg-[#fcfaf7] border-t border-[#e5e0d8] flex justify-between gap-3 items-center">
                 <button
                   onClick={() => handleRemovePin(selectedPasture!.id)}
-                  className="flex items-center gap-1.5 text-xs text-red-600 hover:text-red-800 font-bold uppercase transition-colors"
+                  className="btn-outline flex items-center gap-1.5 text-xs"
                 >
                   <Trash2 size={14} /> Remover do Mapa
                 </button>
 
                 <button
                   onClick={() => setSelectedPasture(null)}
-                  className="bg-[#3d5a45] text-white hover:bg-[#2d4234] text-xs font-black tracking-wide uppercase px-6 py-2.5 rounded-xl transition-all shadow"
+                  className="btn-primary text-xs"
                 >
                   Fechar Painel
                 </button>
@@ -1018,15 +1012,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               className="bg-white rounded-3xl border border-[#e5e0d8] shadow-2xl max-w-md w-full overflow-hidden text-left"
             >
-              <div className={`p-6 text-white relative ${
-                selectedOccurrence.type === 'nascente'
-                  ? 'bg-gradient-to-r from-blue-700 to-blue-600'
-                  : selectedOccurrence.type === 'cerca'
-                  ? 'bg-gradient-to-r from-amber-700 to-amber-600'
-                  : selectedOccurrence.type === 'recuperacao'
-                  ? 'bg-gradient-to-r from-emerald-800 to-emerald-700'
-                  : 'bg-gradient-to-r from-zinc-700 to-zinc-650'
-              }`}>
+              <div className={`p-6 text-white relative bg-gradient-to-r from-[#3d5a45] to-[#2d4a3a]`}>
                 <button
                   onClick={() => setSelectedOccurrence(null)}
                   className="absolute right-4 top-4 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-xl transition-all"
@@ -1065,14 +1051,14 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
               <div className="p-6 bg-[#fcfaf7] border-t border-[#e5e0d8] flex justify-between gap-3 items-center">
                 <button
                   onClick={() => handleRemoveOccurrence(selectedOccurrence.id)}
-                  className="flex items-center gap-1.5 text-xs text-red-600 hover:text-red-800 font-bold uppercase transition-colors"
+                  className="btn-outline flex items-center gap-1.5 text-xs"
                 >
                   <Trash2 size={14} /> Excluir Ponto
                 </button>
 
                 <button
                   onClick={() => setSelectedOccurrence(null)}
-                  className="bg-[#3d5a45] text-white hover:bg-[#2d4234] text-xs font-black tracking-wide uppercase px-6 py-2.5 rounded-xl transition-all shadow-sm"
+                  className="btn-primary text-xs"
                 >
                   Fechar
                 </button>

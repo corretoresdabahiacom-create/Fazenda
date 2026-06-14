@@ -351,9 +351,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className={`w-full bg-[#3d5a45] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#2d4333] transition-all shadow-md group ${
-            isSaving ? 'opacity-80 cursor-not-allowed' : ''
-          }`}
+          className="btn-primary w-full py-4 text-lg disabled:opacity-80 disabled:cursor-not-allowed"
         >
           <Save size={20} className="group-hover:scale-110 transition-transform" />
           {isSaving ? 'Salvando...' : 'Salvar Dados da Fazenda'}
@@ -368,9 +366,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
             <button
               onClick={handleSeed}
               disabled={isSeeding}
-              className={`w-full border-2 border-dashed border-[#3d5a45] text-[#3d5a45] hover:bg-[#3d5a45]/5 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                isSeeding ? 'opacity-80 cursor-not-allowed' : ''
-              }`}
+              className="btn-outline w-full py-3 border-dashed disabled:opacity-80 disabled:cursor-not-allowed"
             >
               <RefreshCcw size={16} className={`${isSeeding ? 'animate-spin' : ''}`} />
               {isSeeding ? 'Povoando banco de dados...' : 'Carregar / Atualizar Dados Iniciais'}
@@ -393,14 +389,14 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
               <button
                 onClick={handleExportBackup}
                 disabled={isSeeding}
-                className="flex items-center justify-center gap-2 border border-[#3d5a45]/30 text-[#3d5a45] hover:bg-[#3d5a45]/5 py-2.5 px-4 rounded-xl font-semibold text-xs transition-colors cursor-pointer"
+                className="btn-outline flex items-center justify-center gap-2 py-2.5 text-xs disabled:opacity-80"
               >
                 <Download size={14} />
                 Exportar Backup (.json)
               </button>
 
               {/* Import backup */}
-              <label className="flex items-center justify-center gap-2 border border-orange-600/30 text-orange-700 hover:bg-orange-50 py-2.5 px-4 rounded-xl font-semibold text-xs transition-colors cursor-pointer text-center relative">
+              <label className="btn-outline flex items-center justify-center gap-2 py-2.5 text-xs cursor-pointer text-center border-orange-600/30 text-orange-700 hover:bg-orange-50">
                 <UploadCloud size={14} />
                 Importar Backup
                 <input
@@ -416,8 +412,8 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
       </div>
 
       <div className="bg-[#fcfaf7] p-6 rounded-3xl border border-[#e5e0d8] flex flex-col md:flex-row items-center gap-6">
-        <div className="bg-orange-50 p-4 rounded-2xl flex-shrink-0">
-          <CloudSun className="text-orange-500 w-8 h-8" />
+        <div className="bg-[#3d5a45]/10 p-4 rounded-2xl flex-shrink-0">
+          <CloudSun className="text-[#3d5a45] w-8 h-8" />
         </div>
         <div>
           <h4 className="font-bold text-[#3d5a45] mb-1">Nota sobre Gestão Geográfica</h4>
@@ -493,14 +489,14 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
 
                 <div className="bg-white p-4 rounded-2xl border border-[#e5e0d8] text-center md:flex items-center justify-between gap-4">
                   <div className="text-left">
-                    <span className="text-[10px] uppercase font-bold text-orange-600 block">Capacidade Estimativa</span>
+                    <span className="text-[10px] uppercase font-bold text-[#3d5a45] block">Capacidade Estimativa</span>
                     <p className="text-[11px] text-[#6d6a66] font-medium max-w-md leading-relaxed">
                       Este modelo simula dados com base no histórico local brasileiro da cidade configurada, refinando sua UA/ha automaticamente.
                     </p>
                   </div>
                   <button 
                     onClick={() => setIsWeatherModalOpen(false)}
-                    className="mt-3 md:mt-0 bg-[#3d5a45] text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-[#2d4333] transition-colors cursor-pointer"
+                    className="btn-primary mt-3 md:mt-0 px-5 py-2 text-xs"
                   >
                     Entendido
                   </button>

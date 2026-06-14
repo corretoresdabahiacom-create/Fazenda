@@ -352,7 +352,7 @@ export default function Dashboard({
           <button
             onClick={() => fetchAISuggestion(true)}
             disabled={loadingSuggestion}
-            className="text-xs font-bold text-[#3d5a45] hover:text-white border border-[#3d5a45]/20 hover:bg-[#3d5a45] shrink-0 py-2 px-4 rounded-full transition-all flex items-center gap-1.5 self-start md:self-auto cursor-pointer"
+            className="btn-primary text-xs shrink-0 self-start md:self-auto"
             id="btn-refresh-suggestion"
           >
             <RefreshCw size={12} className={loadingSuggestion ? 'animate-spin' : ''} />
@@ -365,7 +365,7 @@ export default function Dashboard({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button 
           onClick={() => onNavigate?.('animals-scan')}
-          className="flex items-center gap-4 bg-[#3d5a45] text-white p-4 sm:p-6 rounded-3xl border border-[#3d5a45] shadow-sm hover:bg-[#2d4233] transition-all group"
+          className="btn-primary flex items-center gap-4 p-4 sm:p-6 rounded-3xl text-left group"
         >
           <div className="bg-white/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
              <Scan size={24} />
@@ -378,7 +378,7 @@ export default function Dashboard({
         </button>
         <button 
           onClick={() => onNavigate?.('pastures')}
-          className="flex items-center gap-4 bg-white text-[#3d5a45] p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm hover:border-[#3d5a45] transition-all group"
+          className="btn-outline flex items-center gap-4 p-4 sm:p-6 rounded-3xl text-left group"
         >
           <div className="bg-[#3d5a45]/5 p-3 rounded-2xl group-hover:scale-110 transition-transform">
              <Scan size={24} />
@@ -401,7 +401,7 @@ export default function Dashboard({
             </h3>
             <button 
               onClick={onOpenObligations}
-              className="text-xs font-bold text-[#3d5a45] hover:underline flex items-center gap-1 bg-[#f5f2ed] hover:bg-[#e5e0d8] py-1.5 px-3 rounded-full transition-colors"
+              className="btn-ghost text-xs py-1.5 px-3 rounded-full"
               id="dash-open-obligations-btn"
             >
               Ver todas ({activeAlerts.length}) <ChevronRightIcon size={12} />
@@ -576,7 +576,7 @@ export default function Dashboard({
               <button 
                 onClick={() => onToggleTaskCompletion?.(task)}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer active:scale-95 transition-transform ${
-                  task.completed ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-[#3d5a45] text-white hover:bg-[#2d4233]'
+                  task.completed ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'btn-primary py-1.5 px-4'
                 }`}
               >
                 {task.completed ? '✓ Concluída' : 'Marcar Concluída'}

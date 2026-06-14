@@ -237,7 +237,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
               });
               setIsEmployeeFormOpen(true);
             }}
-            className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#3d5a45] text-white px-6 py-2.5 rounded-xl font-bold hover:bg-[#2d4233] transition-colors shadow-sm"
+            className="btn-primary w-full md:w-auto flex items-center justify-center gap-2"
           >
             <Plus size={20} />
             Cadastrar Colaborador
@@ -254,7 +254,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
               });
               setIsPaymentFormOpen(true);
             }}
-            className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#3d5a45] text-white px-6 py-2.5 rounded-xl font-bold hover:bg-[#2d4233] transition-colors shadow-sm"
+            className="btn-primary w-full md:w-auto flex items-center justify-center gap-2"
           >
             <Plus size={20} />
             Registrar Pagamento
@@ -626,13 +626,13 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <button 
                   type="button" 
                   onClick={() => setIsEmployeeFormOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
+                  className="btn-outline flex-1"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-[#3d5a45] font-bold text-white hover:bg-[#2d4233] transition-colors shadow-md"
+                  className="btn-primary flex-1"
                 >
                   Salvar
                 </button>
@@ -787,13 +787,13 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <button 
                   type="button" 
                   onClick={() => setIsPaymentFormOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
+                  className="btn-outline flex-1"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-[#3d5a45] font-bold text-white hover:bg-[#2d4233] transition-colors shadow-md"
+                  className="btn-primary flex-1"
                 >
                   Confirmar
                 </button>

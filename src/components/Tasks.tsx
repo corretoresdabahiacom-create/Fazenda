@@ -107,7 +107,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
             });
             setIsFormOpen(true);
           }}
-          className="flex items-center gap-2 bg-[#3d5a45] text-white px-6 py-2.5 rounded-xl font-bold hover:bg-[#2d4233] transition-colors shadow-sm text-sm"
+          className="btn-primary flex items-center gap-2 text-sm"
         >
           <Plus size={18} />
           Criar Nova Tarefa
@@ -129,7 +129,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
             >
               <button 
                 onClick={() => toggleTask(task.id)}
-                className={`mt-1.5 transition-colors ${task.completed ? 'text-green-600' : 'text-[#8d8a86] hover:text-[#3d5a45]'}`}
+                className={`mt-1.5 transition-colors ${task.completed ? 'text-[#3d5a45]' : 'text-[#8d8a86] hover:text-[#3d5a45]'}`}
               >
                 {task.completed ? <CheckCircle2 size={24} className="stroke-2" /> : <Circle size={24} className="stroke-2" />}
               </button>
@@ -287,7 +287,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Designar Colaborador</label>
                   {employees && employees.length > 0 ? (
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-semibold text-slate-800 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
                       value={formData.assignedTo || ''}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
                     >
@@ -299,7 +299,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   ) : (
                     <input 
                       type="text" 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs"
+                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                       value={formData.assignedTo || ''}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
                       placeholder="Nome do executor..."
@@ -311,7 +311,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Local para Execução</label>
                   <input 
                     type="text" 
-                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs font-semibold focus:outline-none"
+                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
                     value={formData.executionLocation || ''}
                     onChange={(e) => setFormData({...formData, executionLocation: e.target.value})}
                     placeholder="Ex: Pasto 02, Curral, Sede..."
@@ -323,13 +323,13 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 <button 
                   type="button" 
                   onClick={() => setIsFormOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
+                  className="btn-outline flex-1"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-[#3d5a45] font-bold text-white hover:bg-[#2d4233] transition-colors shadow-md"
+                  className="btn-primary flex-1"
                 >
                   Salvar Tarefa
                 </button>

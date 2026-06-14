@@ -157,7 +157,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
             });
             setIsFormOpen(true);
           }}
-          className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#3d5a45] text-white px-6 py-2.5 rounded-xl font-bold hover:bg-[#2d4233] transition-colors shadow-sm text-sm"
+          className="btn-primary w-full md:w-auto flex items-center justify-center gap-2 text-sm"
         >
           <Plus size={20} />
           Adicionar Item de Estoque
@@ -281,7 +281,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   selectedItemForHistory.history.map((log, idx) => (
                     <div key={idx} className="flex gap-3 text-xs">
                       <div className="flex flex-col items-center">
-                        <div className="w-5 h-5 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold">
+                        <div className="w-5 h-5 rounded-full bg-[#3d5a45]/10 border border-[#3d5a45]/20 flex items-center justify-center text-[#3d5a45] font-bold">
                           {idx + 1}
                         </div>
                         {idx !== selectedItemForHistory.history!.length - 1 && (
@@ -354,7 +354,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                     type="button"
                     onClick={() => setFormData({...formData, category: 'Supply'})}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase transition-all ${
-                      formData.category === 'Supply' ? 'bg-blue-600 text-white shadow-md' : 'bg-[#fcfaf7] border border-[#e5e0d8] text-[#8d8a86]'
+                      formData.category === 'Supply' ? 'btn-primary' : 'btn-outline'
                     }`}
                   >
                     Suprimento (Sal, Ração, etc)
@@ -363,7 +363,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                     type="button"
                     onClick={() => setFormData({...formData, category: 'Equipment'})}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase transition-all ${
-                      formData.category === 'Equipment' ? 'bg-orange-600 text-white shadow-md' : 'bg-[#fcfaf7] border border-[#e5e0d8] text-[#8d8a86]'
+                      formData.category === 'Equipment' ? 'btn-primary' : 'btn-outline'
                     }`}
                   >
                     Equipamento (Cerca, Trator, etc)
@@ -420,7 +420,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   <input 
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-emerald-700"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-[#3d5a45]"
                     value={formData.unitPrice || ''}
                     onChange={(e) => {
                       const val = Number(e.target.value);
@@ -496,13 +496,13 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 <button 
                   type="button" 
                   onClick={() => setIsFormOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
+                  className="btn-outline flex-1"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-[#3d5a45] font-bold text-white hover:bg-[#2d4233] transition-colors shadow-md"
+                  className="btn-primary flex-1"
                 >
                   Salvar
                 </button>

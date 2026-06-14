@@ -49,7 +49,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
 
   const [fixedFormData, setFixedFormData] = useState<Partial<FixedExpense>>({
     description: '',
-    dueDate: '5', // day of month (e.g. 5)
+    dueDate: '5',
     value: 0,
     expenseType: 'Energia',
   });
@@ -170,17 +170,17 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
       <div className="flex border-b border-[#e5e0d8] gap-4">
         <button 
           onClick={() => { setActiveTab('variaveis'); setSearchTerm(''); }}
-          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'variaveis' ? 'text-red-650 font-black text-[#2d2a26]' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
+          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'variaveis' ? 'text-[#3d5a45]' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
         >
           🧾 Lançamentos de Despesas (Variáveis)
-          {activeTab === 'variaveis' && <motion.div layoutId="expense_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600" />}
+          {activeTab === 'variaveis' && <motion.div layoutId="expense_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3d5a45]" />}
         </button>
         <button 
           onClick={() => { setActiveTab('fixas'); setSearchTerm(''); }}
-          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'fixas' ? 'text-red-650 font-black text-[#2d2a26]' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
+          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'fixas' ? 'text-[#3d5a45]' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
         >
           📌 Custos & Despesas Fixas da Fazenda
-          {activeTab === 'fixas' && <motion.div layoutId="expense_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600" />}
+          {activeTab === 'fixas' && <motion.div layoutId="expense_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3d5a45]" />}
         </button>
       </div>
 
@@ -191,7 +191,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder={activeTab === 'variaveis' ? "Pesquisar despesa..." : "Pesquisar custo fixo..."}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-red-650/20 font-medium"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -203,7 +203,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
               setEditingExpense(null);
               setIsFormOpen(true);
             }}
-            className="w-full md:w-auto flex items-center justify-center gap-2 bg-red-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-red-700 transition-colors shadow-sm animate-fade-in"
+            className="btn-primary w-full md:w-auto flex items-center justify-center gap-2"
           >
             <Plus size={20} />
             Lançar Despesa
@@ -214,7 +214,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
               setEditingFixed(null);
               setIsFixedFormOpen(true);
             }}
-            className="w-full md:w-auto flex items-center justify-center gap-2 bg-red-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-red-700 transition-colors shadow-sm animate-fade-in"
+            className="btn-primary w-full md:w-auto flex items-center justify-center gap-2"
           >
             <Plus size={20} />
             Adicionar Despesa Fixa
@@ -226,7 +226,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
         /* Fixed Cost Proportional Cards Dashboard */
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#fcfaf7] p-5 rounded-3xl border border-[#e5e0d8]">
           <div className="bg-white p-5 rounded-2xl border border-[#e5e0d8] flex items-center gap-4">
-            <div className="p-3 bg-red-50 text-red-600 rounded-xl">
+            <div className="p-3 bg-[#3d5a45]/10 text-[#3d5a45] rounded-xl">
               <Banknote size={24} />
             </div>
             <div>
@@ -236,7 +236,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-[#e5e0d8] flex items-center gap-4">
-            <div className="p-3 bg-green-50 text-green-600 rounded-xl">
+            <div className="p-3 bg-[#3d5a45]/10 text-[#3d5a45] rounded-xl">
               <TrendingUp size={24} />
             </div>
             <div>
@@ -287,7 +287,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5f2ed] text-red-650">
+                      <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5f2ed] text-[#3d5a45]">
                         {e.type}
                       </span>
                     </td>
@@ -297,7 +297,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     <td className="px-6 py-4">
                       <div className="font-bold text-[#3d5a45] text-xs uppercase tracking-tight">{e.provider || '-'}</div>
                     </td>
-                    <td className="px-6 py-4 font-bold text-red-600">
+                    <td className="px-6 py-4 font-bold text-[#3d5a45]">
                       R$ {e.value.toLocaleString('pt-BR')}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -327,20 +327,20 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
         /* Fixed Expenses list */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredFixed.map((f) => (
-            <div key={f.id} className="bg-white p-6 rounded-3xl border border-[#e5e0d8] space-y-4 hover:border-red-200 transition-colors relative shadow-sm">
+            <div key={f.id} className="bg-white p-6 rounded-3xl border border-[#e5e0d8] space-y-4 hover:border-[#3d5a45]/30 transition-colors relative shadow-sm">
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="px-3 py-0.5 bg-red-50 text-red-700 text-[10px] font-bold rounded-full uppercase block w-fit mb-1 border border-red-100">{f.expenseType}</span>
+                  <span className="px-3 py-0.5 bg-[#3d5a45]/10 text-[#3d5a45] text-[10px] font-bold rounded-full uppercase block w-fit mb-1 border border-[#3d5a45]/20">{f.expenseType}</span>
                   <h4 className="text-base font-black text-[#2d2a26]">{f.description}</h4>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-[#8d8a86] font-bold uppercase block">Valor Mensal</span>
-                  <span className="text-lg font-black text-red-600">R$ {f.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  <span className="text-lg font-black text-[#3d5a45]">R$ {f.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
 
               <div className="pt-3 border-t border-[#f0f0f0] flex justify-between items-center text-xs text-[#6d6a66] font-bold">
-                <span className="flex items-center gap-1"><Clock size={14} className="text-red-500" /> Dia Vencimento: {f.dueDate}</span>
+                <span className="flex items-center gap-1"><Clock size={14} className="text-[#3d5a45]" /> Dia Vencimento: {f.dueDate}</span>
                 <span className="bg-[#fcfaf7] px-2 py-1 rounded text-[10px] text-[#3d5a45] font-extrabold uppercase border border-[#e5e0d8]">Suporta R$ {(totalActiveHeads > 0 ? f.value / totalActiveHeads : 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}/animal</span>
               </div>
 
@@ -377,12 +377,12 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingExpense(null); }}
-                  className="p-2 -ml-2 text-[#6d6a66] hover:text-red-600 hover:bg-[#f5f2ed] rounded-full transition-colors"
+                  className="p-2 -ml-2 text-[#6d6a66] hover:text-[#3d5a45] hover:bg-[#f5f2ed] rounded-full transition-colors"
                   title="Voltar"
                 >
                   <ArrowLeft size={18} />
                 </button>
-                <h3 className="text-base font-bold flex items-center gap-2 text-red-600">
+                <h3 className="text-base font-bold flex items-center gap-2 text-[#3d5a45]">
                   <FileText size={18} />
                   {editingExpense ? 'Editar Despesa Lançada' : 'Lançar Nova Despesa'}
                 </h3>
@@ -404,7 +404,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                       <div className="relative flex-1">
                         <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
                         <select 
-                          className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/20 focus:outline-none appearance-none bg-white font-bold"
+                          className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none appearance-none bg-white font-bold"
                           value={formData.type}
                           onChange={(e) => setFormData({...formData, type: e.target.value as any})}
                         >
@@ -414,13 +414,13 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                       <button 
                         type="button"
                         onClick={() => setIsAddingCustomType(true)}
-                        className="px-3.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold rounded-xl text-xs transition-colors"
+                        className="btn-outline px-3.5 text-xs"
                       >
                         + Novo Tipo
                       </button>
                     </div>
                   ) : (
-                    <div className="flex gap-2 bg-red-50/50 p-4 border border-red-200 rounded-xl animate-fade-in">
+                    <div className="flex gap-2 bg-[#3d5a45]/5 p-4 border border-[#3d5a45]/20 rounded-xl animate-fade-in">
                       <div className="flex-1">
                         <input 
                           type="text" 
@@ -433,14 +433,14 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                       <button 
                         type="button"
                         onClick={handleCreateCustomType}
-                        className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700"
+                        className="btn-primary px-3 py-1.5 text-xs"
                       >
                         Salvar
                       </button>
                       <button 
                         type="button"
                         onClick={() => setIsAddingCustomType(false)}
-                        className="px-2 py-1.5 bg-gray-100 text-[#6d6a66] border rounded-lg text-xs"
+                        className="btn-outline px-2 py-1.5 text-xs"
                       >
                         Voltar
                       </button>
@@ -455,7 +455,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     <input 
                       required
                       type="date" 
-                      className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/20 focus:outline-none"
+                      className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                       value={formData.date}
                       onChange={(e) => setFormData({...formData, date: e.target.value})}
                     />
@@ -468,7 +468,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
                     <input 
                       type="date" 
-                      className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/20 focus:outline-none"
+                      className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                       value={formData.dueDate || ''}
                       onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
                     />
@@ -480,7 +480,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/20 focus:outline-none"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                     value={formData.description || ''}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     placeholder="Ex: Nota fiscal Nº 453"
@@ -491,7 +491,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Vendedor ou Fornecedor</label>
                   <input 
                     type="text" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/20 focus:outline-none"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                     value={formData.provider || ''}
                     onChange={(e) => setFormData({...formData, provider: e.target.value})}
                     placeholder="Nome da empresa ou revenda..."
@@ -504,7 +504,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     required
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/20 focus:outline-none font-bold text-red-600 text-base"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-[#3d5a45] text-base"
                     value={formData.value || ''}
                     onChange={(e) => setFormData({...formData, value: Number(e.target.value)})}
                   />
@@ -513,7 +513,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <div className="col-span-2">
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Observações adicionais</label>
                   <textarea 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/20 focus:outline-none text-sm min-h-[70px]"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none text-sm min-h-[70px]"
                     value={formData.observation || ''}
                     onChange={(e) => setFormData({...formData, observation: e.target.value})}
                     placeholder="Qualquer detalhe extra..."
@@ -525,13 +525,13 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <button 
                   type="button" 
                   onClick={() => setIsFormOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
+                  className="btn-outline flex-1"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-red-600 font-bold text-white hover:bg-red-700 transition-colors shadow-md"
+                  className="btn-primary flex-1"
                 >
                   Salvar Despesa
                 </button>
@@ -553,12 +553,12 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setIsFixedFormOpen(false)}
-                  className="p-2 -ml-2 text-[#6d6a66] hover:text-red-600 hover:bg-[#f5f2ed] rounded-full transition-colors"
+                  className="p-2 -ml-2 text-[#6d6a66] hover:text-[#3d5a45] hover:bg-[#f5f2ed] rounded-full transition-colors"
                   title="Voltar"
                 >
                   <ArrowLeft size={18} />
                 </button>
-                <h3 className="text-base font-bold flex items-center gap-2 text-red-600">
+                <h3 className="text-base font-bold flex items-center gap-2 text-[#3d5a45]">
                   <Tag size={18} />
                   {editingFixed ? 'Editar Despesa Fixa' : 'Cadastrar Custo Fixo da Fazenda'}
                 </h3>
@@ -577,7 +577,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/25 focus:outline-none"
+                  className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none"
                   value={fixedFormData.description || ''}
                   onChange={(e) => setFixedFormData({...fixedFormData, description: e.target.value})}
                   placeholder="Ex: Arrendamento da Sede, Energia Elétrica Cemig, Pro-Labore..."
@@ -588,7 +588,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Categoria</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/25 focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-medium"
                     value={fixedFormData.expenseType}
                     onChange={(e) => setFixedFormData({...fixedFormData, expenseType: e.target.value})}
                   >
@@ -610,7 +610,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     type="number" 
                     min="1" 
                     max="31" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/25 focus:outline-none"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none"
                     value={fixedFormData.dueDate || ''}
                     onChange={(e) => setFixedFormData({...fixedFormData, dueDate: e.target.value})}
                     placeholder="Ex: 10"
@@ -624,7 +624,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                   required
                   type="number" 
                   step="0.01" 
-                  className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-red-500/25 focus:outline-none font-bold text-red-600 text-lg"
+                  className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none font-bold text-[#3d5a45] text-lg"
                   value={fixedFormData.value || ''}
                   onChange={(e) => setFixedFormData({...fixedFormData, value: Number(e.target.value)})}
                 />
@@ -634,13 +634,13 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <button 
                   type="button" 
                   onClick={() => setIsFixedFormOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
+                  className="btn-outline flex-1"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-red-600 font-bold text-white hover:bg-red-700 transition-colors shadow-md"
+                  className="btn-primary flex-1"
                 >
                   Confirmar
                 </button>

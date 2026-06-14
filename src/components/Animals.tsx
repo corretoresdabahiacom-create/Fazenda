@@ -605,7 +605,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     </div>
                     <div className="flex justify-between border-b pb-1.5 border-red-100">
                       <span>Faturamento Total Bruto:</span>
-                      <span className="font-extrabold text-emerald-800">R$ {animal.saleDetails.totalSaleValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="font-extrabold text-[#3d5a45]">R$ {animal.saleDetails.totalSaleValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex justify-between border-b pb-1.5 border-red-100 font-bold text-red-900">
                       <span>Custos Comercialização:</span>
@@ -614,15 +614,15 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <div className="p-2.5 bg-white border border-red-200 rounded-xl space-y-1 mt-1 text-[11px]">
                       <div className="flex justify-between text-neutral-800 font-bold">
                         <span>Lucro Bruto Ciclo:</span>
-                        <span className="text-emerald-700">R$ {animal.saleDetails.grossProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-[#3d5a45]">R$ {animal.saleDetails.grossProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="flex justify-between text-neutral-800 font-bold">
                         <span>Lucro Líquido Ciclo:</span>
-                        <span className="text-emerald-700">R$ {animal.saleDetails.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-[#3d5a45]">R$ {animal.saleDetails.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="flex justify-between border-t border-dashed border-neutral-200 pt-1 text-[10px] text-[#8d8a86] font-bold uppercase mt-1">
                         <span>Líq. p/ Mês ({calculateMonths(animal.entryDate, animal.saleDetails.saleDate)}m):</span>
-                        <span className="text-emerald-800">R$ {(animal.saleDetails.netProfit / calculateMonths(animal.entryDate, animal.saleDetails.saleDate)).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} / mês</span>
+                        <span className="text-[#3d5a45]">R$ {(animal.saleDetails.netProfit / calculateMonths(animal.entryDate, animal.saleDetails.saleDate)).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} / mês</span>
                       </div>
                     </div>
                   </div>
@@ -662,7 +662,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         });
                         setIsSellModalOpen(true);
                       }}
-                      className="flex-1 flex items-center justify-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-600 hover:text-white py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-1 bg-[#3d5a45]/10 text-[#3d5a45] border border-[#3d5a45]/30 hover:bg-[#3d5a45] hover:text-white py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer"
                     >
                       <ShoppingCart size={13} /> Comercializar
                     </button>
@@ -740,7 +740,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 >
                   <ArrowLeft size={20} />
                 </button>
-                <h3 className="text-base font-black flex items-center gap-2 text-emerald-700">
+                <h3 className="text-base font-black flex items-center gap-2 text-[#3d5a45]">
                   <ShoppingCart size={18} />
                   Fechar Venda do Lote: {sellingAnimal.lotName} ({sellingAnimal.quantity} cab.)
                 </h3>
@@ -797,13 +797,13 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1.5 block flex items-center gap-1">
                     {sellingAnimal.type === AnimalType.PARTIAL ? 'Regime de Meia - Peso de Saída (Kg)' : 'Peso Médio Saída (Kg/cab)'}
-                    <span className="text-[9px] bg-emerald-50 text-emerald-800 px-1 py-0.2 rounded">Estimado</span>
+                    <span className="text-[9px] bg-[#3d5a45]/10 text-[#3d5a45] px-1 py-0.2 rounded">Estimado</span>
                   </label>
                   <input 
                     required={sellingAnimal.type !== AnimalType.RENT}
                     type="number" 
                     step="0.1"
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none text-sm font-black text-[#2d2a26]"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none text-sm font-black text-[#2d2a26]"
                     value={saleFormData.averageWeight || ''}
                     disabled={sellingAnimal.type === AnimalType.RENT}
                     onChange={(e) => setSaleFormData({...saleFormData, averageWeight: Number(e.target.value)})}
@@ -816,7 +816,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     required={sellingAnimal.type !== AnimalType.RENT}
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none text-sm font-black text-emerald-700"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none text-sm font-black text-[#3d5a45]"
                     placeholder="Ex: 320"
                     disabled={sellingAnimal.type === AnimalType.RENT}
                     value={saleFormData.arrobaPrice || ''}
@@ -826,19 +826,19 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               </div>
 
               {sellingAnimal.type === AnimalType.PARTIAL && (
-                <div className="p-4 bg-emerald-50/40 border border-emerald-100 rounded-2xl space-y-2">
-                  <span className="text-[10px] font-black uppercase text-emerald-800 block">Dados da Parceria (Meia-A-Meia)</span>
+                <div className="p-4 bg-[#3d5a45]/5 border border-[#3d5a45]/20 rounded-2xl space-y-2">
+                  <span className="text-[10px] font-black uppercase text-[#3d5a45] block">Dados da Parceria (Meia-A-Meia)</span>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <span className="text-xs font-semibold text-[#8d8a86] block">Peso de Entrada Declarado:</span>
                       <span className="text-sm font-black text-[#2d2a26]">{sellingAnimal.averageWeight} kg / cabeça</span>
                     </div>
                     <div>
-                      <label className="text-xs font-bold uppercase text-emerald-800 mb-1 block">Porcentagem que Fica p/ Fazenda (%)</label>
+                      <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Porcentagem que Fica p/ Fazenda (%)</label>
                       <input 
                         required
                         type="number" 
-                        className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl focus:outline-none text-xs font-extrabold text-emerald-800"
+                        className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl focus:outline-none text-xs font-extrabold text-[#3d5a45]"
                         value={saleFormData.partnershipFarmShare}
                         onChange={(e) => setSaleFormData({...saleFormData, partnershipFarmShare: Number(e.target.value)})}
                       />
@@ -848,8 +848,8 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               )}
 
               {sellingAnimal.type === AnimalType.RENT && (
-                <div className="p-4 bg-emerald-50/40 border border-emerald-100 rounded-2xl space-y-2">
-                  <span className="text-[10px] font-black uppercase text-emerald-800 block">Cálculo de Estadia do Aluguel de Pasto</span>
+                <div className="p-4 bg-[#3d5a45]/5 border border-[#3d5a45]/20 rounded-2xl space-y-2">
+                  <span className="text-[10px] font-black uppercase text-[#3d5a45] block">Cálculo de Estadia do Aluguel de Pasto</span>
                   <div className="grid grid-cols-2 gap-4 text-xs font-semibold">
                     <div>
                       <span className="text-neutral-500 block">Dias de Estadia Decorridos:</span>
@@ -860,7 +860,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     </div>
                     <div>
                       <span className="text-neutral-500 block">Taxa Mensal p/ Cabeça Acertada:</span>
-                      <span className="font-extrabold text-green-700">
+                      <span className="font-extrabold text-[#3d5a45]">
                         R$ {(sellingAnimal.rentValue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} / mês
                       </span>
                     </div>
@@ -922,7 +922,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         <span className="text-xs uppercase font-medium text-white/80">Ganho de Peso Total:</span>
                         <span className="font-bold text-sm">
                           {Math.max(0, saleFormData.averageWeight - (sellingAnimal.averageWeight || 0))} Kg / cab.
-                          <span className="text-[10px] text-emerald-200 font-normal ml-2">
+                          <span className="text-[10px] text-[#8d8a86] font-normal ml-2">
                             ({sellingAnimal.averageWeight} kg entrada ➔ {saleFormData.averageWeight} kg saída)
                           </span>
                         </span>
@@ -953,13 +953,13 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-3">
                         <div>
                           <span className="text-white/80 uppercase text-[9px] font-bold block">Faturamento Parceiro Meia:</span>
-                          <span className="text-sm font-bold text-emerald-300">
+                          <span className="text-sm font-bold text-[#8d8a86]">
                             R$ {(((Math.max(0, saleFormData.averageWeight - (sellingAnimal.averageWeight || 0)) / 30) * sellingAnimal.quantity * (saleFormData.arrobaPrice || 0)) * (1 - ((saleFormData.partnershipFarmShare !== undefined ? saleFormData.partnershipFarmShare : 50) / 100))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
                         <div>
                           <span className="text-white/80 uppercase text-[9px] font-bold block">Lucro Líquido Ciclo Fazenda:</span>
-                          <span className="text-base font-black text-emerald-300">
+                          <span className="text-base font-black text-[#8d8a86]">
                             R$ {((((Math.max(0, saleFormData.averageWeight - (sellingAnimal.averageWeight || 0)) / 30) * sellingAnimal.quantity * (saleFormData.arrobaPrice || 0)) * ((saleFormData.partnershipFarmShare !== undefined ? saleFormData.partnershipFarmShare : 50) / 100)) - ((saleFormData.shippingCost || 0) + (saleFormData.funruralCost || 0) + (saleFormData.taxesCost || 0) + (saleFormData.otherSaleCosts || 0))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
@@ -971,7 +971,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         <span className="text-xs uppercase font-medium text-white/80">Tempo Sob Gestão:</span>
                         <span className="font-bold text-sm">
                           {Math.max(1, differenceInDays(new Date(saleFormData.saleDate), new Date(sellingAnimal.entryDate)))} dias
-                          <span className="text-[10px] text-emerald-250 font-normal ml-2">
+                          <span className="text-[10px] text-[#8d8a86] font-normal ml-2">
                             (~ {(differenceInDays(new Date(saleFormData.saleDate), new Date(sellingAnimal.entryDate)) / 30).toFixed(1)} meses)
                           </span>
                         </span>
@@ -1001,7 +1001,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         </div>
                         <div>
                           <span className="text-white/80 uppercase text-[9px] font-bold block">Lucro Líquido Ciclo Fazenda:</span>
-                          <span className="text-base font-black text-emerald-300">
+                          <span className="text-base font-black text-[#8d8a86]">
                             R$ {(((sellingAnimal.rentValue || 0) * sellingAnimal.quantity * Math.max(0.1, differenceInDays(new Date(saleFormData.saleDate), new Date(sellingAnimal.entryDate)) / 30)) - ((saleFormData.shippingCost || 0) + (saleFormData.funruralCost || 0) + (saleFormData.taxesCost || 0) + (saleFormData.otherSaleCosts || 0))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
@@ -1030,13 +1030,13 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-3">
                         <div>
                           <span className="text-white/80 uppercase text-[9px] font-bold block">Lucro Bruto do Lote:</span>
-                          <span className="text-base font-black text-emerald-300">
+                          <span className="text-base font-black text-[#8d8a86]">
                             R$ {((((((saleFormData.averageWeight || 0) / 30) * sellingAnimal.quantity) * (saleFormData.arrobaPrice || 0))) - ((sellingAnimal.purchasePrice || 0) * sellingAnimal.quantity)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
                         <div>
                           <span className="text-white/80 uppercase text-[9px] font-bold block">Lucro Líquido Ciclo:</span>
-                          <span className="text-base font-black text-emerald-300">
+                          <span className="text-base font-black text-[#8d8a86]">
                             R$ {((((((saleFormData.averageWeight || 0) / 30) * sellingAnimal.quantity) * (saleFormData.arrobaPrice || 0))) - ((sellingAnimal.purchasePrice || 0) * sellingAnimal.quantity) - ((saleFormData.shippingCost || 0) + (saleFormData.funruralCost || 0) + (saleFormData.taxesCost || 0) + (saleFormData.otherSaleCosts || 0))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
@@ -1056,7 +1056,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-emerald-600 font-bold text-white hover:bg-emerald-700 transition-colors shadow-md"
+                  className="flex-1 px-6 py-2.5 rounded-xl bg-[#3d5a45] font-bold text-white hover:bg-[#2d4233] transition-colors shadow-md"
                 >
                   Concluir Venda
                 </button>
@@ -1205,113 +1205,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 {formData.type === AnimalType.OWN && (
                   <>
                     <div>
-                      <label className="text-xs font-bold uppercase text-emerald-800 mb-1 block">Preço de Compra p/ Cabeça (R$)</label>
+                      <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Preço de Compra p/ Cabeça (R$)</label>
                       <input 
                         type="number" step="0.01"
-                        className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none font-black text-emerald-700 text-sm"
-                        value={formData.purchasePrice || ''}
-                        onChange={(e) => setFormData({...formData, purchasePrice: Number(e.target.value)})}
-                        placeholder="Ex: 1800"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Outros Custos Iniciais Incoorporados (R$)</label>
-                      <input 
-                        type="number" step="0.01"
-                        className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-red-600"
-                        value={formData.costs || ''}
-                        onChange={(e) => setFormData({...formData, costs: Number(e.target.value)})}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {formData.type === AnimalType.RENT && (
-                  <div>
-                    <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Valor Aluguel p/ Cabeça (Mensal)</label>
-                    <input 
-                      type="number" step="0.01"
-                      className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-green-600"
-                      value={formData.rentValue || ''}
-                      onChange={(e) => setFormData({...formData, rentValue: Number(e.target.value)})}
-                    />
-                  </div>
-                )}
-
-                {formData.type === AnimalType.PARTIAL && (
-                  <div>
-                    <label className="text-xs font-bold uppercase text-emerald-800 mb-1 block">Porcentagem (%) que fica para Fazenda</label>
-                    <input 
-                      type="number" 
-                      className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-black text-emerald-700"
-                      placeholder="Padrão: 50%"
-                      value={formData.partnershipFarmShare !== undefined ? formData.partnershipFarmShare : 50}
-                      onChange={(e) => setFormData({...formData, partnershipFarmShare: Number(e.target.value)})}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {formData.aiTechnicalNote && (
-                <div className="bg-[#3d5a45]/5 p-4 rounded-2xl border border-[#3d5a45]/10 space-y-1">
-                  <span className="text-[10px] font-black text-[#3d5a45] uppercase">Scanner IA Laudo Integrado:</span>
-                  <p className="text-xs text-[#3d5a45] font-semibold">{formData.aiTechnicalNote}</p>
-                </div>
-              )}
-
-              {/* Former Owner Info - Optional */}
-              <div className="pt-4 border-t border-[#e5e0d8] space-y-3">
-                <h4 className="text-xs font-bold text-[#3d5a45] uppercase">Procedência do Lote (Ex-Proprietário)</h4>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-1">
-                    <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Vendedor</label>
-                    <input 
-                      type="text" 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs"
-                      value={formData.formerOwnerName || ''}
-                      onChange={(e) => setFormData({...formData, formerOwnerName: e.target.value})}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Cidade Origem</label>
-                    <input 
-                      type="text" 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs"
-                      value={formData.formerOwnerCity || ''}
-                      onChange={(e) => setFormData({...formData, formerOwnerCity: e.target.value})}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Telefone</label>
-                    <input 
-                      type="tel" 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs"
-                      value={formData.formerOwnerPhone || ''}
-                      onChange={(e) => setFormData({...formData, formerOwnerPhone: e.target.value})}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 flex gap-3">
-                <button 
-                  type="button" 
-                  onClick={() => setIsFormOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
-                >
-                  Regressar
-                </button>
-                <button 
-                  type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-[#3d5a45] font-bold text-white hover:bg-[#2d4233] transition-colors shadow-md"
-                >
-                  Confirmar Lote
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
-    </div>
-  );
-}
+                        className="w-full px
