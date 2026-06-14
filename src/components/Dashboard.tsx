@@ -258,42 +258,42 @@ export default function Dashboard({
   return (
     <div className="container-fluid space-y-8">
       {/* Farm Location Header */}
-      <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-theme-card p-4 sm:p-6 rounded-3xl border border-theme shadow-theme flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-serif italic font-bold text-[#3d5a45] mb-2">{settings.farmName}</h2>
-          <div className="flex items-center gap-4 text-[#6d6a66]">
+          <h2 className="text-2xl sm:text-3xl font-serif italic font-bold text-primary mb-2">{settings.farmName}</h2>
+          <div className="flex items-center gap-4 text-theme-secondary">
             <div className="flex items-center gap-1.5 font-medium">
-              <MapPin size={16} className="text-[#3d5a45]" />
+              <MapPin size={16} className="text-primary" />
               {settings.city || 'Cidade não informada'}
             </div>
           </div>
         </div>
         
         {/* Local Date/Time Header */}
-        <div className="flex items-center gap-4 bg-[#fcfaf7] p-4 rounded-2xl border border-[#e5e0d8]">
-          <div className="bg-white p-2.5 rounded-xl shadow-sm text-[#3d5a45]">
+        <div className="flex items-center gap-4 bg-theme-secondary p-4 rounded-2xl border border-theme">
+          <div className="bg-theme-card p-2.5 rounded-xl shadow-theme text-primary">
             <CloudSun size={24} />
           </div>
           <div>
-            <div className="text-[10px] uppercase font-bold text-[#8d8a86]">{new Date().toLocaleDateString('pt-BR', { weekday: 'long' })}</div>
-            <div className="text-sm font-bold text-[#3d5a45]">{new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}</div>
+            <div className="text-[10px] uppercase font-bold text-theme-secondary">{new Date().toLocaleDateString('pt-BR', { weekday: 'long' })}</div>
+            <div className="text-sm font-bold text-primary">{new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}</div>
           </div>
         </div>
       </div>
 
       {/* Sugestão Inteligente (AI Technical Advice) Card */}
-      <div className="bg-[#fcfaf7] rounded-3xl border border-[#e5e0d8] p-4 sm:p-6 shadow-xs relative overflow-hidden transition-all">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#3d5a45]/5 rounded-bl-full -z-10" />
+      <div className="bg-theme-secondary rounded-3xl border border-theme p-4 sm:p-6 shadow-theme relative overflow-hidden transition-all">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-10" />
         
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className={`p-3.5 rounded-2xl shrink-0 ${
               suggestion?.priority === 'High' ? 'bg-red-50 text-red-600' :
               suggestion?.priority === 'Medium' ? 'bg-amber-50 text-amber-600' :
-              'bg-[#3d5a45]/10 text-[#3d5a45]'
+              'bg-primary/10 text-primary'
             }`}>
               {loadingSuggestion ? (
-                <RefreshCw size={24} className="animate-spin text-[#3d5a45]" />
+                <RefreshCw size={24} className="animate-spin text-primary" />
               ) : (
                 <Sparkles size={24} className="animate-pulse" />
               )}
@@ -301,14 +301,14 @@ export default function Dashboard({
             
             <div className="space-y-1.5 flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] tracking-wider uppercase font-black px-2.5 py-1 rounded-full bg-[#3d5a45]/10 text-[#3d5a45]">
+                <span className="text-[10px] tracking-wider uppercase font-black px-2.5 py-1 rounded-full bg-primary/10 text-primary">
                   Sugestão Inteligente
                 </span>
                 {suggestion && (
                   <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${
                     suggestion.priority === 'High' ? 'bg-red-100 text-red-800' :
                     suggestion.priority === 'Medium' ? 'bg-amber-100 text-amber-800' :
-                    'bg-[#e2efe4] text-[#3d5a45]'
+                    'bg-[#e2efe4] text-primary'
                   }`}>
                     Prioridade {suggestion.priority === 'High' ? 'Alta' : suggestion.priority === 'Medium' ? 'Média' : 'Baixa'}
                   </span>
@@ -328,22 +328,22 @@ export default function Dashboard({
                 </div>
               ) : suggestionError ? (
                 <div>
-                  <h4 className="font-bold text-[#2d2a26] text-sm">Não foi possível carregar o conselho</h4>
-                  <p className="text-xs text-[#8d8a86] mt-1">Conecte-se à internet ou certifique-se de que a API está ativa. {suggestionError}</p>
+                  <h4 className="font-bold text-theme-primary text-sm">Não foi possível carregar o conselho</h4>
+                  <p className="text-xs text-theme-secondary mt-1">Conecte-se à internet ou certifique-se de que a API está ativa. {suggestionError}</p>
                 </div>
               ) : suggestion ? (
                 <div>
-                  <h4 className="font-bold text-[#2d2a26] text-base leading-tight">
+                  <h4 className="font-bold text-theme-primary text-base leading-tight">
                     {suggestion.title}
                   </h4>
-                  <p className="text-xs text-[#5d5a56] mt-2 leading-relaxed whitespace-pre-line">
+                  <p className="text-xs text-theme-secondary mt-2 leading-relaxed whitespace-pre-line">
                     {suggestion.advice}
                   </p>
                 </div>
               ) : (
                 <div>
-                  <h4 className="font-bold text-[#2d2a26] text-sm font-sans">Conselho diário ainda não gerado</h4>
-                  <p className="text-xs text-[#8d8a86] mt-1">Clique em 'Gerar Conselho' para analisar o estoque e obter sugestões.</p>
+                  <h4 className="font-bold text-theme-primary text-sm font-sans">Conselho diário ainda não gerado</h4>
+                  <p className="text-xs text-theme-secondary mt-1">Clique em 'Gerar Conselho' para analisar o estoque e obter sugestões.</p>
                 </div>
               )}
             </div>
@@ -380,23 +380,23 @@ export default function Dashboard({
           onClick={() => onNavigate?.('pastures')}
           className="btn-outline flex items-center gap-4 p-4 sm:p-6 rounded-3xl text-left group"
         >
-          <div className="bg-[#3d5a45]/5 p-3 rounded-2xl group-hover:scale-110 transition-transform">
+          <div className="bg-primary/5 p-3 rounded-2xl group-hover:scale-110 transition-transform">
              <Scan size={24} />
           </div>
           <div className="text-left flex-1">
              <h3 className="font-bold text-sm sm:text-base">Agro Scan</h3>
-             <p className="text-xs text-[#6d6a66]">Análise agrostológica IA</p>
+             <p className="text-xs text-theme-secondary">Análise agrostológica IA</p>
           </div>
-          <ChevronRightIcon size={20} className="text-[#3d5a45]/20 group-hover:translate-x-1 transition-transform" />
+          <ChevronRightIcon size={20} className="text-primary/20 group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
 
       {/* Dynamic Dashboard Obligations Alert Panel */}
       {activeAlerts && activeAlerts.length > 0 && (
-        <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
+        <div className="bg-theme-card p-4 sm:p-6 rounded-3xl border border-theme shadow-theme space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif italic font-bold text-lg text-[#3d5a45] flex items-center gap-2">
-              <Clock size={18} className="text-[#3d5a45] animate-pulse" />
+            <h3 className="font-serif italic font-bold text-lg text-primary flex items-center gap-2">
+              <Clock size={18} className="text-primary animate-pulse" />
               Obrigações e Vencimentos Críticos
             </h3>
             <button 
@@ -411,8 +411,8 @@ export default function Dashboard({
             {activeAlerts.slice(0, 4).map((alert) => {
               const isOverdue = alert.daysRemaining < 0;
               const isToday = alert.daysRemaining === 0;
-              let bgStyle = "bg-[#fdfcfb] border-[#e5e0d8]";
-              let textStyle = "text-[#6d6a66]";
+              let bgStyle = "bg-[#fdfcfb] border-theme";
+              let textStyle = "text-theme-secondary";
               let alertBadge = "";
 
               if (isOverdue) {
@@ -431,14 +431,14 @@ export default function Dashboard({
                 <div 
                   key={alert.id}
                   onClick={onOpenObligations}
-                  className={`p-4 rounded-2xl border flex items-center justify-between cursor-pointer hover:shadow-xs hover:border-[#3d5a45]/30 transition-all gap-4 ${bgStyle}`}
+                  className={`p-4 rounded-2xl border flex items-center justify-between cursor-pointer hover:shadow-xs hover:border-primary/30 transition-all gap-4 ${bgStyle}`}
                   title="Ver detalhes na Central"
                   id={`dash-alert-${alert.id}`}
                 >
                   <div className="overflow-hidden min-w-0">
-                    <h4 className="text-xs font-black truncate text-[#2d2a26]">{alert.title}</h4>
-                    <p className="text-[10px] text-[#6d6a66] mt-0.5 truncate">{alert.description}</p>
-                    <p className="text-[9px] text-[#8d8a86] font-mono mt-1 uppercase">Prazo: {alert.dueDate.split('-').reverse().join('/')}</p>
+                    <h4 className="text-xs font-black truncate text-theme-primary">{alert.title}</h4>
+                    <p className="text-[10px] text-theme-secondary mt-0.5 truncate">{alert.description}</p>
+                    <p className="text-[9px] text-theme-secondary font-mono mt-1 uppercase">Prazo: {alert.dueDate.split('-').reverse().join('/')}</p>
                   </div>
                   <span className={`text-[8px] uppercase font-black px-2 py-0.5 rounded-full bg-white border shrink-0 ${textStyle}`}>
                     {alertBadge}
@@ -462,7 +462,7 @@ export default function Dashboard({
         <StatCard 
           title="Animais Totais" 
           value={totalAnimals.toString()} 
-          icon={<Beef className="text-[#3d5a45]" />}
+          icon={<Beef className="text-primary" />}
           trend={`${animals.length} lotes ativos`}
           onClick={() => onNavigate?.('animals')}
         />
@@ -498,18 +498,18 @@ export default function Dashboard({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Charts */}
-        <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
-          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+        <div className="bg-theme-card p-4 sm:p-6 rounded-3xl border border-theme shadow-theme">
+          <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-theme-primary">
             Evolução Mensal (R$)
           </h3>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyEvolution}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
                 <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}
                 />
                 <Bar dataKey="despesas" fill="#5c8a67" radius={[4, 4, 0, 0]} name="Despesas" />
                 <Bar dataKey="pagamentos" fill="#3d5a45" radius={[4, 4, 0, 0]} name="Pagamentos" />
@@ -518,8 +518,8 @@ export default function Dashboard({
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
-          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+        <div className="bg-theme-card p-4 sm:p-6 rounded-3xl border border-theme shadow-theme">
+          <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-theme-primary">
             Distribuição de Custos
           </h3>
           <div className="h-[300px] w-full flex flex-col sm:flex-row items-center gap-6">
@@ -539,7 +539,7 @@ export default function Dashboard({
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -548,9 +548,9 @@ export default function Dashboard({
                 <div key={item.name} className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                    <span className="text-[#6d6a66] truncate max-w-[120px]">{item.name}</span>
+                    <span className="text-theme-secondary truncate max-w-[120px]">{item.name}</span>
                   </div>
-                  <span className="font-semibold">R$ {item.value.toLocaleString()}</span>
+                  <span className="font-semibold text-theme-primary">R$ {item.value.toLocaleString()}</span>
                 </div>
               ))}
             </div>
@@ -559,18 +559,18 @@ export default function Dashboard({
       </div>
 
       {/* Quick Tasks */}
-      <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
-        <h3 className="text-lg font-bold mb-4">Tarefas Próximas</h3>
+      <div className="bg-theme-card p-4 sm:p-6 rounded-3xl border border-theme shadow-theme">
+        <h3 className="text-lg font-bold mb-4 text-theme-primary">Tarefas Próximas</h3>
         <div className="space-y-4">
           {tasks.slice(0, 3).map(task => (
-            <div key={task.id} className="flex items-center justify-between p-4 bg-[#fcfaf7] rounded-2xl border border-[#ece7e0]">
+            <div key={task.id} className="flex items-center justify-between p-4 bg-theme-secondary rounded-2xl border border-theme">
               <div className="flex items-center gap-4">
                 <div className={`w-2 h-10 rounded-full ${
                   task.priority === 'High' ? 'bg-red-400' : task.priority === 'Medium' ? 'bg-orange-400' : 'bg-blue-400'
                 }`} />
                 <div>
-                  <h4 className="font-semibold text-sm">{task.title}</h4>
-                  <p className="text-xs text-[#8d8a86]">{format(new Date(task.dueDate), "dd 'de' MMMM", { locale: ptBR })}</p>
+                  <h4 className="font-semibold text-sm text-theme-primary">{task.title}</h4>
+                  <p className="text-xs text-theme-secondary">{format(new Date(task.dueDate), "dd 'de' MMMM", { locale: ptBR })}</p>
                 </div>
               </div>
               <button 
@@ -584,7 +584,7 @@ export default function Dashboard({
             </div>
           ))}
           {tasks.length === 0 && (
-            <p className="text-center py-8 text-[#8d8a86] italic text-sm">Nenhuma tarefa agendada.</p>
+            <p className="text-center py-8 text-theme-secondary italic text-sm">Nenhuma tarefa agendada.</p>
           )}
         </div>
       </div>
@@ -596,19 +596,19 @@ function StatCard({ title, value, icon, trend, onClick }: { title: string; value
   return (
     <div 
       onClick={onClick} 
-      className={`bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm hover:shadow-md transition-all ${
-        onClick ? 'cursor-pointer hover:border-[#3d5a45]/30 active:scale-[0.99]' : ''
+      className={`bg-theme-card p-4 sm:p-6 rounded-3xl border border-theme shadow-theme hover:shadow-md transition-all ${
+        onClick ? 'cursor-pointer hover:border-primary/30 active:scale-[0.99]' : ''
       }`}
     >
       <div className="flex items-center justify-between mb-4">
-        <div className="p-3 bg-[#fcfaf7] rounded-2xl">
+        <div className="p-3 bg-theme-secondary rounded-2xl">
           {icon}
         </div>
       </div>
       <div>
-        <h4 className="text-sm font-medium text-[#8d8a86] uppercase tracking-wider">{title}</h4>
-        <div className="text-xl sm:text-2xl font-bold mt-1 break-words">{value}</div>
-        <p className="text-xs text-[#5c8a67] mt-2 font-medium break-words">{trend}</p>
+        <h4 className="text-sm font-medium text-theme-secondary uppercase tracking-wider">{title}</h4>
+        <div className="text-xl sm:text-2xl font-bold mt-1 break-words text-theme-primary">{value}</div>
+        <p className="text-xs text-primary mt-2 font-medium break-words">{trend}</p>
       </div>
     </div>
   );
