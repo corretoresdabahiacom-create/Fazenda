@@ -71,7 +71,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
     quantity: 0,
     lotName: '',
     entryDate: new Date().toISOString().split('T')[0],
-    currentPastureId: '',
+    currentPastryId: '',
     averageWeight: 0,
     purchasePrice: 0,
     costs: 0
@@ -292,7 +292,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               key={tab}
               onClick={() => setActiveTab(tab as any)}
               className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all whitespace-nowrap ${
-                activeTab === tab ? 'bg-[#3d5a45] text-white shadow-md' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === tab ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
               }`}
             >
               {tab === 'History' ? '📁 Arquivo de Vendas (Histórico)' : tab}
@@ -331,8 +331,8 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   }}
                   className={`flex-1 md:flex-none flex items-center justify-center gap-2 border px-4 py-2.5 rounded-xl font-bold transition-all shadow-sm text-xs uppercase tracking-wider cursor-pointer ${
                     showQuickTransferPanel 
-                      ? 'bg-[#2c4c38] border-[#2c4c38] text-white shadow-inner scale-[0.98]' 
-                      : 'bg-[#fcfaf7] border-[#3d5a45]/30 text-[#3d5a45] hover:bg-[#eaf4ed] hover:border-[#3d5a45]'
+                      ? 'btn-primary scale-[0.98]' 
+                      : 'btn-outline'
                   }`}
                 >
                   <ArrowRightLeft size={15} className={`${showQuickTransferPanel ? 'animate-spin' : ''}`} />
@@ -341,7 +341,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               )}
               <button 
                 onClick={() => setIsAIScanning(true)}
-                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#fcfaf7] text-[#3d5a45] border border-[#3d5a45] px-4 py-2.5 rounded-xl font-bold hover:bg-[#3d5a45] hover:text-white transition-all shadow-sm group text-xs uppercase tracking-wider cursor-pointer"
+                className="btn-outline flex-1 md:flex-none flex items-center justify-center gap-2 text-xs uppercase tracking-wider cursor-pointer group"
               >
                 <Scan size={16} className="group-hover:scale-110 transition-transform" />
                 Contagem IA
@@ -349,7 +349,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               <button 
                 onClick={() => { 
                   setFormData({
-                    type: activeTab,
+                    type: activeTab as AnimalType,
                     category: AnimalCategory.BULL,
                     breed: '',
                     quantity: 0,
@@ -362,7 +362,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   }); 
                   setIsFormOpen(true); 
                 }}
-                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#3d5a45] text-white px-6 py-2.5 rounded-xl font-bold hover:bg-[#2d4233] transition-colors shadow-sm text-sm"
+                className="btn-primary flex-1 md:flex-none flex items-center justify-center gap-2 text-sm"
               >
                 <Plus size={18} />
                 Adicionar Gado
@@ -381,7 +381,6 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
             className="overflow-hidden mb-6"
           >
             <div className="bg-white border-2 border-[#3d5a45]/20 rounded-3xl p-6 md:p-8 shadow-xl space-y-5 relative overflow-hidden" id="quick-transfer-panel">
-              {/* Decorative top accent line */}
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#3d5a45] via-[#4d6e56] to-[#d4a373]"></div>
 
               <div className="absolute top-5 right-5 z-10">
@@ -518,7 +517,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                           alert(`Sucesso! Lote "${lotToMove.lotName}" transferido com sucesso para o novo pasto.`);
                         }}
                         disabled={!newTransferPastureId}
-                        className="w-full flex items-center justify-center gap-2 bg-[#3d5a45] hover:bg-[#2c4031] disabled:opacity-40 text-white font-bold py-3 px-4 rounded-xl text-xs transition-all shadow-md cursor-pointer uppercase tracking-wider"
+                        className="w-full flex items-center justify-center gap-2 btn-primary disabled:opacity-40 text-xs uppercase tracking-wider"
                       >
                         <ArrowRightLeft size={14} /> Registrar Movimentação Pasto / Manejo
                       </button>
@@ -662,7 +661,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         });
                         setIsSellModalOpen(true);
                       }}
-                      className="flex-1 flex items-center justify-center gap-1 bg-[#3d5a45]/10 text-[#3d5a45] border border-[#3d5a45]/30 hover:bg-[#3d5a45] hover:text-white py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-1 btn-outline py-2 text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer"
                     >
                       <ShoppingCart size={13} /> Comercializar
                     </button>
@@ -691,8 +690,8 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       onClick={() => setExpandedWeightLotId(expandedWeightLotId === animal.id ? null : animal.id)} 
                       className={`p-2 border rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
                         expandedWeightLotId === animal.id
-                          ? 'bg-[#3d5a45] text-white border-[#3d5a45]' 
-                          : 'hover:bg-[#f5f2ed] border-[#e5e0d8] text-[#3d5a45] bg-white'
+                          ? 'btn-primary' 
+                          : 'btn-outline'
                       }`}
                       title="Evolução de Peso (Gráfico Line)"
                     >
@@ -1050,13 +1049,13 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 <button 
                   type="button" 
                   onClick={() => setIsSellModalOpen(false)}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-[#e5e0d8] font-bold text-[#6d6a66] hover:bg-[#fcfaf7] transition-colors"
+                  className="btn-outline flex-1"
                 >
                   Regressar
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-[#3d5a45] font-bold text-white hover:bg-[#2d4233] transition-colors shadow-md"
+                  className="btn-primary flex-1"
                 >
                   Concluir Venda
                 </button>
@@ -1208,4 +1207,91 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Preço de Compra p/ Cabeça (R$)</label>
                       <input 
                         type="number" step="0.01"
-                        className="w-full px
+                        className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-[#3d5a45]"
+                        value={formData.purchasePrice || ''}
+                        onChange={(e) => setFormData({...formData, purchasePrice: Number(e.target.value)})}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Custo de Aquisição Total</label>
+                      <div className="w-full px-4 py-2.5 bg-[#fcfaf7] border border-[#e5e0d8] rounded-xl font-black text-[#3d5a45] text-sm">
+                        R$ {((formData.purchasePrice || 0) * (formData.quantity || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {formData.type === AnimalType.RENT && (
+                  <div className="col-span-2">
+                    <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Valor do Aluguel (R$/mês por Cabeça)</label>
+                    <input 
+                      type="number" step="0.01"
+                      className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                      value={formData.rentValue || ''}
+                      onChange={(e) => setFormData({...formData, rentValue: Number(e.target.value)})}
+                      placeholder="Ex: 65"
+                    />
+                  </div>
+                )}
+
+                {formData.type === AnimalType.PARTIAL && (
+                  <>
+                    <div>
+                      <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Proporção Fazenda (%)</label>
+                      <div className="relative">
+                        <Percent className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
+                        <input 
+                          type="number" 
+                          className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                          placeholder="Ex: 50"
+                          value={formData.partnershipFarmShare || ''}
+                          onChange={(e) => setFormData({...formData, partnershipFarmShare: Number(e.target.value)})}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Peso Final de Saída (kg)</label>
+                      <input 
+                        type="number" 
+                        className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                        value={formData.partnershipExitWeight || ''}
+                        onChange={(e) => setFormData({...formData, partnershipExitWeight: Number(e.target.value)})}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {formData.type !== AnimalType.OWN && (
+                <div className="p-4 bg-[#3d5a45]/5 rounded-2xl border border-[#3d5a45]/10">
+                  <p className="text-[10px] font-bold text-[#3d5a45] uppercase tracking-wide flex items-center gap-1 mb-2">
+                    <HelpCircle size={12} /> Nota sobre Automação de Receita
+                  </p>
+                  <p className="text-[10px] text-[#6d6a66] leading-relaxed">
+                    O sistema calculará automaticamente a <strong>Receita Prevista</strong> baseada no valor do contrato quando registrada a venda deste lote.
+                  </p>
+                </div>
+              )}
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setIsFormOpen(false)}
+                  className="btn-outline flex-1"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  className="btn-primary flex-1"
+                >
+                  {editingAnimal ? 'Atualizar Lote' : 'Cadastrar Entrada'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+}
