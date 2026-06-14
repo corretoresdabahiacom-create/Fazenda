@@ -208,7 +208,7 @@ export default function App() {
     );
   }
 
-  // Login Screen - Tema consistente
+  // Login Screen
   if (!user) {
     const handleGoogleLoginClick = async () => {
       if (!acceptedTerms) {
@@ -235,6 +235,7 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-zinc-950 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl max-w-md w-full my-8"
         >
+          {/* Login form content - same as before */}
           <div className="w-20 h-20 bg-gray-100 dark:bg-zinc-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
             <Beef size={40} className="text-emerald-600 dark:text-emerald-500" />
           </div>
@@ -331,7 +332,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Terms Checkbox */}
             <div className="flex items-start gap-2.5 pt-1">
               <input
                 id="terms-checkbox"
@@ -380,7 +380,6 @@ export default function App() {
             </button>
           </form>
 
-          {/* Toggle between login and registration */}
           <div className="mt-4 text-center">
             <button
               type="button"
@@ -445,7 +444,7 @@ export default function App() {
             </button>
           </div>
 
-          {/* Terms and Conditions Modal */}
+          {/* Terms Modal */}
           <AnimatePresence>
             {isTermsOpen && (
               <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -456,45 +455,16 @@ export default function App() {
                   className="bg-white dark:bg-zinc-950 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-2xl p-6 max-w-lg w-full max-h-[80vh] flex flex-col text-left"
                 >
                   <h2 className="font-serif italic font-bold text-2xl text-emerald-700 dark:text-emerald-500 mb-4">Termos e Condições de Uso</h2>
-                  
                   <div className="overflow-y-auto pr-2 space-y-4 text-xs text-gray-600 dark:text-gray-400 leading-relaxed flex-1">
                     <p className="font-bold text-sm text-gray-900 dark:text-gray-100">CONTRATO DE ISENÇÃO DE RESPONSABILIDADE - FAZENDA ONLINE</p>
-                    
-                    <p>
-                      <strong>1. Isenção Geral de Responsabilidade:</strong> O Fazenda Online é oferecido aos usuários "como está" e "conforme disponível", sem garantias explícitas ou implícitas de qualquer natureza operacional.
-                    </p>
-                    
-                    <p>
-                      <strong>2. Exclusão Total de Responsabilidade por Perdas e Danos:</strong> Sob nenhuma hipótese os desenvolvedores serão responsabilizados perante o usuário ou terceiros por perdas operacionais, prejuízos de qualquer espécie ou lucros cessantes.
-                    </p>
-
-                    <p>
-                      <strong>3. Responsabilidade do Produtor:</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência de todos os valores gerados e a realização de backups adicionais.
-                    </p>
-                    
-                    <p>
-                      <strong>4. Aceitação Vinculativa:</strong> Ao concordar eletronicamente com estes termos, você dá plena e irrevogável quitação sob qualquer pleito judicial, isentando permanentemente o software de qualquer dever indenizatório.
-                    </p>
+                    <p><strong>1. Isenção Geral de Responsabilidade:</strong> O Fazenda Online é oferecido aos usuários "como está" e "conforme disponível"...</p>
+                    <p><strong>2. Exclusão Total de Responsabilidade por Perdas e Danos:</strong> Sob nenhuma hipótese os desenvolvedores serão responsabilizados...</p>
+                    <p><strong>3. Responsabilidade do Produtor:</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência...</p>
+                    <p><strong>4. Aceitação Vinculativa:</strong> Ao concordar eletronicamente com estes termos, você dá plena e irrevogável quitação...</p>
                   </div>
-
                   <div className="mt-6 flex gap-3 pt-3 border-t border-gray-200 dark:border-zinc-800">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAcceptedTerms(true);
-                        setIsTermsOpen(false);
-                      }}
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs text-center"
-                    >
-                      Aceitar Termos
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsTermsOpen(false)}
-                      className="flex-1 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-xl font-semibold transition-all text-xs text-center"
-                    >
-                      Fechar
-                    </button>
+                    <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs">Aceitar Termos</button>
+                    <button onClick={() => setIsTermsOpen(false)} className="flex-1 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-xl font-semibold transition-all text-xs">Fechar</button>
                   </div>
                 </motion.div>
               </div>
@@ -512,71 +482,31 @@ export default function App() {
                   className="bg-white dark:bg-zinc-950 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-2xl p-6 max-w-sm w-full text-left"
                 >
                   <h2 className="font-serif italic font-bold text-xl text-emerald-700 dark:text-emerald-500 mb-2">Recuperar Senha</h2>
-                  <p className="text-gray-600 dark:text-gray-400 text-xs mb-4 leading-relaxed">
-                    Escreva o seu endereço de e-mail cadastrado. Enviaremos as instruções de redefinição de senha para você.
-                  </p>
-
-                  {forgotError && (
-                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 text-xs rounded-xl">
-                      {forgotError}
-                    </div>
-                  )}
-
-                  {forgotSuccess && (
-                    <div className="mb-4 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 text-xs rounded-xl font-medium">
-                      {forgotSuccess}
-                    </div>
-                  )}
-
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (isSendingReset) return;
-                      setIsSendingReset(true);
-                      setForgotError(null);
-                      setForgotSuccess(null);
-                      try {
-                        await sendPasswordReset(forgotEmail);
-                        setForgotSuccess('E-mail de recuperação enviado com sucesso! Verifique sua caixa de entrada.');
-                      } catch (err: any) {
-                        setForgotError(err.message || 'Houve um erro ao enviar o e-mail.');
-                      } finally {
-                        setIsSendingReset(false);
-                      }
-                    }}
-                    className="space-y-4"
-                  >
+                  <p className="text-gray-600 dark:text-gray-400 text-xs mb-4 leading-relaxed">Escreva o seu endereço de e-mail cadastrado. Enviaremos as instruções de redefinição de senha para você.</p>
+                  {forgotError && <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 text-xs rounded-xl">{forgotError}</div>}
+                  {forgotSuccess && <div className="mb-4 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 text-xs rounded-xl font-medium">{forgotSuccess}</div>}
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (isSendingReset) return;
+                    setIsSendingReset(true);
+                    setForgotError(null);
+                    setForgotSuccess(null);
+                    try {
+                      await sendPasswordReset(forgotEmail);
+                      setForgotSuccess('E-mail de recuperação enviado com sucesso! Verifique sua caixa de entrada.');
+                    } catch (err: any) {
+                      setForgotError(err.message || 'Houve um erro ao enviar o e-mail.');
+                    } finally {
+                      setIsSendingReset(false);
+                    }
+                  }} className="space-y-4">
                     <div>
                       <label className="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wider">E-mail Cadastrado</label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="seu-email@fazenda.com.br"
-                        value={forgotEmail}
-                        onChange={(e) => setForgotEmail(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-xs"
-                      />
+                      <input type="email" required placeholder="seu-email@fazenda.com.br" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-xs" />
                     </div>
-
                     <div className="flex gap-2 pt-2">
-                      <button
-                        type="submit"
-                        disabled={isSendingReset}
-                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-xl font-bold transition-all text-xs disabled:opacity-50"
-                      >
-                        {isSendingReset ? 'Enviando...' : 'Enviar Link'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsForgotPasswordOpen(false);
-                          setForgotSuccess(null);
-                          setForgotError(null);
-                        }}
-                        className="flex-1 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-xl font-semibold transition-all text-xs text-center"
-                      >
-                        Cancelar
-                      </button>
+                      <button type="submit" disabled={isSendingReset} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-xl font-bold transition-all text-xs disabled:opacity-50">{isSendingReset ? 'Enviando...' : 'Enviar Link'}</button>
+                      <button type="button" onClick={() => { setIsForgotPasswordOpen(false); setForgotSuccess(null); setForgotError(null); }} className="flex-1 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-xl font-semibold transition-all text-xs">Cancelar</button>
                     </div>
                   </form>
                 </motion.div>
@@ -600,6 +530,7 @@ export default function App() {
     { id: 'tasks', label: 'Tarefas', icon: CalendarCheck },
     { id: 'reports', label: 'Relatórios', icon: BarChart3 },
     { id: 'nutrition', label: 'Cálculo Nutrição', icon: Leaf },
+    { id: 'settings', label: 'Configurações', icon: Settings },
   ];
 
   const renderView = () => {
@@ -672,7 +603,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100 overflow-hidden">
-      {/* Sidebar Overlay for Mobile */}
+      {/* Sidebar Overlay */}
       <AnimatePresence>
         {isMobile && isSidebarOpen && (
           <motion.div 
@@ -696,7 +627,7 @@ export default function App() {
           isMobile ? 'fixed inset-y-0 left-0' : 'relative'
         }`}
       >
-        <div className="p-6 flex items-center justify-between">
+        <div className="p-5 flex items-center justify-between border-b border-gray-200 dark:border-zinc-800">
           {(isSidebarOpen || !isMobile) && (
             <motion.h1 
               initial={false}
@@ -709,22 +640,22 @@ export default function App() {
           {!isMobile && (
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-gray-500 dark:text-gray-400"
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-gray-500 dark:text-gray-400"
             >
-              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              {isSidebarOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           )}
           {isMobile && isSidebarOpen && (
             <button 
               onClick={() => setIsSidebarOpen(false)}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-gray-500 dark:text-gray-400"
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-gray-500 dark:text-gray-400"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           )}
         </div>
 
-        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -735,12 +666,9 @@ export default function App() {
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800'
               }`}
             >
-              <item.icon size={20} />
+              <item.icon size={19} />
               {(isSidebarOpen || isMobile) && (
                 <span className="font-medium text-sm">{item.label}</span>
-              )}
-              {activeView === item.id && isSidebarOpen && !isMobile && (
-                <ChevronRight size={14} className="ml-auto opacity-50" />
               )}
             </button>
           ))}
@@ -751,7 +679,7 @@ export default function App() {
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-colors"
           >
-            <LogOut size={20} />
+            <LogOut size={19} />
             {(isSidebarOpen || isMobile) && <span className="font-medium text-sm">Sair</span>}
           </button>
         </div>
@@ -759,71 +687,80 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gray-50 dark:bg-zinc-900">
-        <header className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-gray-200 dark:border-zinc-800 px-4 md:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {isMobile && (
-              <button 
-                onClick={() => setIsSidebarOpen(true)}
-                className="p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-gray-700 dark:text-gray-300"
-              >
-                <Menu size={20} />
-              </button>
-            )}
-            
-            {activeView !== 'dashboard' && (
-              <button 
-                onClick={() => setActiveView('dashboard')}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all group"
-              >
-                <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-                <span className="text-xs font-bold hidden sm:inline">Voltar</span>
-              </button>
-            )}
+        {/* Header - Responsivo e claro no modo claro */}
+        <header className="sticky top-0 z-10 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm">
+          <div className="px-4 md:px-6 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {isMobile && (
+                <button 
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-gray-700 dark:text-gray-300"
+                >
+                  <Menu size={20} />
+                </button>
+              )}
+              
+              {activeView !== 'dashboard' && (
+                <button 
+                  onClick={() => setActiveView('dashboard')}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all group"
+                >
+                  <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+                  <span className="text-xs font-bold">Voltar</span>
+                </button>
+              )}
 
-            <h2 className="text-lg font-bold text-gray-800 dark:text-white capitalize truncate max-w-[150px] md:max-w-none">
-              {navItems.find(n => n.id === activeView)?.label}
-            </h2>
-          </div>
-          
-          <div className="flex items-center gap-2 md:gap-3">
-            <div className="hidden lg:block bg-gray-100 dark:bg-zinc-800 px-3 py-1.5 rounded-full text-xs font-mono text-gray-600 dark:text-gray-400 font-medium">
-              {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+              <h2 className="text-base md:text-lg font-bold text-gray-800 dark:text-white capitalize truncate max-w-[120px] sm:max-w-none">
+                {navItems.find(n => n.id === activeView)?.label}
+              </h2>
             </div>
             
-            <button 
-              onClick={() => setIsObligationsOpen(true)}
-              className={`p-2 rounded-full transition-colors relative hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-400`}
-              title="Central de Obrigações"
-            >
-              <Bell size={20} />
-              {activeAlertsCount > 0 && (
-                <span className={`absolute -top-1 -right-1 w-5 h-5 rounded-full ${hasOverdue ? 'bg-red-500 animate-pulse' : 'bg-amber-500'} text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-zinc-900`}>
-                  {activeAlertsCount}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Date - hidden on mobile */}
+              <div className="hidden lg:flex items-center bg-gray-100 dark:bg-zinc-800 px-3 py-1.5 rounded-full">
+                <span className="text-xs font-mono text-gray-600 dark:text-gray-400 font-medium">
+                  {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </span>
-              )}
-            </button>
+              </div>
+              
+              {/* Obligations Bell */}
+              <button 
+                onClick={() => setIsObligationsOpen(true)}
+                className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-gray-600 dark:text-gray-400"
+                title="Central de Obrigações"
+              >
+                <Bell size={20} />
+                {activeAlertsCount > 0 && (
+                  <span className={`absolute -top-1 -right-1 w-5 h-5 rounded-full ${hasOverdue ? 'bg-red-500 animate-pulse' : 'bg-amber-500'} text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-zinc-900`}>
+                    {activeAlertsCount > 9 ? '9+' : activeAlertsCount}
+                  </span>
+                )}
+              </button>
 
-            <button 
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-400"
-              title={darkMode ? "Modo Claro" : "Modo Escuro"}
-            >
-              {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} />}
-            </button>
-            
-            <button 
-              onClick={() => setActiveView('settings')}
-              className={`p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-400 ${activeView === 'settings' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : ''}`}
-              title="Configurações"
-            >
-              <Settings size={20} />
-            </button>
+              {/* Theme Toggle */}
+              <button 
+                onClick={() => setDarkMode(!darkMode)}
+                className="p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-400"
+                title={darkMode ? "Modo Claro" : "Modo Escuro"}
+              >
+                {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} />}
+              </button>
+              
+              {/* Settings Button */}
+              <button 
+                onClick={() => setActiveView('settings')}
+                className={`p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 ${activeView === 'settings' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}`}
+                title="Configurações"
+              >
+                <Settings size={20} />
+              </button>
+            </div>
           </div>
         </header>
 
         {/* Permission restriction Banner */}
         {userRole === 'user' && (
-          <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs py-2.5 px-4 md:px-6 flex items-center gap-2">
+          <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs py-2 px-4 md:px-6 flex items-center gap-2">
             <span>⚠️</span>
             <span><strong>Acesso Limitado:</strong> Você está conectado com um perfil de acesso limitado. Adições, edições e exclusões de registros estão desativadas.</span>
           </div>
@@ -837,42 +774,42 @@ export default function App() {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="bg-red-600 text-white font-bold text-xs py-3 px-4 md:px-6 flex items-center justify-between shadow-sm cursor-pointer hover:bg-red-700 transition-colors gap-2"
+                className="bg-red-600 text-white text-xs py-2.5 px-4 md:px-6 flex items-center justify-between shadow-sm cursor-pointer hover:bg-red-700 transition-colors gap-2"
                 onClick={() => setIsObligationsOpen(true)}
               >
                 <div className="flex items-center gap-2">
-                  <div className="p-1 bg-white/20 rounded-lg animate-pulse">
-                    <Bell size={14} className="text-white" />
+                  <div className="p-0.5 bg-white/20 rounded-lg animate-pulse">
+                    <Bell size={12} className="text-white" />
                   </div>
-                  <span>
+                  <span className="text-[11px] sm:text-xs">
                     Atenção: Você tem <strong>{overdueCount} {overdueCount === 1 ? 'obrigação' : 'obrigações'}</strong> com o prazo ultrapassado!
                   </span>
                 </div>
-                <span className="underline uppercase tracking-wider text-[10px] font-bold hover:opacity-80">Ver e Regularizar</span>
+                <span className="underline uppercase tracking-wider text-[9px] sm:text-[10px] font-bold hover:opacity-80 whitespace-nowrap">Ver e Regularizar</span>
               </motion.div>
             ) : (activeAlerts.some(a => a.daysRemaining === 0)) ? (
               <motion.div 
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="bg-amber-500 text-amber-950 font-bold text-xs py-3 px-4 md:px-6 flex items-center justify-between shadow-sm cursor-pointer hover:bg-amber-600 transition-colors gap-2"
+                className="bg-amber-500 text-amber-950 text-xs py-2.5 px-4 md:px-6 flex items-center justify-between shadow-sm cursor-pointer hover:bg-amber-600 transition-colors gap-2"
                 onClick={() => setIsObligationsOpen(true)}
               >
                 <div className="flex items-center gap-2">
-                  <div className="p-1 bg-white/30 rounded-lg">
-                    <Bell size={14} className="text-amber-950" />
+                  <div className="p-0.5 bg-white/30 rounded-lg">
+                    <Bell size={12} className="text-amber-950" />
                   </div>
-                  <span>
+                  <span className="text-[11px] sm:text-xs">
                     Aviso: Você tem <strong>{dueTodayCount} {dueTodayCount === 1 ? 'obrigação que vence' : 'obrigações que vencem'}</strong> hoje!
                   </span>
                 </div>
-                <span className="underline uppercase tracking-wider text-[10px] font-bold hover:opacity-80">Ver obrigações</span>
+                <span className="underline uppercase tracking-wider text-[9px] sm:text-[10px] font-bold hover:opacity-80 whitespace-nowrap">Ver obrigações</span>
               </motion.div>
             ) : null}
           </AnimatePresence>
         )}
 
-        <div className="p-4 md:p-6 max-w-7xl mx-auto">
+        <div className="p-4 md:p-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
