@@ -7,7 +7,9 @@
     "dev": "vite --port 3000 --host 0.0.0.0",
     "build": "vite build",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "fix-theme": "node scripts/fix-theme-classes.js",
+    "fix-theme:dry": "node scripts/fix-theme-classes.js --dry"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

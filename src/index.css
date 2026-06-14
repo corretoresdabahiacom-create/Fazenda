@@ -8,25 +8,50 @@
 
 /* Cores padrão do APP - Verde Escuro */
 :root {
-  --primary: #3d5a45;
-  --primary-dark: #2d4a3a;
-  --primary-light: #4a6b54;
-  --primary-soft: #e8f0ea;
-  --primary-hover: #2d4233;
+  /* Cores primárias */
+  --primary: #2d6a4f;
+  --primary-dark: #1b4d3e;
+  --primary-light: #40916c;
+  --primary-soft: #d8f3dc;
+  --primary-hover: #1b4d3e;
+  
+  /* Cores de fundo e texto - MODO CLARO (alto contraste) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --bg-card: #ffffff;
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-tertiary: #6c757d;
+  --text-on-primary: #ffffff;
+  --border-color: #dee2e6;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .dark {
-  --primary: #5c8a67;
-  --primary-dark: #4a6b54;
-  --primary-light: #7aa089;
-  --primary-soft: #1a2d22;
-  --primary-hover: #6b9a77;
+  /* Cores de fundo e texto - MODO ESCURO (alto contraste) */
+  --primary: #52b788;
+  --primary-dark: #40916c;
+  --primary-light: #74c69d;
+  --primary-soft: #1b4332;
+  --primary-hover: #40916c;
+  
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-tertiary: #2d2d2d;
+  --bg-card: #1e1e1e;
+  --text-primary: #e9ecef;
+  --text-secondary: #ced4da;
+  --text-tertiary: #adb5bd;
+  --text-on-primary: #ffffff;
+  --border-color: #2d2d2d;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Classes de botão padronizadas */
+/* Classes de botão padronizadas - COR VERDE ESCURO PADRÃO */
 .btn-primary {
   background-color: var(--primary);
-  color: white;
+  color: var(--text-on-primary);
   padding: 0.625rem 1.5rem;
   border-radius: 0.75rem;
   font-weight: 700;
@@ -35,8 +60,9 @@
   justify-content: center;
   gap: 0.5rem;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  box-shadow: var(--shadow);
   cursor: pointer;
+  border: none;
 }
 
 .btn-primary:hover {
@@ -48,9 +74,15 @@
   transform: translateY(0);
 }
 
+.btn-primary:focus {
+  outline: none;
+  ring: 2px solid var(--primary);
+  ring-offset: 2px;
+}
+
 .btn-outline {
-  background-color: white;
-  border: 1px solid var(--primary);
+  background-color: var(--bg-card);
+  border: 2px solid var(--primary);
   color: var(--primary);
   padding: 0.625rem 1.5rem;
   border-radius: 0.75rem;
@@ -66,11 +98,46 @@
 .btn-outline:hover {
   background-color: var(--primary-soft);
   transform: translateY(-1px);
+  border-color: var(--primary-dark);
+  color: var(--primary-dark);
 }
 
-/* Cores utilitárias */
+.btn-outline:active {
+  transform: translateY(0);
+}
+
+/* Botão secundário/ghost */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--primary);
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background-color: var(--primary-soft);
+  color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+/* Cores utilitárias - Mantendo o padrão verde escuro */
 .bg-primary {
   background-color: var(--primary);
+}
+
+.bg-primary-dark {
+  background-color: var(--primary-dark);
+}
+
+.bg-primary-light {
+  background-color: var(--primary-light);
 }
 
 .bg-primary-soft {
@@ -81,14 +148,109 @@
   color: var(--primary);
 }
 
+.text-primary-dark {
+  color: var(--primary-dark);
+}
+
 .border-primary {
   border-color: var(--primary);
 }
 
-@layer base {
-  .dark {
-    color-scheme: dark;
-  }
+/* Classes de texto com alto contraste */
+.text-high-contrast {
+  color: var(--text-primary);
+}
+
+.text-medium-contrast {
+  color: var(--text-secondary);
+}
+
+.text-low-contrast {
+  color: var(--text-tertiary);
+}
+
+/* Layout base */
+html, body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.2s ease;
+}
+
+/* Cards e containers */
+.bg-white, .bg-card {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Inputs */
+input, select, textarea {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+input:focus, select:focus, textarea:focus {
+  ring-color: var(--primary);
+  border-color: var(--primary);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Links */
+a {
+  color: var(--primary);
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
+
+/* Tabelas */
+table {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+th {
+  color: var(--text-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+td {
+  border-bottom-color: var(--border-color);
+}
+
+/* Cards de estatísticas */
+.stat-card {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.stat-card .stat-value {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.stat-card .stat-label {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* Badges */
+.badge {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.badge-primary {
+  background-color: var(--primary-soft);
+  color: var(--primary);
 }
 
 /* ===== RESPONSIVIDADE MOBILE ===== */
@@ -247,6 +409,104 @@ html {
   margin-bottom: 1rem;
 }
 
+/* ===== CLASSES UTILITÁRIAS DE TEXTO COM ALTO CONTRASTE ===== */
+
+/* Cores de texto principais */
+.text-theme-primary {
+  color: var(--text-primary) !important;
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.text-theme-tertiary {
+  color: var(--text-tertiary) !important;
+}
+
+/* Cores de fundo */
+.bg-theme-primary {
+  background-color: var(--bg-primary) !important;
+}
+
+.bg-theme-secondary {
+  background-color: var(--bg-secondary) !important;
+}
+
+.bg-theme-tertiary {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.bg-theme-card {
+  background-color: var(--bg-card) !important;
+}
+
+/* Bordas */
+.border-theme {
+  border-color: var(--border-color) !important;
+}
+
+/* Sombras */
+.shadow-theme {
+  box-shadow: var(--shadow) !important;
+}
+
+/* Links */
+.link-theme {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.link-theme:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Headers com contraste garantido */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Parágrafos e textos corridos */
+p, span, li, label {
+  color: var(--text-secondary);
+}
+
+/* Textos de destaque/importantes */
+strong, b, .font-bold, .font-extrabold {
+  color: var(--text-primary);
+}
+
+/* Textos de ajuda/menor importância */
+.text-muted, .help-text, .caption {
+  color: var(--text-tertiary);
+}
+
+/* Ícones - garantir contraste */
+svg {
+  color: var(--text-secondary);
+}
+
+svg.text-primary, svg.[class*="text-primary"] {
+  color: var(--primary);
+}
+
+/* Placeholders com boa visibilidade */
+::placeholder {
+  color: var(--text-tertiary);
+  opacity: 0.7;
+}
+
+/* Seleção de texto com contraste */
+::selection {
+  background-color: var(--primary);
+  color: white;
+}
+
 /* Espaçamento seguro para iOS */
 @supports (padding: max(0px)) {
   .safe-bottom {
@@ -259,128 +519,3 @@ html {
 }
 
 /* ===== FIM RESPONSIVIDADE MOBILE ===== */
-
-/* Custom dark mode utility adjustments for better global contrast and eye-safe rural visual nights */
-html.dark body {
-  background-color: #121212;
-  color: #f4f4f5;
-}
-
-/* Make cards and panels easily toggle to dark mode */
-html.dark .bg-white {
-  background-color: #1a1a1c !important;
-  color: #f4f4f5 !important;
-  border-color: #27272a !important;
-}
-
-/* Light mode high-contrast text improvements */
-html:not(.dark) .text-\[\#8d8a86\],
-html:not(.dark) .text-zinc-400,
-html:not(.dark) .text-gray-400,
-html:not(.dark) .text-neutral-400 {
-  color: #55524e !important;
-}
-
-html:not(.dark) .text-\[\#6d6a66\],
-html:not(.dark) .text-zinc-500,
-html:not(.dark) .text-gray-500,
-html:not(.dark) .text-neutral-500 {
-  color: #3b3936 !important;
-}
-
-html:not(.dark) .text-\[\#2d2a26\] {
-  color: #151413 !important;
-}
-
-html.dark .text-gray-900,
-html.dark .text-neutral-900,
-html.dark .text-\[\#2d2a26\] {
-  color: #f4f4f5 !important;
-}
-
-html.dark .text-gray-500,
-html.dark .text-neutral-500,
-html.dark .text-\[\#6d6a66\],
-html.dark .text-\[\#8d8a86\] {
-  color: #a1a1aa !important;
-}
-
-html.dark .bg-\[\#fcfaf7\],
-html.dark .bg-\[\#f5f2ed\],
-html.dark .bg-\[\#f9faf8\] {
-  background-color: #141416 !important;
-  border-color: #27272a !important;
-}
-
-html.dark .border,
-html.dark .border-b,
-html.dark .border-t,
-html.dark .border-r,
-html.dark .border-l {
-  border-color: #27272a !important;
-}
-
-html.dark input,
-html.dark select,
-html.dark textarea {
-  background-color: #202024 !important;
-  color: #f4f4f5 !important;
-  border-color: #2d2d30 !important;
-}
-
-/* Custom shadow adjustments for dark theme */
-html.dark .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4) !important;
-}
-html.dark .shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Light Mode Advanced Contrast improvements */
-html:not(.dark) .bg-emerald-50, 
-html:not(.dark) .bg-emerald-50\/20,
-html:not(.dark) .bg-emerald-50\/30,
-html:not(.dark) .bg-\[\#3d5a45\]\/5,
-html:not(.dark) .bg-amber-50\/40,
-html:not(.dark) .bg-amber-50,
-html:not(.dark) .bg-\[\#fcfaf7\] {
-  color: #1c1b1a !important;
-}
-
-html:not(.dark) .text-amber-800,
-html:not(.dark) .text-amber-900,
-html:not(.dark) .text-\[\#8a5b00\],
-html:not(.dark) .text-amber-700 {
-  color: #6e3d00 !important;
-}
-
-html:not(.dark) .text-emerald-800,
-html:not(.dark) .text-emerald-700,
-html:not(.dark) .text-\[\#3d5a45\] {
-  color: #1b3823 !important;
-}
-
-html:not(.dark) .text-zinc-400,
-html:not(.dark) .text-gray-400,
-html:not(.dark) .text-neutral-400,
-html:not(.dark) .text-\[\#8d8a86\],
-html:not(.dark) .text-zinc-500,
-html:not(.dark) .text-\[\#6d6a66\] {
-  color: #3b3936 !important;
-}
-
-html:not(.dark) .text-zinc-400.font-bold,
-html:not(.dark) .text-zinc-500.font-bold,
-html:not(.dark) .text-\[\#8d8a86\].font-bold,
-html:not(.dark) .text-\[\#6d6a66\].font-bold {
-  color: #272624 !important;
-}
-
-html:not(.dark) .text-xs.font-medium,
-html:not(.dark) .text-sm.font-medium,
-html:not(.dark) .text-xs.font-semibold,
-html:not(.dark) .font-medium,
-html:not(.dark) .font-semibold {
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-}

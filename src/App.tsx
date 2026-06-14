@@ -40,6 +40,14 @@ import {
   FarmSettings
 } from './types';
 
+import ThemeToggle from './components/ThemeToggle';
+
+// No seu JSX, adicione o botão de toggle onde desejar (ex: no topo direito)
+<div className="flex items-center gap-3">
+  <ThemeToggle />
+  {/* outros botões */}
+</div>
+
 // Utils
 import { computeObligations, ObligationAlert } from './utils/obligations';
 
