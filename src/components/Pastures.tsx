@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { 
   Plus, Search, Edit3, Trash2, Map as MapIcon, Users, Activity, X, Camera, Scan, 
-  Info, CheckCircle2, AlertTriangle, ThermometerSun, Leaf, ArrowLeft, Beef, Sparkles, AlertCircle
+  Info, CheckCircle2, ThermometerSun, Leaf, ArrowLeft, Beef, Sparkles, AlertCircle
 } from 'lucide-react';
 import { Pasture, Animal, FarmSettings } from '../types';
 import { PASTURE_TYPES } from '../constants';
@@ -156,10 +156,11 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
 
   const handleAIResult = (result: any) => {
     if (selectedPastureForAnalysis) {
-      onAdd({
+      const updatedPasture: Pasture = {
         ...selectedPastureForAnalysis,
         aiAnalysis: { ...result, timestamp: new Date().toISOString() }
-      });
+      };
+      onAdd(updatedPasture);
     } else {
       setFormData({
         ...formData,
@@ -478,7 +479,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                       <input 
                         type="checkbox"
                         className="rounded text-[#3d5a45] focus:ring-[#3d5a45]"
-                        checked={formData.grassTypes?.includes(type)}
+                        checked={formData.grassTypes?.includes(type) || false}
                         onChange={(e) => {
                           const types = formData.grassTypes || [];
                           if (e.target.checked) {

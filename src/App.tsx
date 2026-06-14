@@ -3,11 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
@@ -25,7 +20,6 @@ import {
   ChevronRight,
   LogOut,
   Settings,
-  LogIn,
   Bell,
   Scale,
   UserPlus,
@@ -917,4 +911,3 @@ export default function App() {
     </div>
   );
 }
-

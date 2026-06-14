@@ -106,7 +106,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
       id: editingAnimal?.id || Date.now().toString(),
       type: formData.type || AnimalType.OWN,
       category: formData.category || AnimalCategory.BULL,
-      breed: formData.breed,
+      breed: formData.breed || '',
       ownerName: formData.ownerName,
       quantity: formData.quantity || 0,
       lotName: formData.lotName || '',
@@ -412,7 +412,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       value={selectedTransferAnimalId}
                       onChange={(e) => {
                         setSelectedTransferAnimalId(e.target.value);
-                        setNewTransferPastureId(''); // Reset when selection changes
+                        setNewTransferPastureId('');
                       }}
                     >
                       <option value="">-- Escolha um Lote de Gado --</option>
@@ -514,9 +514,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
 
                           await onAdd(updatedLot);
                           
-                          // Reset the new transfer selection so that "a opção 'Trocar de pasto' estará em branco"
                           setNewTransferPastureId('');
-                          // Show beautiful feedback
                           alert(`Sucesso! Lote "${lotToMove.lotName}" transferido com sucesso para o novo pasto.`);
                         }}
                         disabled={!newTransferPastureId}
@@ -653,7 +651,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         setSellingAnimal(animal);
                         setSaleFormData({
                           saleDate: new Date().toISOString().split('T')[0],
-                          arrobaPrice: 320, // default @ price estimate in Brazil
+                          arrobaPrice: 320,
                           averageWeight: animal.averageWeight || 450,
                           buyerName: '',
                           shippingCost: 200,
@@ -994,7 +992,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         </div>
                       </div>
 
-                      <div className="grid grid-cols- gap-4 border-t border-white/10 pt-3 flex justify-between items-center">
+                      <div className="grid grid-cols-1 gap-4 border-t border-white/10 pt-3 flex justify-between items-center">
                         <div>
                           <span className="text-white/80 uppercase text-[9px] font-bold block">Taxa Diária Faturada:</span>
                           <span className="text-xs">
@@ -1067,7 +1065,6 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
           </motion.div>
         </div>
       )}
-
 
       {/* 2. New Animal Setup Form Modal */}
       {isFormOpen && (

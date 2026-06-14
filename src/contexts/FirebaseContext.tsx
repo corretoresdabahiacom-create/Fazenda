@@ -280,10 +280,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const getFirestoreUserId = (): string => {
     if (!user) return '';
-    const email = (user.email || '').toLowerCase();
-    return (email === 'admin@fazenda.com.br' || email === 'usuario@fazenda.com.br' || email === 'admmeuarmazem@gmail.com' || email === 'arnaldolima.adv79@gmail.com')
-      ? 'fazenda_shared_production_db_v1'
-      : user.uid;
+    return user.uid;
   };
 
   // --- Generic Helpers for LocalStorage Data Parsing ---
@@ -402,7 +399,6 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } else {
       try {
         const credential = await signInWithEmailAndPassword(auth, email, pass);
-
         console.log('LOGIN OK');
         console.log('UID:', credential.user.uid);
         console.log('EMAIL:', credential.user.email);
@@ -464,24 +460,24 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const loginWithGoogle = async () => {
     setLoading(true);
     try {
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log('GOOGLE LOGIN OK');
-        console.log(result.user);
-        const u = result.user;
-        setUser(u);
-        const defaultRole = 'admin';
-        setUserRole(defaultRole);
-        localStorage.setItem('gestao_fazenda_user_role', defaultRole);
-        setIsDemoMode(false);
-        localStorage.removeItem('gestao_fazenda_is_demo');
-        localStorage.removeItem('gestao_fazenda_custom_user');
-        setLoading(false);
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log('GOOGLE LOGIN OK');
+      console.log(result.user);
+      const u = result.user;
+      setUser(u);
+      const defaultRole = 'admin';
+      setUserRole(defaultRole);
+      localStorage.setItem('gestao_fazenda_user_role', defaultRole);
+      setIsDemoMode(false);
+      localStorage.removeItem('gestao_fazenda_is_demo');
+      localStorage.removeItem('gestao_fazenda_custom_user');
+      setLoading(false);
     } catch (err: any) {
-        console.error('Google login error:', err);
-        setLoading(false);
-        throw err;
+      console.error('Google login error:', err);
+      setLoading(false);
+      throw err;
     }
-};
+  };
 
   const sendPasswordReset = async (email: string) => {
     try {
@@ -593,61 +589,60 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return;
     }
 
-    const userId = getFirestoreUserId();
+    const userId = user.uid;
+    
+    if (!userId) {
+      console.error('User ID não encontrado');
+      return;
+    }
 
-    // Settings
+    console.log('🔥 Carregando dados para usuário:', userId);
+
     const settingsUnsub = onSnapshot(doc(db, 'users', userId), (snap) => {
       if (snap.exists()) {
+        console.log('✅ Settings carregadas');
         setSettings(snap.data() as FarmSettings);
+      } else {
+        setSettings({ farmName: '', city: '' });
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, `users/${userId}`));
 
-    // Animals
     const animalsUnsub = onSnapshot(collection(db, 'users', userId, 'animals'), (snap) => {
       setAnimals(snap.docs.map(d => d.data() as Animal));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/animals`));
 
-    // Pastures
     const pasturesUnsub = onSnapshot(collection(db, 'users', userId, 'pastures'), (snap) => {
       setPastures(snap.docs.map(d => d.data() as Pasture));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/pastures`));
 
-    // Expenses
     const expensesUnsub = onSnapshot(collection(db, 'users', userId, 'expenses'), (snap) => {
       setExpenses(snap.docs.map(d => d.data() as Expense));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/expenses`));
 
-    // Payments
     const paymentsUnsub = onSnapshot(collection(db, 'users', userId, 'payments'), (snap) => {
       setPayments(snap.docs.map(d => d.data() as EmployeePayment));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/payments`));
 
-    // Tasks
     const tasksUnsub = onSnapshot(collection(db, 'users', userId, 'tasks'), (snap) => {
       setTasks(snap.docs.map(d => d.data() as FarmTask));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/tasks`));
 
-    // Transactions
     const transactionsUnsub = onSnapshot(collection(db, 'users', userId, 'transactions'), (snap) => {
       setTransactions(snap.docs.map(d => d.data() as TransactionHistory));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/transactions`));
 
-    // Inventory
     const inventoryUnsub = onSnapshot(collection(db, 'users', userId, 'inventory'), (snap) => {
       setInventory(snap.docs.map(d => d.data() as InventoryItem));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/inventory`));
 
-    // Employees
     const employeesUnsub = onSnapshot(collection(db, 'users', userId, 'employees'), (snap) => {
       setEmployees(snap.docs.map(d => d.data() as Employee));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/employees`));
 
-    // Fixed Expenses
     const fixedExpensesUnsub = onSnapshot(collection(db, 'users', userId, 'fixedExpenses'), (snap) => {
       setFixedExpenses(snap.docs.map(d => d.data() as FixedExpense));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/fixedExpenses`));
 
-    // Weighing Sheets
     const weighingSheetsUnsub = onSnapshot(collection(db, 'users', userId, 'weighingSheets'), (snap) => {
       setWeighingSheets(snap.docs.map(d => d.data() as WeighingSheet));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/weighingSheets`));
@@ -683,9 +678,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       localStorage.setItem('demo_settings', JSON.stringify(s));
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid), s);
+      console.log('✅ Settings salvas para usuário:', currentUid);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}`);
     }
@@ -698,7 +694,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('animals', animal, setAnimals);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'animals', animal.id), animal);
     } catch (err) {
@@ -714,7 +710,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       optionsRemoveFromWeighingSheetRows(id);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'animals', id));
     } catch (err) {
@@ -722,10 +718,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  // Internal helper to handle cascades
-  const optionsRemoveFromWeighingSheetRows = (animalId: string) => {
-    // optional helper
-  };
+  const optionsRemoveFromWeighingSheetRows = (animalId: string) => {};
 
   const savePasture = async (pasture: Pasture) => {
     if (!user) return;
@@ -734,7 +727,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('pastures', pasture, setPastures);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'pastures', pasture.id), pasture);
     } catch (err) {
@@ -749,7 +742,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       deleteDemoItem('pastures', id, setPastures);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'pastures', id));
     } catch (err) {
@@ -764,7 +757,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('expenses', expense, setExpenses);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'expenses', expense.id), expense);
     } catch (err) {
@@ -779,7 +772,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       deleteDemoItem('expenses', id, setExpenses);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'expenses', id));
     } catch (err) {
@@ -794,7 +787,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('payments', payment, setPayments);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'payments', payment.id), payment);
     } catch (err) {
@@ -809,7 +802,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       deleteDemoItem('payments', id, setPayments);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'payments', id));
     } catch (err) {
@@ -824,7 +817,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('tasks', task, setTasks);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'tasks', task.id), task);
     } catch (err) {
@@ -839,7 +832,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       deleteDemoItem('tasks', id, setTasks);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'tasks', id));
     } catch (err) {
@@ -854,7 +847,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('transactions', transaction, setTransactions);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'transactions', transaction.id), transaction);
     } catch (err) {
@@ -869,7 +862,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('inventory', item, setInventory);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'inventory', item.id), item);
     } catch (err) {
@@ -884,7 +877,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       deleteDemoItem('inventory', id, setInventory);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'inventory', id));
     } catch (err) {
@@ -899,7 +892,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('employees', employee, setEmployees);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'employees', employee.id), employee);
     } catch (err) {
@@ -914,7 +907,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       deleteDemoItem('employees', id, setEmployees);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'employees', id));
     } catch (err) {
@@ -929,7 +922,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('fixedExpenses', fixedExpense, setFixedExpenses);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'fixedExpenses', fixedExpense.id), fixedExpense);
     } catch (err) {
@@ -944,7 +937,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       deleteDemoItem('fixedExpenses', id, setFixedExpenses);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'fixedExpenses', id));
     } catch (err) {
@@ -959,7 +952,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveDemoItem('weighingSheets', sheet, setWeighingSheets);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await setDoc(doc(db, 'users', currentUid, 'weighingSheets', sheet.id), sheet);
     } catch (err) {
@@ -974,7 +967,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       deleteDemoItem('weighingSheets', id, setWeighingSheets);
       return;
     }
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     try {
       await deleteDoc(doc(db, 'users', currentUid, 'weighingSheets', id));
     } catch (err) {
@@ -985,40 +978,34 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const seedDatabase = async () => {
     if (!user) return;
     if (!checkWritePermission()) return;
-    const currentUid = getFirestoreUserId();
+    const currentUid = user.uid;
     if (!currentUid) return;
 
     try {
       setLoading(true);
 
-      // Seed settings
       const s: FarmSettings = { 
         farmName: 'Fazenda Online', 
         city: 'Uberaba - MG' 
       };
       await setDoc(doc(db, 'users', currentUid), s);
 
-      // Seed pastures
       for (const p of defaultDemoPastures) {
         await setDoc(doc(db, 'users', currentUid, 'pastures', p.id), p);
       }
 
-      // Seed animals
       for (const a of defaultDemoAnimals) {
         await setDoc(doc(db, 'users', currentUid, 'animals', a.id), a);
       }
 
-      // Seed employees
       for (const e of defaultDemoEmployees) {
         await setDoc(doc(db, 'users', currentUid, 'employees', e.id), e);
       }
 
-      // Seed fixedExpenses
       for (const fe of defaultDemoFixedExpenses) {
         await setDoc(doc(db, 'users', currentUid, 'fixedExpenses', fe.id), fe);
       }
 
-      // Seed tasks
       for (const t of defaultDemoTasks) {
         await setDoc(doc(db, 'users', currentUid, 'tasks', t.id), t);
       }
@@ -1061,7 +1048,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
         }
       } else {
-        const currentUid = getFirestoreUserId();
+        const currentUid = user.uid;
         if (!currentUid) return;
         
         if (backup.settings) {
@@ -1069,16 +1056,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
         
         const subcollections = [
-          'animals',
-          'pastures',
-          'expenses',
-          'payments',
-          'tasks',
-          'transactions',
-          'inventory',
-          'employees',
-          'fixedExpenses',
-          'weighingSheets'
+          'animals', 'pastures', 'expenses', 'payments', 'tasks',
+          'transactions', 'inventory', 'employees', 'fixedExpenses', 'weighingSheets'
         ];
         
         for (const coll of subcollections) {
@@ -1101,50 +1080,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   return (
     <FirebaseContext.Provider value={{
-      user, 
-      userRole,
-      loading, 
-      isDemoMode,
-      loginAsGuest,
-      logoutAsGuest,
-      loginWithEmail,
-      registerWithEmail,
-      loginWithGoogle,
-      sendPasswordReset,
-      logout,
-      animals, 
-      pastures, 
-      expenses, 
-      payments, 
-      tasks, 
-      transactions, 
-      inventory, 
-      employees, 
-      fixedExpenses, 
-      weighingSheets, 
-      settings,
-      updateSettings, 
-      saveAnimal, 
-      deleteAnimal, 
-      savePasture, 
-      deletePasture, 
-      saveExpense, 
-      deleteExpense,
-      savePayment, 
-      deletePayment, 
-      saveTask, 
-      deleteTask, 
-      saveTransaction, 
-      saveInventory, 
-      deleteInventory,
-      saveEmployee, 
-      deleteEmployee, 
-      saveFixedExpense, 
-      deleteFixedExpense, 
-      saveWeighingSheet, 
-      deleteWeighingSheet,
-      seedDatabase,
-      importBackupData
+      user, userRole, loading, isDemoMode,
+      loginAsGuest, logoutAsGuest, loginWithEmail, registerWithEmail,
+      loginWithGoogle, sendPasswordReset, logout,
+      animals, pastures, expenses, payments, tasks, transactions,
+      inventory, employees, fixedExpenses, weighingSheets, settings,
+      updateSettings, saveAnimal, deleteAnimal, savePasture, deletePasture,
+      saveExpense, deleteExpense, savePayment, deletePayment, saveTask,
+      deleteTask, saveTransaction, saveInventory, deleteInventory,
+      saveEmployee, deleteEmployee, saveFixedExpense, deleteFixedExpense,
+      saveWeighingSheet, deleteWeighingSheet, seedDatabase, importBackupData
     }}>
       {children}
     </FirebaseContext.Provider>

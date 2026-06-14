@@ -256,11 +256,11 @@ export default function Dashboard({
   const COLORS = ['#3d5a45', '#5c8a67', '#8bb193', '#b8d8be', '#e2efe4', '#f0a500', '#cf7500', '#a13100'];
 
   return (
-    <div className="space-y-8">
+    <div className="container-fluid space-y-8">
       {/* Farm Location Header */}
-      <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-serif italic font-bold text-[#3d5a45] mb-2">{settings.farmName}</h2>
+          <h2 className="text-2xl sm:text-3xl font-serif italic font-bold text-[#3d5a45] mb-2">{settings.farmName}</h2>
           <div className="flex items-center gap-4 text-[#6d6a66]">
             <div className="flex items-center gap-1.5 font-medium">
               <MapPin size={16} className="text-[#3d5a45]" />
@@ -282,8 +282,7 @@ export default function Dashboard({
       </div>
 
       {/* Sugestão Inteligente (AI Technical Advice) Card */}
-      <div className="bg-[#fcfaf7] rounded-3xl border border-[#e5e0d8] p-6 shadow-xs relative overflow-hidden transition-all">
-        {/* Subtle decorative background pattern elements */}
+      <div className="bg-[#fcfaf7] rounded-3xl border border-[#e5e0d8] p-4 sm:p-6 shadow-xs relative overflow-hidden transition-all">
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#3d5a45]/5 rounded-bl-full -z-10" />
         
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -363,29 +362,29 @@ export default function Dashboard({
       </div>
 
       {/* AI Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button 
           onClick={() => onNavigate?.('animals-scan')}
-          className="flex items-center gap-4 bg-[#3d5a45] text-white p-6 rounded-3xl border border-[#3d5a45] shadow-sm hover:bg-[#2d4233] transition-all group"
+          className="flex items-center gap-4 bg-[#3d5a45] text-white p-4 sm:p-6 rounded-3xl border border-[#3d5a45] shadow-sm hover:bg-[#2d4233] transition-all group"
         >
           <div className="bg-white/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
              <Scan size={24} />
           </div>
           <div className="text-left flex-1">
-             <h3 className="font-bold">Animal Scan</h3>
+             <h3 className="font-bold text-sm sm:text-base">Animal Scan</h3>
              <p className="text-xs text-white/70">Identificação e contagem IA</p>
           </div>
           <ChevronRightIcon size={20} className="text-white/40 group-hover:translate-x-1 transition-transform" />
         </button>
         <button 
           onClick={() => onNavigate?.('pastures')}
-          className="flex items-center gap-4 bg-white text-[#3d5a45] p-6 rounded-3xl border border-[#e5e0d8] shadow-sm hover:border-[#3d5a45] transition-all group"
+          className="flex items-center gap-4 bg-white text-[#3d5a45] p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm hover:border-[#3d5a45] transition-all group"
         >
           <div className="bg-[#3d5a45]/5 p-3 rounded-2xl group-hover:scale-110 transition-transform">
              <Scan size={24} />
           </div>
           <div className="text-left flex-1">
-             <h3 className="font-bold">Agro Scan</h3>
+             <h3 className="font-bold text-sm sm:text-base">Agro Scan</h3>
              <p className="text-xs text-[#6d6a66]">Análise agrostológica IA</p>
           </div>
           <ChevronRightIcon size={20} className="text-[#3d5a45]/20 group-hover:translate-x-1 transition-transform" />
@@ -394,7 +393,7 @@ export default function Dashboard({
 
       {/* Dynamic Dashboard Obligations Alert Panel */}
       {activeAlerts && activeAlerts.length > 0 && (
-        <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-serif italic font-bold text-lg text-[#3d5a45] flex items-center gap-2">
               <Clock size={18} className="text-[#3d5a45] animate-pulse" />
@@ -408,7 +407,7 @@ export default function Dashboard({
               Ver todas ({activeAlerts.length}) <ChevronRightIcon size={12} />
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid-responsive gap-4">
             {activeAlerts.slice(0, 4).map((alert) => {
               const isOverdue = alert.daysRemaining < 0;
               const isToday = alert.daysRemaining === 0;
@@ -451,8 +450,8 @@ export default function Dashboard({
         </div>
       )}
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+      {/* Stats Grid - USING RESPONSIVE CLASS */}
+      <div className="grid-responsive gap-6">
         <StatCard 
           title="Gasto Total" 
           value={`R$ ${totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
@@ -499,7 +498,7 @@ export default function Dashboard({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Charts */}
-        <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             Evolução Mensal (R$)
           </h3>
@@ -519,7 +518,7 @@ export default function Dashboard({
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             Distribuição de Custos
           </h3>
@@ -560,7 +559,7 @@ export default function Dashboard({
       </div>
 
       {/* Quick Tasks */}
-      <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
+      <div className="bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
         <h3 className="text-lg font-bold mb-4">Tarefas Próximas</h3>
         <div className="space-y-4">
           {tasks.slice(0, 3).map(task => (
@@ -597,7 +596,7 @@ function StatCard({ title, value, icon, trend, onClick }: { title: string; value
   return (
     <div 
       onClick={onClick} 
-      className={`bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm hover:shadow-md transition-all ${
+      className={`bg-white p-4 sm:p-6 rounded-3xl border border-[#e5e0d8] shadow-sm hover:shadow-md transition-all ${
         onClick ? 'cursor-pointer hover:border-[#3d5a45]/30 active:scale-[0.99]' : ''
       }`}
     >
@@ -608,8 +607,8 @@ function StatCard({ title, value, icon, trend, onClick }: { title: string; value
       </div>
       <div>
         <h4 className="text-sm font-medium text-[#8d8a86] uppercase tracking-wider">{title}</h4>
-        <div className="text-2xl font-bold mt-1">{value}</div>
-        <p className="text-xs text-[#5c8a67] mt-2 font-medium">{trend}</p>
+        <div className="text-xl sm:text-2xl font-bold mt-1 break-words">{value}</div>
+        <p className="text-xs text-[#5c8a67] mt-2 font-medium break-words">{trend}</p>
       </div>
     </div>
   );
