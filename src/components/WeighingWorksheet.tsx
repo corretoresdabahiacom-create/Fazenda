@@ -572,7 +572,7 @@ export default function WeighingWorksheet() {
                     <th style={colStyles[6]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Valor parcial/ animal</th>
                     <th style={colStyles[7]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Total Geral</th>
                     <th style={colStyles[8]} className="p-4"></th>
-                  </table>
+                  </tr>
                 </thead>
                 <tbody>
                   <AnimatePresence initial={false}>
