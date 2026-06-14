@@ -467,7 +467,7 @@ export default function WeighingWorksheet() {
                     />
                     <button 
                       onClick={() => setIsEditingName(false)}
-                      className="btn-primary p-1 px-2.5 text-xs"
+                      className="bg-[#3d5a45] text-white p-1 px-2.5 text-xs rounded-lg hover:bg-[#2d4233] transition-colors"
                     >
                       <Check size={14} /> OK
                     </button>
@@ -527,7 +527,7 @@ export default function WeighingWorksheet() {
 
               <button 
                 onClick={handleExportCSV}
-                className="btn-outline px-3 py-2.5 text-xs"
+                className="border border-[#3d5a45] text-[#3d5a45] hover:bg-[#3d5a45] hover:text-white px-3 py-2.5 rounded-xl text-xs font-bold transition-colors"
               >
                 <FileDown size={14} /> Exportar
               </button>
@@ -535,7 +535,7 @@ export default function WeighingWorksheet() {
               <button 
                 onClick={handleSaveSheet}
                 disabled={saveStatus === 'saving'}
-                className="btn-primary px-4 py-2.5 text-xs disabled:opacity-50"
+                className="bg-[#3d5a45] text-white hover:bg-[#2d4233] px-4 py-2.5 rounded-xl text-xs font-bold transition-colors disabled:opacity-50"
               >
                 <Save size={14} />
                 {saveStatus === 'saving' ? 'Salvando...' : saveStatus === 'saved' ? 'Salvo!' : 'Salvar no Servidor'}
@@ -572,7 +572,7 @@ export default function WeighingWorksheet() {
                     <th style={colStyles[6]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Valor parcial/ animal</th>
                     <th style={colStyles[7]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Total Geral</th>
                     <th style={colStyles[8]} className="p-4"></th>
-                  </table>
+                  </tr>
                 </thead>
                 <tbody>
                   <AnimatePresence initial={false}>
@@ -676,199 +676,4 @@ export default function WeighingWorksheet() {
                   </AnimatePresence>
 
                   {/* !!! AS REQUESTED: Pule sempre uma linha !!! */}
-                  <tr className="bg-[#fefdfc] border-b border-[#e5e0d8]">
-                    <td style={{ ...colStyles[0], height: '40px' }} />
-                    <td style={{ ...colStyles[1], height: '40px' }} />
-                    <td style={{ ...colStyles[2], height: '40px' }} />
-                    <td style={{ ...colStyles[3], height: '40px' }} />
-                    <td style={{ ...colStyles[4], height: '40px' }} />
-                    <td style={{ ...colStyles[5], height: '40px' }} />
-                    <td style={{ ...colStyles[6], height: '40px' }} />
-                    <td style={{ ...colStyles[7], height: '40px' }} />
-                    <td style={{ ...colStyles[8], height: '40px' }} />
-                  </tr>
-
-                  {/* !!! AS REQUESTED: Totais Row in order: 
-                     "Quantidade total, peso total, divisão por 15, valor da arroba, total por unidade e total por quantidade" 
-                  !!! */}
-                  <tr className="bg-[#fcfaf7] font-black border-t-2 border-[#e5e0d8]">
-                    {/* Quantidade total */}
-                    <td style={colStyles[0]} className="p-4 px-2 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Qtd Total</div>
-                      <span className="text-xs font-black text-[#3d5a45] block whitespace-nowrap">
-                        {totals.qTotal} <span className="text-[10px] font-medium text-[#8d8a86]">cab.</span>
-                      </span>
-                    </td>
-
-                    {/* Peso total sum */}
-                    <td style={colStyles[1]} className="p-4 px-2 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Peso Total</div>
-                      <span className="text-xs font-black text-[#2d2a26] block whitespace-nowrap">
-                        {totals.weightSum.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 5 })} kg
-                      </span>
-                    </td>
-
-                    {/* Peso (kg)/ Animal (Average Weight per head) */}
-                    <td style={colStyles[2]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Média kg/Animal</div>
-                      <span className="text-xs font-black text-[#3d5a45] block whitespace-nowrap">
-                        {totals.averageWeight.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 5 })} kg
-                      </span>
-                    </td>
-
-                    {/* Divisão por 15 (Total @) */}
-                    <td style={colStyles[3]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Divisão por 15</div>
-                      <span className="text-xs font-black text-[#3d5a45] font-mono whitespace-nowrap block">
-                        {totals.totalDivisionBy15.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 5 })} @
-                      </span>
-                    </td>
-
-                    {/* Parcial de Arroba por Animal (Sum/Avg) */}
-                    <td style={colStyles[4]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Média @/Animal</div>
-                      <span className="text-xs font-black text-[#3d5a45] font-mono whitespace-nowrap block">
-                        {totals.averageArrobas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 5 })} @
-                      </span>
-                    </td>
-
-                    {/* Valor da Arroba (Weighted Price Average) */}
-                    <td style={colStyles[5]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Valor da Arroba</div>
-                      <span className="text-xs font-bold text-orange-600 font-mono whitespace-nowrap">
-                        {totals.weightedArrobaValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
-                       </span>
-                    </td>
-
-                    {/* Valor parcial/ animal (Average Value per Head) - CENTER ALIGNED! */}
-                    <td style={colStyles[6]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Valor parcial/ animal</div>
-                      <span className="text-sm font-black text-[#3d5a45] font-mono whitespace-nowrap">
-                        {totals.averageValuePerHead.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
-                      </span>
-                    </td>
-
-                    {/* Total por quantidade - CENTER ALIGNED! */}
-                    <td style={colStyles[7]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1 text-orange-600">Total Geral</div>
-                      <span className="text-base font-black text-[#2d2a26] font-mono bg-orange-100/30 px-3 py-1.5 rounded-xl border border-orange-200 whitespace-nowrap inline-block">
-                        {totals.totalQuantityValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
-                      </span>
-                    </td>
-
-                    {/* Empty cell for column matching delete actions */}
-                    <td style={colStyles[8]} className="p-4"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* Quick action footer */}
-            <div className="p-5 bg-[#fcfaf7] border-t border-[#e5e0d8] flex items-center justify-between">
-              <button 
-                onClick={handleAddRow}
-                className="btn-outline px-4 py-2.5 text-xs"
-              >
-                <Plus size={14} /> Adicionar Nova Linha
-              </button>
-              
-              <div className="text-[10px] text-[#8d8a86] uppercase font-bold flex items-center gap-1">
-                <Sparkles size={12} className="text-orange-500 animate-spin" /> Digite diretamente nas celulas para recalcular
-              </div>
-            </div>
-          </div>
-
-          {/* Notes and description */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#fcfaf7] p-6 rounded-3xl border border-[#e5e0d8]">
-            <div className="md:col-span-2 space-y-2">
-              <label className="text-xs font-bold uppercase text-[#8d8a86]">Observações de Lote / Observações Gerais</label>
-              <textarea 
-                value={sheetNotes}
-                onChange={(e) => setSheetNotes(e.target.value)}
-                placeholder="Exemplo: Vacina aplicada, condições climáticas do dia, destino do lote..."
-                className="w-full bg-white border border-[#e5e0d8] focus:border-[#3d5a45] focus:ring-1 focus:ring-[#3d5a45]/20 focus:outline-none p-4 rounded-2xl text-xs font-semibold leading-relaxed h-20"
-              />
-            </div>
-            
-            <div className="p-4 bg-white rounded-2xl border border-[#e5e0d8] space-y-3 shadow-xs">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#3d5a45]">
-                <TrendingUp size={16} /> Resumo Prático
-              </div>
-              <ul className="text-[11px] text-[#6d6a66] space-y-1.5 leading-snug font-medium list-disc list-inside">
-                <li>O peso total em <strong>@ (Arroba)</strong> é a divisão do peso total por 15.</li>
-                <li>A coluna <strong>Média @/Animal</strong> é obtida dividindo-se o total de @ pela quantidade de animais da linha/lote.</li>
-                <li><strong>Total Geral</strong> é o resultado da multiplicação da Divisão por 15 pelo valor da arroba.</li>
-                <li><strong>Valor parcial/ animal</strong> é calculado dividindo o Total Geral pela quantidade de animais (nas linhas e no rodapé) e depois dividindo por 2.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between bg-white border border-[#e5e0d8] rounded-3xl p-4 px-6 shadow-xs">
-            <button 
-              onClick={() => setActiveTab('sheets')}
-              className="btn-outline px-4 py-2 text-xs"
-            >
-              ← Voltar para Minhas Planilhas
-            </button>
-
-            {activeSheetId && activeSheetId !== 'temp' && (
-              <button 
-                onClick={() => handleDeleteSheet(activeSheetId)}
-                className="btn-outline text-red-500 hover:bg-red-50 hover:text-red-600 border-red-200 text-xs flex items-center gap-1.5"
-              >
-                <Trash2 size={14} /> Excluir Planilha
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Confirmação de Exclusão */}
-      <AnimatePresence>
-        {deletingSheetId && (
-          <div className="fixed inset-0 bg-[#2d2a26]/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="bg-white rounded-3xl border border-[#e5e0d8] shadow-xl p-6 max-w-sm w-full space-y-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-3 text-red-500">
-                <div className="p-3 bg-red-50 rounded-2xl border border-red-100">
-                  <Trash2 size={24} />
-                </div>
-                <div>
-                  <h3 className="font-serif italic font-bold text-lg text-[#2d2a26]">Deletar Planilha</h3>
-                  <p className="text-[10px] uppercase font-black tracking-wider text-red-500/80">Ação irreversível</p>
-                </div>
-              </div>
-
-              <p className="text-xs text-[#6d6a66] leading-relaxed font-semibold">
-                Deseja realmente deletar esta planilha? Todos os dados de pesagem salvos nela serão excluídos permanentemente.
-              </p>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setDeletingSheetId(null)}
-                  className="btn-outline px-4 py-2 text-xs"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmDeleteSheet}
-                  className="btn-primary px-4 py-2 text-xs bg-red-500 hover:bg-red-600"
-                >
-                  Excluir Planilha
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
+                  <tr className="bg-[#fefdfc] border-b border-[#e5e0d
