@@ -6,134 +6,161 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+/* Base theme variables */
+:root {
+  --bg-primary: #f9fafb;
+  --bg-secondary: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --border-color: #e5e7eb;
+  --card-bg: #ffffff;
+}
+
+.dark {
+  --bg-primary: #18181b;
+  --bg-secondary: #27272a;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --border-color: #3f3f46;
+  --card-bg: #27272a;
+}
+
 @layer base {
   .dark {
     color-scheme: dark;
   }
+  
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
 }
 
-/* ===== RESPONSIVIDADE MOBILE ===== */
-
-/* Reset e prevenção de overflow */
-* {
-  box-sizing: border-box;
+/* Light mode - ensure entire background is light */
+html:not(.dark) body {
+  background-color: #f9fafb;
 }
 
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100%;
+html:not(.dark) .bg-white {
+  background-color: #ffffff !important;
 }
 
-body {
-  margin: 0;
-  padding: 0;
+html:not(.dark) .bg-gray-50 {
+  background-color: #f9fafb !important;
 }
 
-/* Container responsivo global */
-.container-fluid {
-  width: 100%;
-  padding-left: 1rem;
-  padding-right: 1rem;
+html:not(.dark) .bg-gray-100 {
+  background-color: #f3f4f6 !important;
 }
 
-/* Viewport fixo para evitar zoom em inputs */
+/* Dark mode backgrounds */
+html.dark .bg-white {
+  background-color: #18181b !important;
+}
+
+html.dark .bg-gray-50 {
+  background-color: #18181b !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: #27272a !important;
+}
+
+/* Text contrast improvements */
+html:not(.dark) .text-gray-500,
+html:not(.dark) .text-gray-400,
+html:not(.dark) .text-zinc-400,
+html:not(.dark) .text-neutral-400 {
+  color: #6b7280 !important;
+}
+
+html:not(.dark) .text-gray-600,
+html:not(.dark) .text-gray-700 {
+  color: #374151 !important;
+}
+
+html:not(.dark) .text-gray-800,
+html:not(.dark) .text-gray-900 {
+  color: #111827 !important;
+}
+
+/* Dark mode text */
+html.dark .text-gray-500,
+html.dark .text-gray-600,
+html.dark .text-gray-700 {
+  color: #a1a1aa !important;
+}
+
+html.dark .text-gray-800,
+html.dark .text-gray-900 {
+  color: #f4f4f5 !important;
+}
+
+/* Border colors */
+html:not(.dark) .border {
+  border-color: #e5e7eb !important;
+}
+
+html.dark .border {
+  border-color: #3f3f46 !important;
+}
+
+/* Form inputs */
 input, select, textarea {
-  font-size: 16px !important;
+  background-color: #ffffff;
+  border-color: #e5e7eb;
+  color: #111827;
 }
 
-/* Tamanho mínimo para botões (acessibilidade toque) */
-button,
-.button,
-[role="button"],
-input[type="submit"],
-input[type="button"] {
-  min-height: 44px;
-  min-width: 44px;
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #27272a;
+  border-color: #3f3f46;
+  color: #fafafa;
 }
 
-/* Tabelas responsivas */
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  display: block;
-  width: 100%;
+/* Button hover states */
+button:active {
+  transform: scale(0.98);
 }
 
-/* Grid responsivo automático */
-.grid-responsive {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-@media (min-width: 640px) {
-  .grid-responsive {
-    grid-template-columns: repeat(2, 1fr);
-  }
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
 }
 
-@media (min-width: 1024px) {
-  .grid-responsive {
-    grid-template-columns: repeat(3, 1fr);
-  }
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
 }
 
-@media (min-width: 1280px) {
-  .grid-responsive {
-    grid-template-columns: repeat(4, 1fr);
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
-/* Empilhar elementos em mobile */
+.dark ::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
+/* Responsividade mobile */
 @media (max-width: 640px) {
-  .stack-on-mobile {
-    flex-direction: column !important;
-  }
-  
-  .stack-on-mobile > * {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-  
   .hide-on-mobile {
     display: none !important;
-  }
-  
-  .full-width-mobile {
-    width: 100% !important;
-  }
-  
-  .p-4-mobile {
-    padding: 1rem !important;
-  }
-  
-  .m-0-mobile {
-    margin: 0 !important;
-  }
-}
-
-/* Ajuste de fontes para telas pequenas */
-@media (max-width: 640px) {
-  h1 {
-    font-size: 1.5rem;
-    line-height: 1.3;
-  }
-  
-  h2 {
-    font-size: 1.25rem;
-    line-height: 1.3;
-  }
-  
-  h3 {
-    font-size: 1.125rem;
-    line-height: 1.3;
-  }
-  
-  p, span, li, a, label, .text-base {
-    font-size: 0.875rem;
-    line-height: 1.4;
   }
   
   .text-sm {
@@ -143,165 +170,15 @@ input[type="button"] {
   .text-xs {
     font-size: 0.7rem !important;
   }
-}
-
-/* Ajuste para tablets */
-@media (min-width: 641px) and (max-width: 1024px) {
-  .hide-on-tablet {
-    display: none !important;
-  }
   
-  .grid-tablet-2 {
-    grid-template-columns: repeat(2, 1fr) !important;
+  .p-4 {
+    padding: 0.75rem !important;
   }
 }
 
-/* Rolagem suave */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Cards responsivos */
-.card-responsive {
-  width: 100%;
-  overflow-x: auto;
-  margin-bottom: 1rem;
-}
-
-/* Espaçamento seguro para iOS */
+/* Safe area for iOS */
 @supports (padding: max(0px)) {
   .safe-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
-  
-  .safe-top {
-    padding-top: max(1rem, env(safe-area-inset-top));
-  }
-}
-
-/* ===== FIM RESPONSIVIDADE MOBILE ===== */
-
-/* Custom dark mode utility adjustments for better global contrast and eye-safe rural visual nights */
-html.dark body {
-  background-color: #121212;
-  color: #f4f4f5;
-}
-
-/* Make cards and panels easily toggle to dark mode */
-html.dark .bg-white {
-  background-color: #1a1a1c !important;
-  color: #f4f4f5 !important;
-  border-color: #27272a !important;
-}
-
-/* Light mode high-contrast text improvements to solve "too light / faint" issues */
-html:not(.dark) .text-\[\#8d8a86\],
-html:not(.dark) .text-zinc-400,
-html:not(.dark) .text-gray-400,
-html:not(.dark) .text-neutral-400 {
-  color: #55524e !important; /* Considerably darker for maximum legibility */
-}
-
-html:not(.dark) .text-\[\#6d6a66\],
-html:not(.dark) .text-zinc-500,
-html:not(.dark) .text-gray-500,
-html:not(.dark) .text-neutral-500 {
-  color: #3b3936 !important; /* Perfect high contrast charcoal text */
-}
-
-html:not(.dark) .text-\[\#2d2a26\] {
-  color: #151413 !important; /* Ultra-deep high readability brown-black */
-}
-
-html.dark .text-gray-900,
-html.dark .text-neutral-900,
-html.dark .text-\[\#2d2a26\] {
-  color: #f4f4f5 !important;
-}
-
-html.dark .text-gray-500,
-html.dark .text-neutral-500,
-html.dark .text-\[\#6d6a66\],
-html.dark .text-\[\#8d8a86\] {
-  color: #a1a1aa !important;
-}
-
-html.dark .bg-\[\#fcfaf7\],
-html.dark .bg-\[\#f5f2ed\],
-html.dark .bg-\[\#f9faf8\] {
-  background-color: #141416 !important;
-  border-color: #27272a !important;
-}
-
-html.dark .border,
-html.dark .border-b,
-html.dark .border-t,
-html.dark .border-r,
-html.dark .border-l {
-  border-color: #27272a !important;
-}
-
-html.dark input,
-html.dark select,
-html.dark textarea {
-  background-color: #202024 !important;
-  color: #f4f4f5 !important;
-  border-color: #2d2d30 !important;
-}
-
-/* Custom shadow adjustments for dark theme */
-html.dark .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4) !important;
-}
-html.dark .shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Light Mode Advanced Contrast & WCAG AA improvements for pastel components and light cards */
-html:not(.dark) .bg-emerald-50, 
-html:not(.dark) .bg-emerald-50\/20,
-html:not(.dark) .bg-emerald-50\/30,
-html:not(.dark) .bg-[#3d5a45]\/5,
-html:not(.dark) .bg-amber-50\/40,
-html:not(.dark) .bg-amber-50,
-html:not(.dark) .bg-[#fcfaf7] {
-  color: #1c1b1a !important;
-}
-
-html:not(.dark) .text-amber-800,
-html:not(.dark) .text-amber-900,
-html:not(.dark) .text-[#8a5b00],
-html:not(.dark) .text-amber-700 {
-  color: #6e3d00 !important; /* High contrast dark amber */
-}
-
-html:not(.dark) .text-emerald-800,
-html:not(.dark) .text-emerald-700,
-html:not(.dark) .text-[#3d5a45] {
-  color: #1b3823 !important; /* Rich deep forest green for text */
-}
-
-html:not(.dark) .text-zinc-400,
-html:not(.dark) .text-gray-400,
-html:not(.dark) .text-neutral-400,
-html:not(.dark) .text-[#8d8a86],
-html:not(.dark) .text-zinc-500,
-html:not(.dark) .text-[#6d6a66] {
-  color: #3b3936 !important; /* Deep charcoal text for light mode headers & indicators */
-}
-
-html:not(.dark) .text-zinc-400.font-bold,
-html:not(.dark) .text-zinc-500.font-bold,
-html:not(.dark) .text-[#8d8a86].font-bold,
-html:not(.dark) .text-[#6d6a66].font-bold {
-  color: #272624 !important;
-}
-
-html:not(.dark) .text-xs.font-medium,
-html:not(.dark) .text-sm.font-medium,
-html:not(.dark) .text-xs.font-semibold,
-html:not(.dark) .font-medium,
-html:not(.dark) .font-semibold {
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
 }
