@@ -15,21 +15,21 @@
   --primary-soft: #d8f3dc;
   --primary-hover: #1b4d3e;
   
-  /* Cores de fundo e texto - MODO CLARO (alto contraste) */
+  /* MODO CLARO (PADRÃO) - ALTO CONTRASTE */
   --bg-primary: #ffffff;
   --bg-secondary: #f8f9fa;
   --bg-tertiary: #e9ecef;
   --bg-card: #ffffff;
-  --text-primary: #212529;
-  --text-secondary: #495057;
-  --text-tertiary: #6c757d;
+  --text-primary: #1a1a1a;
+  --text-secondary: #333333;
+  --text-tertiary: #666666;
   --text-on-primary: #ffffff;
-  --border-color: #dee2e6;
+  --border-color: #d4d4d4;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .dark {
-  /* Cores de fundo e texto - MODO ESCURO (alto contraste) */
+  /* MODO ESCURO - ALTO CONTRASTE */
   --primary: #52b788;
   --primary-dark: #40916c;
   --primary-light: #74c69d;
@@ -40,18 +40,18 @@
   --bg-secondary: #1e1e1e;
   --bg-tertiary: #2d2d2d;
   --bg-card: #1e1e1e;
-  --text-primary: #e9ecef;
-  --text-secondary: #ced4da;
-  --text-tertiary: #adb5bd;
+  --text-primary: #f0f0f0;
+  --text-secondary: #d0d0d0;
+  --text-tertiary: #a0a0a0;
   --text-on-primary: #ffffff;
-  --border-color: #2d2d2d;
+  --border-color: #3d3d3d;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Classes de botão padronizadas - COR VERDE ESCURO PADRÃO */
+/* Classes de botão padronizadas */
 .btn-primary {
   background-color: var(--primary);
-  color: var(--text-on-primary);
+  color: white;
   padding: 0.625rem 1.5rem;
   border-radius: 0.75rem;
   font-weight: 700;
@@ -72,12 +72,6 @@
 
 .btn-primary:active {
   transform: translateY(0);
-}
-
-.btn-primary:focus {
-  outline: none;
-  ring: 2px solid var(--primary);
-  ring-offset: 2px;
 }
 
 .btn-outline {
@@ -102,11 +96,6 @@
   color: var(--primary-dark);
 }
 
-.btn-outline:active {
-  transform: translateY(0);
-}
-
-/* Botão secundário/ghost */
 .btn-ghost {
   background-color: transparent;
   color: var(--primary);
@@ -127,7 +116,7 @@
   transform: translateY(-1px);
 }
 
-/* Cores utilitárias - Mantendo o padrão verde escuro */
+/* Cores utilitárias */
 .bg-primary {
   background-color: var(--primary);
 }
@@ -156,50 +145,73 @@
   border-color: var(--primary);
 }
 
-/* Classes de texto com alto contraste */
-.text-high-contrast {
-  color: var(--text-primary);
-}
-
-.text-medium-contrast {
-  color: var(--text-secondary);
-}
-
-.text-low-contrast {
-  color: var(--text-tertiary);
-}
-
-/* Layout base */
-html, body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.2s ease;
-}
-
-/* Cards e containers */
-.bg-white, .bg-card {
-  background-color: var(--bg-card) !important;
+/* Classes de texto com alto contraste - ESSAS SÃO AS MAIS IMPORTANTES */
+.text-theme-primary {
   color: var(--text-primary) !important;
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.text-theme-tertiary {
+  color: var(--text-tertiary) !important;
+}
+
+.bg-theme-primary {
+  background-color: var(--bg-primary) !important;
+}
+
+.bg-theme-secondary {
+  background-color: var(--bg-secondary) !important;
+}
+
+.bg-theme-tertiary {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.bg-theme-card {
+  background-color: var(--bg-card) !important;
+}
+
+.border-theme {
   border-color: var(--border-color) !important;
 }
 
-/* Inputs */
+.shadow-theme {
+  box-shadow: var(--shadow) !important;
+}
+
+/* Garantir que inputs tenham texto visível */
 input, select, textarea {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   border-color: var(--border-color);
 }
 
-input:focus, select:focus, textarea:focus {
-  ring-color: var(--primary);
-  border-color: var(--primary);
-}
-
 input::placeholder, textarea::placeholder {
   color: var(--text-tertiary);
 }
 
-/* Links */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  ring: 2px solid var(--primary);
+  border-color: var(--primary);
+}
+
+/* Garantir que labels sejam visíveis */
+label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Garantir que títulos sejam bem visíveis */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Garantir que textos de links sejam visíveis */
 a {
   color: var(--primary);
 }
@@ -208,54 +220,13 @@ a:hover {
   color: var(--primary-dark);
 }
 
-/* Tabelas */
-table {
-  background-color: var(--bg-card);
+/* Garantir que textos em cards sejam visíveis */
+.card, .bg-white, .bg-theme-card {
   color: var(--text-primary);
-}
-
-th {
-  color: var(--text-secondary);
-  border-bottom-color: var(--border-color);
-}
-
-td {
-  border-bottom-color: var(--border-color);
-}
-
-/* Cards de estatísticas */
-.stat-card {
-  background-color: var(--bg-card);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-.stat-card .stat-value {
-  color: var(--primary);
-  font-weight: 800;
-}
-
-.stat-card .stat-label {
-  color: var(--text-secondary);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-/* Badges */
-.badge {
-  background-color: var(--bg-tertiary);
-  color: var(--text-secondary);
-}
-
-.badge-primary {
-  background-color: var(--primary-soft);
-  color: var(--primary);
 }
 
 /* ===== RESPONSIVIDADE MOBILE ===== */
 
-/* Reset e prevenção de overflow */
 * {
   box-sizing: border-box;
 }
@@ -264,6 +235,8 @@ html, body {
   overflow-x: hidden;
   width: 100%;
   max-width: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 body {
@@ -271,19 +244,16 @@ body {
   padding: 0;
 }
 
-/* Container responsivo global */
 .container-fluid {
   width: 100%;
   padding-left: 1rem;
   padding-right: 1rem;
 }
 
-/* Viewport fixo para evitar zoom em inputs */
 input, select, textarea {
   font-size: 16px !important;
 }
 
-/* Tamanho mínimo para botões (acessibilidade toque) */
 button,
 .button,
 [role="button"],
@@ -293,7 +263,6 @@ input[type="button"] {
   min-width: 44px;
 }
 
-/* Tabelas responsivas */
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -301,7 +270,6 @@ input[type="button"] {
   width: 100%;
 }
 
-/* Grid responsivo automático */
 .grid-responsive {
   display: grid;
   grid-template-columns: 1fr;
@@ -326,7 +294,6 @@ input[type="button"] {
   }
 }
 
-/* Empilhar elementos em mobile */
 @media (max-width: 640px) {
   .stack-on-mobile {
     flex-direction: column !important;
@@ -355,7 +322,6 @@ input[type="button"] {
   }
 }
 
-/* Ajuste de fontes para telas pequenas */
 @media (max-width: 640px) {
   h1 {
     font-size: 1.5rem;
@@ -386,7 +352,6 @@ input[type="button"] {
   }
 }
 
-/* Ajuste para tablets */
 @media (min-width: 641px) and (max-width: 1024px) {
   .hide-on-tablet {
     display: none !important;
@@ -397,117 +362,94 @@ input[type="button"] {
   }
 }
 
-/* Rolagem suave */
 html {
   scroll-behavior: smooth;
 }
 
-/* Cards responsivos */
 .card-responsive {
   width: 100%;
   overflow-x: auto;
   margin-bottom: 1rem;
 }
-
-/* ===== CLASSES UTILITÁRIAS DE TEXTO COM ALTO CONTRASTE ===== */
-
-/* Cores de texto principais */
-.text-theme-primary {
-  color: var(--text-primary) !important;
+/* CORREÇÃO DE CONTRASTE PARA O MODO CLARO - GARANTIR LETRAS ESCURAS */
+:root {
+  --text-primary: #1a1a1a !important;
+  --text-secondary: #333333 !important;
+  --text-tertiary: #555555 !important;
 }
 
-.text-theme-secondary {
-  color: var(--text-secondary) !important;
+/* Forçar contraste em elementos específicos */
+input, 
+select, 
+textarea,
+input::placeholder,
+textarea::placeholder {
+  color: #1a1a1a !important;
 }
 
-.text-theme-tertiary {
-  color: var(--text-tertiary) !important;
+input::placeholder,
+textarea::placeholder {
+  color: #888888 !important;
 }
 
-/* Cores de fundo */
-.bg-theme-primary {
-  background-color: var(--bg-primary) !important;
+/* Garantir que labels sejam escuras no modo claro */
+label,
+.text-sm,
+.text-xs,
+.font-medium,
+.font-semibold {
+  color: #333333 !important;
 }
 
-.bg-theme-secondary {
-  background-color: var(--bg-secondary) !important;
+/* Títulos escuros no modo claro */
+h1, h2, h3, h4, h5, h6,
+.font-bold,
+.font-extrabold,
+.font-black {
+  color: #1a1a1a !important;
 }
 
-.bg-theme-tertiary {
-  background-color: var(--bg-tertiary) !important;
+/* Links no modo claro */
+a,
+.link {
+  color: #2d6a4f !important;
 }
 
-.bg-theme-card {
-  background-color: var(--bg-card) !important;
+/* Cards e containers no modo claro */
+.bg-theme-card,
+.bg-white,
+.card {
+  color: #1a1a1a !important;
 }
 
-/* Bordas */
-.border-theme {
-  border-color: var(--border-color) !important;
+/* No modo escuro, manter as cores claras */
+.dark {
+  --text-primary: #f0f0f0 !important;
+  --text-secondary: #d0d0d0 !important;
+  --text-tertiary: #a0a0a0 !important;
 }
 
-/* Sombras */
-.shadow-theme {
-  box-shadow: var(--shadow) !important;
+.dark input,
+.dark select,
+.dark textarea,
+.dark label,
+.dark .text-sm,
+.dark .text-xs,
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6,
+.dark .font-bold,
+.dark .font-semibold {
+  color: #f0f0f0 !important;
 }
 
-/* Links */
-.link-theme {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  cursor: pointer;
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #888888 !important;
 }
-
-.link-theme:hover {
-  color: var(--primary-dark);
-  text-decoration: underline;
-}
-
-/* Headers com contraste garantido */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
-/* Parágrafos e textos corridos */
-p, span, li, label {
-  color: var(--text-secondary);
-}
-
-/* Textos de destaque/importantes */
-strong, b, .font-bold, .font-extrabold {
-  color: var(--text-primary);
-}
-
-/* Textos de ajuda/menor importância */
-.text-muted, .help-text, .caption {
-  color: var(--text-tertiary);
-}
-
-/* Ícones - garantir contraste */
-svg {
-  color: var(--text-secondary);
-}
-
-svg.text-primary, svg.[class*="text-primary"] {
-  color: var(--primary);
-}
-
-/* Placeholders com boa visibilidade */
-::placeholder {
-  color: var(--text-tertiary);
-  opacity: 0.7;
-}
-
-/* Seleção de texto com contraste */
-::selection {
-  background-color: var(--primary);
-  color: white;
-}
-
-/* Espaçamento seguro para iOS */
 @supports (padding: max(0px)) {
   .safe-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
@@ -517,5 +459,3 @@ svg.text-primary, svg.[class*="text-primary"] {
     padding-top: max(1rem, env(safe-area-inset-top));
   }
 }
-
-/* ===== FIM RESPONSIVIDADE MOBILE ===== */

@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
 export default function ThemeToggle() {
+  // Garantir que o modo claro seja o padrão (darkMode = false)
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return saved === 'dark' || (saved === null && prefersDark);
+    // Se não houver salvamento, padrão é MODO CLARO (false)
+    if (saved === null) return false;
+    return saved === 'dark';
   });
 
   useEffect(() => {
@@ -23,9 +25,9 @@ export default function ThemeToggle() {
       onClick={() => setIsDark(!isDark)}
       className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
       style={{
-        backgroundColor: isDark ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
-        border: `1px solid var(--border-color)`,
-        color: 'var(--text-primary)'
+        backgroundColor: isDark ? '#2d2d2d' : '#e9ecef',
+        border: `1px solid ${isDark ? '#3d3d3d' : '#d4d4d4'}`,
+        color: isDark ? '#f0f0f0' : '#1a1a1a'
       }}
       title={isDark ? 'Modo claro' : 'Modo escuro'}
     >

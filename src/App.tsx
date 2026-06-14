@@ -42,12 +42,6 @@ import {
 
 import ThemeToggle from './components/ThemeToggle';
 
-// No seu JSX, adicione o botão de toggle onde desejar (ex: no topo direito)
-<div className="flex items-center gap-3">
-  <ThemeToggle />
-  {/* outros botões */}
-</div>
-
 // Utils
 import { computeObligations, ObligationAlert } from './utils/obligations';
 
@@ -110,21 +104,6 @@ export default function App() {
   } = useFirebase();
 
   const [activeView, setActiveView] = useState<View>('dashboard');
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved === 'true';
-  });
-
-  // Apply theme to document
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('darkMode', darkMode.toString());
-  }, [darkMode]);
-
   const [scanMode, setScanMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -210,7 +189,7 @@ export default function App() {
       <div className="h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-zinc-900">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-[#3d5a45]/20 border-t-[#3d5a45] rounded-full animate-spin" />
-          <p className="text-[#3d5a45] font-bold">Carregando Fazenda...</p>
+          <p className="text-theme-primary font-bold">Carregando Fazenda...</p>
         </div>
       </div>
     );
@@ -243,15 +222,14 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-zinc-950 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl max-w-md w-full my-8"
         >
-          {/* Login form content - same as before */}
           <div className="w-20 h-20 bg-gray-100 dark:bg-zinc-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Beef size={40} className="text-[#3d5a45]" />
+            <Beef size={40} className="text-primary" />
           </div>
           
-          <h1 className="font-serif italic font-bold text-3xl text-[#3d5a45] mb-2 text-balance text-center leading-tight">
+          <h1 className="font-serif italic font-bold text-3xl text-primary mb-2 text-balance text-center leading-tight">
             {isRegistering ? 'Criar Nova Conta' : 'Fazenda Online'}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm text-center leading-relaxed">
+          <p className="text-theme-secondary mb-6 text-sm text-center leading-relaxed">
             {isRegistering 
               ? 'Cadastre o seu e-mail para ter um espaço exclusivo de gestão inteligente de rebanhos e finanças.'
               : 'Gestão inteligente de rebanho e finanças para o produtor rural moderno.'}
@@ -293,19 +271,19 @@ export default function App() {
             className="space-y-4 text-left"
           >
             <div>
-              <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1.5 uppercase tracking-wider">E-mail</label>
+              <label className="block text-xs font-bold text-theme-secondary mb-1.5 uppercase tracking-wider">E-mail</label>
               <input
                 type="email"
                 required
                 placeholder="seu-email@fazenda.com.br"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45] focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-zinc-900 text-theme-primary text-sm"
               />
             </div>
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Senha</label>
+                <label className="block text-xs font-bold text-theme-secondary uppercase tracking-wider">Senha</label>
                 {!isRegistering && (
                   <button
                     type="button"
@@ -315,7 +293,7 @@ export default function App() {
                       setForgotEmail(email);
                       setIsForgotPasswordOpen(true);
                     }}
-                    className="text-xs text-[#3d5a45] hover:underline font-bold"
+                    className="text-xs text-primary hover:underline font-bold"
                   >
                     Esqueceu a senha?
                   </button>
@@ -328,12 +306,12 @@ export default function App() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45] focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-sm pr-16"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-zinc-900 text-theme-primary text-sm pr-16"
                 />
                 <button
                   type="button"
                   onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#3d5a45] hover:text-[#2d4233]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-primary hover:text-primary-dark"
                 >
                   {isPasswordVisible ? "Ocultar" : "Mostrar"}
                 </button>
@@ -346,14 +324,14 @@ export default function App() {
                 type="checkbox"
                 checked={acceptedTerms}
                 onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 dark:border-zinc-700 text-[#3d5a45] focus:ring-[#3d5a45] cursor-pointer"
+                className="mt-1 h-4 w-4 rounded border-gray-300 dark:border-zinc-700 text-primary focus:ring-primary cursor-pointer"
               />
-              <label htmlFor="terms-checkbox" className="text-xs text-gray-600 dark:text-gray-400 leading-tight cursor-pointer select-none">
+              <label htmlFor="terms-checkbox" className="text-xs text-theme-secondary leading-tight cursor-pointer select-none">
                 Li e aceito expressamente os{' '}
                 <button
                   type="button"
                   onClick={() => setIsTermsOpen(true)}
-                  className="text-[#3d5a45] hover:underline font-bold"
+                  className="text-primary hover:underline font-bold"
                 >
                   Termos e Condições de Uso
                 </button>
@@ -365,8 +343,8 @@ export default function App() {
                disabled={isLoggingIn}
                className={`w-full flex items-center justify-center gap-3 text-white py-3.5 px-6 mt-4 rounded-xl font-bold transition-all shadow-md active:scale-95 ${
                  isLoggingIn 
-                   ? 'bg-[#3d5a45]/60 cursor-not-allowed' 
-                   : 'bg-[#3d5a45] hover:bg-[#2d4233]'
+                   ? 'bg-primary/60 cursor-not-allowed' 
+                   : 'btn-primary'
                }`}
             >
               {isLoggingIn ? (
@@ -395,7 +373,7 @@ export default function App() {
                 setIsRegistering(!isRegistering);
                 setLoginError(null);
               }}
-              className="text-xs text-[#3d5a45] hover:underline font-bold"
+              className="text-xs text-primary hover:underline font-bold"
             >
               {isRegistering 
                 ? 'Já possui uma conta? Toque para Entrar' 
@@ -408,7 +386,7 @@ export default function App() {
               <div className="w-full border-t border-gray-200 dark:border-zinc-800"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-zinc-950 px-2 text-gray-500 dark:text-gray-400 font-semibold">Ou conecte por</span>
+              <span className="bg-white dark:bg-zinc-950 px-2 text-theme-tertiary font-semibold">Ou conecte por</span>
             </div>
           </div>
 
@@ -417,7 +395,7 @@ export default function App() {
               type="button"
               onClick={handleGoogleLoginClick}
               disabled={isLoggingIn}
-              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-sm"
+              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 text-theme-secondary py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-sm"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -433,7 +411,7 @@ export default function App() {
                 <div className="w-full border-t border-dashed border-gray-200 dark:border-zinc-800"></div>
               </div>
               <div className="relative flex justify-center text-[10px] uppercase">
-                <span className="bg-white dark:bg-zinc-950 px-2 text-gray-500 dark:text-gray-400 font-semibold">Sem Internet ou Testando?</span>
+                <span className="bg-white dark:bg-zinc-950 px-2 text-theme-tertiary font-semibold">Sem Internet ou Testando?</span>
               </div>
             </div>
 
@@ -446,7 +424,7 @@ export default function App() {
                 }
                 loginAsGuest();
               }}
-              className="w-full flex items-center justify-center gap-3 bg-[#3d5a45]/10 dark:bg-[#3d5a45]/20 border border-dashed border-[#3d5a45]/50 hover:bg-[#3d5a45]/20 text-[#3d5a45] dark:text-[#5c8a67] py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-xs cursor-pointer"
+              className="w-full flex items-center justify-center gap-3 bg-primary/10 dark:bg-primary/20 border border-dashed border-primary/50 hover:bg-primary/20 text-primary dark:text-primary-light py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-xs cursor-pointer"
             >
               Entrar no Modo Convidado (Offline / Teste)
             </button>
@@ -462,17 +440,17 @@ export default function App() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="bg-white dark:bg-zinc-950 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-2xl p-6 max-w-lg w-full max-h-[80vh] flex flex-col text-left"
                 >
-                  <h2 className="font-serif italic font-bold text-2xl text-[#3d5a45] mb-4">Termos e Condições de Uso</h2>
-                  <div className="overflow-y-auto pr-2 space-y-4 text-xs text-gray-600 dark:text-gray-400 leading-relaxed flex-1">
-                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100">CONTRATO DE ISENÇÃO DE RESPONSABILIDADE - FAZENDA ONLINE</p>
+                  <h2 className="font-serif italic font-bold text-2xl text-primary mb-4">Termos e Condições de Uso</h2>
+                  <div className="overflow-y-auto pr-2 space-y-4 text-xs text-theme-secondary leading-relaxed flex-1">
+                    <p className="font-bold text-sm text-theme-primary">CONTRATO DE ISENÇÃO DE RESPONSABILIDADE - FAZENDA ONLINE</p>
                     <p><strong>1. Isenção Geral de Responsabilidade:</strong> O Fazenda Online é oferecido aos usuários "como está" e "conforme disponível"...</p>
                     <p><strong>2. Exclusão Total de Responsabilidade por Perdas e Danos:</strong> Sob nenhuma hipótese os desenvolvedores serão responsabilizados...</p>
                     <p><strong>3. Responsabilidade do Produtor:</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência...</p>
                     <p><strong>4. Aceitação Vinculativa:</strong> Ao concordar eletronicamente com estes termos, você dá plena e irrevogável quitação...</p>
                   </div>
                   <div className="mt-6 flex gap-3 pt-3 border-t border-gray-200 dark:border-zinc-800">
-                    <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 bg-[#3d5a45] hover:bg-[#2d4233] text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs">Aceitar Termos</button>
-                    <button onClick={() => setIsTermsOpen(false)} className="flex-1 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-xl font-semibold transition-all text-xs">Fechar</button>
+                    <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 btn-primary text-xs">Aceitar Termos</button>
+                    <button onClick={() => setIsTermsOpen(false)} className="flex-1 btn-outline text-xs">Fechar</button>
                   </div>
                 </motion.div>
               </div>
@@ -489,8 +467,8 @@ export default function App() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="bg-white dark:bg-zinc-950 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-2xl p-6 max-w-sm w-full text-left"
                 >
-                  <h2 className="font-serif italic font-bold text-xl text-[#3d5a45] mb-2">Recuperar Senha</h2>
-                  <p className="text-gray-600 dark:text-gray-400 text-xs mb-4 leading-relaxed">Escreva o seu endereço de e-mail cadastrado. Enviaremos as instruções de redefinição de senha para você.</p>
+                  <h2 className="font-serif italic font-bold text-xl text-primary mb-2">Recuperar Senha</h2>
+                  <p className="text-theme-secondary text-xs mb-4 leading-relaxed">Escreva o seu endereço de e-mail cadastrado. Enviaremos as instruções de redefinição de senha para você.</p>
                   {forgotError && <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 text-xs rounded-xl">{forgotError}</div>}
                   {forgotSuccess && <div className="mb-4 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 text-xs rounded-xl font-medium">{forgotSuccess}</div>}
                   <form onSubmit={async (e) => {
@@ -509,12 +487,12 @@ export default function App() {
                     }
                   }} className="space-y-4">
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wider">E-mail Cadastrado</label>
-                      <input type="email" required placeholder="seu-email@fazenda.com.br" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45] focus:border-transparent bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 text-xs" />
+                      <label className="block text-[10px] font-bold text-theme-secondary mb-1 uppercase tracking-wider">E-mail Cadastrado</label>
+                      <input type="email" required placeholder="seu-email@fazenda.com.br" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-zinc-900 text-theme-primary text-xs" />
                     </div>
                     <div className="flex gap-2 pt-2">
-                      <button type="submit" disabled={isSendingReset} className="flex-1 bg-[#3d5a45] hover:bg-[#2d4233] text-white py-2 px-4 rounded-xl font-bold transition-all text-xs disabled:opacity-50">{isSendingReset ? 'Enviando...' : 'Enviar Link'}</button>
-                      <button type="button" onClick={() => { setIsForgotPasswordOpen(false); setForgotSuccess(null); setForgotError(null); }} className="flex-1 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-xl font-semibold transition-all text-xs">Cancelar</button>
+                      <button type="submit" disabled={isSendingReset} className="flex-1 btn-primary text-xs disabled:opacity-50">{isSendingReset ? 'Enviando...' : 'Enviar Link'}</button>
+                      <button type="button" onClick={() => { setIsForgotPasswordOpen(false); setForgotSuccess(null); setForgotError(null); }} className="flex-1 btn-outline text-xs">Cancelar</button>
                     </div>
                   </form>
                 </motion.div>
@@ -610,7 +588,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 dark:bg-zinc-900 overflow-hidden">
       {/* Sidebar Overlay */}
       <AnimatePresence>
         {isMobile && isSidebarOpen && (
@@ -640,7 +618,7 @@ export default function App() {
             <motion.h1 
               initial={false}
               animate={{ opacity: isSidebarOpen ? 1 : 0 }}
-              className="font-serif italic font-bold text-xl text-[#3d5a45] whitespace-nowrap"
+              className="font-serif italic font-bold text-xl text-primary whitespace-nowrap"
             >
               Fazenda Online
             </motion.h1>
@@ -670,8 +648,8 @@ export default function App() {
               onClick={() => handleViewChange(item.id as View)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
                 activeView === item.id 
-                  ? 'bg-[#3d5a45] text-white shadow-md' 
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800'
+                  ? 'bg-primary text-white shadow-md' 
+                  : 'text-theme-secondary hover:bg-gray-100 dark:hover:bg-zinc-800'
               }`}
             >
               <item.icon size={19} />
@@ -685,7 +663,7 @@ export default function App() {
         <div className="p-4 border-t border-gray-200 dark:border-zinc-800">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-theme-secondary hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-colors"
           >
             <LogOut size={19} />
             {(isSidebarOpen || isMobile) && <span className="font-medium text-sm">Sair</span>}
@@ -695,7 +673,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gray-50 dark:bg-zinc-900">
-        {/* Header - Responsivo e claro no modo claro */}
+        {/* Header */}
         <header className="sticky top-0 z-10 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm">
           <div className="px-4 md:px-6 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -711,22 +689,22 @@ export default function App() {
               {activeView !== 'dashboard' && (
                 <button 
                   onClick={() => setActiveView('dashboard')}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#3d5a45]/10 text-[#3d5a45] rounded-full hover:bg-[#3d5a45]/20 transition-all group"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-all group"
                 >
                   <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
                   <span className="text-xs font-bold">Voltar</span>
                 </button>
               )}
 
-              <h2 className="text-base md:text-lg font-bold text-gray-800 dark:text-white capitalize truncate max-w-[120px] sm:max-w-none">
+              <h2 className="text-base md:text-lg font-bold text-theme-primary capitalize truncate max-w-[120px] sm:max-w-none">
                 {navItems.find(n => n.id === activeView)?.label}
               </h2>
             </div>
             
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Date - hidden on mobile */}
+              {/* Date */}
               <div className="hidden lg:flex items-center bg-gray-100 dark:bg-zinc-800 px-3 py-1.5 rounded-full">
-                <span className="text-xs font-mono text-gray-600 dark:text-gray-400 font-medium">
+                <span className="text-xs font-mono text-theme-secondary font-medium">
                   {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </span>
               </div>
@@ -745,19 +723,13 @@ export default function App() {
                 )}
               </button>
 
-              {/* Theme Toggle */}
-              <button 
-                onClick={() => setDarkMode(!darkMode)}
-                className="p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-400"
-                title={darkMode ? "Modo Claro" : "Modo Escuro"}
-              >
-                {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} />}
-              </button>
+              {/* Theme Toggle - usando o componente */}
+              <ThemeToggle />
               
               {/* Settings Button */}
               <button 
                 onClick={() => setActiveView('settings')}
-                className={`p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 ${activeView === 'settings' ? 'bg-[#3d5a45]/10 text-[#3d5a45]' : 'text-gray-600 dark:text-gray-400'}`}
+                className={`p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 ${activeView === 'settings' ? 'bg-primary/10 text-primary' : 'text-gray-600 dark:text-gray-400'}`}
                 title="Configurações"
               >
                 <Settings size={20} />
@@ -766,11 +738,10 @@ export default function App() {
           </div>
         </header>
 
-        {/* Permission Restriction Banner - Modern Card Style */}
+        {/* Permission Restriction Banner */}
         {userRole === 'user' && (
           <div className="mx-4 md:mx-6 mt-3 mb-2">
             <div className="relative overflow-hidden rounded-xl bg-white dark:bg-zinc-800/50 border border-amber-200 dark:border-amber-800/30 shadow-sm">
-              {/* Decorative bar */}
               <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"></div>
               
               <div className="pl-4 pr-4 py-3 md:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -797,7 +768,7 @@ export default function App() {
                 
                 <div className="flex-shrink-0">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-zinc-700/50 rounded-full">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#3d5a45]"></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
                     <span className="text-[9px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                       Somente Leitura
                     </span>
