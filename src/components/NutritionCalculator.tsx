@@ -66,25 +66,24 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
 
   // Zootecnic coefficients based on Category and Season
   const nutritionParameters = useMemo(() => {
-    let mineralRate = 0.0002; // defaults in % of body weight
-    let proteinRate = 0.001; 
+    let mineralRate = 0.0002;
+    let proteinRate = 0.001;
 
-    // Adjustments based on animal category
     switch (currentCategory) {
       case AnimalCategory.COW:
-        mineralRate = 0.00022; // 0.022% body weight
+        mineralRate = 0.00022;
         proteinRate = season === 'dry' ? 0.0015 : 0.0008;
         break;
       case AnimalCategory.BULL:
-        mineralRate = 0.00025; // 0.025% body weight
+        mineralRate = 0.00025;
         proteinRate = season === 'dry' ? 0.0025 : 0.0012;
         break;
       case AnimalCategory.CALF:
-        mineralRate = 0.00015; // 0.015% body weight
+        mineralRate = 0.00015;
         proteinRate = season === 'dry' ? 0.0012 : 0.0006;
         break;
       case AnimalCategory.HEIFER:
-        mineralRate = 0.0002;  // 0.02% body weight
+        mineralRate = 0.0002;
         proteinRate = season === 'dry' ? 0.0018 : 0.0008;
         break;
       default:
@@ -93,23 +92,15 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
         break;
     }
 
-    // Calculating individual intake gram sums
     const rawMineralGrams = Math.round(currentWeight * mineralRate * 1000);
     const rawProteinGrams = Math.round(currentWeight * proteinRate * 1000);
-
-    // Hard clamps for security & realistic constraints (Ruminant health restrictions)
     const finalMineralGrams = Math.max(30, Math.min(200, rawMineralGrams));
     const finalProteinGrams = Math.max(50, Math.min(1500, rawProteinGrams));
-
-    // Lot bulk demands multiplier
     const dailyMineralLotKg = (finalMineralGrams * currentQuantity) / 1000;
     const dailyProteinLotKg = (finalProteinGrams * currentQuantity) / 1000;
-
-    // Sack metric estimates (Typically 30kg sacs in Brazilian livestock)
     const sacksPerMonthMineral = Math.ceil((dailyMineralLotKg * 30.5) / 30);
     const sacksPerMonthProtein = Math.ceil((dailyProteinLotKg * 30.5) / 30);
 
-    // Nutrition explanations
     let recommendationGuide = '';
     if (season === 'dry') {
       recommendationGuide = 'Período de SECA: Pastagem de fibra grossa e baixo teor proteico. Suplementação proteica é CRÍTICA para alimentar a flora ruminal e manter o ganho de peso diário.';
@@ -129,15 +120,13 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
     };
   }, [currentWeight, currentCategory, currentQuantity, season]);
 
-  // Inventory matching checks
   const matchedInventoryStocks = useMemo(() => {
-    const saltItems = inventory.filter(item => 
+    return inventory.filter(item => 
       item.name.toLowerCase().includes('sal') || 
       item.name.toLowerCase().includes('suplemento') ||
       item.name.toLowerCase().includes('mineral') ||
       item.name.toLowerCase().includes('prote')
     );
-    return saltItems;
   }, [inventory]);
 
   return (
@@ -150,16 +139,16 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
             <span className="text-[10px] font-black uppercase tracking-wider bg-primary/10 dark:bg-primary/20 px-2 py-0.5 rounded-full text-primary dark:text-primary-light">Inteligência Nutricional</span>
           </div>
           <h2 className="font-serif italic text-2xl font-black text-primary dark:text-primary-light">Calculadora de Nutrição Animal</h2>
-          <p className="text-xs text-theme-secondary dark:text-zinc-400 max-w-xl leading-relaxed">
+          <p className="text-xs text-gray-600 dark:text-gray-400 max-w-xl leading-relaxed">
             Efetue previsões científicas exatas de suprimento mineral e proteico. Monitore as pesagens dos lotes para sugerir de forma eficiente a nutrição ruminal preventiva.
           </p>
         </div>
         
-        <div className="bg-theme-secondary dark:bg-zinc-800/80 px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl flex items-center gap-3 w-full md:w-auto">
+        <div className="bg-gray-100 dark:bg-zinc-800/80 px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl flex items-center gap-3 w-full md:w-auto">
           <Dumbbell className="text-primary" size={20} />
           <div>
-            <span className="text-[9px] font-black uppercase text-theme-secondary dark:text-gray-400 block">Estimativa GMD Gado</span>
-            <span className="text-xs font-black text-theme-primary dark:text-zinc-200">{nutritionParameters.estimatedGmdGrams}</span>
+            <span className="text-[9px] font-black uppercase text-gray-500 dark:text-gray-400 block">Estimativa GMD Gado</span>
+            <span className="text-xs font-black text-gray-900 dark:text-white">{nutritionParameters.estimatedGmdGrams}</span>
           </div>
         </div>
       </div>
@@ -170,14 +159,13 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
           <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 p-6 rounded-3xl shadow-sm space-y-6">
             <h3 className="font-serif italic font-bold text-primary dark:text-primary-light text-base border-b pb-2">1. Seleção do Lote ou Parâmetros</h3>
             
-            {/* Choose Preset vs Manual */}
-            <div className="grid grid-cols-2 bg-theme-secondary dark:bg-zinc-800/60 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="grid grid-cols-2 bg-gray-100 dark:bg-zinc-800/60 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setUsePresetLot(true)}
                 className={`py-2 text-xs font-black rounded-lg transition-all ${
                   usePresetLot 
-                    ? 'btn-primary' 
-                    : 'text-theme-secondary dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-700/50'
+                    ? 'bg-primary text-white shadow-sm' 
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-zinc-700'
                 }`}
               >
                 Conectar Lote Ativo
@@ -186,8 +174,8 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                 onClick={() => setUsePresetLot(false)}
                 className={`py-2 text-xs font-black rounded-lg transition-all ${
                   !usePresetLot 
-                    ? 'btn-primary' 
-                    : 'text-theme-secondary dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-700/50'
+                    ? 'bg-primary text-white shadow-sm' 
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-zinc-700'
                 }`}
               >
                 Simulação Livre
@@ -197,11 +185,11 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
             {usePresetLot ? (
               <div className="space-y-4">
                 <div>
-                  <label className="text-[9px] font-black uppercase text-theme-secondary dark:text-gray-400 tracking-wider block mb-1">
+                  <label className="text-[9px] font-black uppercase text-gray-500 dark:text-gray-400 tracking-wider block mb-1">
                     Lote Cadastrado nos Pastos
                   </label>
                   <select
-                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs focus:ring-2 focus:ring-primary/20 focus:outline-none text-theme-primary dark:text-white"
+                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs focus:ring-2 focus:ring-primary/20 focus:outline-none text-gray-900 dark:text-white"
                     value={selectedLotId}
                     onChange={(e) => setSelectedLotId(e.target.value)}
                   >
@@ -219,19 +207,19 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                     <span className="text-[9px] font-black uppercase text-primary tracking-wider block">Metadados Recuperados do Lote</span>
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>
-                        <span className="text-[9px] text-theme-tertiary dark:text-gray-400 block">Categoria Zootécnica:</span>
-                        <span className="font-extrabold text-theme-primary dark:text-zinc-200">{activeLot.category}</span>
+                        <span className="text-[9px] text-gray-500 dark:text-gray-400 block">Categoria Zootécnica:</span>
+                        <span className="font-extrabold text-gray-900 dark:text-white">{activeLot.category}</span>
                       </div>
                       <div>
-                        <span className="text-[9px] text-theme-tertiary dark:text-gray-400 block">Regime de Criatório:</span>
-                        <span className="font-extrabold text-theme-primary dark:text-zinc-200">{activeLot.type}</span>
+                        <span className="text-[9px] text-gray-500 dark:text-gray-400 block">Regime de Criatório:</span>
+                        <span className="font-extrabold text-gray-900 dark:text-white">{activeLot.type}</span>
                       </div>
                       <div>
-                        <span className="text-[9px] text-theme-tertiary dark:text-gray-400 block">Número de Cabeças:</span>
-                        <span className="font-extrabold text-theme-primary dark:text-zinc-200">{activeLot.quantity} cab.</span>
+                        <span className="text-[9px] text-gray-500 dark:text-gray-400 block">Número de Cabeças:</span>
+                        <span className="font-extrabold text-gray-900 dark:text-white">{activeLot.quantity} cab.</span>
                       </div>
                       <div>
-                        <span className="text-[9px] text-theme-tertiary dark:text-gray-400 block">Peso Médio Atual (kg):</span>
+                        <span className="text-[9px] text-gray-500 dark:text-gray-400 block">Peso Médio Atual (kg):</span>
                         <span className="font-extrabold text-primary dark:text-primary-light">{activeLot.averageWeight} kg</span>
                       </div>
                     </div>
@@ -240,13 +228,12 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Manual parameters inputs */}
                 <div>
-                  <label className="text-[9px] font-black uppercase text-theme-secondary dark:text-gray-400 tracking-wider block mb-1">
+                  <label className="text-[9px] font-black uppercase text-gray-500 dark:text-gray-400 tracking-wider block mb-1">
                     Categoria Animal
                   </label>
                   <select
-                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs focus:ring-2 focus:ring-primary/20 focus:outline-none text-theme-primary dark:text-white"
+                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs focus:ring-2 focus:ring-primary/20 focus:outline-none text-gray-900 dark:text-white"
                     value={manualCategory}
                     onChange={(e) => setManualCategory(e.target.value as any)}
                   >
@@ -259,26 +246,26 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[9px] font-black uppercase text-theme-secondary dark:text-gray-400 tracking-wider block mb-1">
+                    <label className="text-[9px] font-black uppercase text-gray-500 dark:text-gray-400 tracking-wider block mb-1">
                       Peso Médio Atual (kg)
                     </label>
                     <div className="relative">
-                      <Scale className="absolute left-2.5 top-1/2 -translate-y-1/2 text-theme-tertiary dark:text-gray-500" size={14} />
+                      <Scale className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={14} />
                       <input
                         type="number"
-                        className="w-full pl-8 pr-2 py-1.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs focus:ring-2 focus:ring-primary/20 focus:outline-none text-theme-primary dark:text-white"
+                        className="w-full pl-8 pr-2 py-1.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs focus:ring-2 focus:ring-primary/20 focus:outline-none text-gray-900 dark:text-white"
                         value={manualWeight}
                         onChange={(e) => setManualWeight(Math.max(10, parseInt(e.target.value) || 0))}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="text-[9px] font-black uppercase text-theme-secondary dark:text-gray-400 tracking-wider block mb-1">
+                    <label className="text-[9px] font-black uppercase text-gray-500 dark:text-gray-400 tracking-wider block mb-1">
                       Quantidade Cabeças
                     </label>
                     <input
                       type="number"
-                      className="w-full px-3 py-1.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs focus:ring-2 focus:ring-primary/20 focus:outline-none text-theme-primary dark:text-white"
+                      className="w-full px-3 py-1.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs focus:ring-2 focus:ring-primary/20 focus:outline-none text-gray-900 dark:text-white"
                       value={manualQuantity}
                       onChange={(e) => setManualQuantity(Math.max(1, parseInt(e.target.value) || 0))}
                     />
@@ -289,7 +276,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
 
             {/* Weather / Season selection */}
             <div>
-              <label className="text-[9px] font-black uppercase text-theme-secondary dark:text-gray-400 tracking-wider block mb-2">
+              <label className="text-[9px] font-black uppercase text-gray-500 dark:text-gray-400 tracking-wider block mb-2">
                 Época / Estação do Ano (Clima)
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -319,7 +306,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
               </div>
             </div>
 
-            {/* Note text info - CORRIGIDO: FONTE MAIOR E MELHOR CONTRASTE */}
+            {/* Note text info - CORRIGIDO COM FONTE MAIOR E MELHOR CONTRASTE */}
             <div className="p-5 bg-amber-50 dark:bg-amber-950/40 border-l-4 border-l-amber-500 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-start gap-3">
               <Info className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={18} />
               <p className="text-sm md:text-base text-amber-900 dark:text-amber-200 leading-relaxed font-semibold">
@@ -336,7 +323,6 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
           <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 p-6 md:p-8 rounded-3xl shadow-sm space-y-6">
             <h3 className="font-serif italic font-bold text-primary dark:text-primary-light text-base border-b pb-2">2. Consumo Sugerido e Planejamento</h3>
 
-            {/* Individual Consumo Head Indicators */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
               {/* Mineral result */}
@@ -346,14 +332,11 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                   <span className="text-3xl font-black text-primary dark:text-primary-light">
                     {nutritionParameters.mineralPerDayHeadG}g
                   </span>
-                  <span className="text-xs text-theme-secondary dark:text-gray-400 font-extrabold">/ animal / dia</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 font-extrabold">/ animal / dia</span>
                 </div>
-                <p className="text-[11px] text-theme-secondary dark:text-gray-300 leading-normal font-medium pt-1">
+                <p className="text-[11px] text-gray-600 dark:text-gray-300 leading-normal font-medium pt-1">
                   Previne carências macro e microminerais (Fósforo, Cálcio, Zinco, Cobalto). Fornecer limpo à vontade no cocho.
                 </p>
-                <div className="absolute right-3 bottom-3 opacity-10">
-                  <Leaf size={44} className="text-primary" />
-                </div>
               </div>
 
               {/* Protein result */}
@@ -363,33 +346,30 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                   <span className="text-3xl font-black text-primary dark:text-primary-light">
                     {nutritionParameters.proteinPerDayHeadG}g
                   </span>
-                  <span className="text-xs text-theme-secondary dark:text-gray-400 font-extrabold">/ animal / dia</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 font-extrabold">/ animal / dia</span>
                 </div>
-                <p className="text-[11px] text-theme-secondary dark:text-gray-300 leading-normal font-medium pt-1">
+                <p className="text-[11px] text-gray-600 dark:text-gray-300 leading-normal font-medium pt-1">
                   Sal proteico enriquecido com farelo de soja/milho e ureia. Essencial para elevar o ganho médio diário e a digestão.
                 </p>
-                <div className="absolute right-3 bottom-3 opacity-10">
-                  <Dumbbell size={44} className="text-primary" />
-                </div>
               </div>
             </div>
 
-            {/* Total Herd Demands in Kg & Sacks */}
-            <div className="border hover:border-primary/20 p-5 rounded-2xl bg-theme-secondary dark:bg-zinc-800/40 space-y-4">
-              <span className="text-[9px] font-black uppercase text-theme-secondary dark:text-gray-400 tracking-wider block">Consumo Agregado p/ o Lote Inteiro ({currentQuantity} cab.)</span>
+            {/* Total Herd Demands */}
+            <div className="border hover:border-primary/20 p-5 rounded-2xl bg-gray-50 dark:bg-zinc-800/40 space-y-4">
+              <span className="text-[9px] font-black uppercase text-gray-500 dark:text-gray-400 tracking-wider block">Consumo Agregado p/ o Lote Inteiro ({currentQuantity} cab.)</span>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
-                  <span className="text-[10px] text-theme-tertiary dark:text-gray-400 font-bold block">Demanda Mineral Diária:</span>
-                  <span className="text-base font-black text-theme-primary dark:text-zinc-100">{nutritionParameters.dailyMineralLotKg.toFixed(1)} kg/dia</span>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-bold block">Demanda Mineral Diária:</span>
+                  <span className="text-base font-black text-gray-900 dark:text-white">{nutritionParameters.dailyMineralLotKg.toFixed(1)} kg/dia</span>
                   <div className="flex items-center gap-1 bg-white/60 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border w-fit text-[9px] font-black text-primary">
                     <ShoppingBag size={10} /> {nutritionParameters.sacksPerMonthMineral} sacas de 30kg / mês
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-[10px] text-theme-tertiary dark:text-gray-400 font-bold block">Demanda Proteica Diária:</span>
-                  <span className="text-base font-black text-theme-primary dark:text-zinc-100">{nutritionParameters.dailyProteinLotKg.toFixed(1)} kg/dia</span>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-bold block">Demanda Proteica Diária:</span>
+                  <span className="text-base font-black text-gray-900 dark:text-white">{nutritionParameters.dailyProteinLotKg.toFixed(1)} kg/dia</span>
                   <div className="flex items-center gap-1 bg-white/60 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border w-fit text-[9px] font-black text-primary">
                     <ShoppingBag size={10} /> {nutritionParameters.sacksPerMonthProtein} sacas de 30kg / mês
                   </div>
@@ -403,29 +383,25 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
             <h4 className="font-serif italic font-bold text-sm text-primary dark:text-primary-light flex items-center gap-1.5">
               <Warehouse size={16} /> Verificação de Estoque Disp.
             </h4>
-            <p className="text-xs text-theme-secondary dark:text-gray-400">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               Suprimentos cruzados do estoque de ração e sais minerais no inventário rural central:
             </p>
 
             <div className="space-y-2">
               {matchedInventoryStocks.map(item => {
-                // simple days of feed left forecast
                 const isProtein = item.name.toLowerCase().includes('prote') || item.name.toLowerCase().includes('ra');
                 const dailyRate = isProtein ? nutritionParameters.dailyProteinLotKg : nutritionParameters.dailyMineralLotKg;
-                
-                // Assuming inventory quantity is in bags of 30kg or total kg
                 let balanceKg = item.quantity;
                 if (item.unit.toLowerCase().includes('sac') || item.unit.toLowerCase().includes('pct')) {
-                  balanceKg = item.quantity * 30; // 30kg sacs standard
+                  balanceKg = item.quantity * 30;
                 }
-                
                 const daysLeft = dailyRate > 0 ? Math.floor(balanceKg / dailyRate) : 0;
 
                 return (
-                  <div key={item.id} className="flex justify-between items-center bg-theme-secondary dark:bg-zinc-800/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs">
+                  <div key={item.id} className="flex justify-between items-center bg-gray-50 dark:bg-zinc-800/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs">
                     <div>
-                      <span className="font-black text-theme-primary dark:text-zinc-200 block">{item.name}</span>
-                      <span className="text-[9px] text-theme-secondary dark:text-gray-400 uppercase font-bold">Saldo: {item.quantity} {item.unit} ({balanceKg} kg)</span>
+                      <span className="font-black text-gray-900 dark:text-white block">{item.name}</span>
+                      <span className="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-bold">Saldo: {item.quantity} {item.unit} ({balanceKg} kg)</span>
                     </div>
                     <div className="text-right">
                       {daysLeft > 0 ? (
@@ -445,7 +421,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
               })}
 
               {matchedInventoryStocks.length === 0 && (
-                <div className="text-center py-6 text-xs italic text-theme-secondary dark:text-gray-400 bg-gray-50/50 dark:bg-zinc-800/20 border border-gray-200 dark:border-gray-700 rounded-2xl">
+                <div className="text-center py-6 text-xs italic text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-zinc-800/20 border border-gray-200 dark:border-gray-700 rounded-2xl">
                   Nenhum sal mineral ou proteinado identificado no estoque rural ativo.
                 </div>
               )}
