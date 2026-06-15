@@ -639,9 +639,11 @@ export default function App() {
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
-              <item.icon size={19} />
+              <item.icon size={19} className={activeView === item.id ? 'text-white' : 'text-gray-500'} />
               {(isSidebarOpen || isMobile) && (
-                <span className="font-medium text-sm">{item.label}</span>
+                <span className={`font-medium text-sm ${activeView === item.id ? 'text-white' : 'text-gray-700'}`}>
+                  {item.label}
+                </span>
               )}
             </button>
           ))}
