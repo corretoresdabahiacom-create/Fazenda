@@ -54,18 +54,7 @@
 .border-theme { border-color: var(--border-color) !important; }
 .shadow-theme { box-shadow: var(--shadow) !important; }
 
-/* ===== ESTILOS GLOBAIS ===== */
-html, body, #root {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-/* Todos os textos */
-h1, h2, h3, h4, h5, h6, p, span, li, a, label, div, button {
-  color: var(--text-primary);
-}
-
-/* ===== BOTÕES ===== */
+/* ===== BOTÕES PADRONIZADOS ===== */
 .btn-primary {
   background-color: var(--primary);
   color: white !important;
@@ -122,88 +111,163 @@ h1, h2, h3, h4, h5, h6, p, span, li, a, label, div, button {
   background-color: var(--primary-soft);
 }
 
-/* ===== MODO CLARO ===== */
-:root {
-  background-color: #ffffff;
+/* ===== ESTILOS GLOBAIS ===== */
+html, body, #root {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-/* ===== MODO ESCURO CORRIGIDO ===== */
+/* ===== MODO ESCURO - CORREÇÃO TOTAL ===== */
 .dark {
   background-color: #0a0a0a;
 }
 
+/* FUNDOS - Garantir que todos os cards e containers tenham fundo escuro consistente */
 .dark .bg-white,
+.dark .bg-gray-50,
+.dark .bg-gray-100,
+.dark .bg-gray-200,
+.dark [class*="bg-gray"],
+.dark [class*="bg-neutral"],
 .dark .card,
+.dark [class*="rounded"],
 .dark [class*="bg-white"] {
   background-color: #141414 !important;
 }
 
-.dark .bg-gray-50,
-.dark .bg-gray-100 {
+.dark .bg-theme-card {
+  background-color: #141414 !important;
+}
+
+.dark .bg-theme-secondary {
   background-color: #1a1a1a !important;
 }
 
+/* BORDAS */
 .dark .border,
-.dark .border-gray-200 {
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark [class*="border-"] {
   border-color: #2a2a2a !important;
 }
 
-/* Textos no modo escuro - GARANTIR BRANCO */
-.dark .text-gray-600,
+/* ===== TEXTOS - FORÇAR BRANCO EM TODOS OS ELEMENTOS NO MODO ESCURO ===== */
+.dark,
+.dark *,
 .dark .text-gray-500,
-.dark .text-gray-400,
+.dark .text-gray-600,
 .dark .text-gray-700,
 .dark .text-gray-800,
-.dark .text-gray-900 {
+.dark .text-gray-900,
+.dark .text-neutral-500,
+.dark .text-neutral-600,
+.dark .text-neutral-700,
+.dark .text-neutral-800,
+.dark .text-neutral-900,
+.dark .text-zinc-500,
+.dark .text-zinc-600,
+.dark .text-zinc-700,
+.dark .text-zinc-800,
+.dark .text-zinc-900,
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+.dark p, .dark span, .dark li, .dark a, .dark label, .dark div,
+.dark .font-bold, .dark .font-semibold, .dark .font-medium,
+.dark .font-normal, .dark .text-sm, .dark .text-xs, .dark .text-base,
+.dark .text-lg, .dark .text-xl, .dark .text-2xl,
+.dark th, .dark td,
+.dark .table th, .dark .table td {
   color: #ffffff !important;
 }
 
-/* Cabeçalho no modo escuro */
-.dark header {
+/* Textos secundários e terciários no modo escuro */
+.dark .text-theme-secondary {
+  color: #d0d0d0 !important;
+}
+
+.dark .text-theme-tertiary {
+  color: #a0a0a0 !important;
+}
+
+.dark .text-muted,
+.dark .text-secondary,
+.dark .text-tertiary,
+.dark small,
+.dark .small {
+  color: #c0c0c0 !important;
+}
+
+/* ===== CORREÇÃO PARA BOTÕES E LINKS NO MODO ESCURO ===== */
+.dark button:not(.btn-primary):not(.btn-outline):not(.btn-ghost) {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+.dark button:not(.btn-primary):not(.btn-outline):not(.btn-ghost):hover {
+  background-color: #2a2a2a !important;
+}
+
+.dark a {
+  color: var(--primary) !important;
+}
+
+.dark a:hover {
+  color: var(--primary-light) !important;
+}
+
+/* ===== CABEÇALHO E HEADER NO MODO ESCURO ===== */
+.dark header,
+.dark .header,
+.dark .sticky,
+.dark [class*="sticky"] {
   background-color: #0a0a0a !important;
   border-bottom-color: #2a2a2a !important;
 }
 
 .dark header button,
-.dark header svg {
+.dark header svg,
+.dark .header button,
+.dark .header svg {
   color: #ffffff !important;
 }
 
-.dark header .text-gray-600,
-.dark header .text-gray-700 {
-  color: #ffffff !important;
-}
-
-.dark header .bg-gray-100 {
-  background-color: #1a1a1a !important;
-}
-
-/* Sidebar no modo escuro */
-.dark aside {
+/* ===== SIDEBAR NO MODO ESCURO ===== */
+.dark aside,
+.dark .sidebar,
+.dark [class*="sidebar"],
+.dark [class*="aside"] {
   background-color: #0a0a0a !important;
   border-right-color: #2a2a2a !important;
 }
 
 .dark aside button,
 .dark aside span,
-.dark aside svg {
+.dark aside svg,
+.dark .sidebar button,
+.dark .sidebar span,
+.dark .sidebar svg {
   color: #e0e0e0 !important;
 }
 
-.dark aside button:hover {
+.dark aside button:hover,
+.dark .sidebar button:hover {
   background-color: #1a1a1a !important;
 }
 
-.dark aside .bg-\\[\\#2d6a4f\\] {
+/* Botão ativo no sidebar */
+.dark aside .bg-\\[\\#2d6a4f\\],
+.dark .sidebar .bg-\\[\\#2d6a4f\\] {
   background-color: var(--primary) !important;
 }
 
 .dark aside .bg-\\[\\#2d6a4f\\] span,
-.dark aside .bg-\\[\\#2d6a4f\\] svg {
+.dark aside .bg-\\[\\#2d6a4f\\] svg,
+.dark .sidebar .bg-\\[\\#2d6a4f\\] span,
+.dark .sidebar .bg-\\[\\#2d6a4f\\] svg {
   color: #ffffff !important;
 }
 
-/* Inputs no modo escuro */
+/* ===== INPUTS NO MODO ESCURO ===== */
 .dark input,
 .dark select,
 .dark textarea {
@@ -217,24 +281,122 @@ h1, h2, h3, h4, h5, h6, p, span, li, a, label, div, button {
   color: #888888 !important;
 }
 
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: var(--primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(82, 183, 136, 0.3) !important;
+}
+
 .dark label {
   color: #e0e0e0 !important;
 }
 
-/* Tabelas no modo escuro */
-.dark table {
+/* ===== TABELAS NO MODO ESCURO ===== */
+.dark table,
+.dark .table {
   background-color: #141414 !important;
 }
 
+.dark thead,
+.dark .thead {
+  background-color: #1a1a1a !important;
+}
+
 .dark th,
-.dark td {
+.dark .table th {
   color: #ffffff !important;
+  background-color: #1a1a1a !important;
+  border-bottom-color: #3a3a3a !important;
+}
+
+.dark td,
+.dark .table td {
+  color: #e0e0e0 !important;
   border-bottom-color: #2a2a2a !important;
 }
 
-/* Hover dos botões */
+.dark tr:hover,
+.dark .table tr:hover {
+  background-color: #1a1a1a !important;
+}
+
+/* ===== CARDS E CONTAINERS NO MODO ESCURO ===== */
+.dark .card,
+.dark [class*="card"],
+.dark [class*="Card"],
+.dark [class*="rounded-2xl"],
+.dark [class*="rounded-3xl"],
+.dark [class*="rounded-xl"] {
+  background-color: #141414 !important;
+  border-color: #2a2a2a !important;
+}
+
+.dark .card-header,
+.dark .card-footer,
+.dark [class*="card-header"],
+.dark [class*="card-footer"] {
+  background-color: #1a1a1a !important;
+  border-color: #2a2a2a !important;
+}
+
+/* ===== BOTÕES DE ESTAÇÃO (ÁGUAS/SECA) NO MODO ESCURO ===== */
+.dark button[class*="Estação"],
+.dark button:has(> span:contains("Águas")),
+.dark button:has(> span:contains("Seca")) {
+  color: #ffffff !important;
+}
+
+.dark button[class*="Estação"]:hover,
+.dark button:has(> span:contains("Águas")):hover,
+.dark button:has(> span:contains("Seca")):hover {
+  background-color: #2a2a2a !important;
+}
+
+/* Botões de estação ativos */
+.dark .bg-white.shadow-sm:has(> .text-\\[\\#3d5a45\\]) {
+  background-color: var(--primary) !important;
+}
+
+.dark .bg-white.shadow-sm:has(> .text-\\[\\#3d5a45\\]) span,
+.dark .bg-white.shadow-sm:has(> .text-\\[\\#3d5a45\\]) svg {
+  color: #ffffff !important;
+}
+
+/* ===== CALCULADORA DE NUTRIÇÃO - MODO ESCURO ===== */
+.dark [class*="NutritionCalculator"],
+.dark [class*="nutrition"],
+.dark .bg-emerald-50,
+.dark .bg-amber-50,
+.dark .bg-red-50,
+.dark .bg-blue-50,
+.dark .bg-green-50,
+.dark .bg-orange-50 {
+  background-color: #1a1a1a !important;
+}
+
+.dark .border-emerald-100,
+.dark .border-amber-100,
+.dark .border-red-100,
+.dark .border-blue-100,
+.dark .border-green-100,
+.dark .border-orange-100 {
+  border-color: #3a3a3a !important;
+}
+
+.dark .text-emerald-800,
+.dark .text-amber-800,
+.dark .text-red-800,
+.dark .text-blue-800,
+.dark .text-green-800,
+.dark .text-orange-800 {
+  color: #ffffff !important;
+}
+
+/* ===== HOVER DOS BOTÕES ===== */
 button:hover:not(.btn-primary):not(.btn-outline):not(.btn-ghost) {
-  background-color: #f5f5f5 !important;
+  background-color: #e5e5e5 !important;
   color: #000000 !important;
 }
 
