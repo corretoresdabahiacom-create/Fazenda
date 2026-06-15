@@ -1,13 +1,9 @@
-// src/components/ThemeToggle.tsx
 import React, { useEffect, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
 export default function ThemeToggle() {
-  // MODO CLARO É O PADRÃO (false)
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
-    // Se não há salvamento, padrão é MODO CLARO
-    if (saved === null) return false;
     return saved === 'dark';
   });
 
@@ -26,8 +22,8 @@ export default function ThemeToggle() {
       onClick={() => setIsDark(!isDark)}
       className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
       style={{
-        backgroundColor: isDark ? '#2d2d2d' : '#f5f5f5',
-        border: `1px solid ${isDark ? '#3d3d3d' : '#cccccc'}`,
+        backgroundColor: isDark ? '#2d2d2d' : '#f0f0f0',
+        border: `1px solid ${isDark ? '#444' : '#ddd'}`,
         color: isDark ? '#ffffff' : '#000000'
       }}
       title={isDark ? 'Modo claro' : 'Modo escuro'}

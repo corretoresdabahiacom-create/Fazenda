@@ -455,3 +455,31 @@ html {
     padding-top: max(1rem, env(safe-area-inset-top));
   }
 }
+
+/* ===== CORREÇÃO PARA O MODO ESCURO ===== */
+
+/* Garantir que no modo escuro os textos dos cards fiquem brancos */
+.dark .bg-theme-card,
+.dark .bg-white,
+.dark .card,
+.dark [class*="rounded-"] {
+  color: #ffffff !important;
+}
+
+/* Garantir que textos dentro dos cards no modo escuro sejam brancos */
+.dark .text-theme-primary,
+.dark .text-theme-secondary,
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+.dark p, .dark span, .dark li, .dark label,
+.dark .font-bold, .dark .font-extrabold, .dark .font-black {
+  color: #ffffff !important;
+}
+
+/* Garantir que textos secundários no modo escuro sejam claros */
+.dark .text-theme-secondary {
+  color: #d0d0d0 !important;
+}
+
+.dark .text-theme-tertiary {
+  color: #a0a0a0 !important;
+}
