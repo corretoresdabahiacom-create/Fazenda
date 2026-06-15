@@ -15,21 +15,21 @@
   --primary-soft: #d8f3dc;
   --primary-hover: #1b4d3e;
   
-  /* MODO CLARO (PADRÃO) - ALTO CONTRASTE */
+  /* MODO CLARO - FUNDO BRANCO TOTAL E TEXTO PRETO */
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-tertiary: #e9ecef;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #eeeeee;
   --bg-card: #ffffff;
-  --text-primary: #1a1a1a;
-  --text-secondary: #333333;
-  --text-tertiary: #666666;
+  --text-primary: #000000;
+  --text-secondary: #1a1a1a;
+  --text-tertiary: #333333;
   --text-on-primary: #ffffff;
-  --border-color: #d4d4d4;
+  --border-color: #cccccc;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .dark {
-  /* MODO ESCURO - ALTO CONTRASTE */
+  /* MODO ESCURO - FUNDO ESCURO E TEXTO CLARO */
   --primary: #52b788;
   --primary-dark: #40916c;
   --primary-light: #74c69d;
@@ -40,9 +40,9 @@
   --bg-secondary: #1e1e1e;
   --bg-tertiary: #2d2d2d;
   --bg-card: #1e1e1e;
-  --text-primary: #f0f0f0;
-  --text-secondary: #d0d0d0;
-  --text-tertiary: #a0a0a0;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #c0c0c0;
   --text-on-primary: #ffffff;
   --border-color: #3d3d3d;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -145,7 +145,7 @@
   border-color: var(--primary);
 }
 
-/* Classes de texto com alto contraste - ESSAS SÃO AS MAIS IMPORTANTES */
+/* Classes de texto com alto contraste */
 .text-theme-primary {
   color: var(--text-primary) !important;
 }
@@ -182,47 +182,123 @@
   box-shadow: var(--shadow) !important;
 }
 
-/* Garantir que inputs tenham texto visível */
+/* ===== ESTILOS GLOBAIS PARA O MODO CLARO TOTALMENTE BRANCO ===== */
+
+/* Fundo da página - branco puro */
+html, body, #root {
+  background-color: #ffffff !important;
+}
+
+/* Modo claro - fundo branco, texto preto */
+:root {
+  background-color: #ffffff !important;
+}
+
+/* Garantir que todos os cards e containers sejam brancos no modo claro */
+.bg-white, .bg-theme-card, .card, [class*="bg-white"] {
+  background-color: #ffffff !important;
+}
+
+/* Garantir que textos sejam pretos no modo claro */
+.text-theme-primary, 
+.text-theme-secondary, 
+.text-theme-tertiary,
+h1, h2, h3, h4, h5, h6,
+p, span, li, label, div:not([class*="text-"]) {
+  color: #000000 !important;
+}
+
+/* Textos secundários no modo claro - cinza escuro para hierarquia */
+.text-theme-secondary {
+  color: #333333 !important;
+}
+
+.text-theme-tertiary {
+  color: #666666 !important;
+}
+
+/* Inputs no modo claro */
 input, select, textarea {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border-color: var(--border-color);
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #cccccc !important;
 }
 
 input::placeholder, textarea::placeholder {
-  color: var(--text-tertiary);
+  color: #999999 !important;
 }
 
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  ring: 2px solid var(--primary);
-  border-color: var(--primary);
-}
-
-/* Garantir que labels sejam visíveis */
+/* Labels no modo claro */
 label {
-  color: var(--text-secondary);
+  color: #000000 !important;
   font-weight: 600;
 }
 
-/* Garantir que títulos sejam bem visíveis */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text-primary);
-  font-weight: 700;
+/* Títulos no modo claro */
+h1, h2, h3, h4, h5, h6,
+.font-bold, .font-extrabold, .font-black {
+  color: #000000 !important;
 }
 
-/* Garantir que textos de links sejam visíveis */
+/* Links no modo claro */
 a {
-  color: var(--primary);
+  color: #2d6a4f !important;
 }
 
-a:hover {
-  color: var(--primary-dark);
+/* Bordas no modo claro */
+.border, .border-theme, [class*="border-"] {
+  border-color: #e0e0e0 !important;
 }
 
-/* Garantir que textos em cards sejam visíveis */
-.card, .bg-white, .bg-theme-card {
-  color: var(--text-primary);
+/* Sombras no modo claro - sutis */
+.shadow-sm, .shadow-theme {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== MODO ESCURO - FUNDO ESCURO, TEXTO CLARO ===== */
+.dark,
+.dark #root,
+.dark html,
+.dark body {
+  background-color: #121212 !important;
+}
+
+.dark .bg-white,
+.dark .bg-theme-card,
+.dark .card {
+  background-color: #1e1e1e !important;
+}
+
+.dark .text-theme-primary,
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+.dark p, .dark span, .dark li, .dark label {
+  color: #ffffff !important;
+}
+
+.dark .text-theme-secondary {
+  color: #d0d0d0 !important;
+}
+
+.dark .text-theme-tertiary {
+  color: #a0a0a0 !important;
+}
+
+.dark input, .dark select, .dark textarea {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border-color: #3d3d3d !important;
+}
+
+.dark input::placeholder, .dark textarea::placeholder {
+  color: #888888 !important;
+}
+
+.dark label {
+  color: #e0e0e0 !important;
+}
+
+.dark .border, .dark .border-theme {
+  border-color: #3d3d3d !important;
 }
 
 /* ===== RESPONSIVIDADE MOBILE ===== */
@@ -235,8 +311,6 @@ html, body {
   overflow-x: hidden;
   width: 100%;
   max-width: 100%;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
 }
 
 body {
@@ -371,85 +445,7 @@ html {
   overflow-x: auto;
   margin-bottom: 1rem;
 }
-/* CORREÇÃO DE CONTRASTE PARA O MODO CLARO - GARANTIR LETRAS ESCURAS */
-:root {
-  --text-primary: #1a1a1a !important;
-  --text-secondary: #333333 !important;
-  --text-tertiary: #555555 !important;
-}
 
-/* Forçar contraste em elementos específicos */
-input, 
-select, 
-textarea,
-input::placeholder,
-textarea::placeholder {
-  color: #1a1a1a !important;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #888888 !important;
-}
-
-/* Garantir que labels sejam escuras no modo claro */
-label,
-.text-sm,
-.text-xs,
-.font-medium,
-.font-semibold {
-  color: #333333 !important;
-}
-
-/* Títulos escuros no modo claro */
-h1, h2, h3, h4, h5, h6,
-.font-bold,
-.font-extrabold,
-.font-black {
-  color: #1a1a1a !important;
-}
-
-/* Links no modo claro */
-a,
-.link {
-  color: #2d6a4f !important;
-}
-
-/* Cards e containers no modo claro */
-.bg-theme-card,
-.bg-white,
-.card {
-  color: #1a1a1a !important;
-}
-
-/* No modo escuro, manter as cores claras */
-.dark {
-  --text-primary: #f0f0f0 !important;
-  --text-secondary: #d0d0d0 !important;
-  --text-tertiary: #a0a0a0 !important;
-}
-
-.dark input,
-.dark select,
-.dark textarea,
-.dark label,
-.dark .text-sm,
-.dark .text-xs,
-.dark h1,
-.dark h2,
-.dark h3,
-.dark h4,
-.dark h5,
-.dark h6,
-.dark .font-bold,
-.dark .font-semibold {
-  color: #f0f0f0 !important;
-}
-
-.dark input::placeholder,
-.dark textarea::placeholder {
-  color: #888888 !important;
-}
 @supports (padding: max(0px)) {
   .safe-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
