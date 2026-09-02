@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-} from 'lucide-react';
+, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -52,6 +52,7 @@ import Expenses from './components/Expenses';
 import Inventory from './components/Inventory';
 import Animals from './components/Animals';
 import Pastures from './components/Pastures';
+import Properties from './components/Properties';
 import Tasks from './components/Tasks';
 import Reports from './components/Reports';
 import FarmSettingsComp from './components/FarmSettings';
@@ -100,7 +101,12 @@ export default function App() {
     saveInventory,
     deleteInventory,
     updateSettings,
-    weighingSheets
+    weighingSheets,
+    properties,
+    activePropertyId,
+    setActivePropertyId,
+    saveProperty,
+    deleteProperty
   } = useFirebase();
 
   const [activeView, setActiveView] = useState<View>('dashboard');
@@ -493,6 +499,7 @@ export default function App() {
 
   const navItems = [
     { id: 'dashboard', label: 'Painel', icon: LayoutDashboard },
+    { id: 'properties', label: 'Propriedades', icon: Building2 },
     { id: 'payments', label: 'Funcionários', icon: Users },
     { id: 'expenses', label: 'Despesas', icon: Receipt },
     { id: 'inventory', label: 'Estoque Suprimentos', icon: Package },
@@ -545,6 +552,7 @@ export default function App() {
       case 'reports': return <Reports payments={payments} expenses={expenses} animals={animals} transactions={transactions} pastures={pastures} />;
       case 'nutrition': return <NutritionCalculator animals={animals} inventory={inventory} />;
       case 'settings': return <FarmSettingsComp settings={settings} setSettings={updateSettings} />;
+      case 'properties': return <Properties properties={properties} activePropertyId={activePropertyId} onSetActive={setActivePropertyId} onSave={saveProperty} onDelete={deleteProperty} />;
       default: 
         return (
           <Dashboard 
@@ -688,6 +696,25 @@ export default function App() {
               <h2 className="text-base md:text-lg font-bold text-gray-800 capitalize truncate max-w-[120px] sm:max-w-none">
                 {navItems.find(n => n.id === activeView)?.label}
               </h2>
+
+              {properties.length > 0 && (
+                properties.length === 1 ? (
+                  <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
+                    <Building2 size={12} /> {properties[0].name}
+                  </span>
+                ) : (
+                  <select
+                    value={activePropertyId ?? ''}
+                    onChange={(e) => setActivePropertyId(e.target.value)}
+                    className="hidden sm:block bg-gray-100 text-gray-700 text-xs font-semibold rounded-full px-3 py-1.5 border-0 focus:ring-2 focus:ring-[#2d6a4f]"
+                    title="Propriedade ativa"
+                  >
+                    {properties.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                )
+              )}
             </div>
             
             <div className="flex items-center gap-1 sm:gap-2">

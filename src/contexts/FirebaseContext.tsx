@@ -12,7 +12,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType, googleProvider } from '../lib/firebase';
-import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType } from '../types';
+import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType } from '../types';
 
 interface FirebaseContextType {
   user: User | null;
@@ -26,6 +26,12 @@ interface FirebaseContextType {
   loginWithGoogle: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   logout: () => Promise<void>;
+  properties: Property[];
+  activePropertyId: string | null;
+  activeProperty: Property | null;
+  setActivePropertyId: (id: string) => void;
+  saveProperty: (property: Property) => Promise<void>;
+  deleteProperty: (id: string) => Promise<void>;
   animals: Animal[];
   pastures: Pasture[];
   expenses: Expense[];
@@ -267,6 +273,14 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
 
   const [animals, setAnimals] = useState<Animal[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [activePropertyId, setActivePropertyIdState] = useState<string | null>(() => {
+    return localStorage.getItem('gestao_fazenda_active_property');
+  });
+  const setActivePropertyId = (id: string) => {
+    localStorage.setItem('gestao_fazenda_active_property', id);
+    setActivePropertyIdState(id);
+  };
   const [pastures, setPastures] = useState<Pasture[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [payments, setPayments] = useState<EmployeePayment[]>([]);
@@ -607,6 +621,35 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, `users/${userId}`));
 
+    // Fase 2 (multi-propriedade): carrega as propriedades do usuário. Se
+    // ainda não existir nenhuma (usuário de antes desta atualização), cria
+    // automaticamente uma propriedade padrão ("Minha Propriedade") e a
+    // define como ativa — os dados antigos continuam acessíveis normalmente
+    // através dela (ver migração de propertyId logo abaixo).
+    const propertiesUnsub = onSnapshot(collection(db, 'users', userId, 'properties'), async (snap) => {
+      const list = snap.docs.map(d => d.data() as Property);
+      setProperties(list);
+
+      if (list.length === 0) {
+        const defaultProperty: Property = {
+          id: `prop_${Date.now()}`,
+          name: 'Minha Propriedade',
+          type: PropertyType.FAZENDA,
+          createdAt: new Date().toISOString(),
+        };
+        try {
+          await setDoc(doc(db, 'users', userId, 'properties', defaultProperty.id), defaultProperty);
+          setActivePropertyId(defaultProperty.id);
+        } catch (err) {
+          handleFirestoreError(err, OperationType.WRITE, `users/${userId}/properties`);
+        }
+      } else if (!activePropertyId || !list.some(p => p.id === activePropertyId)) {
+        // Se não há propriedade ativa selecionada (ou a que estava salva não
+        // existe mais), cai para a primeira da lista em vez de travar a tela.
+        setActivePropertyId(list[0].id);
+      }
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/properties`));
+
     const animalsUnsub = onSnapshot(collection(db, 'users', userId, 'animals'), (snap) => {
       setAnimals(snap.docs.map(d => d.data() as Animal));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/animals`));
@@ -649,6 +692,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     return () => {
       settingsUnsub();
+      propertiesUnsub();
       animalsUnsub();
       pasturesUnsub();
       expensesUnsub();
@@ -661,6 +705,45 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       weighingSheetsUnsub();
     };
   }, [user, isDemoMode]);
+
+  // Fase 2 (multi-propriedade): registros que existiam antes desta
+  // atualização não têm "propertyId". Assim que houver exatamente uma
+  // propriedade (o caso normal de quem já usava o app), preenchemos o
+  // propertyId que estiver faltando automaticamente — uma vez só, sem apagar
+  // ou duplicar nada, só rotulando cada registro com a propriedade certa.
+  useEffect(() => {
+    if (!user || isDemoMode || properties.length !== 1) return;
+    const targetPropertyId = properties[0].id;
+
+    const backfill = async <T extends { id: string; propertyId?: string }>(
+      items: T[],
+      collectionName: string,
+    ) => {
+      const pending = items.filter((it) => !it.propertyId);
+      for (const item of pending) {
+        try {
+          await updateDoc(doc(db, 'users', user.uid, collectionName, item.id), {
+            propertyId: targetPropertyId,
+          });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.WRITE, `users/${user.uid}/${collectionName}/${item.id}`);
+        }
+      }
+    };
+
+    backfill(animals, 'animals');
+    backfill(pastures, 'pastures');
+    backfill(expenses, 'expenses');
+    backfill(payments, 'payments');
+    backfill(tasks, 'tasks');
+    backfill(inventory, 'inventory');
+    backfill(employees, 'employees');
+    backfill(fixedExpenses, 'fixedExpenses');
+    backfill(weighingSheets, 'weighingSheets');
+    // Roda de novo sempre que a lista de qualquer coleção mudar, mas o
+    // filtro "!it.propertyId" garante que registros já migrados são
+    // ignorados nas próximas execuções (idempotente).
+  }, [user, isDemoMode, properties, animals, pastures, expenses, payments, tasks, inventory, employees, fixedExpenses, weighingSheets]);
 
   const checkWritePermission = (): boolean => {
     if (userRole === 'user') {
@@ -687,6 +770,34 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const saveProperty = async (property: Property) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    try {
+      await setDoc(doc(db, 'users', user.uid, 'properties', property.id), property);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${user.uid}/properties`);
+    }
+  };
+
+  const deleteProperty = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    if (properties.length <= 1) {
+      console.warn('Não é possível excluir a única propriedade cadastrada.');
+      return;
+    }
+    try {
+      await deleteDoc(doc(db, 'users', user.uid, 'properties', id));
+      if (activePropertyId === id) {
+        const remaining = properties.filter(p => p.id !== id);
+        if (remaining[0]) setActivePropertyId(remaining[0].id);
+      }
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${user.uid}/properties/${id}`);
+    }
+  };
+
   const saveAnimal = async (animal: Animal) => {
     if (!user) return;
     if (!checkWritePermission()) return;
@@ -696,7 +807,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'animals', animal.id), animal);
+      const animalToSave = { ...animal, propertyId: animal.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'animals', animal.id), animalToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/animals/${animal.id}`);
     }
@@ -729,7 +841,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'pastures', pasture.id), pasture);
+      const pastureToSave = { ...pasture, propertyId: pasture.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'pastures', pasture.id), pastureToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/pastures/${pasture.id}`);
     }
@@ -759,7 +872,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'expenses', expense.id), expense);
+      const expenseToSave = { ...expense, propertyId: expense.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'expenses', expense.id), expenseToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/expenses/${expense.id}`);
     }
@@ -789,7 +903,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'payments', payment.id), payment);
+      const paymentToSave = { ...payment, propertyId: payment.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'payments', payment.id), paymentToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/payments/${payment.id}`);
     }
@@ -819,7 +934,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'tasks', task.id), task);
+      const taskToSave = { ...task, propertyId: task.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'tasks', task.id), taskToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/tasks/${task.id}`);
     }
@@ -864,7 +980,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'inventory', item.id), item);
+      const itemToSave = { ...item, propertyId: item.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'inventory', item.id), itemToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/inventory/${item.id}`);
     }
@@ -894,7 +1011,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'employees', employee.id), employee);
+      const employeeToSave = { ...employee, propertyId: employee.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'employees', employee.id), employeeToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/employees/${employee.id}`);
     }
@@ -924,7 +1042,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'fixedExpenses', fixedExpense.id), fixedExpense);
+      const fixedExpenseToSave = { ...fixedExpense, propertyId: fixedExpense.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'fixedExpenses', fixedExpense.id), fixedExpenseToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/fixedExpenses/${fixedExpense.id}`);
     }
@@ -954,7 +1073,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'weighingSheets', sheet.id), sheet);
+      const sheetToSave = { ...sheet, propertyId: sheet.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'weighingSheets', sheet.id), sheetToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/weighingSheets/${sheet.id}`);
     }
@@ -1078,13 +1198,40 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const activeProperty = properties.find(p => p.id === activePropertyId) || null;
+
+  // Filtra cada lista pela propriedade ativa. Enquanto a migração automática
+  // (acima) ainda não rotulou um registro antigo, ele continua aparecendo
+  // normalmente contanto que só exista uma propriedade — assim nenhum dado
+  // "some" da tela durante a transição.
+  function byActiveProperty<T extends { propertyId?: string }>(items: T[]): T[] {
+    if (!activePropertyId) return items;
+    return items.filter(
+      (it) => it.propertyId === activePropertyId || (!it.propertyId && properties.length <= 1),
+    );
+  }
+
+  const filteredAnimals = byActiveProperty(animals);
+  const filteredPastures = byActiveProperty(pastures);
+  const filteredExpenses = byActiveProperty(expenses);
+  const filteredPayments = byActiveProperty(payments);
+  const filteredTasks = byActiveProperty(tasks);
+  const filteredInventory = byActiveProperty(inventory);
+  const filteredEmployees = byActiveProperty(employees);
+  const filteredFixedExpenses = byActiveProperty(fixedExpenses);
+  const filteredWeighingSheets = byActiveProperty(weighingSheets);
+
   return (
     <FirebaseContext.Provider value={{
       user, userRole, loading, isDemoMode,
       loginAsGuest, logoutAsGuest, loginWithEmail, registerWithEmail,
       loginWithGoogle, sendPasswordReset, logout,
-      animals, pastures, expenses, payments, tasks, transactions,
-      inventory, employees, fixedExpenses, weighingSheets, settings,
+      properties, activePropertyId, activeProperty, setActivePropertyId,
+      saveProperty, deleteProperty,
+      animals: filteredAnimals, pastures: filteredPastures, expenses: filteredExpenses,
+      payments: filteredPayments, tasks: filteredTasks, transactions,
+      inventory: filteredInventory, employees: filteredEmployees,
+      fixedExpenses: filteredFixedExpenses, weighingSheets: filteredWeighingSheets, settings,
       updateSettings, saveAnimal, deleteAnimal, savePasture, deletePasture,
       saveExpense, deleteExpense, savePayment, deletePayment, saveTask,
       deleteTask, saveTransaction, saveInventory, deleteInventory,

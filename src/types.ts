@@ -3,6 +3,31 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export enum PropertyType {
+  FAZENDA = "Fazenda",
+  SITIO = "Sítio",
+  CHACARA = "Chácara",
+  ARRENDAMENTO = "Arrendamento",
+  PARCEIRO = "Parceiro"
+}
+
+export interface Property {
+  id: string;
+  name: string;
+  type: PropertyType;
+  areaTotal?: number; // hectares
+  areaProdutiva?: number; // hectares
+  areaPreservada?: number; // hectares
+  reservaLegal?: number; // hectares
+  car?: string; // Cadastro Ambiental Rural
+  location?: {
+    lat: number;
+    lng: number;
+  };
+  partnerName?: string; // para tipo "Parceiro" ou "Arrendamento"
+  createdAt: string;
+}
+
 export enum PaymentType {
   SALARY = "Salário",
   FORTNIGHT = "Quinzena",
@@ -21,6 +46,7 @@ export enum EmployeeRole {
 
 export interface EmployeePayment {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   date: string;
   employeeName: string;
   role: EmployeeRole;
@@ -46,6 +72,7 @@ export enum ExpenseType {
 
 export interface Expense {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   date: string;
   dueDate?: string; // Optional due date
   type: ExpenseType;
@@ -82,6 +109,7 @@ export enum AnimalCategory {
 
 export interface Employee {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   name: string;
   role: EmployeeRole;
   admissionDate: string;
@@ -95,6 +123,7 @@ export interface Employee {
 
 export interface Animal {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   type: AnimalType;
   category: AnimalCategory;
   breed?: string; // Add breed
@@ -144,6 +173,7 @@ export interface Animal {
 
 export interface Pasture {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   number: string;
   name: string;
   grassTypes: string[]; // Brachiaria, Mombaça, etc.
@@ -173,6 +203,7 @@ export interface Pasture {
 
 export interface InventoryItem {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   name: string;
   category: "Supply" | "Equipment";
   quantity: number;
@@ -193,6 +224,7 @@ export interface InventoryItem {
 
 export interface FarmTask {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   title: string;
   description: string;
   dueDate: string;
@@ -213,6 +245,7 @@ export interface TransactionHistory {
 
 export interface FixedExpense {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   description: string;
   dueDate: string;
   value: number;
@@ -253,6 +286,7 @@ export interface WeighingRow {
 
 export interface WeighingSheet {
   id: string;
+  propertyId?: string; // vincula o registro a uma propriedade (Fase 2 - multi-propriedade)
   name: string;
   date: string;
   rows: WeighingRow[];
