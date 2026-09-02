@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 } from 'lucide-react';
+, Building2 , Stethoscope } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -53,6 +53,7 @@ import Inventory from './components/Inventory';
 import Animals from './components/Animals';
 import Pastures from './components/Pastures';
 import Properties from './components/Properties';
+import PecuariaProfissional from './components/PecuariaProfissional';
 import Tasks from './components/Tasks';
 import Reports from './components/Reports';
 import FarmSettingsComp from './components/FarmSettings';
@@ -106,7 +107,19 @@ export default function App() {
     activePropertyId,
     setActivePropertyId,
     saveProperty,
-    deleteProperty
+    deleteProperty,
+    individualAnimals,
+    saveIndividualAnimal,
+    deleteIndividualAnimal,
+    reproductionEvents,
+    saveReproductionEvent,
+    deleteReproductionEvent,
+    healthEvents,
+    saveHealthEvent,
+    deleteHealthEvent,
+    milkRecords,
+    saveMilkRecord,
+    deleteMilkRecord
   } = useFirebase();
 
   const [activeView, setActiveView] = useState<View>('dashboard');
@@ -500,6 +513,7 @@ export default function App() {
   const navItems = [
     { id: 'dashboard', label: 'Painel', icon: LayoutDashboard },
     { id: 'properties', label: 'Propriedades', icon: Building2 },
+    { id: 'pecuaria-pro', label: 'Pecuária Profissional', icon: Stethoscope },
     { id: 'payments', label: 'Funcionários', icon: Users },
     { id: 'expenses', label: 'Despesas', icon: Receipt },
     { id: 'inventory', label: 'Estoque Suprimentos', icon: Package },
@@ -553,6 +567,7 @@ export default function App() {
       case 'nutrition': return <NutritionCalculator animals={animals} inventory={inventory} />;
       case 'settings': return <FarmSettingsComp settings={settings} setSettings={updateSettings} />;
       case 'properties': return <Properties properties={properties} activePropertyId={activePropertyId} onSetActive={setActivePropertyId} onSave={saveProperty} onDelete={deleteProperty} />;
+      case 'pecuaria-pro': return <PecuariaProfissional individualAnimals={individualAnimals} saveIndividualAnimal={saveIndividualAnimal} deleteIndividualAnimal={deleteIndividualAnimal} reproductionEvents={reproductionEvents} saveReproductionEvent={saveReproductionEvent} deleteReproductionEvent={deleteReproductionEvent} healthEvents={healthEvents} saveHealthEvent={saveHealthEvent} deleteHealthEvent={deleteHealthEvent} milkRecords={milkRecords} saveMilkRecord={saveMilkRecord} deleteMilkRecord={deleteMilkRecord} />;
       default: 
         return (
           <Dashboard 

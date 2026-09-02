@@ -12,7 +12,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType, googleProvider } from '../lib/firebase';
-import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType } from '../types';
+import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord } from '../types';
 
 interface FirebaseContextType {
   user: User | null;
@@ -32,6 +32,18 @@ interface FirebaseContextType {
   setActivePropertyId: (id: string) => void;
   saveProperty: (property: Property) => Promise<void>;
   deleteProperty: (id: string) => Promise<void>;
+  individualAnimals: IndividualAnimal[];
+  saveIndividualAnimal: (animal: IndividualAnimal) => Promise<void>;
+  deleteIndividualAnimal: (id: string) => Promise<void>;
+  reproductionEvents: ReproductionEvent[];
+  saveReproductionEvent: (event: ReproductionEvent) => Promise<void>;
+  deleteReproductionEvent: (id: string) => Promise<void>;
+  healthEvents: HealthEvent[];
+  saveHealthEvent: (event: HealthEvent) => Promise<void>;
+  deleteHealthEvent: (id: string) => Promise<void>;
+  milkRecords: MilkProductionRecord[];
+  saveMilkRecord: (record: MilkProductionRecord) => Promise<void>;
+  deleteMilkRecord: (id: string) => Promise<void>;
   animals: Animal[];
   pastures: Pasture[];
   expenses: Expense[];
@@ -273,6 +285,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
 
   const [animals, setAnimals] = useState<Animal[]>([]);
+  const [individualAnimals, setIndividualAnimals] = useState<IndividualAnimal[]>([]);
+  const [reproductionEvents, setReproductionEvents] = useState<ReproductionEvent[]>([]);
+  const [healthEvents, setHealthEvents] = useState<HealthEvent[]>([]);
+  const [milkRecords, setMilkRecords] = useState<MilkProductionRecord[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [activePropertyId, setActivePropertyIdState] = useState<string | null>(() => {
     return localStorage.getItem('gestao_fazenda_active_property');
@@ -583,6 +599,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setEmployees([]);
       setFixedExpenses([]);
       setWeighingSheets([]);
+      setIndividualAnimals([]);
+      setReproductionEvents([]);
+      setHealthEvents([]);
+      setMilkRecords([]);
       setSettings({ farmName: '', city: '' });
       return;
     }
@@ -690,6 +710,23 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setWeighingSheets(snap.docs.map(d => d.data() as WeighingSheet));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/weighingSheets`));
 
+    // Fase 6/7 — Pecuária Profissional
+    const individualAnimalsUnsub = onSnapshot(collection(db, 'users', userId, 'individualAnimals'), (snap) => {
+      setIndividualAnimals(snap.docs.map(d => d.data() as IndividualAnimal));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/individualAnimals`));
+
+    const reproductionEventsUnsub = onSnapshot(collection(db, 'users', userId, 'reproductionEvents'), (snap) => {
+      setReproductionEvents(snap.docs.map(d => d.data() as ReproductionEvent));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/reproductionEvents`));
+
+    const healthEventsUnsub = onSnapshot(collection(db, 'users', userId, 'healthEvents'), (snap) => {
+      setHealthEvents(snap.docs.map(d => d.data() as HealthEvent));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/healthEvents`));
+
+    const milkRecordsUnsub = onSnapshot(collection(db, 'users', userId, 'milkRecords'), (snap) => {
+      setMilkRecords(snap.docs.map(d => d.data() as MilkProductionRecord));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/milkRecords`));
+
     return () => {
       settingsUnsub();
       propertiesUnsub();
@@ -703,6 +740,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       employeesUnsub();
       fixedExpensesUnsub();
       weighingSheetsUnsub();
+      individualAnimalsUnsub();
+      reproductionEventsUnsub();
+      healthEventsUnsub();
+      milkRecordsUnsub();
     };
   }, [user, isDemoMode]);
 
@@ -795,6 +836,99 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, `users/${user.uid}/properties/${id}`);
+    }
+  };
+
+  // Fase 6/7 — Pecuária Profissional
+  const saveIndividualAnimal = async (animalItem: IndividualAnimal) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = { ...animalItem, propertyId: animalItem.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'individualAnimals', animalItem.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/individualAnimals/${animalItem.id}`);
+    }
+  };
+
+  const deleteIndividualAnimal = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'individualAnimals', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/individualAnimals/${id}`);
+    }
+  };
+
+  const saveReproductionEvent = async (event: ReproductionEvent) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = { ...event, propertyId: event.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'reproductionEvents', event.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/reproductionEvents/${event.id}`);
+    }
+  };
+
+  const deleteReproductionEvent = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'reproductionEvents', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/reproductionEvents/${id}`);
+    }
+  };
+
+  const saveHealthEvent = async (event: HealthEvent) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = { ...event, propertyId: event.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'healthEvents', event.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/healthEvents/${event.id}`);
+    }
+  };
+
+  const deleteHealthEvent = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'healthEvents', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/healthEvents/${id}`);
+    }
+  };
+
+  const saveMilkRecord = async (record: MilkProductionRecord) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = { ...record, propertyId: record.propertyId || activePropertyId || undefined };
+      await setDoc(doc(db, 'users', currentUid, 'milkRecords', record.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/milkRecords/${record.id}`);
+    }
+  };
+
+  const deleteMilkRecord = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'milkRecords', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/milkRecords/${id}`);
     }
   };
 
@@ -1220,6 +1354,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const filteredEmployees = byActiveProperty(employees);
   const filteredFixedExpenses = byActiveProperty(fixedExpenses);
   const filteredWeighingSheets = byActiveProperty(weighingSheets);
+  const filteredIndividualAnimals = byActiveProperty(individualAnimals);
+  const filteredReproductionEvents = byActiveProperty(reproductionEvents);
+  const filteredHealthEvents = byActiveProperty(healthEvents);
+  const filteredMilkRecords = byActiveProperty(milkRecords);
 
   return (
     <FirebaseContext.Provider value={{
@@ -1228,6 +1366,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       loginWithGoogle, sendPasswordReset, logout,
       properties, activePropertyId, activeProperty, setActivePropertyId,
       saveProperty, deleteProperty,
+      individualAnimals: filteredIndividualAnimals, saveIndividualAnimal, deleteIndividualAnimal,
+      reproductionEvents: filteredReproductionEvents, saveReproductionEvent, deleteReproductionEvent,
+      healthEvents: filteredHealthEvents, saveHealthEvent, deleteHealthEvent,
+      milkRecords: filteredMilkRecords, saveMilkRecord, deleteMilkRecord,
       animals: filteredAnimals, pastures: filteredPastures, expenses: filteredExpenses,
       payments: filteredPayments, tasks: filteredTasks, transactions,
       inventory: filteredInventory, employees: filteredEmployees,

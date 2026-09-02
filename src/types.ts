@@ -293,3 +293,109 @@ export interface WeighingSheet {
   notes?: string;
 }
 
+// =====================================================================
+// FASE 6/7 — PECUÁRIA PROFISSIONAL
+// Cadastro individual (complementa, não substitui, o controle por lote já
+// existente em `Animal`), Reprodução, Sanidade e Produção Leiteira.
+// =====================================================================
+
+export enum AnimalSex {
+  MALE = "Macho",
+  FEMALE = "Fêmea",
+}
+
+export enum LotGroup {
+  BEZERROS = "Bezerros",
+  NOVILHAS = "Novilhas",
+  MATRIZES = "Matrizes",
+  TOUROS = "Touros",
+  CONFINAMENTO = "Confinamento",
+}
+
+// Representa UM animal específico (brinco/RFID) — diferente de `Animal`,
+// que representa um LOTE (várias cabeças agrupadas). Um IndividualAnimal
+// pode opcionalmente pertencer a um lote (lotGroup) para fins de manejo.
+export interface IndividualAnimal {
+  id: string;
+  propertyId?: string;
+  earTag: string; // Brinco — identificação visual
+  rfid?: string; // Identificação eletrônica
+  name?: string;
+  breed?: string;
+  sex: AnimalSex;
+  category: AnimalCategory;
+  lotGroup?: LotGroup;
+  birthDate?: string;
+  motherEarTag?: string;
+  fatherEarTag?: string;
+  currentPastureId?: string;
+  status: "active" | "sold" | "dead";
+  weightHistory?: { date: string; weight: number }[];
+  photoUrl?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export enum ReproductionEventType {
+  COBERTURA = "Cobertura",
+  INSEMINACAO = "Inseminação Artificial",
+  IATF = "IATF",
+  DIAGNOSTICO_PRENHEZ = "Diagnóstico de Prenhez",
+  PARTO = "Parto",
+  DESMAMA = "Desmama",
+}
+
+// Gestação bovina ~283 dias — usado para sugerir a data provável de parto
+// automaticamente a partir da cobertura/inseminação/IATF.
+export const GESTACAO_BOVINA_DIAS = 283;
+
+export interface ReproductionEvent {
+  id: string;
+  propertyId?: string;
+  animalEarTag: string; // fêmea envolvida
+  type: ReproductionEventType;
+  date: string;
+  sireEarTag?: string; // touro/reprodutor (cobertura/inseminação/IATF)
+  semenBatch?: string; // partida de sêmen (inseminação/IATF)
+  pregnancyResult?: "positivo" | "negativo" | "pendente"; // diagnóstico de prenhez
+  expectedBirthDate?: string; // calculado automaticamente
+  offspringEarTag?: string; // bezerro nascido (parto)
+  weaningWeight?: number; // peso à desmama (desmama)
+  notes?: string;
+}
+
+export enum HealthEventType {
+  VACINACAO = "Vacinação",
+  VERMIFUGACAO = "Vermifugação",
+  MEDICAMENTO = "Medicamento",
+  EXAME = "Exame",
+}
+
+export interface HealthEvent {
+  id: string;
+  propertyId?: string;
+  animalEarTag: string;
+  type: HealthEventType;
+  productName: string;
+  date: string;
+  nextDoseDate?: string; // controle de reforço/vencimento
+  dosage?: string;
+  veterinarian?: string;
+  cost?: number;
+  notes?: string;
+}
+
+export interface MilkProductionRecord {
+  id: string;
+  propertyId?: string;
+  animalEarTag?: string; // registro individual
+  lotGroup?: LotGroup; // ou registro por lote
+  date: string;
+  period: "manha" | "tarde" | "dia";
+  liters: number;
+  ccs?: number; // Contagem de Células Somáticas (mil cel/mL)
+  cbt?: number; // Contagem Bacteriana Total (UFC/mL)
+  notes?: string;
+}
+
+
