@@ -837,10 +837,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const deleteProperty = async (id: string) => {
     if (!user) return;
     if (!checkWritePermission()) return;
-    if (properties.length <= 1) {
-      console.warn('Não é possível excluir a única propriedade cadastrada.');
-      return;
-    }
+    // Se esta for a última propriedade, o efeito de migração (que já roda
+    // no carregamento) recria automaticamente uma propriedade padrão vazia
+    // assim que a lista ficar vazia — por isso é seguro excluir mesmo
+    // restando só uma.
     try {
       await deleteDoc(doc(db, 'users', user.uid, 'properties', id));
       if (activePropertyId === id) {

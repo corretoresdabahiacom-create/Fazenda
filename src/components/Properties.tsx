@@ -64,11 +64,11 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
   }
 
   async function handleDelete(id: string) {
-    if (properties.length <= 1) {
-      alert('Não é possível excluir a única propriedade cadastrada. Cadastre outra antes de remover esta.');
-      return;
-    }
-    if (confirm('Excluir esta propriedade? Os registros vinculados a ela (animais, pastos, despesas etc.) não serão apagados, mas deixarão de aparecer até serem migrados manualmente.')) {
+    const isLast = properties.length <= 1;
+    const message = isLast
+      ? 'Esta é sua única propriedade. Ao excluir, uma nova propriedade vazia ("Minha Propriedade") será criada automaticamente. Os registros vinculados a esta (animais, pastos, despesas etc.) não serão apagados, mas deixarão de aparecer até serem migrados manualmente. Continuar?'
+      : 'Excluir esta propriedade? Os registros vinculados a ela (animais, pastos, despesas etc.) não serão apagados, mas deixarão de aparecer até serem migrados manualmente.';
+    if (confirm(message)) {
       await onDelete(id);
     }
   }
