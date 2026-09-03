@@ -132,6 +132,44 @@ service cloud.firestore {
           && (!('notes' in data) || data.notes is string);
     }
 
+    function isValidProperty(data) {
+      return data.id is string
+          && data.name is string && data.name.size() <= 200
+          && data.type is string
+          && data.createdAt is string;
+    }
+
+    function isValidIndividualAnimal(data) {
+      return data.id is string
+          && data.earTag is string && data.earTag.size() <= 50
+          && data.sex is string
+          && data.category is string
+          && data.status is string
+          && data.createdAt is string;
+    }
+
+    function isValidReproductionEvent(data) {
+      return data.id is string
+          && data.animalEarTag is string
+          && data.type is string
+          && data.date is string;
+    }
+
+    function isValidHealthEvent(data) {
+      return data.id is string
+          && data.animalEarTag is string
+          && data.type is string
+          && data.productName is string
+          && data.date is string;
+    }
+
+    function isValidMilkRecord(data) {
+      return data.id is string
+          && data.date is string
+          && data.period is string
+          && data.liters is number && data.liters >= 0;
+    }
+
     // -------------------------------------------------------------------------
     // MATCH BLOCKS
     // -------------------------------------------------------------------------
@@ -212,6 +250,41 @@ service cloud.firestore {
         allow list, get: if isOwner(userId);
         allow create: if canWrite(userId) && isValidId(sheetId) && isValidWeighingSheet(incoming());
         allow update: if canWrite(userId) && isValidWeighingSheet(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /properties/{propertyId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(propertyId) && isValidProperty(incoming());
+        allow update: if canWrite(userId) && isValidProperty(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /individualAnimals/{animalId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(animalId) && isValidIndividualAnimal(incoming());
+        allow update: if canWrite(userId) && isValidIndividualAnimal(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /reproductionEvents/{eventId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(eventId) && isValidReproductionEvent(incoming());
+        allow update: if canWrite(userId) && isValidReproductionEvent(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /healthEvents/{eventId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(eventId) && isValidHealthEvent(incoming());
+        allow update: if canWrite(userId) && isValidHealthEvent(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /milkRecords/{recordId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(recordId) && isValidMilkRecord(incoming());
+        allow update: if canWrite(userId) && isValidMilkRecord(incoming());
         allow delete: if canWrite(userId);
       }
     }
