@@ -412,4 +412,140 @@ export interface MilkProductionRecord {
   notes?: string;
 }
 
+// =====================================================================
+// FASE 3/4 — AGRICULTURA
+// Talhões, Planejamento Agrícola, Caderno de Campo, Manejo de Pragas e
+// Irrigação. Nenhum campo é obrigatório — o usuário cadastra e salva do
+// jeito que quiser, sem travas.
+// =====================================================================
+
+export enum TalhaoStatus {
+  ATIVO = "Ativo",
+  EM_DESCANSO = "Em descanso",
+  EM_PREPARO = "Em preparo",
+}
+
+export interface Talhao {
+  id: string;
+  propertyId?: string;
+  name: string;
+  area?: number;
+  areaUnit?: AreaUnit;
+  currentCrop?: string;
+  status: TalhaoStatus;
+  soilType?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export enum Cultura {
+  SOJA = "Soja",
+  MILHO = "Milho",
+  ALGODAO = "Algodão",
+  LARANJA = "Laranja",
+  CAFE = "Café",
+  CANA = "Cana-de-açúcar",
+  FEIJAO = "Feijão",
+  TRIGO = "Trigo",
+  EUCALIPTO = "Eucalipto",
+  HORTALICAS = "Hortaliças",
+  FRUTICULTURA = "Fruticultura",
+  OUTRA = "Outra",
+}
+
+export enum CropPlanStatus {
+  PLANEJADO = "Planejado",
+  EM_ANDAMENTO = "Em andamento",
+  COLHIDO = "Colhido",
+  CANCELADO = "Cancelado",
+}
+
+export interface CropPlan {
+  id: string;
+  propertyId?: string;
+  talhaoId?: string;
+  cultura: Cultura;
+  safra?: string; // ex: "2026/2027"
+  plantingDateEstimate?: string;
+  harvestDateEstimate?: string;
+  areaPlanejada?: number;
+  status: CropPlanStatus;
+  notes?: string;
+  createdAt: string;
+}
+
+export enum FieldLogType {
+  PLANTIO = "Plantio",
+  PULVERIZACAO = "Pulverização",
+  IRRIGACAO = "Irrigação",
+  ADUBACAO = "Adubação",
+  APLICACAO_FOLIAR = "Aplicação Foliar",
+  CONTROLE_PRAGAS = "Controle de Pragas",
+  CONTROLE_DOENCAS = "Controle de Doenças",
+  COLHEITA = "Colheita",
+}
+
+export interface FieldLogEntry {
+  id: string;
+  propertyId?: string;
+  talhaoId?: string;
+  type: FieldLogType;
+  date: string;
+  responsavel?: string;
+  product?: string;
+  quantity?: string;
+  gpsLat?: number;
+  gpsLng?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export enum PestType {
+  LAGARTA = "Lagarta",
+  PERCEVEJO = "Percevejo",
+  MOSCA_BRANCA = "Mosca-branca",
+  CIGARRINHA = "Cigarrinha",
+  FERRUGEM = "Ferrugem",
+  NEMATOIDE = "Nematoide",
+  OUTRA = "Outra",
+}
+
+export enum InfestationLevel {
+  BAIXO = "Baixo",
+  MEDIO = "Médio",
+  ALTO = "Alto",
+  CRITICO = "Crítico",
+}
+
+export interface PestRecord {
+  id: string;
+  propertyId?: string;
+  talhaoId?: string;
+  pestType: PestType;
+  date: string;
+  infestationLevel: InfestationLevel;
+  affectedArea?: number;
+  controlAction?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export enum IrrigationMethod {
+  GOTEJAMENTO = "Gotejamento",
+  ASPERSAO = "Aspersão",
+  PIVO_CENTRAL = "Pivô Central",
+}
+
+export interface IrrigationRecord {
+  id: string;
+  propertyId?: string;
+  talhaoId?: string;
+  method: IrrigationMethod;
+  date: string;
+  durationHours?: number;
+  waterVolume?: number;
+  notes?: string;
+  createdAt: string;
+}
+
 

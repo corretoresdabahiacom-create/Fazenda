@@ -12,7 +12,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType, googleProvider } from '../lib/firebase';
-import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord } from '../types';
+import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord, Talhao, CropPlan, FieldLogEntry, PestRecord, IrrigationRecord } from '../types';
 
 interface FirebaseContextType {
   user: User | null;
@@ -44,6 +44,21 @@ interface FirebaseContextType {
   milkRecords: MilkProductionRecord[];
   saveMilkRecord: (record: MilkProductionRecord) => Promise<void>;
   deleteMilkRecord: (id: string) => Promise<void>;
+  talhoes: Talhao[];
+  saveTalhao: (t: Talhao) => Promise<void>;
+  deleteTalhao: (id: string) => Promise<void>;
+  cropPlans: CropPlan[];
+  saveCropPlan: (c: CropPlan) => Promise<void>;
+  deleteCropPlan: (id: string) => Promise<void>;
+  fieldLogEntries: FieldLogEntry[];
+  saveFieldLogEntry: (e: FieldLogEntry) => Promise<void>;
+  deleteFieldLogEntry: (id: string) => Promise<void>;
+  pestRecords: PestRecord[];
+  savePestRecord: (r: PestRecord) => Promise<void>;
+  deletePestRecord: (id: string) => Promise<void>;
+  irrigationRecords: IrrigationRecord[];
+  saveIrrigationRecord: (r: IrrigationRecord) => Promise<void>;
+  deleteIrrigationRecord: (id: string) => Promise<void>;
   animals: Animal[];
   pastures: Pasture[];
   expenses: Expense[];
@@ -289,6 +304,11 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [reproductionEvents, setReproductionEvents] = useState<ReproductionEvent[]>([]);
   const [healthEvents, setHealthEvents] = useState<HealthEvent[]>([]);
   const [milkRecords, setMilkRecords] = useState<MilkProductionRecord[]>([]);
+  const [talhoes, setTalhoes] = useState<Talhao[]>([]);
+  const [cropPlans, setCropPlans] = useState<CropPlan[]>([]);
+  const [fieldLogEntries, setFieldLogEntries] = useState<FieldLogEntry[]>([]);
+  const [pestRecords, setPestRecords] = useState<PestRecord[]>([]);
+  const [irrigationRecords, setIrrigationRecords] = useState<IrrigationRecord[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [activePropertyId, setActivePropertyIdState] = useState<string | null>(() => {
     return localStorage.getItem('gestao_fazenda_active_property');
@@ -603,6 +623,11 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setReproductionEvents([]);
       setHealthEvents([]);
       setMilkRecords([]);
+      setTalhoes([]);
+      setCropPlans([]);
+      setFieldLogEntries([]);
+      setPestRecords([]);
+      setIrrigationRecords([]);
       setSettings({ farmName: '', city: '' });
       return;
     }
@@ -742,6 +767,27 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setMilkRecords(snap.docs.map(d => d.data() as MilkProductionRecord));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/milkRecords`));
 
+    // Fase 3/4 — Agricultura
+    const talhoesUnsub = onSnapshot(collection(db, 'users', userId, 'talhoes'), (snap) => {
+      setTalhoes(snap.docs.map(d => d.data() as Talhao));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/talhoes`));
+
+    const cropPlansUnsub = onSnapshot(collection(db, 'users', userId, 'cropPlans'), (snap) => {
+      setCropPlans(snap.docs.map(d => d.data() as CropPlan));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/cropPlans`));
+
+    const fieldLogEntriesUnsub = onSnapshot(collection(db, 'users', userId, 'fieldLogEntries'), (snap) => {
+      setFieldLogEntries(snap.docs.map(d => d.data() as FieldLogEntry));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/fieldLogEntries`));
+
+    const pestRecordsUnsub = onSnapshot(collection(db, 'users', userId, 'pestRecords'), (snap) => {
+      setPestRecords(snap.docs.map(d => d.data() as PestRecord));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/pestRecords`));
+
+    const irrigationRecordsUnsub = onSnapshot(collection(db, 'users', userId, 'irrigationRecords'), (snap) => {
+      setIrrigationRecords(snap.docs.map(d => d.data() as IrrigationRecord));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/irrigationRecords`));
+
     return () => {
       settingsUnsub();
       propertiesUnsub();
@@ -759,6 +805,11 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       reproductionEventsUnsub();
       healthEventsUnsub();
       milkRecordsUnsub();
+      talhoesUnsub();
+      cropPlansUnsub();
+      fieldLogEntriesUnsub();
+      pestRecordsUnsub();
+      irrigationRecordsUnsub();
     };
   }, [user, isDemoMode]);
 
@@ -957,6 +1008,122 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       await deleteDoc(doc(db, 'users', currentUid, 'milkRecords', id));
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/milkRecords/${id}`);
+    }
+  };
+
+  // Fase 3/4 — Agricultura
+  const saveTalhao = async (t: Talhao) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...t, propertyId: t.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'talhoes', t.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/talhoes/${t.id}`);
+    }
+  };
+
+  const deleteTalhao = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'talhoes', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/talhoes/${id}`);
+    }
+  };
+
+  const saveCropPlan = async (c: CropPlan) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...c, propertyId: c.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'cropPlans', c.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/cropPlans/${c.id}`);
+    }
+  };
+
+  const deleteCropPlan = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'cropPlans', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/cropPlans/${id}`);
+    }
+  };
+
+  const saveFieldLogEntry = async (e: FieldLogEntry) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...e, propertyId: e.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'fieldLogEntries', e.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/fieldLogEntries/${e.id}`);
+    }
+  };
+
+  const deleteFieldLogEntry = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'fieldLogEntries', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/fieldLogEntries/${id}`);
+    }
+  };
+
+  const savePestRecord = async (r: PestRecord) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...r, propertyId: r.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'pestRecords', r.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/pestRecords/${r.id}`);
+    }
+  };
+
+  const deletePestRecord = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'pestRecords', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/pestRecords/${id}`);
+    }
+  };
+
+  const saveIrrigationRecord = async (r: IrrigationRecord) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...r, propertyId: r.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'irrigationRecords', r.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/irrigationRecords/${r.id}`);
+    }
+  };
+
+  const deleteIrrigationRecord = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'irrigationRecords', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/irrigationRecords/${id}`);
     }
   };
 
@@ -1386,6 +1553,11 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const filteredReproductionEvents = byActiveProperty(reproductionEvents);
   const filteredHealthEvents = byActiveProperty(healthEvents);
   const filteredMilkRecords = byActiveProperty(milkRecords);
+  const filteredTalhoes = byActiveProperty(talhoes);
+  const filteredCropPlans = byActiveProperty(cropPlans);
+  const filteredFieldLogEntries = byActiveProperty(fieldLogEntries);
+  const filteredPestRecords = byActiveProperty(pestRecords);
+  const filteredIrrigationRecords = byActiveProperty(irrigationRecords);
 
   return (
     <FirebaseContext.Provider value={{
@@ -1398,6 +1570,11 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       reproductionEvents: filteredReproductionEvents, saveReproductionEvent, deleteReproductionEvent,
       healthEvents: filteredHealthEvents, saveHealthEvent, deleteHealthEvent,
       milkRecords: filteredMilkRecords, saveMilkRecord, deleteMilkRecord,
+      talhoes: filteredTalhoes, saveTalhao, deleteTalhao,
+      cropPlans: filteredCropPlans, saveCropPlan, deleteCropPlan,
+      fieldLogEntries: filteredFieldLogEntries, saveFieldLogEntry, deleteFieldLogEntry,
+      pestRecords: filteredPestRecords, savePestRecord, deletePestRecord,
+      irrigationRecords: filteredIrrigationRecords, saveIrrigationRecord, deleteIrrigationRecord,
       animals: filteredAnimals, pastures: filteredPastures, expenses: filteredExpenses,
       payments: filteredPayments, tasks: filteredTasks, transactions,
       inventory: filteredInventory, employees: filteredEmployees,
