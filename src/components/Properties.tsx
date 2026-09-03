@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Edit3, Trash2, X, MapPinned, Ruler, Leaf, ShieldCheck, FileText } from 'lucide-react';
-import { Property, PropertyType } from '../types';
+import { Property, PropertyType, AreaUnit } from '../types';
 
 interface Props {
   properties: Property[];
@@ -18,6 +18,7 @@ interface Props {
 const emptyForm: Partial<Property> = {
   name: '',
   type: PropertyType.FAZENDA,
+  areaUnit: AreaUnit.HECTARE,
   areaTotal: undefined,
   areaProdutiva: undefined,
   areaPreservada: undefined,
@@ -50,6 +51,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
       id: editing?.id ?? `prop_${Date.now()}`,
       name: formData.name!,
       type: formData.type as PropertyType,
+      areaUnit: formData.areaUnit,
       areaTotal: formData.areaTotal,
       areaProdutiva: formData.areaProdutiva,
       areaPreservada: formData.areaPreservada,
@@ -113,17 +115,17 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
               <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-600">
                 {p.areaTotal != null && (
                   <div className="flex items-center gap-1">
-                    <Ruler size={12} className="text-gray-400" /> {p.areaTotal} ha total
+                    <Ruler size={12} className="text-gray-400" /> {p.areaTotal} {p.areaUnit ?? AreaUnit.HECTARE} total
                   </div>
                 )}
                 {p.areaProdutiva != null && (
                   <div className="flex items-center gap-1">
-                    <Leaf size={12} className="text-gray-400" /> {p.areaProdutiva} ha produtiva
+                    <Leaf size={12} className="text-gray-400" /> {p.areaProdutiva} {p.areaUnit ?? AreaUnit.HECTARE} produtiva
                   </div>
                 )}
                 {p.reservaLegal != null && (
                   <div className="flex items-center gap-1">
-                    <ShieldCheck size={12} className="text-gray-400" /> {p.reservaLegal} ha reserva legal
+                    <ShieldCheck size={12} className="text-gray-400" /> {p.reservaLegal} {p.areaUnit ?? AreaUnit.HECTARE} reserva legal
                   </div>
                 )}
                 {p.car && (
@@ -207,9 +209,22 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                 </div>
               )}
 
+              <div>
+                <label className="text-xs font-semibold text-gray-500">Unidade de medida de área</label>
+                <select
+                  value={formData.areaUnit ?? AreaUnit.HECTARE}
+                  onChange={(e) => setFormData({ ...formData, areaUnit: e.target.value as AreaUnit })}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                >
+                  {Object.values(AreaUnit).map((u) => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Área total (ha)</label>
+                  <label className="text-xs font-semibold text-gray-500">Área total</label>
                   <input
                     type="number" step="0.01"
                     value={formData.areaTotal ?? ''}
@@ -218,7 +233,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Área produtiva (ha)</label>
+                  <label className="text-xs font-semibold text-gray-500">Área produtiva</label>
                   <input
                     type="number" step="0.01"
                     value={formData.areaProdutiva ?? ''}
@@ -227,7 +242,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Área preservada (ha)</label>
+                  <label className="text-xs font-semibold text-gray-500">Área preservada</label>
                   <input
                     type="number" step="0.01"
                     value={formData.areaPreservada ?? ''}
@@ -236,7 +251,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Reserva legal (ha)</label>
+                  <label className="text-xs font-semibold text-gray-500">Reserva legal</label>
                   <input
                     type="number" step="0.01"
                     value={formData.reservaLegal ?? ''}

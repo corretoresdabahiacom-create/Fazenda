@@ -122,15 +122,14 @@ function AnimaisTab({ animals, onSave, onDelete }: {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.earTag || !form.sex || !form.category) return;
     const item: IndividualAnimal = {
       id: editing?.id ?? `ind_${Date.now()}`,
-      earTag: form.earTag!,
+      earTag: form.earTag ?? '',
       rfid: form.rfid,
       name: form.name,
       breed: form.breed,
-      sex: form.sex as AnimalSex,
-      category: form.category as AnimalCategory,
+      sex: (form.sex as AnimalSex) ?? AnimalSex.FEMALE,
+      category: (form.category as AnimalCategory) ?? AnimalCategory.COW,
       lotGroup: form.lotGroup,
       birthDate: form.birthDate,
       motherEarTag: form.motherEarTag,
@@ -197,7 +196,7 @@ function AnimaisTab({ animals, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <Field label="Brinco *">
-                <input required value={form.earTag ?? ''} onChange={e => setForm({ ...form, earTag: e.target.value })} className={inputCls} />
+                <input value={form.earTag ?? ''} onChange={e => setForm({ ...form, earTag: e.target.value })} className={inputCls} />
               </Field>
               <Field label="RFID">
                 <input value={form.rfid ?? ''} onChange={e => setForm({ ...form, rfid: e.target.value })} className={inputCls} />
@@ -216,12 +215,12 @@ function AnimaisTab({ animals, onSave, onDelete }: {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Sexo *">
-                <select required value={form.sex} onChange={e => setForm({ ...form, sex: e.target.value as AnimalSex })} className={inputCls}>
+                <select value={form.sex} onChange={e => setForm({ ...form, sex: e.target.value as AnimalSex })} className={inputCls}>
                   {Object.values(AnimalSex).map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </Field>
               <Field label="Categoria *">
-                <select required value={form.category ?? ''} onChange={e => setForm({ ...form, category: e.target.value as AnimalCategory })} className={inputCls}>
+                <select value={form.category ?? ''} onChange={e => setForm({ ...form, category: e.target.value as AnimalCategory })} className={inputCls}>
                   <option value="">Selecione</option>
                   {Object.values(AnimalCategory).map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -274,18 +273,17 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.animalEarTag || !form.type || !form.date) return;
-
+    const item0date = form.date || format(new Date(), 'yyyy-MM-dd');
     let expectedBirthDate: string | undefined;
     if ([ReproductionEventType.COBERTURA, ReproductionEventType.INSEMINACAO, ReproductionEventType.IATF].includes(form.type)) {
-      expectedBirthDate = format(addDays(new Date(form.date), GESTACAO_BOVINA_DIAS), 'yyyy-MM-dd');
+      expectedBirthDate = format(addDays(new Date(item0date), GESTACAO_BOVINA_DIAS), 'yyyy-MM-dd');
     }
 
     const item: ReproductionEvent = {
       id: `repro_${Date.now()}`,
-      animalEarTag: form.animalEarTag!,
-      type: form.type as ReproductionEventType,
-      date: form.date!,
+      animalEarTag: form.animalEarTag ?? '',
+      type: (form.type as ReproductionEventType) ?? ReproductionEventType.COBERTURA,
+      date: item0date,
       sireEarTag: form.sireEarTag,
       semenBatch: form.semenBatch,
       pregnancyResult: form.pregnancyResult,
@@ -347,16 +345,16 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
         <Modal title="Novo Evento Reprodutivo" onClose={() => setIsOpen(false)}>
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Tipo de evento *">
-              <select required value={form.type} onChange={e => setForm({ ...form, type: e.target.value as ReproductionEventType })} className={inputCls}>
+              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as ReproductionEventType })} className={inputCls}>
                 {Object.values(ReproductionEventType).map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Brinco da fêmea *">
-                <input required list="animais-list" value={form.animalEarTag ?? ''} onChange={e => setForm({ ...form, animalEarTag: e.target.value })} className={inputCls} />
+                <input list="animais-list" value={form.animalEarTag ?? ''} onChange={e => setForm({ ...form, animalEarTag: e.target.value })} className={inputCls} />
               </Field>
               <Field label="Data *">
-                <input required type="date" value={form.date ?? ''} onChange={e => setForm({ ...form, date: e.target.value })} className={inputCls} />
+                <input type="date" value={form.date ?? ''} onChange={e => setForm({ ...form, date: e.target.value })} className={inputCls} />
               </Field>
             </div>
             <datalist id="animais-list">
@@ -426,13 +424,12 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.animalEarTag || !form.productName || !form.date) return;
     const item: HealthEvent = {
       id: `health_${Date.now()}`,
-      animalEarTag: form.animalEarTag!,
-      type: form.type as HealthEventType,
-      productName: form.productName!,
-      date: form.date!,
+      animalEarTag: form.animalEarTag ?? '',
+      type: (form.type as HealthEventType) ?? HealthEventType.VACINACAO,
+      productName: form.productName ?? '',
+      date: form.date || format(new Date(), 'yyyy-MM-dd'),
       nextDoseDate: form.nextDoseDate,
       dosage: form.dosage,
       veterinarian: form.veterinarian,
@@ -499,23 +496,23 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
         <Modal title="Novo Registro de Sanidade" onClose={() => setIsOpen(false)}>
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Tipo *">
-              <select required value={form.type} onChange={e => setForm({ ...form, type: e.target.value as HealthEventType })} className={inputCls}>
+              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as HealthEventType })} className={inputCls}>
                 {Object.values(HealthEventType).map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Brinco do animal *">
-                <input required list="animais-list-2" value={form.animalEarTag ?? ''} onChange={e => setForm({ ...form, animalEarTag: e.target.value })} className={inputCls} />
+                <input list="animais-list-2" value={form.animalEarTag ?? ''} onChange={e => setForm({ ...form, animalEarTag: e.target.value })} className={inputCls} />
               </Field>
               <Field label="Data *">
-                <input required type="date" value={form.date ?? ''} onChange={e => setForm({ ...form, date: e.target.value })} className={inputCls} />
+                <input type="date" value={form.date ?? ''} onChange={e => setForm({ ...form, date: e.target.value })} className={inputCls} />
               </Field>
             </div>
             <datalist id="animais-list-2">
               {animals.map(a => <option key={a.id} value={a.earTag} />)}
             </datalist>
             <Field label="Produto/Nome *">
-              <input required value={form.productName ?? ''} onChange={e => setForm({ ...form, productName: e.target.value })} className={inputCls} placeholder="Ex: Vacina Aftosa, Ivermectina..." />
+              <input value={form.productName ?? ''} onChange={e => setForm({ ...form, productName: e.target.value })} className={inputCls} placeholder="Ex: Vacina Aftosa, Ivermectina..." />
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Dosagem">
@@ -559,14 +556,13 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.date || form.liters == null) return;
     const item: MilkProductionRecord = {
       id: `milk_${Date.now()}`,
       animalEarTag: form.animalEarTag,
       lotGroup: form.lotGroup,
-      date: form.date!,
+      date: form.date || format(new Date(), 'yyyy-MM-dd'),
       period: (form.period as any) ?? 'dia',
-      liters: form.liters!,
+      liters: form.liters ?? 0,
       ccs: form.ccs,
       cbt: form.cbt,
       notes: form.notes,
@@ -631,7 +627,7 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <Field label="Data *">
-                <input required type="date" value={form.date ?? ''} onChange={e => setForm({ ...form, date: e.target.value })} className={inputCls} />
+                <input type="date" value={form.date ?? ''} onChange={e => setForm({ ...form, date: e.target.value })} className={inputCls} />
               </Field>
               <Field label="Período">
                 <select value={form.period} onChange={e => setForm({ ...form, period: e.target.value as any })} className={inputCls}>
@@ -648,7 +644,7 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
               {animals.map(a => <option key={a.id} value={a.earTag} />)}
             </datalist>
             <Field label="Litros *">
-              <input required type="number" step="0.1" value={form.liters ?? ''} onChange={e => setForm({ ...form, liters: e.target.value ? Number(e.target.value) : undefined })} className={inputCls} />
+              <input type="number" step="0.1" value={form.liters ?? ''} onChange={e => setForm({ ...form, liters: e.target.value ? Number(e.target.value) : undefined })} className={inputCls} />
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="CCS (mil cél/mL)">

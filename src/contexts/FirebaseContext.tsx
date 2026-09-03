@@ -641,16 +641,23 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, `users/${userId}`));
 
-    // Fase 2 (multi-propriedade): carrega as propriedades do usuário. Se
-    // ainda não existir nenhuma (usuário de antes desta atualização), cria
-    // automaticamente uma propriedade padrão ("Minha Propriedade") e a
-    // define como ativa — os dados antigos continuam acessíveis normalmente
-    // através dela (ver migração de propertyId logo abaixo).
+    // Fase 2 (multi-propriedade): carrega as propriedades do usuário. Na
+    // PRIMEIRA VEZ que o usuário acessa depois desta atualização (sem
+    // nenhuma propriedade ainda), cria automaticamente uma propriedade
+    // padrão ("Minha Propriedade") só para não perder o acesso aos dados
+    // antigos. Isso roda só essa vez — controlado por uma marca salva no
+    // navegador — para que, se o usuário decidir excluir sua última
+    // propriedade de propósito mais tarde, o app não fique recriando uma
+    // nova sozinho: ele simplesmente fica sem nenhuma até o usuário criar a
+    // que quiser, com o nome que quiser.
+    const migrationFlagKey = `gestao_fazenda_properties_migrated_${userId}`;
     const propertiesUnsub = onSnapshot(collection(db, 'users', userId, 'properties'), async (snap) => {
       const list = snap.docs.map(d => d.data() as Property);
       setProperties(list);
 
-      if (list.length === 0) {
+      const alreadyMigrated = localStorage.getItem(migrationFlagKey) === 'true';
+
+      if (list.length === 0 && !alreadyMigrated) {
         const defaultProperty: Property = {
           id: `prop_${Date.now()}`,
           name: 'Minha Propriedade',
@@ -660,13 +667,21 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         try {
           await setDoc(doc(db, 'users', userId, 'properties', defaultProperty.id), defaultProperty);
           setActivePropertyId(defaultProperty.id);
+          localStorage.setItem(migrationFlagKey, 'true');
         } catch (err) {
           handleFirestoreError(err, OperationType.WRITE, `users/${userId}/properties`);
         }
-      } else if (!activePropertyId || !list.some(p => p.id === activePropertyId)) {
-        // Se não há propriedade ativa selecionada (ou a que estava salva não
-        // existe mais), cai para a primeira da lista em vez de travar a tela.
-        setActivePropertyId(list[0].id);
+      } else if (list.length > 0) {
+        localStorage.setItem(migrationFlagKey, 'true');
+        if (!activePropertyId || !list.some(p => p.id === activePropertyId)) {
+          // Se não há propriedade ativa selecionada (ou a que estava salva
+          // não existe mais), cai para a primeira da lista em vez de travar.
+          setActivePropertyId(list[0].id);
+        }
+      } else {
+        // Lista vazia por decisão do usuário (já migrado antes) — não recria
+        // nada sozinho. Só limpa a propriedade ativa.
+        setActivePropertyId('');
       }
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/properties`));
 

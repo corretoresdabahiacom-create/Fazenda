@@ -11,14 +11,28 @@ export enum PropertyType {
   PARCEIRO = "Parceiro"
 }
 
+// Unidade de medida de área — varia por região do Brasil. Os valores de
+// área (areaTotal, areaProdutiva etc.) são sempre guardados no número que o
+// usuário digitou, na unidade escolhida aqui — sem conversão automática,
+// para não criar confusão sobre "qual valor é o real".
+export enum AreaUnit {
+  HECTARE = "ha",
+  ALQUEIRE_PAULISTA = "alqueire paulista",
+  ALQUEIRE_MINEIRO = "alqueire mineiro/goiano",
+  TAREFA = "tarefa",
+  METRO_QUADRADO = "m²",
+  ACRE = "acre",
+}
+
 export interface Property {
   id: string;
   name: string;
   type: PropertyType;
-  areaTotal?: number; // hectares
-  areaProdutiva?: number; // hectares
-  areaPreservada?: number; // hectares
-  reservaLegal?: number; // hectares
+  areaUnit?: AreaUnit;
+  areaTotal?: number;
+  areaProdutiva?: number;
+  areaPreservada?: number;
+  reservaLegal?: number;
   car?: string; // Cadastro Ambiental Rural
   location?: {
     lat: number;
