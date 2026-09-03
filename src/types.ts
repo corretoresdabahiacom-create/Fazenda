@@ -228,6 +228,9 @@ export interface InventoryItem {
   storeName?: string;
   contactPhone?: string;
   responsiblePerson?: string;
+  minStock?: number; // abaixo disso, alerta de estoque mínimo
+  criticalStock?: number; // abaixo disso, alerta de estoque crítico
+  expirationDate?: string; // alerta de vencimento
   history?: {
     date: string;
     changeType: 'add' | 'edit' | 'adjustment';
@@ -544,6 +547,151 @@ export interface IrrigationRecord {
   date: string;
   durationHours?: number;
   waterVolume?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+// =====================================================================
+// FASE 9 — FINANCEIRO, MÁQUINAS, RH RURAL
+// Mesma filosofia das fases anteriores: nada obrigatório para salvar.
+// =====================================================================
+
+export enum CostCenterType {
+  SAFRA = "Safra",
+  LOTE_ANIMAL = "Lote Animal",
+  GERAL = "Geral",
+}
+
+export interface CostCenter {
+  id: string;
+  propertyId?: string;
+  name: string;
+  type: CostCenterType;
+  linkedRef?: string; // nome da safra/lote vinculado, texto livre
+  createdAt: string;
+}
+
+export enum AccountStatus {
+  PENDENTE = "Pendente",
+  PAGO = "Pago",
+  ATRASADO = "Atrasado",
+}
+
+export interface AccountPayable {
+  id: string;
+  propertyId?: string;
+  description: string;
+  dueDate?: string;
+  value?: number;
+  status: AccountStatus;
+  costCenterId?: string;
+  paidDate?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface AccountReceivable {
+  id: string;
+  propertyId?: string;
+  description: string;
+  dueDate?: string;
+  value?: number;
+  status: AccountStatus;
+  costCenterId?: string;
+  receivedDate?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export enum MachineType {
+  TRATOR = "Trator",
+  COLHEITADEIRA = "Colheitadeira",
+  PULVERIZADOR = "Pulverizador",
+  CAMINHAO = "Caminhão",
+  OUTRO = "Outro",
+}
+
+export interface Machine {
+  id: string;
+  propertyId?: string;
+  type: MachineType;
+  name: string;
+  plate?: string;
+  hourMeter?: number;
+  fuelConsumption?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export enum MaintenanceType {
+  PREVENTIVA = "Preventiva",
+  CORRETIVA = "Corretiva",
+}
+
+export interface MaintenanceRecord {
+  id: string;
+  propertyId?: string;
+  machineId?: string;
+  type: MaintenanceType;
+  date: string;
+  description?: string;
+  cost?: number;
+  hourMeterAtService?: number;
+  nextServiceHourMeter?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface Team {
+  id: string;
+  propertyId?: string;
+  name: string;
+  memberNames?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface WorkSchedule {
+  id: string;
+  propertyId?: string;
+  employeeName?: string;
+  teamId?: string;
+  daysOfWeek?: string;
+  startTime?: string;
+  endTime?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface Training {
+  id: string;
+  propertyId?: string;
+  employeeName?: string;
+  title: string;
+  date?: string;
+  provider?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface PPEItem {
+  id: string;
+  propertyId?: string;
+  employeeName?: string;
+  itemName: string;
+  deliveryDate?: string;
+  expirationDate?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface Certification {
+  id: string;
+  propertyId?: string;
+  employeeName?: string;
+  name: string;
+  issueDate?: string;
+  expirationDate?: string;
   notes?: string;
   createdAt: string;
 }

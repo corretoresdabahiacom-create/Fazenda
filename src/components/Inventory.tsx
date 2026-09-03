@@ -8,6 +8,7 @@ import {
   Plus, Search, Edit3, Trash2, Package, Archive, X, ArrowLeft, 
   Store, Phone, User, History, CheckCircle, Clock, ShieldAlert, FileText, ShoppingCart
 } from 'lucide-react';
+import StockAlerts from './StockAlerts';
 import { InventoryItem } from '../types';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
@@ -129,6 +130,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
 
   return (
     <div className="space-y-6">
+      <StockAlerts items={inventory} />
       {/* Top Filter and Search bar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">

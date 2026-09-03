@@ -12,7 +12,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType, googleProvider } from '../lib/firebase';
-import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord, Talhao, CropPlan, FieldLogEntry, PestRecord, IrrigationRecord } from '../types';
+import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord, Talhao, CropPlan, FieldLogEntry, PestRecord, IrrigationRecord, CostCenter, AccountPayable, AccountReceivable, Machine, MaintenanceRecord, Team, WorkSchedule, Training, PPEItem, Certification } from '../types';
 
 interface FirebaseContextType {
   user: User | null;
@@ -59,6 +59,36 @@ interface FirebaseContextType {
   irrigationRecords: IrrigationRecord[];
   saveIrrigationRecord: (r: IrrigationRecord) => Promise<void>;
   deleteIrrigationRecord: (id: string) => Promise<void>;
+  costCenters: CostCenter[];
+  saveCostCenter: (cc: CostCenter) => Promise<void>;
+  deleteCostCenter: (id: string) => Promise<void>;
+  accountsPayable: AccountPayable[];
+  saveAccountPayable: (ap: AccountPayable) => Promise<void>;
+  deleteAccountPayable: (id: string) => Promise<void>;
+  accountsReceivable: AccountReceivable[];
+  saveAccountReceivable: (ar: AccountReceivable) => Promise<void>;
+  deleteAccountReceivable: (id: string) => Promise<void>;
+  machines: Machine[];
+  saveMachine: (m: Machine) => Promise<void>;
+  deleteMachine: (id: string) => Promise<void>;
+  maintenanceRecords: MaintenanceRecord[];
+  saveMaintenanceRecord: (mr: MaintenanceRecord) => Promise<void>;
+  deleteMaintenanceRecord: (id: string) => Promise<void>;
+  teams: Team[];
+  saveTeam: (tm: Team) => Promise<void>;
+  deleteTeam: (id: string) => Promise<void>;
+  workSchedules: WorkSchedule[];
+  saveWorkSchedule: (ws: WorkSchedule) => Promise<void>;
+  deleteWorkSchedule: (id: string) => Promise<void>;
+  trainings: Training[];
+  saveTraining: (tr: Training) => Promise<void>;
+  deleteTraining: (id: string) => Promise<void>;
+  ppeItems: PPEItem[];
+  savePPEItem: (ppe: PPEItem) => Promise<void>;
+  deletePPEItem: (id: string) => Promise<void>;
+  certifications: Certification[];
+  saveCertification: (cert: Certification) => Promise<void>;
+  deleteCertification: (id: string) => Promise<void>;
   animals: Animal[];
   pastures: Pasture[];
   expenses: Expense[];
@@ -300,6 +330,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
 
   const [animals, setAnimals] = useState<Animal[]>([]);
+  const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
+  const [accountsPayable, setAccountPayables] = useState<AccountPayable[]>([]);
+  const [accountsReceivable, setAccountReceivables] = useState<AccountReceivable[]>([]);
+  const [machines, setMachines] = useState<Machine[]>([]);
+  const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [workSchedules, setWorkSchedules] = useState<WorkSchedule[]>([]);
+  const [trainings, setTrainings] = useState<Training[]>([]);
+  const [ppeItems, setPPEItems] = useState<PPEItem[]>([]);
+  const [certifications, setCertifications] = useState<Certification[]>([]);
   const [individualAnimals, setIndividualAnimals] = useState<IndividualAnimal[]>([]);
   const [reproductionEvents, setReproductionEvents] = useState<ReproductionEvent[]>([]);
   const [healthEvents, setHealthEvents] = useState<HealthEvent[]>([]);
@@ -628,6 +668,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setFieldLogEntries([]);
       setPestRecords([]);
       setIrrigationRecords([]);
+      setCostCenters([]);
+      setAccountPayables([]);
+      setAccountReceivables([]);
+      setMachines([]);
+      setMaintenanceRecords([]);
+      setTeams([]);
+      setWorkSchedules([]);
+      setTrainings([]);
+      setPPEItems([]);
+      setCertifications([]);
       setSettings({ farmName: '', city: '' });
       return;
     }
@@ -665,6 +715,48 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setSettings({ farmName: '', city: '' });
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, `users/${userId}`));
+
+
+    // Fase 9 - Financeiro, Maquinas, RH Rural
+    const costCentersUnsub = onSnapshot(collection(db, 'users', userId, 'costCenters'), (snap) => {
+      setCostCenters(snap.docs.map(d => d.data() as CostCenter));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/costCenters`));
+
+    const accountsPayableUnsub = onSnapshot(collection(db, 'users', userId, 'accountsPayable'), (snap) => {
+      setAccountPayables(snap.docs.map(d => d.data() as AccountPayable));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/accountsPayable`));
+
+    const accountsReceivableUnsub = onSnapshot(collection(db, 'users', userId, 'accountsReceivable'), (snap) => {
+      setAccountReceivables(snap.docs.map(d => d.data() as AccountReceivable));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/accountsReceivable`));
+
+    const machinesUnsub = onSnapshot(collection(db, 'users', userId, 'machines'), (snap) => {
+      setMachines(snap.docs.map(d => d.data() as Machine));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/machines`));
+
+    const maintenanceRecordsUnsub = onSnapshot(collection(db, 'users', userId, 'maintenanceRecords'), (snap) => {
+      setMaintenanceRecords(snap.docs.map(d => d.data() as MaintenanceRecord));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/maintenanceRecords`));
+
+    const teamsUnsub = onSnapshot(collection(db, 'users', userId, 'teams'), (snap) => {
+      setTeams(snap.docs.map(d => d.data() as Team));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/teams`));
+
+    const workSchedulesUnsub = onSnapshot(collection(db, 'users', userId, 'workSchedules'), (snap) => {
+      setWorkSchedules(snap.docs.map(d => d.data() as WorkSchedule));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/workSchedules`));
+
+    const trainingsUnsub = onSnapshot(collection(db, 'users', userId, 'trainings'), (snap) => {
+      setTrainings(snap.docs.map(d => d.data() as Training));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/trainings`));
+
+    const ppeItemsUnsub = onSnapshot(collection(db, 'users', userId, 'ppeItems'), (snap) => {
+      setPPEItems(snap.docs.map(d => d.data() as PPEItem));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/ppeItems`));
+
+    const certificationsUnsub = onSnapshot(collection(db, 'users', userId, 'certifications'), (snap) => {
+      setCertifications(snap.docs.map(d => d.data() as Certification));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/certifications`));
 
     // Fase 2 (multi-propriedade): carrega as propriedades do usuário. Na
     // PRIMEIRA VEZ que o usuário acessa depois desta atualização (sem
@@ -810,6 +902,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fieldLogEntriesUnsub();
       pestRecordsUnsub();
       irrigationRecordsUnsub();
+      costCentersUnsub();
+      accountsPayableUnsub();
+      accountsReceivableUnsub();
+      machinesUnsub();
+      maintenanceRecordsUnsub();
+      teamsUnsub();
+      workSchedulesUnsub();
+      trainingsUnsub();
+      ppeItemsUnsub();
+      certificationsUnsub();
     };
   }, [user, isDemoMode]);
 
@@ -1124,6 +1226,237 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       await deleteDoc(doc(db, 'users', currentUid, 'irrigationRecords', id));
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/irrigationRecords/${id}`);
+    }
+  };
+
+  // Fase 9 - Financeiro, Maquinas, RH Rural
+  const saveCostCenter = async (cc: CostCenter) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...cc, propertyId: cc.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'costCenters', cc.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/costCenters/${cc.id}`);
+    }
+  };
+
+  const deleteCostCenter = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'costCenters', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/costCenters/${id}`);
+    }
+  };
+
+  const saveAccountPayable = async (ap: AccountPayable) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...ap, propertyId: ap.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'accountsPayable', ap.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/accountsPayable/${ap.id}`);
+    }
+  };
+
+  const deleteAccountPayable = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'accountsPayable', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/accountsPayable/${id}`);
+    }
+  };
+
+  const saveAccountReceivable = async (ar: AccountReceivable) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...ar, propertyId: ar.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'accountsReceivable', ar.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/accountsReceivable/${ar.id}`);
+    }
+  };
+
+  const deleteAccountReceivable = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'accountsReceivable', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/accountsReceivable/${id}`);
+    }
+  };
+
+  const saveMachine = async (m: Machine) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...m, propertyId: m.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'machines', m.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/machines/${m.id}`);
+    }
+  };
+
+  const deleteMachine = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'machines', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/machines/${id}`);
+    }
+  };
+
+  const saveMaintenanceRecord = async (mr: MaintenanceRecord) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...mr, propertyId: mr.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'maintenanceRecords', mr.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/maintenanceRecords/${mr.id}`);
+    }
+  };
+
+  const deleteMaintenanceRecord = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'maintenanceRecords', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/maintenanceRecords/${id}`);
+    }
+  };
+
+  const saveTeam = async (tm: Team) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...tm, propertyId: tm.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'teams', tm.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/teams/${tm.id}`);
+    }
+  };
+
+  const deleteTeam = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'teams', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/teams/${id}`);
+    }
+  };
+
+  const saveWorkSchedule = async (ws: WorkSchedule) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...ws, propertyId: ws.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'workSchedules', ws.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/workSchedules/${ws.id}`);
+    }
+  };
+
+  const deleteWorkSchedule = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'workSchedules', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/workSchedules/${id}`);
+    }
+  };
+
+  const saveTraining = async (tr: Training) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...tr, propertyId: tr.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'trainings', tr.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/trainings/${tr.id}`);
+    }
+  };
+
+  const deleteTraining = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'trainings', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/trainings/${id}`);
+    }
+  };
+
+  const savePPEItem = async (ppe: PPEItem) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...ppe, propertyId: ppe.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'ppeItems', ppe.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/ppeItems/${ppe.id}`);
+    }
+  };
+
+  const deletePPEItem = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'ppeItems', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/ppeItems/${id}`);
+    }
+  };
+
+  const saveCertification = async (cert: Certification) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...cert, propertyId: cert.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'certifications', cert.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/certifications/${cert.id}`);
+    }
+  };
+
+  const deleteCertification = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'certifications', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/certifications/${id}`);
     }
   };
 
@@ -1558,6 +1891,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const filteredFieldLogEntries = byActiveProperty(fieldLogEntries);
   const filteredPestRecords = byActiveProperty(pestRecords);
   const filteredIrrigationRecords = byActiveProperty(irrigationRecords);
+  const filteredCostCenters = byActiveProperty(costCenters);
+  const filteredAccountPayables = byActiveProperty(accountsPayable);
+  const filteredAccountReceivables = byActiveProperty(accountsReceivable);
+  const filteredMachines = byActiveProperty(machines);
+  const filteredMaintenanceRecords = byActiveProperty(maintenanceRecords);
+  const filteredTeams = byActiveProperty(teams);
+  const filteredWorkSchedules = byActiveProperty(workSchedules);
+  const filteredTrainings = byActiveProperty(trainings);
+  const filteredPPEItems = byActiveProperty(ppeItems);
+  const filteredCertifications = byActiveProperty(certifications);
 
   return (
     <FirebaseContext.Provider value={{
@@ -1575,6 +1918,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fieldLogEntries: filteredFieldLogEntries, saveFieldLogEntry, deleteFieldLogEntry,
       pestRecords: filteredPestRecords, savePestRecord, deletePestRecord,
       irrigationRecords: filteredIrrigationRecords, saveIrrigationRecord, deleteIrrigationRecord,
+      costCenters: filteredCostCenters, saveCostCenter, deleteCostCenter,
+      accountsPayable: filteredAccountPayables, saveAccountPayable, deleteAccountPayable,
+      accountsReceivable: filteredAccountReceivables, saveAccountReceivable, deleteAccountReceivable,
+      machines: filteredMachines, saveMachine, deleteMachine,
+      maintenanceRecords: filteredMaintenanceRecords, saveMaintenanceRecord, deleteMaintenanceRecord,
+      teams: filteredTeams, saveTeam, deleteTeam,
+      workSchedules: filteredWorkSchedules, saveWorkSchedule, deleteWorkSchedule,
+      trainings: filteredTrainings, saveTraining, deleteTraining,
+      ppeItems: filteredPPEItems, savePPEItem, deletePPEItem,
+      certifications: filteredCertifications, saveCertification, deleteCertification,
       animals: filteredAnimals, pastures: filteredPastures, expenses: filteredExpenses,
       payments: filteredPayments, tasks: filteredTasks, transactions,
       inventory: filteredInventory, employees: filteredEmployees,

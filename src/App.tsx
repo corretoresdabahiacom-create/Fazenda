@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 , Stethoscope , Wheat } from 'lucide-react';
+, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -55,6 +55,9 @@ import Pastures from './components/Pastures';
 import Properties from './components/Properties';
 import PecuariaProfissional from './components/PecuariaProfissional';
 import Agricultura from './components/Agricultura';
+import Financeiro from './components/Financeiro';
+import Maquinas from './components/Maquinas';
+import RHRural from './components/RHRural';
 import Tasks from './components/Tasks';
 import Reports from './components/Reports';
 import FarmSettingsComp from './components/FarmSettings';
@@ -135,7 +138,37 @@ export default function App() {
     deletePestRecord,
     irrigationRecords,
     saveIrrigationRecord,
-    deleteIrrigationRecord
+    deleteIrrigationRecord,
+    costCenters,
+    saveCostCenter,
+    deleteCostCenter,
+    accountsPayable,
+    saveAccountPayable,
+    deleteAccountPayable,
+    accountsReceivable,
+    saveAccountReceivable,
+    deleteAccountReceivable,
+    machines,
+    saveMachine,
+    deleteMachine,
+    maintenanceRecords,
+    saveMaintenanceRecord,
+    deleteMaintenanceRecord,
+    teams,
+    saveTeam,
+    deleteTeam,
+    workSchedules,
+    saveWorkSchedule,
+    deleteWorkSchedule,
+    trainings,
+    saveTraining,
+    deleteTraining,
+    ppeItems,
+    savePPEItem,
+    deletePPEItem,
+    certifications,
+    saveCertification,
+    deleteCertification
   } = useFirebase();
 
   const [activeView, setActiveView] = useState<View>('dashboard');
@@ -531,6 +564,9 @@ export default function App() {
     { id: 'properties', label: 'Propriedades', icon: Building2 },
     { id: 'pecuaria-pro', label: 'Pecuária Profissional', icon: Stethoscope },
     { id: 'agricultura', label: 'Agricultura', icon: Wheat },
+    { id: 'financeiro-completo', label: 'Financeiro', icon: Wallet },
+    { id: 'maquinas', label: 'Máquinas', icon: Tractor },
+    { id: 'rh-rural', label: 'RH Rural', icon: UserCog },
     { id: 'payments', label: 'Funcionários', icon: Users },
     { id: 'expenses', label: 'Despesas', icon: Receipt },
     { id: 'inventory', label: 'Estoque Suprimentos', icon: Package },
@@ -586,6 +622,9 @@ export default function App() {
       case 'properties': return <Properties properties={properties} activePropertyId={activePropertyId} onSetActive={setActivePropertyId} onSave={saveProperty} onDelete={deleteProperty} />;
       case 'pecuaria-pro': return <PecuariaProfissional individualAnimals={individualAnimals} saveIndividualAnimal={saveIndividualAnimal} deleteIndividualAnimal={deleteIndividualAnimal} reproductionEvents={reproductionEvents} saveReproductionEvent={saveReproductionEvent} deleteReproductionEvent={deleteReproductionEvent} healthEvents={healthEvents} saveHealthEvent={saveHealthEvent} deleteHealthEvent={deleteHealthEvent} milkRecords={milkRecords} saveMilkRecord={saveMilkRecord} deleteMilkRecord={deleteMilkRecord} />;
       case 'agricultura': return <Agricultura talhoes={talhoes} saveTalhao={saveTalhao} deleteTalhao={deleteTalhao} cropPlans={cropPlans} saveCropPlan={saveCropPlan} deleteCropPlan={deleteCropPlan} fieldLogEntries={fieldLogEntries} saveFieldLogEntry={saveFieldLogEntry} deleteFieldLogEntry={deleteFieldLogEntry} pestRecords={pestRecords} savePestRecord={savePestRecord} deletePestRecord={deletePestRecord} irrigationRecords={irrigationRecords} saveIrrigationRecord={saveIrrigationRecord} deleteIrrigationRecord={deleteIrrigationRecord} />;
+      case 'financeiro-completo': return <Financeiro accountsPayable={accountsPayable} saveAccountPayable={saveAccountPayable} deleteAccountPayable={deleteAccountPayable} accountsReceivable={accountsReceivable} saveAccountReceivable={saveAccountReceivable} deleteAccountReceivable={deleteAccountReceivable} costCenters={costCenters} saveCostCenter={saveCostCenter} deleteCostCenter={deleteCostCenter} />;
+      case 'maquinas': return <Maquinas machines={machines} saveMachine={saveMachine} deleteMachine={deleteMachine} maintenanceRecords={maintenanceRecords} saveMaintenanceRecord={saveMaintenanceRecord} deleteMaintenanceRecord={deleteMaintenanceRecord} />;
+      case 'rh-rural': return <RHRural teams={teams} saveTeam={saveTeam} deleteTeam={deleteTeam} workSchedules={workSchedules} saveWorkSchedule={saveWorkSchedule} deleteWorkSchedule={deleteWorkSchedule} trainings={trainings} saveTraining={saveTraining} deleteTraining={deleteTraining} ppeItems={ppeItems} savePPEItem={savePPEItem} deletePPEItem={deletePPEItem} certifications={certifications} saveCertification={saveCertification} deleteCertification={deleteCertification} />;
       default: 
         return (
           <Dashboard 
