@@ -811,11 +811,24 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  // O SDK do Firestore lança erro se qualquer campo do documento for
+  // `undefined` (não apenas ignora — quebra o salvamento inteiro). Como os
+  // formulários de Propriedade e Pecuária Profissional têm vários campos
+  // opcionais que ficam `undefined` quando o usuário deixa em branco, essa
+  // função remove esses campos antes de gravar, em vez de mandar undefined.
+  function stripUndefined<T extends Record<string, any>>(obj: T): T {
+    const clean: Record<string, any> = {};
+    for (const key in obj) {
+      if (obj[key] !== undefined) clean[key] = obj[key];
+    }
+    return clean as T;
+  }
+
   const saveProperty = async (property: Property) => {
     if (!user) return;
     if (!checkWritePermission()) return;
     try {
-      await setDoc(doc(db, 'users', user.uid, 'properties', property.id), property);
+      await setDoc(doc(db, 'users', user.uid, 'properties', property.id), stripUndefined(property));
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${user.uid}/properties`);
     }
@@ -845,7 +858,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!checkWritePermission()) return;
     const currentUid = user.uid;
     try {
-      const toSave = { ...animalItem, propertyId: animalItem.propertyId || activePropertyId || undefined };
+      const toSave = stripUndefined({ ...animalItem, propertyId: animalItem.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'individualAnimals', animalItem.id), toSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/individualAnimals/${animalItem.id}`);
@@ -868,7 +881,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!checkWritePermission()) return;
     const currentUid = user.uid;
     try {
-      const toSave = { ...event, propertyId: event.propertyId || activePropertyId || undefined };
+      const toSave = stripUndefined({ ...event, propertyId: event.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'reproductionEvents', event.id), toSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/reproductionEvents/${event.id}`);
@@ -891,7 +904,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!checkWritePermission()) return;
     const currentUid = user.uid;
     try {
-      const toSave = { ...event, propertyId: event.propertyId || activePropertyId || undefined };
+      const toSave = stripUndefined({ ...event, propertyId: event.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'healthEvents', event.id), toSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/healthEvents/${event.id}`);
@@ -914,7 +927,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!checkWritePermission()) return;
     const currentUid = user.uid;
     try {
-      const toSave = { ...record, propertyId: record.propertyId || activePropertyId || undefined };
+      const toSave = stripUndefined({ ...record, propertyId: record.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'milkRecords', record.id), toSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/milkRecords/${record.id}`);
@@ -941,7 +954,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const animalToSave = { ...animal, propertyId: animal.propertyId || activePropertyId || undefined };
+      const animalToSave = stripUndefined({ ...animal, propertyId: animal.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'animals', animal.id), animalToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/animals/${animal.id}`);
@@ -975,7 +988,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const pastureToSave = { ...pasture, propertyId: pasture.propertyId || activePropertyId || undefined };
+      const pastureToSave = stripUndefined({ ...pasture, propertyId: pasture.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'pastures', pasture.id), pastureToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/pastures/${pasture.id}`);
@@ -1006,7 +1019,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const expenseToSave = { ...expense, propertyId: expense.propertyId || activePropertyId || undefined };
+      const expenseToSave = stripUndefined({ ...expense, propertyId: expense.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'expenses', expense.id), expenseToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/expenses/${expense.id}`);
@@ -1037,7 +1050,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const paymentToSave = { ...payment, propertyId: payment.propertyId || activePropertyId || undefined };
+      const paymentToSave = stripUndefined({ ...payment, propertyId: payment.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'payments', payment.id), paymentToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/payments/${payment.id}`);
@@ -1068,7 +1081,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const taskToSave = { ...task, propertyId: task.propertyId || activePropertyId || undefined };
+      const taskToSave = stripUndefined({ ...task, propertyId: task.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'tasks', task.id), taskToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/tasks/${task.id}`);
@@ -1114,7 +1127,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const itemToSave = { ...item, propertyId: item.propertyId || activePropertyId || undefined };
+      const itemToSave = stripUndefined({ ...item, propertyId: item.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'inventory', item.id), itemToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/inventory/${item.id}`);
@@ -1145,7 +1158,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const employeeToSave = { ...employee, propertyId: employee.propertyId || activePropertyId || undefined };
+      const employeeToSave = stripUndefined({ ...employee, propertyId: employee.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'employees', employee.id), employeeToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/employees/${employee.id}`);
@@ -1176,7 +1189,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const fixedExpenseToSave = { ...fixedExpense, propertyId: fixedExpense.propertyId || activePropertyId || undefined };
+      const fixedExpenseToSave = stripUndefined({ ...fixedExpense, propertyId: fixedExpense.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'fixedExpenses', fixedExpense.id), fixedExpenseToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/fixedExpenses/${fixedExpense.id}`);
@@ -1207,7 +1220,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      const sheetToSave = { ...sheet, propertyId: sheet.propertyId || activePropertyId || undefined };
+      const sheetToSave = stripUndefined({ ...sheet, propertyId: sheet.propertyId || activePropertyId || undefined });
       await setDoc(doc(db, 'users', currentUid, 'weighingSheets', sheet.id), sheetToSave);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/weighingSheets/${sheet.id}`);
