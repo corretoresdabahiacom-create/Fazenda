@@ -36,12 +36,26 @@ console.log('🔥 Firebase Config Loaded:', {
 
 const app = initializeApp(firebaseConfig);
 
+// IMPORTANTE: o banco do Firestore deste projeto NÃO se chama "(default)"
+// — ele foi criado originalmente pelo Google AI Studio com um nome
+// customizado. Sem informar esse nome aqui, o SDK tenta conectar no banco
+// "(default)", que não existe neste projeto, e TODA leitura/escrita falha
+// com o erro "Database (default) not found". Isso pode ser substituído
+// por uma variável de ambiente no futuro (VITE_FIREBASE_DATABASE_ID), mas
+// o valor abaixo é o ID real confirmado no Firebase Console.
+const FIRESTORE_DATABASE_ID =
+  import.meta.env.VITE_FIREBASE_DATABASE_ID || 'ai-studio-2b3ac47a-8172-426f-a2a5-c848844ff479';
+
 // Configuração robusta de cache offline local persistente usando IndexedDB
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager()
-  })
-});
+export const db = initializeFirestore(
+  app,
+  {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    })
+  },
+  FIRESTORE_DATABASE_ID,
+);
 
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
