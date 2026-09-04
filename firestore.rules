@@ -34,9 +34,15 @@ service cloud.firestore {
     // VALIDATION HELPERS
     // -------------------------------------------------------------------------
 
+    function isBootstrapAdminEmail() {
+      return isSignedIn() && request.auth.token.email in
+        ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
+    }
+
     function isValidUser(data) {
       return data.farmName is string && data.farmName.size() <= 200
           && data.city is string && data.city.size() <= 200
+          && data.role is string && data.role in ['admin', 'user']
           && (!('customExpenseTypes' in data) || data.customExpenseTypes is list)
           && (!('farmMapUrl' in data) || data.farmMapUrl is string)
           && (!('farmMapFileName' in data) || data.farmMapFileName is string)
@@ -170,6 +176,20 @@ service cloud.firestore {
           && data.liters is number && data.liters >= 0;
     }
 
+    // Fase 3/4 (Agricultura) — validação mínima de propósito: o app garante
+    // que todo registro sempre chega com um valor padrão sensato em cada
+    // campo (mesmo que o usuário deixe em branco na tela), então aqui só
+    // confirmamos que existe um id válido, sem exigir mais nada.
+    function isValidAgricultureRecord(data) {
+      return data.id is string;
+    }
+
+    // Fase 9 (Financeiro, Maquinas, RH Rural) — mesma filosofia: o app
+    // sempre garante um id válido; nenhum outro campo é obrigatório.
+    function isValidFase9Record(data) {
+      return data.id is string;
+    }
+
     // -------------------------------------------------------------------------
     // MATCH BLOCKS
     // -------------------------------------------------------------------------
@@ -180,8 +200,18 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow get: if isOwner(userId);
-      allow create: if canWrite(userId) && isValidUser(incoming());
-      allow update: if canWrite(userId) && isValidUser(incoming());
+      allow create: if canWrite(userId) && isValidUser(incoming())
+          && (
+            (isBootstrapAdminEmail() && incoming().role == 'admin') ||
+            (!isBootstrapAdminEmail() && incoming().role == 'user')
+          );
+      // Numa atualização normal, o papel do usuário nunca pode mudar — isso
+      // impede que alguém se autopromova a admin reescrevendo o próprio
+      // documento pelo console do navegador. Trocar de papel exige edição
+      // manual direto no Firebase Console (aceitável para o tamanho atual
+      // do projeto, sem custo de Cloud Functions).
+      allow update: if canWrite(userId) && isValidUser(incoming())
+          && incoming().role == resource.data.role;
 
       match /animals/{animalId} {
         allow list, get: if isOwner(userId);
@@ -285,6 +315,118 @@ service cloud.firestore {
         allow list, get: if isOwner(userId);
         allow create: if canWrite(userId) && isValidId(recordId) && isValidMilkRecord(incoming());
         allow update: if canWrite(userId) && isValidMilkRecord(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /talhoes/{talhaoId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(talhaoId) && isValidAgricultureRecord(incoming());
+        allow update: if canWrite(userId) && isValidAgricultureRecord(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /cropPlans/{planId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(planId) && isValidAgricultureRecord(incoming());
+        allow update: if canWrite(userId) && isValidAgricultureRecord(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /fieldLogEntries/{entryId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(entryId) && isValidAgricultureRecord(incoming());
+        allow update: if canWrite(userId) && isValidAgricultureRecord(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /pestRecords/{pestId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(pestId) && isValidAgricultureRecord(incoming());
+        allow update: if canWrite(userId) && isValidAgricultureRecord(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /irrigationRecords/{recordId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(recordId) && isValidAgricultureRecord(incoming());
+        allow update: if canWrite(userId) && isValidAgricultureRecord(incoming());
+        allow delete: if canWrite(userId);
+      }
+    
+      match /costCenters/{costCenterId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(costCenterId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /accountsPayable/{accountId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(accountId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /accountsReceivable/{accountId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(accountId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /machines/{machineId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(machineId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /maintenanceRecords/{maintId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(maintId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /teams/{teamId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(teamId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /workSchedules/{schedId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(schedId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /trainings/{trainId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(trainId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /ppeItems/{ppeId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(ppeId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /certifications/{certId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(certId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /documents/{docId} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(docId) && isValidFase9Record(incoming());
+        allow update: if canWrite(userId) && isValidFase9Record(incoming());
         allow delete: if canWrite(userId);
       }
     }

@@ -696,4 +696,34 @@ export interface Certification {
   createdAt: string;
 }
 
+// =====================================================================
+// DOCUMENTOS — CAR, CCIR, ITR, contratos, licenças ambientais,
+// receituários agronômicos. Arquivos ficam no Firebase Storage; aqui só
+// guardamos os metadados + o link de download.
+// =====================================================================
+
+export enum DocumentCategory {
+  CAR = "CAR",
+  CCIR = "CCIR",
+  ITR = "ITR",
+  CONTRATO = "Contrato",
+  LICENCA_AMBIENTAL = "Licença Ambiental",
+  RECEITUARIO_AGRONOMICO = "Receituário Agronômico",
+  OUTRO = "Outro",
+}
+
+export interface FarmDocument {
+  id: string;
+  propertyId?: string;
+  category: DocumentCategory;
+  title: string;
+  issueDate?: string;
+  expirationDate?: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  notes?: string;
+  createdAt: string;
+}
+
 

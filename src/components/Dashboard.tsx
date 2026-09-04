@@ -17,10 +17,11 @@ import {
   Pie
 } from 'recharts';
 import { TrendingUp, Users, Beef, AlertCircle, MapPin, CloudSun, Scan, Clock, ChevronRight as ChevronRightIcon, Coins, Scale, Sparkles, RefreshCw } from 'lucide-react';
-import { EmployeePayment, Expense, Animal, FarmTask, ExpenseType, FarmSettings, WeighingSheet, InventoryItem } from '../types';
+import { EmployeePayment, Expense, Animal, FarmTask, ExpenseType, FarmSettings, WeighingSheet, InventoryItem, AccountPayable, AccountReceivable, Talhao, IndividualAnimal, Machine, FarmDocument } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ObligationAlert } from '../utils/obligations';
+import ModulosResumo from './ModulosResumo';
 
 interface DashboardProps {
   payments: EmployeePayment[];
@@ -34,6 +35,12 @@ interface DashboardProps {
   activeAlerts?: ObligationAlert[];
   onOpenObligations?: () => void;
   onToggleTaskCompletion?: (task: FarmTask) => Promise<void>;
+  accountsPayable?: AccountPayable[];
+  accountsReceivable?: AccountReceivable[];
+  talhoes?: Talhao[];
+  individualAnimals?: IndividualAnimal[];
+  machines?: Machine[];
+  documents?: FarmDocument[];
 }
 
 export default function Dashboard({ 
@@ -47,7 +54,13 @@ export default function Dashboard({
   onNavigate,
   activeAlerts,
   onOpenObligations,
-  onToggleTaskCompletion
+  onToggleTaskCompletion,
+  accountsPayable = [],
+  accountsReceivable = [],
+  talhoes = [],
+  individualAnimals = [],
+  machines = [],
+  documents = [],
 }: DashboardProps) {
   const totalExpenses = useMemo(() => {
     const expensesTotal = expenses.reduce((acc, curr) => acc + curr.value, 0);
@@ -588,6 +601,16 @@ export default function Dashboard({
           )}
         </div>
       </div>
+
+      <ModulosResumo
+        accountsPayable={accountsPayable}
+        accountsReceivable={accountsReceivable}
+        talhoes={talhoes}
+        individualAnimals={individualAnimals}
+        machines={machines}
+        documents={documents}
+        onNavigate={onNavigate}
+      />
     </div>
   );
 }

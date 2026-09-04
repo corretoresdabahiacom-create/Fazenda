@@ -12,7 +12,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType, googleProvider } from '../lib/firebase';
-import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord, Talhao, CropPlan, FieldLogEntry, PestRecord, IrrigationRecord, CostCenter, AccountPayable, AccountReceivable, Machine, MaintenanceRecord, Team, WorkSchedule, Training, PPEItem, Certification } from '../types';
+import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord, Talhao, CropPlan, FieldLogEntry, PestRecord, IrrigationRecord, CostCenter, AccountPayable, AccountReceivable, Machine, MaintenanceRecord, Team, WorkSchedule, Training, PPEItem, Certification, FarmDocument } from '../types';
 
 interface FirebaseContextType {
   user: User | null;
@@ -89,6 +89,9 @@ interface FirebaseContextType {
   certifications: Certification[];
   saveCertification: (cert: Certification) => Promise<void>;
   deleteCertification: (id: string) => Promise<void>;
+  documents: FarmDocument[];
+  saveDocument: (d: FarmDocument, file: File | null) => Promise<void>;
+  deleteDocument: (id: string) => Promise<void>;
   animals: Animal[];
   pastures: Pasture[];
   expenses: Expense[];
@@ -340,6 +343,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [ppeItems, setPPEItems] = useState<PPEItem[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [documents, setDocuments] = useState<FarmDocument[]>([]);
   const [individualAnimals, setIndividualAnimals] = useState<IndividualAnimal[]>([]);
   const [reproductionEvents, setReproductionEvents] = useState<ReproductionEvent[]>([]);
   const [healthEvents, setHealthEvents] = useState<HealthEvent[]>([]);
@@ -367,6 +371,39 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
   const [weighingSheets, setWeighingSheets] = useState<WeighingSheet[]>([]);
   const [settings, setSettings] = useState<FarmSettings>({ farmName: '', city: '' });
+
+  // Lista de e-mails usada só para "semear" os primeiros administradores,
+  // na primeiríssima vez que cada um faz login. A partir daí, o papel do
+  // usuário passa a viver só no Firestore (campo "role" em users/{uid}) —
+  // nunca mais é recalculado a partir do e-mail. Antes desta correção,
+  // QUALQUER conta nova virava admin automaticamente; agora o padrão
+  // seguro para contas novas é "user".
+  const BOOTSTRAP_ADMIN_EMAILS = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
+
+  async function resolveUserRole(u: User): Promise<'admin' | 'user'> {
+    const ref = doc(db, 'users', u.uid);
+    try {
+      const snap = await getDoc(ref);
+      const existing = snap.exists() ? snap.data() : {};
+      if (existing.role === 'admin' || existing.role === 'user') {
+        return existing.role;
+      }
+      // Primeiro acesso deste usuário: define o papel pela lista de
+      // bootstrap e grava no Firestore para todas as próximas vezes.
+      const email = (u.email || '').toLowerCase();
+      const role: 'admin' | 'user' = BOOTSTRAP_ADMIN_EMAILS.includes(email) ? 'admin' : 'user';
+      await setDoc(ref, {
+        farmName: existing.farmName ?? '',
+        city: existing.city ?? '',
+        ...existing,
+        role,
+      }, { merge: true });
+      return role;
+    } catch (err) {
+      console.error('Falha ao resolver papel do usuário — usando "user" por segurança:', err);
+      return 'user';
+    }
+  }
 
   const getFirestoreUserId = (): string => {
     if (!user) return '';
@@ -439,8 +476,9 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
         }
         setUser(u);
-        setUserRole('admin');
-        localStorage.setItem('gestao_fazenda_user_role', 'admin');
+        const role = await resolveUserRole(u);
+        setUserRole(role);
+        localStorage.setItem('gestao_fazenda_user_role', role);
         setIsDemoMode(false);
         localStorage.removeItem('gestao_fazenda_is_demo');
         localStorage.removeItem('gestao_fazenda_custom_user');
@@ -470,8 +508,9 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
         }
         setUser(u);
-        setUserRole('user');
-        localStorage.setItem('gestao_fazenda_user_role', 'user');
+        const role = await resolveUserRole(u);
+        setUserRole(role);
+        localStorage.setItem('gestao_fazenda_user_role', role);
         setIsDemoMode(false);
         localStorage.removeItem('gestao_fazenda_is_demo');
         localStorage.removeItem('gestao_fazenda_custom_user');
@@ -494,7 +533,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.log('EMAIL:', credential.user.email);
         const u = credential.user;
         setUser(u);
-        const defaultRole = 'admin';
+        const defaultRole = await resolveUserRole(u);
         setUserRole(defaultRole);
         localStorage.setItem('gestao_fazenda_user_role', defaultRole);
         setIsDemoMode(false);
@@ -522,9 +561,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const u = credential.user;
       setUser(u);
       
-      const isAdminEmail = cleanedEmail === 'admin@fazenda.com.br' || cleanedEmail === 'admmeuarmazem@gmail.com' || cleanedEmail === 'arnaldolima.adv79@gmail.com';
-      const defaultRole = isAdminEmail ? 'admin' : (cleanedEmail === 'usuario@fazenda.com.br' ? 'user' : 'admin');
-      
+      const defaultRole = await resolveUserRole(u);
+
       setUserRole(defaultRole);
       localStorage.setItem('gestao_fazenda_user_role', defaultRole);
       setIsDemoMode(false);
@@ -555,7 +593,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.log(result.user);
       const u = result.user;
       setUser(u);
-      const defaultRole = 'admin';
+      const defaultRole = await resolveUserRole(u);
       setUserRole(defaultRole);
       localStorage.setItem('gestao_fazenda_user_role', defaultRole);
       setIsDemoMode(false);
@@ -598,25 +636,15 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
       if (u) {
         setIsDemoMode(false);
         localStorage.removeItem('gestao_fazenda_is_demo');
         setUser(u);
-        const email = (u.email || '').toLowerCase();
-        let role = localStorage.getItem('gestao_fazenda_user_role') as 'admin' | 'user' | null;
-        const isAdminEmail = email === 'admin@fazenda.com.br' || email === 'admmeuarmazem@gmail.com' || email === 'arnaldolima.adv79@gmail.com';
-        
-        if (!role || (email === 'usuario@fazenda.com.br' && role !== 'user') || (isAdminEmail && role !== 'admin')) {
-          if (isAdminEmail) {
-            role = 'admin';
-          } else if (email === 'usuario@fazenda.com.br') {
-            role = 'user';
-          } else {
-            role = role || 'admin';
-          }
-          localStorage.setItem('gestao_fazenda_user_role', role);
-        }
+        // O papel agora vem sempre do Firestore (fonte da verdade), nunca
+        // mais é adivinhado a partir do e-mail a cada carregamento do app.
+        const role = await resolveUserRole(u);
+        localStorage.setItem('gestao_fazenda_user_role', role);
         setUserRole(role);
         setLoading(false);
       } else {
@@ -624,7 +652,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (customCached) {
           setUser(JSON.parse(customCached) as User);
           const cachedRole = localStorage.getItem('gestao_fazenda_user_role') as 'admin' | 'user' | null;
-          setUserRole(cachedRole || 'admin');
+          setUserRole(cachedRole || 'user');
         } else {
           const demoActive = localStorage.getItem('gestao_fazenda_is_demo') === 'true';
           if (demoActive) {
@@ -678,6 +706,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setTrainings([]);
       setPPEItems([]);
       setCertifications([]);
+      setDocuments([]);
       setSettings({ farmName: '', city: '' });
       return;
     }
@@ -757,6 +786,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const certificationsUnsub = onSnapshot(collection(db, 'users', userId, 'certifications'), (snap) => {
       setCertifications(snap.docs.map(d => d.data() as Certification));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/certifications`));
+
+    const documentsUnsub = onSnapshot(collection(db, 'users', userId, 'documents'), (snap) => {
+      setDocuments(snap.docs.map(d => d.data() as FarmDocument));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/documents`));
 
     // Fase 2 (multi-propriedade): carrega as propriedades do usuário. Na
     // PRIMEIRA VEZ que o usuário acessa depois desta atualização (sem
@@ -912,6 +945,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       trainingsUnsub();
       ppeItemsUnsub();
       certificationsUnsub();
+      documentsUnsub();
     };
   }, [user, isDemoMode]);
 
@@ -972,7 +1006,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid), s);
+      // merge:true preserva campos que não fazem parte de FarmSettings
+      // (como o "role", que não pode ser sobrescrito por uma gravação normal
+      // de configurações — ver firestore.rules).
+      await setDoc(doc(db, 'users', currentUid), s, { merge: true });
       console.log('✅ Settings salvas para usuário:', currentUid);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}`);
@@ -1460,6 +1497,58 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  // Converte um arquivo em uma string base64 (data URL), pra guardar dentro
+  // do próprio documento do Firestore — usado pelos Documentos.
+  function fileToDataUrl(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Documentos — o arquivo fica guardado como base64 dentro do próprio
+  // documento do Firestore (não usa o Firebase Storage, que hoje exige o
+  // plano pago Blaze mesmo dentro da faixa gratuita). O Firestore tem um
+  // limite de 1MB por documento, então arquivos maiores que isso são
+  // recusados aqui mesmo, antes de tentar salvar, com uma mensagem clara.
+  const MAX_DOCUMENT_FILE_BYTES = 700_000; // ~700KB de arquivo original, com folga pro overhead do base64 (~33%) + resto dos campos
+
+  const saveDocument = async (d: FarmDocument, file: File | null) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      let toSave = { ...d };
+      if (file) {
+        if (file.size > MAX_DOCUMENT_FILE_BYTES) {
+          throw new Error(
+            `Arquivo muito grande (${(file.size / 1024).toFixed(0)}KB). O limite é de ${(MAX_DOCUMENT_FILE_BYTES / 1024).toFixed(0)}KB porque o arquivo é guardado dentro do banco de dados gratuito. Tente uma foto/scan comprimido, ou um PDF menor.`,
+          );
+        }
+        const dataUrl = await fileToDataUrl(file);
+        toSave = { ...toSave, fileUrl: dataUrl, fileName: file.name, fileSize: file.size };
+      }
+      const clean = stripUndefined({ ...toSave, propertyId: toSave.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'documents', d.id), clean);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/documents/${d.id}`);
+      throw err; // deixa a tela mostrar a mensagem específica (ex: arquivo grande demais)
+    }
+  };
+
+  const deleteDocument = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'documents', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/documents/${id}`);
+    }
+  };
+
   const saveAnimal = async (animal: Animal) => {
     if (!user) return;
     if (!checkWritePermission()) return;
@@ -1770,7 +1859,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         farmName: 'Fazenda Online', 
         city: 'Uberaba - MG' 
       };
-      await setDoc(doc(db, 'users', currentUid), s);
+      await setDoc(doc(db, 'users', currentUid), s, { merge: true });
 
       for (const p of defaultDemoPastures) {
         await setDoc(doc(db, 'users', currentUid, 'pastures', p.id), p);
@@ -1834,7 +1923,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (!currentUid) return;
         
         if (backup.settings) {
-          await setDoc(doc(db, 'users', currentUid), backup.settings);
+          await setDoc(doc(db, 'users', currentUid), backup.settings, { merge: true });
         }
         
         const subcollections = [
@@ -1901,6 +1990,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const filteredTrainings = byActiveProperty(trainings);
   const filteredPPEItems = byActiveProperty(ppeItems);
   const filteredCertifications = byActiveProperty(certifications);
+  const filteredDocuments = byActiveProperty(documents);
 
   return (
     <FirebaseContext.Provider value={{
@@ -1928,6 +2018,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       trainings: filteredTrainings, saveTraining, deleteTraining,
       ppeItems: filteredPPEItems, savePPEItem, deletePPEItem,
       certifications: filteredCertifications, saveCertification, deleteCertification,
+      documents: filteredDocuments, saveDocument, deleteDocument,
       animals: filteredAnimals, pastures: filteredPastures, expenses: filteredExpenses,
       payments: filteredPayments, tasks: filteredTasks, transactions,
       inventory: filteredInventory, employees: filteredEmployees,

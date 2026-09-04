@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog } from 'lucide-react';
+, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -58,6 +58,7 @@ import Agricultura from './components/Agricultura';
 import Financeiro from './components/Financeiro';
 import Maquinas from './components/Maquinas';
 import RHRural from './components/RHRural';
+import Documentos from './components/Documentos';
 import Tasks from './components/Tasks';
 import Reports from './components/Reports';
 import FarmSettingsComp from './components/FarmSettings';
@@ -168,7 +169,10 @@ export default function App() {
     deletePPEItem,
     certifications,
     saveCertification,
-    deleteCertification
+    deleteCertification,
+    documents,
+    saveDocument,
+    deleteDocument
   } = useFirebase();
 
   const [activeView, setActiveView] = useState<View>('dashboard');
@@ -567,6 +571,7 @@ export default function App() {
     { id: 'financeiro-completo', label: 'Financeiro', icon: Wallet },
     { id: 'maquinas', label: 'Máquinas', icon: Tractor },
     { id: 'rh-rural', label: 'RH Rural', icon: UserCog },
+    { id: 'documentos', label: 'Documentos', icon: FileText },
     { id: 'payments', label: 'Funcionários', icon: Users },
     { id: 'expenses', label: 'Despesas', icon: Receipt },
     { id: 'inventory', label: 'Estoque Suprimentos', icon: Package },
@@ -592,6 +597,12 @@ export default function App() {
             settings={settings} 
             weighingSheets={weighingSheets}
             inventory={inventory}
+            accountsPayable={accountsPayable}
+            accountsReceivable={accountsReceivable}
+            talhoes={talhoes}
+            individualAnimals={individualAnimals}
+            machines={machines}
+            documents={documents}
             onNavigate={(view) => {
               if (view === 'animals-scan') {
                 setScanMode(true);
@@ -625,6 +636,7 @@ export default function App() {
       case 'financeiro-completo': return <Financeiro accountsPayable={accountsPayable} saveAccountPayable={saveAccountPayable} deleteAccountPayable={deleteAccountPayable} accountsReceivable={accountsReceivable} saveAccountReceivable={saveAccountReceivable} deleteAccountReceivable={deleteAccountReceivable} costCenters={costCenters} saveCostCenter={saveCostCenter} deleteCostCenter={deleteCostCenter} />;
       case 'maquinas': return <Maquinas machines={machines} saveMachine={saveMachine} deleteMachine={deleteMachine} maintenanceRecords={maintenanceRecords} saveMaintenanceRecord={saveMaintenanceRecord} deleteMaintenanceRecord={deleteMaintenanceRecord} />;
       case 'rh-rural': return <RHRural teams={teams} saveTeam={saveTeam} deleteTeam={deleteTeam} workSchedules={workSchedules} saveWorkSchedule={saveWorkSchedule} deleteWorkSchedule={deleteWorkSchedule} trainings={trainings} saveTraining={saveTraining} deleteTraining={deleteTraining} ppeItems={ppeItems} savePPEItem={savePPEItem} deletePPEItem={deletePPEItem} certifications={certifications} saveCertification={saveCertification} deleteCertification={deleteCertification} />;
+      case 'documentos': return <Documentos documents={documents} saveDocument={saveDocument} deleteDocument={deleteDocument} />;
       default: 
         return (
           <Dashboard 
@@ -635,6 +647,12 @@ export default function App() {
             settings={settings} 
             weighingSheets={weighingSheets}
             inventory={inventory}
+            accountsPayable={accountsPayable}
+            accountsReceivable={accountsReceivable}
+            talhoes={talhoes}
+            individualAnimals={individualAnimals}
+            machines={machines}
+            documents={documents}
             onNavigate={(view) => {
               if (view === 'animals-scan') {
                 setScanMode(true);
