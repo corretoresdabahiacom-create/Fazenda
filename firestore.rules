@@ -210,8 +210,23 @@ service cloud.firestore {
       // documento pelo console do navegador. Trocar de papel exige edição
       // manual direto no Firebase Console (aceitável para o tamanho atual
       // do projeto, sem custo de Cloud Functions).
+      //
+      // Exceção: contas que já existiam ANTES desta funcionalidade (o
+      // documento já tinha farmName/city salvos, mas nunca teve "role")
+      // podem definir o papel pela primeira vez, seguindo a mesma regra de
+      // bootstrap usada na criação — sem isso, contas antigas ficavam
+      // travadas em "user" para sempre, mesmo sendo e-mail de admin.
       allow update: if canWrite(userId) && isValidUser(incoming())
-          && incoming().role == resource.data.role;
+          && (
+            incoming().role == resource.data.role
+            || (
+              !('role' in resource.data) &&
+              (
+                (isBootstrapAdminEmail() && incoming().role == 'admin') ||
+                (!isBootstrapAdminEmail() && incoming().role == 'user')
+              )
+            )
+          );
 
       match /animals/{animalId} {
         allow list, get: if isOwner(userId);
