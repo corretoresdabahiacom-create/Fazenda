@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Sparkles, Send, Loader2, CheckCircle2, Info } from 'lucide-react';
 import { AccountPayable, AccountReceivable, Talhao, IndividualAnimal, Property } from '../types';
 import { fetchWeatherSnapshot } from '../lib/weatherRules';
+import { answerRuralQuestion } from '../lib/ruralAdvisor';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -24,9 +25,9 @@ interface Props {
 
 const SUGGESTIONS = [
   'Posso pulverizar hoje?',
-  'Qual meu saldo financeiro projetado?',
+  'Qual meu saldo financeiro?',
   'Quantos talhões estão ativos?',
-  'Como está o clima para os próximos dias?',
+  'Como está o clima hoje?',
 ];
 
 export default function ConsultorRuralIA({
@@ -43,6 +44,8 @@ export default function ConsultorRuralIA({
     setLoading(true);
 
     try {
+      // Motor de regras local — não chama nenhuma API de IA externa, então
+      // funciona sempre, de graça, sem depender de nenhuma chave configurada.
       let weather: Awaited<ReturnType<typeof fetchWeatherSnapshot>> | null = null;
       if (activeProperty?.location) {
         try {
@@ -52,44 +55,15 @@ export default function ConsultorRuralIA({
         }
       }
 
-      const totalPagar = accountsPayable.reduce((s, a) => s + (a.value ?? 0), 0);
-      const totalReceber = accountsReceivable.reduce((s, a) => s + (a.value ?? 0), 0);
-
-      const farmContext = {
-        propriedade: activeProperty?.name,
-        clima_hoje: weather
-          ? {
-              temperatura_maxima: weather.tempMaxToday,
-              temperatura_minima: weather.tempMinToday,
-              chuva_prevista_mm: weather.precipitationToday,
-              vento_maximo_kmh: weather.windSpeedMaxToday,
-              alertas: weather.alerts.map(a => a.message),
-            }
-          : 'Localização da propriedade não cadastrada, sem dado de clima disponível.',
-        financeiro: {
-          total_a_pagar: totalPagar,
-          total_a_receber: totalReceber,
-          saldo_projetado: totalReceber - totalPagar,
-        },
-        talhoes: talhoes.map(t => ({ nome: t.name, status: t.status, cultura_atual: t.currentCrop, area: t.area })),
-        rebanho_individual: individualAnimals.map(a => ({
-          brinco: a.earTag, categoria: a.category, status: a.status,
-        })),
-      };
-
-      const res = await fetch('/api/consultor-rural', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, context: farmContext }),
+      const result = answerRuralQuestion(q, {
+        weather,
+        accountsPayable,
+        accountsReceivable,
+        talhoes,
+        individualAnimals,
       });
-      const data = await res.json();
 
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', text: data.answer || 'Não consegui responder agora.', basedOnRealData: data.basedOnRealData },
-      ]);
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Não consegui consultar a IA agora. Tente de novo em instantes.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', text: result.answer, basedOnRealData: result.basedOnRealData }]);
     } finally {
       setLoading(false);
     }
@@ -101,7 +75,7 @@ export default function ConsultorRuralIA({
         <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
           <Sparkles className="text-[#2d6a4f]" size={20} /> Consultor Rural IA
         </h1>
-        <p className="text-sm text-gray-500">Pergunte em português — a resposta cruza os dados reais já cadastrados na sua fazenda.</p>
+        <p className="text-sm text-gray-500">Pergunte sobre clima, financeiro, talhões ou rebanho — a resposta usa os dados reais já cadastrados na sua fazenda (sem depender de nenhuma IA externa).</p>
       </div>
 
       {messages.length === 0 && (
