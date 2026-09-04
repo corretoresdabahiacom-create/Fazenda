@@ -17,11 +17,12 @@ import {
   Pie
 } from 'recharts';
 import { TrendingUp, Users, Beef, AlertCircle, MapPin, CloudSun, Scan, Clock, ChevronRight as ChevronRightIcon, Coins, Scale, Sparkles, RefreshCw } from 'lucide-react';
-import { EmployeePayment, Expense, Animal, FarmTask, ExpenseType, FarmSettings, WeighingSheet, InventoryItem, AccountPayable, AccountReceivable, Talhao, IndividualAnimal, Machine, FarmDocument } from '../types';
+import { EmployeePayment, Expense, Animal, FarmTask, ExpenseType, FarmSettings, WeighingSheet, InventoryItem, AccountPayable, AccountReceivable, Talhao, IndividualAnimal, Machine, FarmDocument, Property } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ObligationAlert } from '../utils/obligations';
 import ModulosResumo from './ModulosResumo';
+import ClimaAlertsPanel from './ClimaAlertsPanel';
 
 interface DashboardProps {
   payments: EmployeePayment[];
@@ -41,6 +42,7 @@ interface DashboardProps {
   individualAnimals?: IndividualAnimal[];
   machines?: Machine[];
   documents?: FarmDocument[];
+  activeProperty?: Property | null;
 }
 
 export default function Dashboard({ 
@@ -61,6 +63,7 @@ export default function Dashboard({
   individualAnimals = [],
   machines = [],
   documents = [],
+  activeProperty = null,
 }: DashboardProps) {
   const totalExpenses = useMemo(() => {
     const expensesTotal = expenses.reduce((acc, curr) => acc + curr.value, 0);
@@ -601,6 +604,8 @@ export default function Dashboard({
           )}
         </div>
       </div>
+
+      <ClimaAlertsPanel activeProperty={activeProperty} />
 
       <ModulosResumo
         accountsPayable={accountsPayable}

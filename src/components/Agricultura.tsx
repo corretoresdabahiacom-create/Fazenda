@@ -3,16 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { Plus, Trash2, X, Sprout, CalendarRange, NotebookPen, Bug, Droplets } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, X, Sprout, CalendarRange, NotebookPen, Bug, Droplets, AlertTriangle } from 'lucide-react';
 import {
   Talhao, TalhaoStatus, AreaUnit,
   CropPlan, Cultura, CropPlanStatus,
   FieldLogEntry, FieldLogType,
   PestRecord, PestType, InfestationLevel,
   IrrigationRecord, IrrigationMethod,
+  Property,
 } from '../types';
 import { format } from 'date-fns';
+import { fetchWeatherSnapshot, WeatherSnapshot } from '../lib/weatherRules';
 
 interface Props {
   talhoes: Talhao[];
@@ -30,6 +32,7 @@ interface Props {
   irrigationRecords: IrrigationRecord[];
   saveIrrigationRecord: (r: IrrigationRecord) => Promise<void>;
   deleteIrrigationRecord: (id: string) => Promise<void>;
+  activeProperty?: Property | null;
 }
 
 type Tab = 'talhoes' | 'planejamento' | 'caderno' | 'pragas' | 'irrigacao';
@@ -83,6 +86,7 @@ export default function Agricultura(props: Props) {
           talhoes={props.talhoes}
           onSave={props.saveFieldLogEntry}
           onDelete={props.deleteFieldLogEntry}
+          activeProperty={props.activeProperty}
         />
       )}
       {tab === 'pragas' && (
@@ -330,14 +334,40 @@ function PlanejamentoTab({ cropPlans, talhoes, onSave, onDelete }: {
 
 // ---------- Caderno de Campo ----------
 
-function CadernoTab({ entries, talhoes, onSave, onDelete }: {
+function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
   entries: FieldLogEntry[];
   talhoes: Talhao[];
   onSave: (e: FieldLogEntry) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  activeProperty?: Property | null;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState<Partial<FieldLogEntry>>({ type: FieldLogType.PLANTIO });
+  const [weatherWarning, setWeatherWarning] = useState<WeatherSnapshot | null>(null);
+  const [checkingWeather, setCheckingWeather] = useState(false);
+
+  // Tipos de registro onde o clima do dia realmente importa — pulverização,
+  // aplicação foliar e controle de pragas ficam prejudicados ou perigosos
+  // com chuva forte ou vento forte. Isso é só um AVISO: nunca impede o
+  // usuário de salvar, como já foi pedido antes para todos os formulários.
+  const weatherSensitiveTypes = [FieldLogType.PULVERIZACAO, FieldLogType.APLICACAO_FOLIAR, FieldLogType.CONTROLE_PRAGAS];
+
+  useEffect(() => {
+    if (!isOpen || !form.type || !weatherSensitiveTypes.includes(form.type) || !activeProperty?.location) {
+      setWeatherWarning(null);
+      return;
+    }
+    setCheckingWeather(true);
+    fetchWeatherSnapshot(activeProperty.location.lat, activeProperty.location.lng)
+      .then(setWeatherWarning)
+      .catch(() => setWeatherWarning(null))
+      .finally(() => setCheckingWeather(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, form.type, activeProperty?.location?.lat, activeProperty?.location?.lng]);
+
+  const relevantAlerts = weatherWarning?.alerts.filter(
+    a => a.type === 'chuva_pulverizacao' || a.type === 'vento_aplicacao_aerea',
+  ) ?? [];
 
   function openNew() {
     setForm({ type: FieldLogType.PLANTIO, date: format(new Date(), 'yyyy-MM-dd') });
@@ -423,6 +453,20 @@ function CadernoTab({ entries, talhoes, onSave, onDelete }: {
                 {Object.values(FieldLogType).map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </Field>
+
+            {checkingWeather && (
+              <p className="text-xs text-gray-400">Checando o clima de hoje para esse tipo de atividade...</p>
+            )}
+            {relevantAlerts.map((a) => (
+              <div key={a.type} className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
+                <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-bold text-amber-700">{a.title}</p>
+                  <p className="text-xs text-amber-600">{a.message} Você ainda pode registrar normalmente — é só um alerta.</p>
+                </div>
+              </div>
+            ))}
+
             <div className="grid grid-cols-2 gap-3">
               <Field label="Data">
                 <input type="date" value={form.date ?? ''} onChange={e => setForm({ ...form, date: e.target.value })} className={inputCls} />

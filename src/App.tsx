@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText } from 'lucide-react';
+, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -59,6 +59,7 @@ import Financeiro from './components/Financeiro';
 import Maquinas from './components/Maquinas';
 import RHRural from './components/RHRural';
 import Documentos from './components/Documentos';
+import ConsultorRuralIA from './components/ConsultorRuralIA';
 import Tasks from './components/Tasks';
 import Reports from './components/Reports';
 import FarmSettingsComp from './components/FarmSettings';
@@ -110,6 +111,7 @@ export default function App() {
     weighingSheets,
     properties,
     activePropertyId,
+    activeProperty,
     setActivePropertyId,
     saveProperty,
     deleteProperty,
@@ -572,6 +574,7 @@ export default function App() {
     { id: 'maquinas', label: 'Máquinas', icon: Tractor },
     { id: 'rh-rural', label: 'RH Rural', icon: UserCog },
     { id: 'documentos', label: 'Documentos', icon: FileText },
+    { id: 'consultor-ia', label: 'Consultor Rural IA', icon: Sparkles },
     { id: 'payments', label: 'Funcionários', icon: Users },
     { id: 'expenses', label: 'Despesas', icon: Receipt },
     { id: 'inventory', label: 'Estoque Suprimentos', icon: Package },
@@ -603,6 +606,7 @@ export default function App() {
             individualAnimals={individualAnimals}
             machines={machines}
             documents={documents}
+            activeProperty={activeProperty}
             onNavigate={(view) => {
               if (view === 'animals-scan') {
                 setScanMode(true);
@@ -632,11 +636,12 @@ export default function App() {
       case 'settings': return <FarmSettingsComp settings={settings} setSettings={updateSettings} />;
       case 'properties': return <Properties properties={properties} activePropertyId={activePropertyId} onSetActive={setActivePropertyId} onSave={saveProperty} onDelete={deleteProperty} />;
       case 'pecuaria-pro': return <PecuariaProfissional individualAnimals={individualAnimals} saveIndividualAnimal={saveIndividualAnimal} deleteIndividualAnimal={deleteIndividualAnimal} reproductionEvents={reproductionEvents} saveReproductionEvent={saveReproductionEvent} deleteReproductionEvent={deleteReproductionEvent} healthEvents={healthEvents} saveHealthEvent={saveHealthEvent} deleteHealthEvent={deleteHealthEvent} milkRecords={milkRecords} saveMilkRecord={saveMilkRecord} deleteMilkRecord={deleteMilkRecord} />;
-      case 'agricultura': return <Agricultura talhoes={talhoes} saveTalhao={saveTalhao} deleteTalhao={deleteTalhao} cropPlans={cropPlans} saveCropPlan={saveCropPlan} deleteCropPlan={deleteCropPlan} fieldLogEntries={fieldLogEntries} saveFieldLogEntry={saveFieldLogEntry} deleteFieldLogEntry={deleteFieldLogEntry} pestRecords={pestRecords} savePestRecord={savePestRecord} deletePestRecord={deletePestRecord} irrigationRecords={irrigationRecords} saveIrrigationRecord={saveIrrigationRecord} deleteIrrigationRecord={deleteIrrigationRecord} />;
+      case 'agricultura': return <Agricultura talhoes={talhoes} saveTalhao={saveTalhao} deleteTalhao={deleteTalhao} cropPlans={cropPlans} saveCropPlan={saveCropPlan} deleteCropPlan={deleteCropPlan} fieldLogEntries={fieldLogEntries} saveFieldLogEntry={saveFieldLogEntry} deleteFieldLogEntry={deleteFieldLogEntry} pestRecords={pestRecords} savePestRecord={savePestRecord} deletePestRecord={deletePestRecord} irrigationRecords={irrigationRecords} saveIrrigationRecord={saveIrrigationRecord} deleteIrrigationRecord={deleteIrrigationRecord} activeProperty={activeProperty} />;
       case 'financeiro-completo': return <Financeiro accountsPayable={accountsPayable} saveAccountPayable={saveAccountPayable} deleteAccountPayable={deleteAccountPayable} accountsReceivable={accountsReceivable} saveAccountReceivable={saveAccountReceivable} deleteAccountReceivable={deleteAccountReceivable} costCenters={costCenters} saveCostCenter={saveCostCenter} deleteCostCenter={deleteCostCenter} />;
       case 'maquinas': return <Maquinas machines={machines} saveMachine={saveMachine} deleteMachine={deleteMachine} maintenanceRecords={maintenanceRecords} saveMaintenanceRecord={saveMaintenanceRecord} deleteMaintenanceRecord={deleteMaintenanceRecord} />;
       case 'rh-rural': return <RHRural teams={teams} saveTeam={saveTeam} deleteTeam={deleteTeam} workSchedules={workSchedules} saveWorkSchedule={saveWorkSchedule} deleteWorkSchedule={deleteWorkSchedule} trainings={trainings} saveTraining={saveTraining} deleteTraining={deleteTraining} ppeItems={ppeItems} savePPEItem={savePPEItem} deletePPEItem={deletePPEItem} certifications={certifications} saveCertification={saveCertification} deleteCertification={deleteCertification} />;
       case 'documentos': return <Documentos documents={documents} saveDocument={saveDocument} deleteDocument={deleteDocument} />;
+      case 'consultor-ia': return <ConsultorRuralIA activeProperty={activeProperty} accountsPayable={accountsPayable} accountsReceivable={accountsReceivable} talhoes={talhoes} individualAnimals={individualAnimals} />;
       default: 
         return (
           <Dashboard 
@@ -653,6 +658,7 @@ export default function App() {
             individualAnimals={individualAnimals}
             machines={machines}
             documents={documents}
+            activeProperty={activeProperty}
             onNavigate={(view) => {
               if (view === 'animals-scan') {
                 setScanMode(true);

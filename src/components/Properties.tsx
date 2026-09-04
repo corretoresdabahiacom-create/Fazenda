@@ -271,6 +271,33 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                 />
               </div>
 
+              <div>
+                <label className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
+                  <MapPinned size={12} /> Localização (usada para alertas de clima)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!navigator.geolocation) return;
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => setFormData({
+                        ...formData,
+                        location: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+                      }),
+                      () => { /* silencioso: localização é opcional, não bloqueia o cadastro */ },
+                    );
+                  }}
+                  className="text-xs font-semibold text-[#2d6a4f] underline mt-1"
+                >
+                  Usar minha localização atual (GPS)
+                </button>
+                {formData.location && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    {formData.location.lat.toFixed(5)}, {formData.location.lng.toFixed(5)}
+                  </p>
+                )}
+              </div>
+
               <div className="flex gap-2 pt-2">
                 <button type="submit" className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 rounded-xl font-bold text-sm">
                   Salvar
