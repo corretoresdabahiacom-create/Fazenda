@@ -366,7 +366,7 @@ export default function WeighingWorksheet() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div 
             onClick={handleCreateNewSheet}
-            className="border-2 border-dashed border-[#e5e0d8] hover:border-[#3d5a45] bg-white p-8 rounded-3xl cursor-pointer flex flex-col items-center justify-center text-center gap-4 transition-all hover:shadow-md hover:scale-101 active:scale-99 group"
+            className="border-2 border-dashed border-[#e5e0d8] hover:border-[#3d5a45] bg-theme-card p-8 rounded-3xl cursor-pointer flex flex-col items-center justify-center text-center gap-4 transition-all hover:shadow-md hover:scale-101 active:scale-99 group"
           >
             <div className="w-16 h-16 bg-[#fcfaf7] rounded-full flex items-center justify-center border border-[#e5e0d8] group-hover:bg-[#3d5a45]/5 group-hover:border-[#3d5a45]/20 group-hover:scale-110 transition-all">
               <Plus size={28} className="text-[#3d5a45]" />
@@ -397,7 +397,7 @@ export default function WeighingWorksheet() {
                     setSheetNotes(sheet.notes || '');
                     setActiveTab('editor');
                   }}
-                  className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-xs cursor-pointer hover:shadow-md hover:border-[#3d5a45]/40 transition-all flex flex-col justify-between group relative overflow-hidden"
+                  className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-xs cursor-pointer hover:shadow-md hover:border-[#3d5a45]/40 transition-all flex flex-col justify-between group relative overflow-hidden"
                 >
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
@@ -449,7 +449,7 @@ export default function WeighingWorksheet() {
         /* active spreadsheet workbench */
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+          <div className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-[#f5f2ed] text-[#3d5a45] rounded-2xl">
                 <FileText size={24} />
@@ -544,7 +544,7 @@ export default function WeighingWorksheet() {
           </div>
 
           {/* Excel Spreadsheet Table Interface */}
-          <div className="bg-white rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
+          <div className="bg-theme-card rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
             <div className="overflow-x-auto w-full scrollbar-thin">
               <table style={{ width: '1410px', minWidth: '1410px', tableLayout: 'fixed' }} className="text-left border-collapse">
                 <colgroup>
@@ -590,7 +590,7 @@ export default function WeighingWorksheet() {
                         >
                            {/* Quantidade */}
                            <td style={colStyles[0]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-[#e5e0d8] focus-within:border-[#3d5a45] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-white w-28 justify-center mx-auto">
+                             <div className="inline-flex items-center gap-1 border border-[#e5e0d8] focus-within:border-[#3d5a45] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-theme-card w-28 justify-center mx-auto">
                                <input 
                                  type="number" 
                                  min="0"
@@ -605,7 +605,7 @@ export default function WeighingWorksheet() {
 
                            {/* Peso kg */}
                            <td style={colStyles[1]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-[#e5e0d8] focus-within:border-[#3d5a45] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-white w-32 justify-center mx-auto">
+                             <div className="inline-flex items-center gap-1 border border-[#e5e0d8] focus-within:border-[#3d5a45] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-theme-card w-32 justify-center mx-auto">
                                <input 
                                  type="number" 
                                  min="0"
@@ -636,7 +636,7 @@ export default function WeighingWorksheet() {
 
                            {/* Valor Arroba R$ */}
                            <td style={colStyles[5]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-[#e5e0d8] focus-within:border-[#3d5a45] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-white w-32 justify-center mx-auto">
+                             <div className="inline-flex items-center gap-1 border border-[#e5e0d8] focus-within:border-[#3d5a45] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-theme-card w-32 justify-center mx-auto">
                                <span className="text-[10px] font-black text-[#8d8a86]">R$</span>
                                <input 
                                  type="number" 
@@ -786,11 +786,11 @@ export default function WeighingWorksheet() {
                 value={sheetNotes}
                 onChange={(e) => setSheetNotes(e.target.value)}
                 placeholder="Exemplo: Vacina aplicada, condições climáticas do dia, destino do lote..."
-                className="w-full bg-white border border-[#e5e0d8] focus:border-[#3d5a45] focus:ring-1 focus:ring-[#3d5a45]/20 focus:outline-none p-4 rounded-2xl text-xs font-semibold leading-relaxed h-20"
+                className="w-full bg-theme-card border border-[#e5e0d8] focus:border-[#3d5a45] focus:ring-1 focus:ring-[#3d5a45]/20 focus:outline-none p-4 rounded-2xl text-xs font-semibold leading-relaxed h-20"
               />
             </div>
             
-            <div className="p-4 bg-white rounded-2xl border border-[#e5e0d8] space-y-3 shadow-xs">
+            <div className="p-4 bg-theme-card rounded-2xl border border-[#e5e0d8] space-y-3 shadow-xs">
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#3d5a45]">
                 <TrendingUp size={16} /> Resumo Prático
               </div>
@@ -803,7 +803,7 @@ export default function WeighingWorksheet() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between bg-white border border-[#e5e0d8] rounded-3xl p-4 px-6 shadow-xs">
+          <div className="flex items-center justify-between bg-theme-card border border-[#e5e0d8] rounded-3xl p-4 px-6 shadow-xs">
             <button 
               onClick={() => setActiveTab('sheets')}
               className="btn-outline px-4 py-2 text-xs"
@@ -832,7 +832,7 @@ export default function WeighingWorksheet() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="bg-white rounded-3xl border border-[#e5e0d8] shadow-xl p-6 max-w-sm w-full space-y-4"
+              className="bg-theme-card rounded-3xl border border-[#e5e0d8] shadow-xl p-6 max-w-sm w-full space-y-4"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 text-red-500">

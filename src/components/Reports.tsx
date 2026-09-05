@@ -582,7 +582,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
       {/* Upper Report Deck Navigation with PDF export */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-          <div className="flex bg-white dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-2xl border border-[#e5e0d8] shadow-sm w-fit min-w-max">
+          <div className="flex bg-theme-card dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-2xl border border-[#e5e0d8] shadow-sm w-fit min-w-max">
             <button 
               onClick={() => setActiveTab('financial')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
@@ -631,7 +631,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
 
       {/* Control Area: Shared date criteria filter (only applies to Financial Flow logs rendering) */}
       {activeTab === 'financial' && (
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-5 rounded-3xl border border-[#e5e0d8] shadow-sm animate-fade-in">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-theme-card p-5 rounded-3xl border border-[#e5e0d8] shadow-sm animate-fade-in">
           <div className="flex items-center gap-2 bg-[#fcfaf7] p-0.5 rounded-xl border">
             <button
               onClick={() => setReportType('monthly')}
@@ -705,7 +705,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             className="grid grid-cols-1 lg:grid-cols-3 gap-8"
           >
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white p-8 rounded-3xl border border-[#e5e0d8] shadow-sm">
+              <div className="bg-theme-card p-8 rounded-3xl border border-[#e5e0d8] shadow-sm">
                 <div className="flex justify-between items-baseline mb-6">
                   <h3 className="font-serif italic text-lg font-bold text-[#3d5a45]">Balancete Geral de Caixa</h3>
                   <span className="text-[10px] font-black uppercase text-[#8d8a86] tracking-widest">
@@ -758,7 +758,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               </div>
 
               {/* Month-by-month Fixed vs Variable Expenses comparative bar chart */}
-              <div className="bg-white p-8 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
+              <div className="bg-theme-card p-8 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
                 <div className="flex justify-between items-baseline mb-2">
                   <h3 className="font-serif italic text-lg font-bold text-[#3d5a45] dark:text-[#5fa875]">Comparativo Trimestral de Custos</h3>
                   <span className="text-[10px] font-black uppercase text-[#8d8a86] tracking-widest">
@@ -812,7 +812,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               </div>
 
               {/* Demonstrativo Geral de Caixa & Lucros */}
-              <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-5">
+              <div className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-5">
                 <div className="border-b pb-3">
                   <h4 className="font-serif italic text-[#3d5a45] font-black text-sm block">Demonstrativo de Resultados</h4>
                   <p className="text-[10px] text-neutral-500 font-semibold leading-relaxed">
@@ -901,7 +901,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               {employeeRolesBreakdownList(employeePaymentsBreakdown.roles)}
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-5">
+            <div className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-5">
               <div className="flex justify-between items-center pb-3 border-b">
                 <div>
                   <h3 className="font-serif italic text-lg font-bold text-[#3d5a45]">Acompanhamento e Custos de Pessoal</h3>
@@ -911,7 +911,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-[#8d8a86] uppercase">Filtrar Colaborador:</span>
                   <select 
-                    className="px-3 py-1.5 border rounded-xl text-xs bg-white font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
+                    className="px-3 py-1.5 border rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
                     value={focusedEmployeeId}
                     onChange={(e) => setFocusedEmployeeId(e.target.value)}
                   >
@@ -993,7 +993,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
           >
             {/* Herd classifications summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
+              <div className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
                 <h4 className="font-serif italic text-base font-bold text-[#3d5a45] mb-4">Lotação Total por Categoria</h4>
                 <div className="space-y-2">
                   {cattleAnalyticsGrouped.categories.map(cat => (
@@ -1004,7 +1004,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                   ))}
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
+              <div className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm">
                 <h4 className="font-serif italic text-base font-bold text-[#3d5a45] mb-4">Distribuição do Custo de Compra por Raça</h4>
                 <div className="space-y-2">
                   {cattleAnalyticsGrouped.breeds.map(b => (
@@ -1018,7 +1018,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             </div>
 
             {/* Individual lot comprehensive listing */}
-            <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
+            <div className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
               <div>
                 <h3 className="font-serif italic text-base font-bold text-[#3d5a45]">Inventário Individual de Lotes de Gado</h3>
                 <p className="text-xs text-[#8d8a86]">Rastreabilidade detalhada: tipo de posse, ano/data de entrada, peso de nascimento/entrada, peso de comercialização/saída, e tempo total de pastoreamento.</p>
@@ -1091,7 +1091,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
           >
             {/* Purchase vs Sales Overheads cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-5 rounded-3xl border border-[#e5e0d8] shadow-sm flex items-center gap-4">
+              <div className="bg-theme-card p-5 rounded-3xl border border-[#e5e0d8] shadow-sm flex items-center gap-4">
                 <div className="p-4 bg-[#3d5a45]/10 rounded-full text-[#3d5a45]">
                   <Coins size={28} />
                 </div>
@@ -1102,7 +1102,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                 </div>
               </div>
 
-              <div className="bg-white p-5 rounded-3xl border border-[#e5e0d8] shadow-sm flex items-center gap-4">
+              <div className="bg-theme-card p-5 rounded-3xl border border-[#e5e0d8] shadow-sm flex items-center gap-4">
                 <div className="p-4 bg-blue-50 rounded-full text-blue-800">
                   <TrendingUp size={28} />
                 </div>
@@ -1113,7 +1113,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                 </div>
               </div>
 
-              <div className="bg-white p-5 rounded-3xl border border-[#e5e0d8] shadow-sm flex items-center gap-4">
+              <div className="bg-theme-card p-5 rounded-3xl border border-[#e5e0d8] shadow-sm flex items-center gap-4">
                 <div className="p-4 bg-purple-50 rounded-full text-purple-800">
                   <Users size={28} />
                 </div>
@@ -1127,7 +1127,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
 
             {/* In-depth Sales expenses breakdown list */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
+              <div className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
                 <h4 className="font-serif italic text-base font-bold text-[#3d5a45] border-b pb-2">Rateio dos Custos na Venda de Gado</h4>
                 
                 <div className="space-y-3 font-semibold text-xs text-slate-800">
@@ -1155,7 +1155,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               </div>
 
               {/* Warehouse stock metrics */}
-              <div className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
+              <div className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-4">
                 <h4 className="font-serif italic text-base font-bold text-[#3d5a45] border-b pb-2">Patrimônio em Estoque / Depósito (Estoque)</h4>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -1198,7 +1198,7 @@ function employeeRolesBreakdownList(roles: { role: string, value: number }[]) {
   return EMPLOYEE_ROLES.map((role) => {
     const payment = roles.find(r => r.role === role)?.value || 0;
     return (
-      <div key={role} className="bg-white p-4.5 rounded-3xl border border-[#e5e0d8] shadow-sm select-none">
+      <div key={role} className="bg-theme-card p-4.5 rounded-3xl border border-[#e5e0d8] shadow-sm select-none">
         <span className="text-[9px] font-black text-[#8d8a86] uppercase block leading-none mb-1">{role}</span>
         <span className="text-base font-black text-slate-800 block">R$ {payment.toLocaleString('pt-BR')}</span>
         <span className="text-[9px] font-semibold text-[#3d5a45] uppercase block mt-0.5">Custo De Folha</span>

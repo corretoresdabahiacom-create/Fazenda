@@ -42,17 +42,17 @@ export default function RHRural(props: Props) {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-gray-800">RH Rural</h1>
-        <p className="text-sm text-gray-500">Equipes, escalas, treinamentos, EPIs e certificações. (Pagamentos continuam na tela "Funcionários".)</p>
+        <h1 className="text-xl font-bold text-theme-primary">RH Rural</h1>
+        <p className="text-sm text-theme-secondary">Equipes, escalas, treinamentos, EPIs e certificações. (Pagamentos continuam na tela "Funcionários".)</p>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
-              tab === t.id ? 'bg-white text-[#2d6a4f] shadow-sm' : 'text-gray-500'
+              tab === t.id ? 'bg-theme-card text-[var(--primary)] shadow-sm' : 'text-theme-secondary'
             }`}
           >
             <t.icon size={14} /> {t.label}
@@ -82,19 +82,19 @@ function EquipesTab({ items, onSave, onDelete }: { items: Team[]; onSave: (t: Te
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={() => { setForm({}); setIsOpen(true); }} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={() => { setForm({}); setIsOpen(true); }} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Nova Equipe
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {items.map((t) => (
-          <div key={t.id} className="bg-white rounded-2xl border border-gray-200 p-4">
-            <h3 className="font-bold text-gray-800">{t.name}</h3>
-            {t.memberNames && <p className="text-xs text-gray-500 mt-1">{t.memberNames}</p>}
+          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4">
+            <h3 className="font-bold text-theme-primary">{t.name}</h3>
+            {t.memberNames && <p className="text-xs text-theme-secondary mt-1">{t.memberNames}</p>}
             <button onClick={() => confirm('Excluir?') && onDelete(t.id)} className="text-xs font-semibold text-red-400 mt-2 flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
           </div>
         ))}
-        {items.length === 0 && <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhuma equipe cadastrada ainda.</p>}
+        {items.length === 0 && <p className="text-sm text-theme-secondary col-span-full text-center py-8">Nenhuma equipe cadastrada ainda.</p>}
       </div>
       {isOpen && (
         <Modal title="Nova Equipe" onClose={() => setIsOpen(false)}>
@@ -128,26 +128,26 @@ function EscalasTab({ items, teams, onSave, onDelete }: { items: WorkSchedule[];
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={() => { setForm({}); setIsOpen(true); }} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={() => { setForm({}); setIsOpen(true); }} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Nova Escala
         </button>
       </div>
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Equipe</th><th className="text-left p-3">Dias</th><th className="text-left p-3">Horário</th><th className="p-3"></th></tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {items.map((s) => (
               <tr key={s.id}>
-                <td className="p-3 font-bold text-gray-700">{s.employeeName || '—'}</td>
-                <td className="p-3 text-gray-600">{teamName(s.teamId)}</td>
-                <td className="p-3 text-gray-600">{s.daysOfWeek || '—'}</td>
-                <td className="p-3 text-gray-500">{s.startTime && s.endTime ? `${s.startTime} - ${s.endTime}` : '—'}</td>
+                <td className="p-3 font-bold text-theme-primary">{s.employeeName || '—'}</td>
+                <td className="p-3 text-theme-secondary">{teamName(s.teamId)}</td>
+                <td className="p-3 text-theme-secondary">{s.daysOfWeek || '—'}</td>
+                <td className="p-3 text-theme-secondary">{s.startTime && s.endTime ? `${s.startTime} - ${s.endTime}` : '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(s.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
-            {items.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-gray-400 text-sm">Nenhuma escala cadastrada ainda.</td></tr>}
+            {items.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-theme-secondary text-sm">Nenhuma escala cadastrada ainda.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -187,26 +187,26 @@ function TreinamentosTab({ items, onSave, onDelete }: { items: Training[]; onSav
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={() => { setForm({ date: format(new Date(), 'yyyy-MM-dd') }); setIsOpen(true); }} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={() => { setForm({ date: format(new Date(), 'yyyy-MM-dd') }); setIsOpen(true); }} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Treinamento
         </button>
       </div>
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Data</th><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Treinamento</th><th className="text-left p-3">Fornecedor</th><th className="p-3"></th></tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {items.map((t) => (
               <tr key={t.id}>
-                <td className="p-3 text-gray-600">{t.date ? format(new Date(t.date), 'dd/MM/yyyy') : '—'}</td>
-                <td className="p-3 text-gray-600">{t.employeeName || '—'}</td>
-                <td className="p-3 font-bold text-gray-700">{t.title}</td>
-                <td className="p-3 text-gray-500">{t.provider || '—'}</td>
+                <td className="p-3 text-theme-secondary">{t.date ? format(new Date(t.date), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3 text-theme-secondary">{t.employeeName || '—'}</td>
+                <td className="p-3 font-bold text-theme-primary">{t.title}</td>
+                <td className="p-3 text-theme-secondary">{t.provider || '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(t.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
-            {items.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-gray-400 text-sm">Nenhum treinamento cadastrado ainda.</td></tr>}
+            {items.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-theme-secondary text-sm">Nenhum treinamento cadastrado ainda.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -240,26 +240,26 @@ function EpisTab({ items, onSave, onDelete }: { items: PPEItem[]; onSave: (p: PP
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={() => { setForm({ deliveryDate: format(new Date(), 'yyyy-MM-dd') }); setIsOpen(true); }} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={() => { setForm({ deliveryDate: format(new Date(), 'yyyy-MM-dd') }); setIsOpen(true); }} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo EPI
         </button>
       </div>
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Item</th><th className="text-left p-3">Entrega</th><th className="text-left p-3">Validade</th><th className="p-3"></th></tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {items.map((p) => (
               <tr key={p.id}>
-                <td className="p-3 text-gray-600">{p.employeeName || '—'}</td>
-                <td className="p-3 font-bold text-gray-700">{p.itemName}</td>
-                <td className="p-3 text-gray-500">{p.deliveryDate ? format(new Date(p.deliveryDate), 'dd/MM/yyyy') : '—'}</td>
-                <td className="p-3 text-gray-500">{p.expirationDate ? format(new Date(p.expirationDate), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3 text-theme-secondary">{p.employeeName || '—'}</td>
+                <td className="p-3 font-bold text-theme-primary">{p.itemName}</td>
+                <td className="p-3 text-theme-secondary">{p.deliveryDate ? format(new Date(p.deliveryDate), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3 text-theme-secondary">{p.expirationDate ? format(new Date(p.expirationDate), 'dd/MM/yyyy') : '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(p.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
-            {items.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-gray-400 text-sm">Nenhum EPI cadastrado ainda.</td></tr>}
+            {items.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-theme-secondary text-sm">Nenhum EPI cadastrado ainda.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -293,26 +293,26 @@ function CertificacoesTab({ items, onSave, onDelete }: { items: Certification[];
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={() => { setForm({}); setIsOpen(true); }} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={() => { setForm({}); setIsOpen(true); }} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Nova Certificação
         </button>
       </div>
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Certificação</th><th className="text-left p-3">Emissão</th><th className="text-left p-3">Validade</th><th className="p-3"></th></tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {items.map((c) => (
               <tr key={c.id}>
-                <td className="p-3 text-gray-600">{c.employeeName || '—'}</td>
-                <td className="p-3 font-bold text-gray-700">{c.name}</td>
-                <td className="p-3 text-gray-500">{c.issueDate ? format(new Date(c.issueDate), 'dd/MM/yyyy') : '—'}</td>
-                <td className="p-3 text-gray-500">{c.expirationDate ? format(new Date(c.expirationDate), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3 text-theme-secondary">{c.employeeName || '—'}</td>
+                <td className="p-3 font-bold text-theme-primary">{c.name}</td>
+                <td className="p-3 text-theme-secondary">{c.issueDate ? format(new Date(c.issueDate), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3 text-theme-secondary">{c.expirationDate ? format(new Date(c.expirationDate), 'dd/MM/yyyy') : '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(c.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
-            {items.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-gray-400 text-sm">Nenhuma certificação cadastrada ainda.</td></tr>}
+            {items.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-theme-secondary text-sm">Nenhuma certificação cadastrada ainda.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -333,12 +333,12 @@ function CertificacoesTab({ items, onSave, onDelete }: { items: Certification[];
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm";
+const inputCls = "w-full border border-theme rounded-xl px-3 py-2 text-sm";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-gray-500">{label}</label>
+      <label className="text-xs font-semibold text-theme-secondary">{label}</label>
       {children}
     </div>
   );
@@ -347,10 +347,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-gray-800">{title}</h2>
-          <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
+          <h2 className="font-bold text-theme-primary">{title}</h2>
+          <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>
         </div>
         {children}
       </div>
@@ -361,8 +361,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
-      <button type="submit" className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">Cancelar</button>
+      <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
     </div>
   );
 }

@@ -44,17 +44,17 @@ export default function PecuariaProfissional(props: Props) {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-gray-800">Pecuária Profissional</h1>
-        <p className="text-sm text-gray-500">Cadastro individual, reprodução, sanidade e produção leiteira.</p>
+        <h1 className="text-xl font-bold text-theme-primary">Pecuária Profissional</h1>
+        <p className="text-sm text-theme-secondary">Cadastro individual, reprodução, sanidade e produção leiteira.</p>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
-              tab === t.id ? 'bg-white text-[#2d6a4f] shadow-sm' : 'text-gray-500'
+              tab === t.id ? 'bg-theme-card text-[var(--primary)] shadow-sm' : 'text-theme-secondary'
             }`}
           >
             <t.icon size={14} /> {t.label}
@@ -145,14 +145,14 @@ function AnimaisTab({ animals, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Animal
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Brinco</th>
               <th className="text-left p-3">Nome</th>
@@ -163,29 +163,29 @@ function AnimaisTab({ animals, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {animals.map((a) => (
               <tr key={a.id}>
-                <td className="p-3 font-bold text-gray-700">{a.earTag}</td>
-                <td className="p-3 text-gray-600">{a.name || '—'}</td>
-                <td className="p-3 text-gray-600">{a.category}</td>
-                <td className="p-3 text-gray-600">{a.sex}</td>
-                <td className="p-3 text-gray-600">{a.lotGroup || '—'}</td>
+                <td className="p-3 font-bold text-theme-primary">{a.earTag}</td>
+                <td className="p-3 text-theme-secondary">{a.name || '—'}</td>
+                <td className="p-3 text-theme-secondary">{a.category}</td>
+                <td className="p-3 text-theme-secondary">{a.sex}</td>
+                <td className="p-3 text-theme-secondary">{a.lotGroup || '—'}</td>
                 <td className="p-3">
                   <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${
-                    a.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                    a.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-theme-secondary text-theme-secondary'
                   }`}>
                     {a.status === 'active' ? 'Ativo' : a.status === 'sold' ? 'Vendido' : 'Morto'}
                   </span>
                 </td>
                 <td className="p-3 flex gap-2 justify-end">
-                  <button onClick={() => openEdit(a)}><Edit3 size={14} className="text-gray-400" /></button>
+                  <button onClick={() => openEdit(a)}><Edit3 size={14} className="text-theme-secondary" /></button>
                   <button onClick={() => confirm('Excluir?') && onDelete(a.id)}><Trash2 size={14} className="text-red-400" /></button>
                 </td>
               </tr>
             ))}
             {animals.length === 0 && (
-              <tr><td colSpan={7} className="p-6 text-center text-gray-400 text-sm">Nenhum animal cadastrado individualmente ainda.</td></tr>
+              <tr><td colSpan={7} className="p-6 text-center text-theme-secondary text-sm">Nenhum animal cadastrado individualmente ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -304,14 +304,14 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Registro
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Data</th>
               <th className="text-left p-3">Animal</th>
@@ -320,13 +320,13 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {[...events].sort((a, b) => b.date.localeCompare(a.date)).map((ev) => (
               <tr key={ev.id}>
-                <td className="p-3 text-gray-600">{format(new Date(ev.date), 'dd/MM/yyyy')}</td>
-                <td className="p-3 font-bold text-gray-700">{ev.animalEarTag}</td>
-                <td className="p-3 text-gray-600">{ev.type}</td>
-                <td className="p-3 text-gray-500 text-xs">
+                <td className="p-3 text-theme-secondary">{format(new Date(ev.date), 'dd/MM/yyyy')}</td>
+                <td className="p-3 font-bold text-theme-primary">{ev.animalEarTag}</td>
+                <td className="p-3 text-theme-secondary">{ev.type}</td>
+                <td className="p-3 text-theme-secondary text-xs">
                   {ev.expectedBirthDate && `Previsão de parto: ${format(new Date(ev.expectedBirthDate), 'dd/MM/yyyy')}`}
                   {ev.pregnancyResult && `Resultado: ${ev.pregnancyResult}`}
                   {ev.offspringEarTag && `Cria: ${ev.offspringEarTag}`}
@@ -335,7 +335,7 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
               </tr>
             ))}
             {events.length === 0 && (
-              <tr><td colSpan={5} className="p-6 text-center text-gray-400 text-sm">Nenhum evento reprodutivo registrado ainda.</td></tr>
+              <tr><td colSpan={5} className="p-6 text-center text-theme-secondary text-sm">Nenhum evento reprodutivo registrado ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -395,7 +395,7 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
             )}
 
             {needsSire && (
-              <p className="text-xs text-gray-400">A previsão de parto é calculada automaticamente ({GESTACAO_BOVINA_DIAS} dias de gestação bovina).</p>
+              <p className="text-xs text-theme-secondary">A previsão de parto é calculada automaticamente ({GESTACAO_BOVINA_DIAS} dias de gestação bovina).</p>
             )}
 
             <SubmitRow onCancel={() => setIsOpen(false)} />
@@ -457,14 +457,14 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
       )}
 
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Registro
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Data</th>
               <th className="text-left p-3">Animal</th>
@@ -474,19 +474,19 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {[...events].sort((a, b) => b.date.localeCompare(a.date)).map((ev) => (
               <tr key={ev.id}>
-                <td className="p-3 text-gray-600">{format(new Date(ev.date), 'dd/MM/yyyy')}</td>
-                <td className="p-3 font-bold text-gray-700">{ev.animalEarTag}</td>
-                <td className="p-3 text-gray-600">{ev.type}</td>
-                <td className="p-3 text-gray-600">{ev.productName}</td>
-                <td className="p-3 text-gray-500">{ev.nextDoseDate ? format(new Date(ev.nextDoseDate), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3 text-theme-secondary">{format(new Date(ev.date), 'dd/MM/yyyy')}</td>
+                <td className="p-3 font-bold text-theme-primary">{ev.animalEarTag}</td>
+                <td className="p-3 text-theme-secondary">{ev.type}</td>
+                <td className="p-3 text-theme-secondary">{ev.productName}</td>
+                <td className="p-3 text-theme-secondary">{ev.nextDoseDate ? format(new Date(ev.nextDoseDate), 'dd/MM/yyyy') : '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(ev.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
             {events.length === 0 && (
-              <tr><td colSpan={6} className="p-6 text-center text-gray-400 text-sm">Nenhum registro de sanidade ainda.</td></tr>
+              <tr><td colSpan={6} className="p-6 text-center text-theme-secondary text-sm">Nenhum registro de sanidade ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -578,21 +578,21 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <div className="bg-white rounded-2xl border border-gray-200 p-4">
-          <p className="text-xs text-gray-400 uppercase font-bold">Total no mês</p>
-          <p className="text-2xl font-bold text-gray-800">{totalMes.toFixed(1)} L</p>
+        <div className="bg-theme-card rounded-2xl border border-theme p-4">
+          <p className="text-xs text-theme-secondary uppercase font-bold">Total no mês</p>
+          <p className="text-2xl font-bold text-theme-primary">{totalMes.toFixed(1)} L</p>
         </div>
       </div>
 
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Registro
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Data</th>
               <th className="text-left p-3">Animal/Lote</th>
@@ -603,20 +603,20 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {[...records].sort((a, b) => b.date.localeCompare(a.date)).map((r) => (
               <tr key={r.id}>
-                <td className="p-3 text-gray-600">{format(new Date(r.date), 'dd/MM/yyyy')}</td>
-                <td className="p-3 font-bold text-gray-700">{r.animalEarTag || r.lotGroup || '—'}</td>
-                <td className="p-3 text-gray-600 capitalize">{r.period}</td>
-                <td className="p-3 text-gray-600">{r.liters} L</td>
-                <td className="p-3 text-gray-500">{r.ccs ?? '—'}</td>
-                <td className="p-3 text-gray-500">{r.cbt ?? '—'}</td>
+                <td className="p-3 text-theme-secondary">{format(new Date(r.date), 'dd/MM/yyyy')}</td>
+                <td className="p-3 font-bold text-theme-primary">{r.animalEarTag || r.lotGroup || '—'}</td>
+                <td className="p-3 text-theme-secondary capitalize">{r.period}</td>
+                <td className="p-3 text-theme-secondary">{r.liters} L</td>
+                <td className="p-3 text-theme-secondary">{r.ccs ?? '—'}</td>
+                <td className="p-3 text-theme-secondary">{r.cbt ?? '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(r.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
             {records.length === 0 && (
-              <tr><td colSpan={7} className="p-6 text-center text-gray-400 text-sm">Nenhum registro de produção leiteira ainda.</td></tr>
+              <tr><td colSpan={7} className="p-6 text-center text-theme-secondary text-sm">Nenhum registro de produção leiteira ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -664,12 +664,12 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
 
 // ---------- Shared UI helpers ----------
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm";
+const inputCls = "w-full border border-theme rounded-xl px-3 py-2 text-sm";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-gray-500">{label}</label>
+      <label className="text-xs font-semibold text-theme-secondary">{label}</label>
       {children}
     </div>
   );
@@ -678,10 +678,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-gray-800">{title}</h2>
-          <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
+          <h2 className="font-bold text-theme-primary">{title}</h2>
+          <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>
         </div>
         {children}
       </div>
@@ -692,8 +692,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
-      <button type="submit" className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">Cancelar</button>
+      <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
     </div>
   );
 }

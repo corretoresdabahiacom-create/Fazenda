@@ -25,15 +25,15 @@ export default function Maquinas(props: Props) {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-gray-800">Máquinas Agrícolas</h1>
-        <p className="text-sm text-gray-500">Tratores, colheitadeiras, pulverizadores, caminhões — cadastro e manutenção.</p>
+        <h1 className="text-xl font-bold text-theme-primary">Máquinas Agrícolas</h1>
+        <p className="text-sm text-theme-secondary">Tratores, colheitadeiras, pulverizadores, caminhões — cadastro e manutenção.</p>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
-        <button onClick={() => setTab('cadastro')} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap ${tab === 'cadastro' ? 'bg-white text-[#2d6a4f] shadow-sm' : 'text-gray-500'}`}>
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
+        <button onClick={() => setTab('cadastro')} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap ${tab === 'cadastro' ? 'bg-theme-card text-[var(--primary)] shadow-sm' : 'text-theme-secondary'}`}>
           <Tractor size={14} /> Cadastro
         </button>
-        <button onClick={() => setTab('manutencao')} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap ${tab === 'manutencao' ? 'bg-white text-[#2d6a4f] shadow-sm' : 'text-gray-500'}`}>
+        <button onClick={() => setTab('manutencao')} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap ${tab === 'manutencao' ? 'bg-theme-card text-[var(--primary)] shadow-sm' : 'text-theme-secondary'}`}>
           <Wrench size={14} /> Manutenção
         </button>
       </div>
@@ -93,27 +93,27 @@ function CadastroTab({ machines, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Nova Máquina
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {machines.map((m) => (
-          <div key={m.id} className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1">
-            <span className="text-[10px] font-bold uppercase text-gray-400">{m.type}</span>
-            <h3 className="font-bold text-gray-800">{m.name}</h3>
-            {m.plate && <p className="text-xs text-gray-500">Placa: {m.plate}</p>}
-            {m.hourMeter != null && <p className="text-xs text-gray-500">Horímetro: {m.hourMeter}h</p>}
-            {m.fuelConsumption != null && <p className="text-xs text-gray-500">Consumo: {m.fuelConsumption} L/h</p>}
+          <div key={m.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1">
+            <span className="text-[10px] font-bold uppercase text-theme-secondary">{m.type}</span>
+            <h3 className="font-bold text-theme-primary">{m.name}</h3>
+            {m.plate && <p className="text-xs text-theme-secondary">Placa: {m.plate}</p>}
+            {m.hourMeter != null && <p className="text-xs text-theme-secondary">Horímetro: {m.hourMeter}h</p>}
+            {m.fuelConsumption != null && <p className="text-xs text-theme-secondary">Consumo: {m.fuelConsumption} L/h</p>}
             <div className="flex gap-2 pt-2">
-              <button onClick={() => openEdit(m)} className="text-xs font-semibold text-gray-500">Editar</button>
+              <button onClick={() => openEdit(m)} className="text-xs font-semibold text-theme-secondary">Editar</button>
               <button onClick={() => confirm('Excluir?') && onDelete(m.id)} className="text-xs font-semibold text-red-400 ml-auto flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
             </div>
           </div>
         ))}
         {machines.length === 0 && (
-          <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhuma máquina cadastrada ainda.</p>
+          <p className="text-sm text-theme-secondary col-span-full text-center py-8">Nenhuma máquina cadastrada ainda.</p>
         )}
       </div>
 
@@ -186,14 +186,14 @@ function ManutencaoTab({ records, machines, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Registro
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Data</th>
               <th className="text-left p-3">Máquina</th>
@@ -203,19 +203,19 @@ function ManutencaoTab({ records, machines, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {[...records].sort((a, b) => b.date.localeCompare(a.date)).map((r) => (
               <tr key={r.id}>
-                <td className="p-3 text-gray-600">{format(new Date(r.date), 'dd/MM/yyyy')}</td>
-                <td className="p-3 font-bold text-gray-700">{machineName(r.machineId)}</td>
-                <td className="p-3 text-gray-600">{r.type}</td>
-                <td className="p-3 text-gray-500">{r.description || '—'}</td>
-                <td className="p-3 text-gray-500">{r.cost != null ? `R$ ${r.cost.toFixed(2)}` : '—'}</td>
+                <td className="p-3 text-theme-secondary">{format(new Date(r.date), 'dd/MM/yyyy')}</td>
+                <td className="p-3 font-bold text-theme-primary">{machineName(r.machineId)}</td>
+                <td className="p-3 text-theme-secondary">{r.type}</td>
+                <td className="p-3 text-theme-secondary">{r.description || '—'}</td>
+                <td className="p-3 text-theme-secondary">{r.cost != null ? `R$ ${r.cost.toFixed(2)}` : '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(r.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
             {records.length === 0 && (
-              <tr><td colSpan={6} className="p-6 text-center text-gray-400 text-sm">Nenhum registro de manutenção ainda.</td></tr>
+              <tr><td colSpan={6} className="p-6 text-center text-theme-secondary text-sm">Nenhum registro de manutenção ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -262,12 +262,12 @@ function ManutencaoTab({ records, machines, onSave, onDelete }: {
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm";
+const inputCls = "w-full border border-theme rounded-xl px-3 py-2 text-sm";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-gray-500">{label}</label>
+      <label className="text-xs font-semibold text-theme-secondary">{label}</label>
       {children}
     </div>
   );
@@ -276,10 +276,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-gray-800">{title}</h2>
-          <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
+          <h2 className="font-bold text-theme-primary">{title}</h2>
+          <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>
         </div>
         {children}
       </div>
@@ -290,8 +290,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
-      <button type="submit" className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">Cancelar</button>
+      <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
     </div>
   );
 }

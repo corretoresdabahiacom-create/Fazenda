@@ -51,17 +51,17 @@ export default function Agricultura(props: Props) {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-gray-800">Agricultura</h1>
-        <p className="text-sm text-gray-500">Talhões, planejamento, caderno de campo, pragas e irrigação.</p>
+        <h1 className="text-xl font-bold text-theme-primary">Agricultura</h1>
+        <p className="text-sm text-theme-secondary">Talhões, planejamento, caderno de campo, pragas e irrigação.</p>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
-              tab === t.id ? 'bg-white text-[#2d6a4f] shadow-sm' : 'text-gray-500'
+              tab === t.id ? 'bg-theme-card text-[var(--primary)] shadow-sm' : 'text-theme-secondary'
             }`}
           >
             <t.icon size={14} /> {t.label}
@@ -152,29 +152,29 @@ function TalhoesTab({ talhoes, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Talhão
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {talhoes.map((t) => (
-          <div key={t.id} className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1">
+          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1">
             <div className="flex items-start justify-between">
-              <h3 className="font-bold text-gray-800">{t.name}</h3>
-              <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-500">{t.status}</span>
+              <h3 className="font-bold text-theme-primary">{t.name}</h3>
+              <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-theme-secondary text-theme-secondary">{t.status}</span>
             </div>
-            {t.currentCrop && <p className="text-sm text-gray-600">Cultura atual: {t.currentCrop}</p>}
-            {t.area != null && <p className="text-xs text-gray-500">{t.area} {t.areaUnit ?? AreaUnit.HECTARE}</p>}
-            {t.soilType && <p className="text-xs text-gray-500">Solo: {t.soilType}</p>}
+            {t.currentCrop && <p className="text-sm text-theme-secondary">Cultura atual: {t.currentCrop}</p>}
+            {t.area != null && <p className="text-xs text-theme-secondary">{t.area} {t.areaUnit ?? AreaUnit.HECTARE}</p>}
+            {t.soilType && <p className="text-xs text-theme-secondary">Solo: {t.soilType}</p>}
             <div className="flex gap-2 pt-2">
-              <button onClick={() => openEdit(t)} className="text-xs font-semibold text-gray-500">Editar</button>
+              <button onClick={() => openEdit(t)} className="text-xs font-semibold text-theme-secondary">Editar</button>
               <button onClick={() => confirm('Excluir?') && onDelete(t.id)} className="text-xs font-semibold text-red-400 ml-auto flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
             </div>
           </div>
         ))}
         {talhoes.length === 0 && (
-          <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhum talhão cadastrado ainda.</p>
+          <p className="text-sm text-theme-secondary col-span-full text-center py-8">Nenhum talhão cadastrado ainda.</p>
         )}
       </div>
 
@@ -254,14 +254,14 @@ function PlanejamentoTab({ cropPlans, talhoes, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Planejamento
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Cultura</th>
               <th className="text-left p-3">Talhão</th>
@@ -272,20 +272,20 @@ function PlanejamentoTab({ cropPlans, talhoes, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {cropPlans.map((c) => (
               <tr key={c.id}>
-                <td className="p-3 font-bold text-gray-700">{c.cultura}</td>
-                <td className="p-3 text-gray-600">{talhaoName(c.talhaoId)}</td>
-                <td className="p-3 text-gray-600">{c.safra || '—'}</td>
-                <td className="p-3 text-gray-500">{c.plantingDateEstimate ? format(new Date(c.plantingDateEstimate), 'dd/MM/yyyy') : '—'}</td>
-                <td className="p-3 text-gray-500">{c.harvestDateEstimate ? format(new Date(c.harvestDateEstimate), 'dd/MM/yyyy') : '—'}</td>
-                <td className="p-3"><span className="text-[10px] font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-600">{c.status}</span></td>
+                <td className="p-3 font-bold text-theme-primary">{c.cultura}</td>
+                <td className="p-3 text-theme-secondary">{talhaoName(c.talhaoId)}</td>
+                <td className="p-3 text-theme-secondary">{c.safra || '—'}</td>
+                <td className="p-3 text-theme-secondary">{c.plantingDateEstimate ? format(new Date(c.plantingDateEstimate), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3 text-theme-secondary">{c.harvestDateEstimate ? format(new Date(c.harvestDateEstimate), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3"><span className="text-[10px] font-bold px-2 py-1 rounded-full bg-theme-secondary text-theme-secondary">{c.status}</span></td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(c.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
             {cropPlans.length === 0 && (
-              <tr><td colSpan={7} className="p-6 text-center text-gray-400 text-sm">Nenhum planejamento cadastrado ainda.</td></tr>
+              <tr><td colSpan={7} className="p-6 text-center text-theme-secondary text-sm">Nenhum planejamento cadastrado ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -408,14 +408,14 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Registro
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Data</th>
               <th className="text-left p-3">Tipo</th>
@@ -426,20 +426,20 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {[...entries].sort((a, b) => b.date.localeCompare(a.date)).map((e) => (
               <tr key={e.id}>
-                <td className="p-3 text-gray-600">{format(new Date(e.date), 'dd/MM/yyyy')}</td>
-                <td className="p-3 font-bold text-gray-700">{e.type}</td>
-                <td className="p-3 text-gray-600">{talhaoName(e.talhaoId)}</td>
-                <td className="p-3 text-gray-500">{e.responsavel || '—'}</td>
-                <td className="p-3 text-gray-500">{e.product || '—'}{e.quantity ? ` (${e.quantity})` : ''}</td>
-                <td className="p-3 text-gray-400 text-xs">{e.gpsLat != null ? `${e.gpsLat.toFixed(4)}, ${e.gpsLng!.toFixed(4)}` : '—'}</td>
+                <td className="p-3 text-theme-secondary">{format(new Date(e.date), 'dd/MM/yyyy')}</td>
+                <td className="p-3 font-bold text-theme-primary">{e.type}</td>
+                <td className="p-3 text-theme-secondary">{talhaoName(e.talhaoId)}</td>
+                <td className="p-3 text-theme-secondary">{e.responsavel || '—'}</td>
+                <td className="p-3 text-theme-secondary">{e.product || '—'}{e.quantity ? ` (${e.quantity})` : ''}</td>
+                <td className="p-3 text-theme-secondary text-xs">{e.gpsLat != null ? `${e.gpsLat.toFixed(4)}, ${e.gpsLng!.toFixed(4)}` : '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(e.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
             {entries.length === 0 && (
-              <tr><td colSpan={7} className="p-6 text-center text-gray-400 text-sm">Nenhum registro no caderno de campo ainda.</td></tr>
+              <tr><td colSpan={7} className="p-6 text-center text-theme-secondary text-sm">Nenhum registro no caderno de campo ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -455,7 +455,7 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
             </Field>
 
             {checkingWeather && (
-              <p className="text-xs text-gray-400">Checando o clima de hoje para esse tipo de atividade...</p>
+              <p className="text-xs text-theme-secondary">Checando o clima de hoje para esse tipo de atividade...</p>
             )}
             {relevantAlerts.map((a) => (
               <div key={a.type} className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
@@ -490,11 +490,11 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
               </Field>
             </div>
             <div>
-              <button type="button" onClick={useMyLocation} className="text-xs font-semibold text-[#2d6a4f] underline">
+              <button type="button" onClick={useMyLocation} className="text-xs font-semibold text-[var(--primary)] underline">
                 Usar minha localização atual (GPS)
               </button>
               {form.gpsLat != null && (
-                <p className="text-xs text-gray-400 mt-1">{form.gpsLat.toFixed(5)}, {form.gpsLng!.toFixed(5)}</p>
+                <p className="text-xs text-theme-secondary mt-1">{form.gpsLat.toFixed(5)}, {form.gpsLng!.toFixed(5)}</p>
               )}
             </div>
             <SubmitRow onCancel={() => setIsOpen(false)} />
@@ -552,14 +552,14 @@ function PragasTab({ records, talhoes, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Registro
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Data</th>
               <th className="text-left p-3">Praga</th>
@@ -569,19 +569,19 @@ function PragasTab({ records, talhoes, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {[...records].sort((a, b) => b.date.localeCompare(a.date)).map((r) => (
               <tr key={r.id}>
-                <td className="p-3 text-gray-600">{format(new Date(r.date), 'dd/MM/yyyy')}</td>
-                <td className="p-3 font-bold text-gray-700">{r.pestType}</td>
-                <td className="p-3 text-gray-600">{talhaoName(r.talhaoId)}</td>
+                <td className="p-3 text-theme-secondary">{format(new Date(r.date), 'dd/MM/yyyy')}</td>
+                <td className="p-3 font-bold text-theme-primary">{r.pestType}</td>
+                <td className="p-3 text-theme-secondary">{talhaoName(r.talhaoId)}</td>
                 <td className="p-3"><span className={`text-[10px] font-bold px-2 py-1 rounded-full ${levelColor[r.infestationLevel]}`}>{r.infestationLevel}</span></td>
-                <td className="p-3 text-gray-500">{r.controlAction || '—'}</td>
+                <td className="p-3 text-theme-secondary">{r.controlAction || '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(r.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
             {records.length === 0 && (
-              <tr><td colSpan={6} className="p-6 text-center text-gray-400 text-sm">Nenhum registro de pragas ainda.</td></tr>
+              <tr><td colSpan={6} className="p-6 text-center text-theme-secondary text-sm">Nenhum registro de pragas ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -664,14 +664,14 @@ function IrrigacaoTab({ records, talhoes, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Registro
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">Data</th>
               <th className="text-left p-3">Método</th>
@@ -681,19 +681,19 @@ function IrrigacaoTab({ records, talhoes, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {[...records].sort((a, b) => b.date.localeCompare(a.date)).map((r) => (
               <tr key={r.id}>
-                <td className="p-3 text-gray-600">{format(new Date(r.date), 'dd/MM/yyyy')}</td>
-                <td className="p-3 font-bold text-gray-700">{r.method}</td>
-                <td className="p-3 text-gray-600">{talhaoName(r.talhaoId)}</td>
-                <td className="p-3 text-gray-500">{r.durationHours != null ? `${r.durationHours}h` : '—'}</td>
-                <td className="p-3 text-gray-500">{r.waterVolume != null ? `${r.waterVolume} L` : '—'}</td>
+                <td className="p-3 text-theme-secondary">{format(new Date(r.date), 'dd/MM/yyyy')}</td>
+                <td className="p-3 font-bold text-theme-primary">{r.method}</td>
+                <td className="p-3 text-theme-secondary">{talhaoName(r.talhaoId)}</td>
+                <td className="p-3 text-theme-secondary">{r.durationHours != null ? `${r.durationHours}h` : '—'}</td>
+                <td className="p-3 text-theme-secondary">{r.waterVolume != null ? `${r.waterVolume} L` : '—'}</td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(r.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
             {records.length === 0 && (
-              <tr><td colSpan={6} className="p-6 text-center text-gray-400 text-sm">Nenhum registro de irrigação ainda.</td></tr>
+              <tr><td colSpan={6} className="p-6 text-center text-theme-secondary text-sm">Nenhum registro de irrigação ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -736,12 +736,12 @@ function IrrigacaoTab({ records, talhoes, onSave, onDelete }: {
 
 // ---------- Shared UI helpers ----------
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm";
+const inputCls = "w-full border border-theme rounded-xl px-3 py-2 text-sm";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-gray-500">{label}</label>
+      <label className="text-xs font-semibold text-theme-secondary">{label}</label>
       {children}
     </div>
   );
@@ -750,10 +750,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-gray-800">{title}</h2>
-          <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
+          <h2 className="font-bold text-theme-primary">{title}</h2>
+          <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>
         </div>
         {children}
       </div>
@@ -764,8 +764,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
-      <button type="submit" className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">Cancelar</button>
+      <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
     </div>
   );
 }

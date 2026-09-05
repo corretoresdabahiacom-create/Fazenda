@@ -108,8 +108,8 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-gray-800">Documentos</h1>
-        <p className="text-sm text-gray-500">CAR, CCIR, ITR, contratos, licenças ambientais, receituários agronômicos.</p>
+        <h1 className="text-xl font-bold text-theme-primary">Documentos</h1>
+        <p className="text-sm text-theme-secondary">CAR, CCIR, ITR, contratos, licenças ambientais, receituários agronômicos.</p>
       </div>
 
       {expiringSoon.length > 0 && (
@@ -124,26 +124,26 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
       )}
 
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Documento
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {documents.map((d) => (
-          <div key={d.id} className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1">
+          <div key={d.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase text-gray-400">{d.category}</span>
-                <h3 className="font-bold text-gray-800">{d.title}</h3>
+                <span className="text-[10px] font-bold uppercase text-theme-secondary">{d.category}</span>
+                <h3 className="font-bold text-theme-primary">{d.title}</h3>
               </div>
-              <FileText size={18} className="text-gray-300 shrink-0" />
+              <FileText size={18} className="text-theme-secondary shrink-0" />
             </div>
-            {d.expirationDate && <p className="text-xs text-gray-500">Validade: {format(new Date(d.expirationDate), 'dd/MM/yyyy')}</p>}
-            {d.fileName && <p className="text-xs text-gray-400 truncate">{d.fileName}</p>}
+            {d.expirationDate && <p className="text-xs text-theme-secondary">Validade: {format(new Date(d.expirationDate), 'dd/MM/yyyy')}</p>}
+            {d.fileName && <p className="text-xs text-theme-secondary truncate">{d.fileName}</p>}
             <div className="flex gap-3 pt-2">
               {d.fileUrl && (
-                <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[#2d6a4f] flex items-center gap-1">
+                <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary)] flex items-center gap-1">
                   <Download size={12} /> Abrir arquivo
                 </a>
               )}
@@ -154,40 +154,40 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
           </div>
         ))}
         {documents.length === 0 && (
-          <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhum documento cadastrado ainda.</p>
+          <p className="text-sm text-theme-secondary col-span-full text-center py-8">Nenhum documento cadastrado ainda.</p>
         )}
       </div>
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+          <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-gray-800">Novo Documento</h2>
-              <button onClick={() => setIsOpen(false)}><X size={20} className="text-gray-400" /></button>
+              <h2 className="font-bold text-theme-primary">Novo Documento</h2>
+              <button onClick={() => setIsOpen(false)}><X size={20} className="text-theme-secondary" /></button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-gray-500">Categoria</label>
+                <label className="text-xs font-semibold text-theme-secondary">Categoria</label>
                 <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value as DocumentCategory })} className={inputCls}>
                   {Object.values(DocumentCategory).map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-500">Título</label>
+                <label className="text-xs font-semibold text-theme-secondary">Título</label>
                 <input value={form.title ?? ''} onChange={e => setForm({ ...form, title: e.target.value })} className={inputCls} placeholder="Ex: CAR Fazenda Terra Rica" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Data de emissão</label>
+                  <label className="text-xs font-semibold text-theme-secondary">Data de emissão</label>
                   <input type="date" value={form.issueDate ?? ''} onChange={e => setForm({ ...form, issueDate: e.target.value })} className={inputCls} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Validade</label>
+                  <label className="text-xs font-semibold text-theme-secondary">Validade</label>
                   <input type="date" value={form.expirationDate ?? ''} onChange={e => setForm({ ...form, expirationDate: e.target.value })} className={inputCls} />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
+                <label className="text-xs font-semibold text-theme-secondary flex items-center gap-1.5">
                   <Upload size={12} /> Arquivo (PDF ou imagem, opcional — máx. ~700KB)
                 </label>
                 <input
@@ -197,11 +197,11 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
                   className="w-full text-sm mt-1"
                 />
                 {file && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-theme-secondary mt-1">
                     {file.name} ({(file.size / 1024).toFixed(0)}KB){file.size > 650_000 && ' — pode ser grande demais'}
                   </p>
                 )}
-                <p className="text-[11px] text-gray-400 mt-1">
+                <p className="text-[11px] text-theme-secondary mt-1">
                   Fotos são comprimidas automaticamente. PDFs grandes podem não caber — nesse caso, tente uma versão menor ou tire uma foto do documento em vez de anexar o PDF original.
                 </p>
               </div>
@@ -209,10 +209,10 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
                 <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg p-2">{error}</p>
               )}
               <div className="flex gap-2 pt-2">
-                <button type="submit" disabled={uploading} className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-60">
+                <button type="submit" disabled={uploading} className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-60">
                   {uploading ? 'Enviando...' : 'Salvar'}
                 </button>
-                <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">
+                <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">
                   Cancelar
                 </button>
               </div>
@@ -224,4 +224,4 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm";
+const inputCls = "w-full border border-theme rounded-xl px-3 py-2 text-sm";

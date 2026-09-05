@@ -44,17 +44,17 @@ export default function Financeiro(props: Props) {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-gray-800">Financeiro</h1>
-        <p className="text-sm text-gray-500">Contas a pagar, contas a receber, centros de custo e fluxo de caixa.</p>
+        <h1 className="text-xl font-bold text-theme-primary">Financeiro</h1>
+        <p className="text-sm text-theme-secondary">Contas a pagar, contas a receber, centros de custo e fluxo de caixa.</p>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
-              tab === t.id ? 'bg-white text-[#2d6a4f] shadow-sm' : 'text-gray-500'
+              tab === t.id ? 'bg-theme-card text-[var(--primary)] shadow-sm' : 'text-theme-secondary'
             }`}
           >
             <t.icon size={14} /> {t.label}
@@ -132,20 +132,20 @@ function ContasTab({ kind, items, costCenters, onSave, onDelete }: {
 
   return (
     <div className="space-y-3">
-      <div className="bg-white rounded-2xl border border-gray-200 p-4">
-        <p className="text-xs text-gray-400 uppercase font-bold">Total {kind === 'pagar' ? 'a pagar' : 'a receber'}</p>
-        <p className="text-2xl font-bold text-gray-800">R$ {total.toFixed(2)}</p>
+      <div className="bg-theme-card rounded-2xl border border-theme p-4">
+        <p className="text-xs text-theme-secondary uppercase font-bold">Total {kind === 'pagar' ? 'a pagar' : 'a receber'}</p>
+        <p className="text-2xl font-bold text-theme-primary">R$ {total.toFixed(2)}</p>
       </div>
 
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Nova Conta
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+          <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
               <th className="text-left p-3">{dateLabel}</th>
               <th className="text-left p-3">Descrição</th>
@@ -155,19 +155,19 @@ function ContasTab({ kind, items, costCenters, onSave, onDelete }: {
               <th className="p-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-theme">
             {[...items].sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || '')).map((i) => (
               <tr key={i.id}>
-                <td className="p-3 text-gray-600">{i.dueDate ? format(new Date(i.dueDate), 'dd/MM/yyyy') : '—'}</td>
-                <td className="p-3 font-bold text-gray-700">{i.description}</td>
-                <td className="p-3 text-gray-600">{costCenterName(i.costCenterId)}</td>
-                <td className="p-3 text-gray-600">{i.value != null ? `R$ ${i.value.toFixed(2)}` : '—'}</td>
+                <td className="p-3 text-theme-secondary">{i.dueDate ? format(new Date(i.dueDate), 'dd/MM/yyyy') : '—'}</td>
+                <td className="p-3 font-bold text-theme-primary">{i.description}</td>
+                <td className="p-3 text-theme-secondary">{costCenterName(i.costCenterId)}</td>
+                <td className="p-3 text-theme-secondary">{i.value != null ? `R$ ${i.value.toFixed(2)}` : '—'}</td>
                 <td className="p-3"><span className={`text-[10px] font-bold px-2 py-1 rounded-full ${statusColor[i.status]}`}>{i.status}</span></td>
                 <td className="p-3 text-right"><button onClick={() => confirm('Excluir?') && onDelete(i.id)}><Trash2 size={14} className="text-red-400" /></button></td>
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td colSpan={6} className="p-6 text-center text-gray-400 text-sm">Nenhuma conta cadastrada ainda.</td></tr>
+              <tr><td colSpan={6} className="p-6 text-center text-theme-secondary text-sm">Nenhuma conta cadastrada ainda.</td></tr>
             )}
           </tbody>
         </table>
@@ -232,22 +232,22 @@ function CentrosTab({ costCenters, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button onClick={() => { setForm({ type: CostCenterType.GERAL }); setIsOpen(true); }} className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+        <button onClick={() => { setForm({ type: CostCenterType.GERAL }); setIsOpen(true); }} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
           <Plus size={18} /> Novo Centro de Custo
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {costCenters.map((c) => (
-          <div key={c.id} className="bg-white rounded-2xl border border-gray-200 p-4">
-            <span className="text-[10px] font-bold uppercase text-gray-400">{c.type}</span>
-            <h3 className="font-bold text-gray-800">{c.name}</h3>
-            {c.linkedRef && <p className="text-xs text-gray-500">{c.linkedRef}</p>}
+          <div key={c.id} className="bg-theme-card rounded-2xl border border-theme p-4">
+            <span className="text-[10px] font-bold uppercase text-theme-secondary">{c.type}</span>
+            <h3 className="font-bold text-theme-primary">{c.name}</h3>
+            {c.linkedRef && <p className="text-xs text-theme-secondary">{c.linkedRef}</p>}
             <button onClick={() => confirm('Excluir?') && onDelete(c.id)} className="text-xs font-semibold text-red-400 mt-2 flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
           </div>
         ))}
         {costCenters.length === 0 && (
-          <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhum centro de custo cadastrado ainda.</p>
+          <p className="text-sm text-theme-secondary col-span-full text-center py-8">Nenhum centro de custo cadastrado ainda.</p>
         )}
       </div>
 
@@ -282,19 +282,19 @@ function FluxoTab({ payable, receivable }: { payable: AccountPayable[]; receivab
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <div className="bg-white rounded-2xl border border-gray-200 p-4">
-        <p className="text-xs text-gray-400 uppercase font-bold">Total a receber</p>
+      <div className="bg-theme-card rounded-2xl border border-theme p-4">
+        <p className="text-xs text-theme-secondary uppercase font-bold">Total a receber</p>
         <p className="text-2xl font-bold text-green-600">R$ {totalReceber.toFixed(2)}</p>
       </div>
-      <div className="bg-white rounded-2xl border border-gray-200 p-4">
-        <p className="text-xs text-gray-400 uppercase font-bold">Total a pagar</p>
+      <div className="bg-theme-card rounded-2xl border border-theme p-4">
+        <p className="text-xs text-theme-secondary uppercase font-bold">Total a pagar</p>
         <p className="text-2xl font-bold text-red-500">R$ {totalPagar.toFixed(2)}</p>
       </div>
-      <div className="bg-white rounded-2xl border border-gray-200 p-4">
-        <p className="text-xs text-gray-400 uppercase font-bold">Saldo projetado</p>
+      <div className="bg-theme-card rounded-2xl border border-theme p-4">
+        <p className="text-xs text-theme-secondary uppercase font-bold">Saldo projetado</p>
         <p className={`text-2xl font-bold ${saldo >= 0 ? 'text-green-600' : 'text-red-500'}`}>R$ {saldo.toFixed(2)}</p>
       </div>
-      <p className="text-xs text-gray-400 col-span-full">
+      <p className="text-xs text-theme-secondary col-span-full">
         Calculado a partir de todas as contas a pagar e a receber cadastradas (independente da data ou status) — é uma projeção simples, não um extrato bancário real.
       </p>
     </div>
@@ -303,12 +303,12 @@ function FluxoTab({ payable, receivable }: { payable: AccountPayable[]; receivab
 
 // ---------- Shared UI helpers ----------
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm";
+const inputCls = "w-full border border-theme rounded-xl px-3 py-2 text-sm";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-gray-500">{label}</label>
+      <label className="text-xs font-semibold text-theme-secondary">{label}</label>
       {children}
     </div>
   );
@@ -317,10 +317,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-gray-800">{title}</h2>
-          <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
+          <h2 className="font-bold text-theme-primary">{title}</h2>
+          <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>
         </div>
         {children}
       </div>
@@ -331,8 +331,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
-      <button type="submit" className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">Cancelar</button>
+      <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
     </div>
   );
 }

@@ -260,10 +260,10 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-white">
+      <div className="h-screen w-full flex items-center justify-center bg-theme-card">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-[#2d6a4f]/20 border-t-[#2d6a4f] rounded-full animate-spin" />
-          <p className="text-[#2d6a4f] font-bold">Carregando Fazenda...</p>
+          <p className="text-[var(--primary)] font-bold">Carregando Fazenda...</p>
         </div>
       </div>
     );
@@ -290,20 +290,20 @@ export default function App() {
     };
 
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-white p-4">
+      <div className="min-h-screen w-full flex items-center justify-center bg-theme-card p-4">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 rounded-3xl border border-gray-200 shadow-xl max-w-md w-full my-8"
+          className="bg-theme-card p-8 rounded-3xl border border-theme shadow-xl max-w-md w-full my-8"
         >
-          <div className="w-20 h-20 bg-[#2d6a4f]/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Beef size={40} className="text-[#2d6a4f]" />
+          <div className="w-20 h-20 bg-[var(--primary)]/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <Beef size={40} className="text-[var(--primary)]" />
           </div>
           
-          <h1 className="font-serif italic font-bold text-3xl text-[#2d6a4f] mb-2 text-center">
+          <h1 className="font-serif italic font-bold text-3xl text-[var(--primary)] mb-2 text-center">
             {isRegistering ? 'Criar Nova Conta' : 'Fazenda Online'}
           </h1>
-          <p className="text-gray-600 mb-6 text-sm text-center">
+          <p className="text-theme-secondary mb-6 text-sm text-center">
             {isRegistering 
               ? 'Cadastre o seu e-mail para ter um espaço exclusivo de gestão inteligente de rebanhos e finanças.'
               : 'Gestão inteligente de rebanho e finanças para o produtor rural moderno.'}
@@ -342,19 +342,19 @@ export default function App() {
             className="space-y-4"
           >
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wider">E-MAIL</label>
+              <label className="block text-xs font-bold text-theme-secondary mb-1.5 uppercase tracking-wider">E-MAIL</label>
               <input
                 type="email"
                 required
                 placeholder="seu-email@fazenda.com.br"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent bg-white text-gray-900 text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-theme focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent bg-theme-card text-theme-primary text-sm"
               />
             </div>
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider">SENHA</label>
+                <label className="block text-xs font-bold text-theme-secondary uppercase tracking-wider">SENHA</label>
                 {!isRegistering && (
                   <button
                     type="button"
@@ -364,7 +364,7 @@ export default function App() {
                       setForgotEmail(email);
                       setIsForgotPasswordOpen(true);
                     }}
-                    className="text-xs text-[#2d6a4f] hover:underline font-bold"
+                    className="text-xs text-[var(--primary)] hover:underline font-bold"
                   >
                     Esqueceu a senha?
                   </button>
@@ -377,12 +377,12 @@ export default function App() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent bg-white text-gray-900 text-sm pr-16"
+                  className="w-full px-4 py-3 rounded-xl border border-theme focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent bg-theme-card text-theme-primary text-sm pr-16"
                 />
                 <button
                   type="button"
                   onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#2d6a4f] hover:text-[#1b4d3e]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--primary)] hover:text-[#1b4d3e]"
                 >
                   {isPasswordVisible ? "Ocultar" : "Mostrar"}
                 </button>
@@ -395,14 +395,14 @@ export default function App() {
                 type="checkbox"
                 checked={acceptedTerms}
                 onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#2d6a4f] focus:ring-[#2d6a4f] cursor-pointer"
+                className="mt-1 h-4 w-4 rounded border-theme text-[var(--primary)] focus:ring-[#2d6a4f] cursor-pointer"
               />
-              <label htmlFor="terms-checkbox" className="text-xs text-gray-600 leading-tight cursor-pointer select-none">
+              <label htmlFor="terms-checkbox" className="text-xs text-theme-secondary leading-tight cursor-pointer select-none">
                 Li e aceito expressamente os{' '}
                 <button
                   type="button"
                   onClick={() => setIsTermsOpen(true)}
-                  className="text-[#2d6a4f] hover:underline font-bold"
+                  className="text-[var(--primary)] hover:underline font-bold"
                 >
                   Termos e Condições de Uso
                 </button>
@@ -412,7 +412,7 @@ export default function App() {
             <button 
               type="submit"
               disabled={isLoggingIn}
-              className="w-full flex items-center justify-center gap-3 text-white py-3.5 px-6 mt-4 rounded-xl font-bold transition-all shadow-md active:scale-95 bg-[#2d6a4f] hover:bg-[#1b4d3e] disabled:opacity-60"
+              className="w-full flex items-center justify-center gap-3 text-white py-3.5 px-6 mt-4 rounded-xl font-bold transition-all shadow-md active:scale-95 bg-[var(--primary)] hover:bg-[var(--primary-hover)] disabled:opacity-60"
             >
               {isLoggingIn ? (
                 <>
@@ -434,7 +434,7 @@ export default function App() {
                 setIsRegistering(!isRegistering);
                 setLoginError(null);
               }}
-              className="text-xs text-[#2d6a4f] hover:underline font-bold"
+              className="text-xs text-[var(--primary)] hover:underline font-bold"
             >
               {isRegistering 
                 ? 'Já possui uma conta? Toque para Entrar' 
@@ -444,10 +444,10 @@ export default function App() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-theme"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500 font-semibold">Ou conecte por</span>
+              <span className="bg-theme-card px-2 text-theme-secondary font-semibold">Ou conecte por</span>
             </div>
           </div>
 
@@ -456,7 +456,7 @@ export default function App() {
               type="button"
               onClick={handleGoogleLoginClick}
               disabled={isLoggingIn}
-              className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-sm"
+              className="w-full flex items-center justify-center gap-3 bg-theme-card border border-theme hover:bg-theme-secondary text-theme-primary py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-sm"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -469,10 +469,10 @@ export default function App() {
 
             <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-dashed border-gray-200"></div>
+                <div className="w-full border-t border-dashed border-theme"></div>
               </div>
               <div className="relative flex justify-center text-[10px] uppercase">
-                <span className="bg-white px-2 text-gray-500 font-semibold">Sem Internet ou Testando?</span>
+                <span className="bg-theme-card px-2 text-theme-secondary font-semibold">Sem Internet ou Testando?</span>
               </div>
             </div>
 
@@ -485,7 +485,7 @@ export default function App() {
                 }
                 loginAsGuest();
               }}
-              className="w-full flex items-center justify-center gap-3 bg-[#2d6a4f]/10 border border-dashed border-[#2d6a4f]/50 hover:bg-[#2d6a4f]/20 text-[#2d6a4f] py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-xs cursor-pointer"
+              className="w-full flex items-center justify-center gap-3 bg-[var(--primary)]/10 border border-dashed border-[#2d6a4f]/50 hover:bg-[var(--primary)]/20 text-[var(--primary)] py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-xs cursor-pointer"
             >
               Entrar no Modo Convidado (Offline / Teste)
             </button>
@@ -499,19 +499,19 @@ export default function App() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white rounded-3xl border border-gray-200 shadow-2xl p-6 max-w-lg w-full max-h-[80vh] flex flex-col"
+                  className="bg-theme-card rounded-3xl border border-theme shadow-2xl p-6 max-w-lg w-full max-h-[80vh] flex flex-col"
                 >
-                  <h2 className="font-serif italic font-bold text-2xl text-[#2d6a4f] mb-4">Termos e Condições de Uso</h2>
-                  <div className="overflow-y-auto pr-2 space-y-4 text-xs text-gray-600 leading-relaxed flex-1">
-                    <p className="font-bold text-sm text-gray-900">CONTRATO DE ISENÇÃO DE RESPONSABILIDADE - FAZENDA ONLINE</p>
+                  <h2 className="font-serif italic font-bold text-2xl text-[var(--primary)] mb-4">Termos e Condições de Uso</h2>
+                  <div className="overflow-y-auto pr-2 space-y-4 text-xs text-theme-secondary leading-relaxed flex-1">
+                    <p className="font-bold text-sm text-theme-primary">CONTRATO DE ISENÇÃO DE RESPONSABILIDADE - FAZENDA ONLINE</p>
                     <p><strong>1. Isenção Geral de Responsabilidade:</strong> O Fazenda Online é oferecido aos usuários "como está" e "conforme disponível"...</p>
                     <p><strong>2. Exclusão Total de Responsabilidade por Perdas e Danos:</strong> Sob nenhuma hipótese os desenvolvedores serão responsabilizados...</p>
                     <p><strong>3. Responsabilidade do Produtor:</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência...</p>
                     <p><strong>4. Aceitação Vinculativa:</strong> Ao concordar eletronicamente com estes termos, você dá plena e irrevogável quitação...</p>
                   </div>
-                  <div className="mt-6 flex gap-3 pt-3 border-t border-gray-200">
-                    <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs">Aceitar Termos</button>
-                    <button onClick={() => setIsTermsOpen(false)} className="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-xl font-semibold transition-all text-xs">Fechar</button>
+                  <div className="mt-6 flex gap-3 pt-3 border-t border-theme">
+                    <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs">Aceitar Termos</button>
+                    <button onClick={() => setIsTermsOpen(false)} className="flex-1 border border-theme hover:bg-theme-secondary text-theme-primary py-2.5 px-4 rounded-xl font-semibold transition-all text-xs">Fechar</button>
                   </div>
                 </motion.div>
               </div>
@@ -526,10 +526,10 @@ export default function App() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white rounded-3xl border border-gray-200 shadow-2xl p-6 max-w-sm w-full"
+                  className="bg-theme-card rounded-3xl border border-theme shadow-2xl p-6 max-w-sm w-full"
                 >
-                  <h2 className="font-serif italic font-bold text-xl text-[#2d6a4f] mb-2">Recuperar Senha</h2>
-                  <p className="text-gray-600 text-xs mb-4">Escreva o seu endereço de e-mail cadastrado. Enviaremos as instruções de redefinição de senha para você.</p>
+                  <h2 className="font-serif italic font-bold text-xl text-[var(--primary)] mb-2">Recuperar Senha</h2>
+                  <p className="text-theme-secondary text-xs mb-4">Escreva o seu endereço de e-mail cadastrado. Enviaremos as instruções de redefinição de senha para você.</p>
                   {forgotError && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl">{forgotError}</div>}
                   {forgotSuccess && <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-800 text-xs rounded-xl font-medium">{forgotSuccess}</div>}
                   <form onSubmit={async (e) => {
@@ -548,12 +548,12 @@ export default function App() {
                     }
                   }} className="space-y-4">
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-600 mb-1 uppercase tracking-wider">E-mail Cadastrado</label>
-                      <input type="email" required placeholder="seu-email@fazenda.com.br" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent bg-white text-gray-900 text-xs" />
+                      <label className="block text-[10px] font-bold text-theme-secondary mb-1 uppercase tracking-wider">E-mail Cadastrado</label>
+                      <input type="email" required placeholder="seu-email@fazenda.com.br" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-theme focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent bg-theme-card text-theme-primary text-xs" />
                     </div>
                     <div className="flex gap-2 pt-2">
-                      <button type="submit" disabled={isSendingReset} className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2 px-4 rounded-xl font-bold transition-all text-xs disabled:opacity-50">{isSendingReset ? 'Enviando...' : 'Enviar Link'}</button>
-                      <button type="button" onClick={() => { setIsForgotPasswordOpen(false); setForgotSuccess(null); setForgotError(null); }} className="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-xl font-semibold transition-all text-xs">Cancelar</button>
+                      <button type="submit" disabled={isSendingReset} className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2 px-4 rounded-xl font-bold transition-all text-xs disabled:opacity-50">{isSendingReset ? 'Enviando...' : 'Enviar Link'}</button>
+                      <button type="button" onClick={() => { setIsForgotPasswordOpen(false); setForgotSuccess(null); setForgotError(null); }} className="flex-1 border border-theme hover:bg-theme-secondary text-theme-primary py-2 px-4 rounded-xl font-semibold transition-all text-xs">Cancelar</button>
                     </div>
                   </form>
                 </motion.div>
@@ -693,7 +693,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden">
+    <div className="flex h-screen bg-theme-card overflow-hidden">
       {/* Sidebar Overlay */}
       <AnimatePresence>
         {isMobile && isSidebarOpen && (
@@ -871,7 +871,7 @@ export default function App() {
         {/* Permission Restriction Banner */}
         {userRole === 'user' && (
           <div className="mx-4 md:mx-6 mt-3 mb-2">
-            <div className="relative overflow-hidden rounded-xl bg-white border border-amber-200 shadow-sm">
+            <div className="relative overflow-hidden rounded-xl bg-theme-card border border-amber-200 shadow-sm">
               <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-amber-500"></div>
               
               <div className="pl-4 pr-4 py-3 md:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -887,19 +887,19 @@ export default function App() {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-bold text-amber-700">Acesso Limitado</span>
-                      <span className="hidden sm:inline text-gray-300 text-xs">•</span>
-                      <span className="text-[11px] text-gray-500">Modo de visualização ativo</span>
+                      <span className="hidden sm:inline text-theme-secondary text-xs">•</span>
+                      <span className="text-[11px] text-theme-secondary">Modo de visualização ativo</span>
                     </div>
-                    <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                    <p className="text-xs text-theme-secondary mt-0.5 leading-relaxed">
                       Edições, adições e exclusões de registros estão desativadas neste perfil.
                     </p>
                   </div>
                 </div>
                 
                 <div className="flex-shrink-0">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#2d6a4f]"></div>
-                    <span className="text-[9px] font-semibold text-gray-600 uppercase tracking-wider">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-theme-secondary rounded-full">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]"></div>
+                    <span className="text-[9px] font-semibold text-theme-secondary uppercase tracking-wider">
                       Somente Leitura
                     </span>
                   </div>
@@ -921,7 +921,7 @@ export default function App() {
                 onClick={() => setIsObligationsOpen(true)}
               >
                 <div className="flex items-center gap-2">
-                  <div className="p-0.5 bg-white/20 rounded-lg animate-pulse">
+                  <div className="p-0.5 bg-theme-card/20 rounded-lg animate-pulse">
                     <Bell size={12} className="text-white" />
                   </div>
                   <span className="text-[11px] sm:text-xs">
@@ -939,7 +939,7 @@ export default function App() {
                 onClick={() => setIsObligationsOpen(true)}
               >
                 <div className="flex items-center gap-2">
-                  <div className="p-0.5 bg-white/30 rounded-lg">
+                  <div className="p-0.5 bg-theme-card/30 rounded-lg">
                     <Bell size={12} className="text-amber-950" />
                   </div>
                   <span className="text-[11px] sm:text-xs">

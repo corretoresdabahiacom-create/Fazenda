@@ -251,7 +251,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-12">
-      <div className="bg-white p-8 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-6">
+      <div className="bg-theme-card p-8 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-6">
         <h3 className="text-xl font-bold flex items-center gap-2 text-[#3d5a45]">
           <Building2 size={24} /> Configurações da Fazenda
         </h3>
@@ -316,7 +316,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div 
               onClick={() => setIsWeatherModalOpen(true)}
-              className="bg-white p-4 rounded-xl border border-[#e5e0d8] shadow-sm cursor-pointer hover:border-[#3d5a45] hover:shadow-md transition-all active:scale-95 group relative overflow-hidden"
+              className="bg-theme-card p-4 rounded-xl border border-[#e5e0d8] shadow-sm cursor-pointer hover:border-[#3d5a45] hover:shadow-md transition-all active:scale-95 group relative overflow-hidden"
               title="Clique para ver a previsão dos próximos 15 dias"
             >
               <div className="text-[10px] uppercase font-bold text-[#8d8a86] mb-1">Precipitação</div>
@@ -331,7 +331,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
 
             <div 
               onClick={() => setIsWeatherModalOpen(true)}
-              className="bg-white p-4 rounded-xl border border-[#e5e0d8] shadow-sm cursor-pointer hover:border-[#3d5a45] hover:shadow-md transition-all active:scale-95 group relative overflow-hidden"
+              className="bg-theme-card p-4 rounded-xl border border-[#e5e0d8] shadow-sm cursor-pointer hover:border-[#3d5a45] hover:shadow-md transition-all active:scale-95 group relative overflow-hidden"
               title="Clique para ver a previsão dos próximos 15 dias"
             >
               <div className="text-[10px] uppercase font-bold text-[#8d8a86] mb-1">Temperatura Média</div>
@@ -438,7 +438,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
               <div className="bg-[#3d5a45] text-white p-6 relative">
                 <button 
                   onClick={() => setIsWeatherModalOpen(false)}
-                  className="absolute right-4 top-4 text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                  className="absolute right-4 top-4 text-white/80 hover:text-white p-1 rounded-full hover:bg-theme-card/10 transition-colors cursor-pointer"
                 >
                   <X size={20} />
                 </button>
@@ -457,7 +457,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
                   {weatherData.forecast.map((day, idx) => (
                     <div 
                       key={idx} 
-                      className="bg-white p-3 rounded-2xl border border-[#e5e0d8] text-center flex flex-col justify-between shadow-xs hover:border-[#3d5a45]/30 hover:shadow-xs transition-shadow"
+                      className="bg-theme-card p-3 rounded-2xl border border-[#e5e0d8] text-center flex flex-col justify-between shadow-xs hover:border-[#3d5a45]/30 hover:shadow-xs transition-shadow"
                     >
                       <div>
                         <div className="text-[10px] font-black uppercase text-[#8d8a86]">
@@ -487,7 +487,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
                   ))}
                 </div>
 
-                <div className="bg-white p-4 rounded-2xl border border-[#e5e0d8] text-center md:flex items-center justify-between gap-4">
+                <div className="bg-theme-card p-4 rounded-2xl border border-[#e5e0d8] text-center md:flex items-center justify-between gap-4">
                   <div className="text-left">
                     <span className="text-[10px] uppercase font-bold text-[#3d5a45] block">Capacidade Estimativa</span>
                     <p className="text-[11px] text-[#6d6a66] font-medium max-w-md leading-relaxed">

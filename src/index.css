@@ -46,13 +46,15 @@
 }
 
 /* ===== CLASSES DE TEMA ===== */
-.text-theme-primary { color: var(--text-primary) !important; }
-.text-theme-secondary { color: var(--text-secondary) !important; }
-.text-theme-tertiary { color: var(--text-tertiary) !important; }
-.bg-theme-card { background-color: var(--bg-card) !important; }
-.bg-theme-secondary { background-color: var(--bg-secondary) !important; }
-.border-theme { border-color: var(--border-color) !important; }
-.shadow-theme { box-shadow: var(--shadow) !important; }
+/* @utility (em vez de classe simples) permite usar hover:/focus: etc
+   normalmente, ex: hover:bg-theme-secondary. */
+@utility text-theme-primary { color: var(--text-primary); }
+@utility text-theme-secondary { color: var(--text-secondary); }
+@utility text-theme-tertiary { color: var(--text-tertiary); }
+@utility bg-theme-card { background-color: var(--bg-card); }
+@utility bg-theme-secondary { background-color: var(--bg-secondary); }
+@utility border-theme { border-color: var(--border-color); }
+@utility shadow-theme { box-shadow: var(--shadow); }
 
 /* ===== BOTÕES PADRONIZADOS ===== */
 .btn-primary {

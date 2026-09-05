@@ -67,19 +67,19 @@ export default function ModulosResumo({
 
   return (
     <div className="mt-6">
-      <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Outros módulos</h2>
+      <h2 className="text-sm font-bold text-theme-secondary uppercase tracking-wide mb-3">Outros módulos</h2>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {cards.map((c) => (
           <button
             key={c.label}
             onClick={() => onNavigate?.(c.view)}
-            className="bg-white rounded-2xl border border-gray-200 p-4 text-left hover:border-gray-300 transition-colors"
+            className="bg-theme-card rounded-2xl border border-theme p-4 text-left hover:border-theme transition-colors"
           >
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2 ${c.color}`}>
               <c.icon size={16} />
             </div>
-            <p className="text-lg font-bold text-gray-800">{c.value}</p>
-            <p className="text-[11px] text-gray-500">{c.sub}</p>
+            <p className="text-lg font-bold text-theme-primary">{c.value}</p>
+            <p className="text-[11px] text-theme-secondary">{c.sub}</p>
           </button>
         ))}
       </div>

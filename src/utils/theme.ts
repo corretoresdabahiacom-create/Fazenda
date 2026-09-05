@@ -5,13 +5,13 @@ export const getThemeStyles = () => {
   const isDark = document.documentElement.classList.contains('dark');
   
   return {
-    textPrimary: isDark ? '#e9ecef' : '#212529',
-    textSecondary: isDark ? '#ced4da' : '#495057',
-    textTertiary: isDark ? '#adb5bd' : '#6c757d',
-    bgCard: isDark ? '#1e1e1e' : '#ffffff',
-    bgSecondary: isDark ? '#1e1e1e' : '#f8f9fa',
-    borderColor: isDark ? '#2d2d2d' : '#dee2e6',
-    primary: isDark ? '#52b788' : '#2d6a4f',
+    textPrimary: isDark ? '#f2f5f0' : '#212529',
+    textSecondary: isDark ? '#9db5a6' : '#495057',
+    textTertiary: isDark ? '#9db5a6' : '#6c757d',
+    bgCard: isDark ? '#16301f' : '#ffffff',
+    bgSecondary: isDark ? '#1c3a26' : '#f8f9fa',
+    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#dee2e6',
+    primary: isDark ? '#4caf6e' : '#2d6a4f',
   };
 };
 

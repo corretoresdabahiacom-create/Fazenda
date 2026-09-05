@@ -79,12 +79,12 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-800">Gestão de Propriedades</h1>
-          <p className="text-sm text-gray-500">Fazendas, sítios, chácaras, arrendamentos e parcerias.</p>
+          <h1 className="text-xl font-bold text-theme-primary">Gestão de Propriedades</h1>
+          <p className="text-sm text-theme-secondary">Fazendas, sítios, chácaras, arrendamentos e parcerias.</p>
         </div>
         <button
           onClick={openNew}
-          className="flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white px-4 py-2 rounded-xl font-semibold text-sm transition-all"
+          className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm transition-all"
         >
           <Plus size={18} /> Nova Propriedade
         </button>
@@ -97,40 +97,40 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
             <div
               key={p.id}
               className={`rounded-2xl border p-4 space-y-2 transition-all ${
-                isActive ? 'border-[#2d6a4f] ring-2 ring-[#2d6a4f]/20 bg-[#2d6a4f]/5' : 'border-gray-200 bg-white'
+                isActive ? 'border-[#2d6a4f] ring-2 ring-[#2d6a4f]/20 bg-[var(--primary)]/5' : 'border-theme bg-theme-card'
               }`}
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">{p.type}</span>
-                  <h3 className="font-bold text-gray-800">{p.name}</h3>
+                  <span className="text-[10px] font-bold uppercase tracking-wide text-theme-secondary">{p.type}</span>
+                  <h3 className="font-bold text-theme-primary">{p.name}</h3>
                 </div>
                 {isActive && (
-                  <span className="text-[10px] font-bold text-[#2d6a4f] bg-[#2d6a4f]/10 px-2 py-1 rounded-full">
+                  <span className="text-[10px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 px-2 py-1 rounded-full">
                     Ativa
                   </span>
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-600">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-theme-secondary">
                 {p.areaTotal != null && (
                   <div className="flex items-center gap-1">
-                    <Ruler size={12} className="text-gray-400" /> {p.areaTotal} {p.areaUnit ?? AreaUnit.HECTARE} total
+                    <Ruler size={12} className="text-theme-secondary" /> {p.areaTotal} {p.areaUnit ?? AreaUnit.HECTARE} total
                   </div>
                 )}
                 {p.areaProdutiva != null && (
                   <div className="flex items-center gap-1">
-                    <Leaf size={12} className="text-gray-400" /> {p.areaProdutiva} {p.areaUnit ?? AreaUnit.HECTARE} produtiva
+                    <Leaf size={12} className="text-theme-secondary" /> {p.areaProdutiva} {p.areaUnit ?? AreaUnit.HECTARE} produtiva
                   </div>
                 )}
                 {p.reservaLegal != null && (
                   <div className="flex items-center gap-1">
-                    <ShieldCheck size={12} className="text-gray-400" /> {p.reservaLegal} {p.areaUnit ?? AreaUnit.HECTARE} reserva legal
+                    <ShieldCheck size={12} className="text-theme-secondary" /> {p.reservaLegal} {p.areaUnit ?? AreaUnit.HECTARE} reserva legal
                   </div>
                 )}
                 {p.car && (
                   <div className="flex items-center gap-1 col-span-2">
-                    <FileText size={12} className="text-gray-400" /> CAR: {p.car}
+                    <FileText size={12} className="text-theme-secondary" /> CAR: {p.car}
                   </div>
                 )}
               </div>
@@ -139,14 +139,14 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                 {!isActive && (
                   <button
                     onClick={() => onSetActive(p.id)}
-                    className="flex items-center gap-1 text-xs font-semibold text-[#2d6a4f] hover:underline"
+                    className="flex items-center gap-1 text-xs font-semibold text-[var(--primary)] hover:underline"
                   >
                     <MapPinned size={14} /> Usar esta
                   </button>
                 )}
                 <button
                   onClick={() => openEdit(p)}
-                  className="flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-gray-700 ml-auto"
+                  className="flex items-center gap-1 text-xs font-semibold text-theme-secondary hover:text-theme-primary ml-auto"
                 >
                   <Edit3 size={14} />
                 </button>
@@ -164,33 +164,33 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
 
       {isFormOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+          <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-gray-800">{editing ? 'Editar Propriedade' : 'Nova Propriedade'}</h2>
+              <h2 className="font-bold text-theme-primary">{editing ? 'Editar Propriedade' : 'Nova Propriedade'}</h2>
               <button onClick={() => setIsFormOpen(false)}>
-                <X size={20} className="text-gray-400" />
+                <X size={20} className="text-theme-secondary" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-gray-500">Nome *</label>
+                <label className="text-xs font-semibold text-theme-secondary">Nome *</label>
                 <input
                   required
                   value={formData.name ?? ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                   placeholder="Ex: Fazenda Terra Rica"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500">Tipo *</label>
+                <label className="text-xs font-semibold text-theme-secondary">Tipo *</label>
                 <select
                   required
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as PropertyType })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                 >
                   {Object.values(PropertyType).map((t) => (
                     <option key={t} value={t}>{t}</option>
@@ -200,21 +200,21 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
 
               {(formData.type === PropertyType.PARCEIRO || formData.type === PropertyType.ARRENDAMENTO) && (
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Nome do parceiro/arrendante</label>
+                  <label className="text-xs font-semibold text-theme-secondary">Nome do parceiro/arrendante</label>
                   <input
                     value={formData.partnerName ?? ''}
                     onChange={(e) => setFormData({ ...formData, partnerName: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                   />
                 </div>
               )}
 
               <div>
-                <label className="text-xs font-semibold text-gray-500">Unidade de medida de área</label>
+                <label className="text-xs font-semibold text-theme-secondary">Unidade de medida de área</label>
                 <select
                   value={formData.areaUnit ?? AreaUnit.HECTARE}
                   onChange={(e) => setFormData({ ...formData, areaUnit: e.target.value as AreaUnit })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                 >
                   {Object.values(AreaUnit).map((u) => (
                     <option key={u} value={u}>{u}</option>
@@ -224,55 +224,55 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Área total</label>
+                  <label className="text-xs font-semibold text-theme-secondary">Área total</label>
                   <input
                     type="number" step="0.01"
                     value={formData.areaTotal ?? ''}
                     onChange={(e) => setFormData({ ...formData, areaTotal: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Área produtiva</label>
+                  <label className="text-xs font-semibold text-theme-secondary">Área produtiva</label>
                   <input
                     type="number" step="0.01"
                     value={formData.areaProdutiva ?? ''}
                     onChange={(e) => setFormData({ ...formData, areaProdutiva: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Área preservada</label>
+                  <label className="text-xs font-semibold text-theme-secondary">Área preservada</label>
                   <input
                     type="number" step="0.01"
                     value={formData.areaPreservada ?? ''}
                     onChange={(e) => setFormData({ ...formData, areaPreservada: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500">Reserva legal</label>
+                  <label className="text-xs font-semibold text-theme-secondary">Reserva legal</label>
                   <input
                     type="number" step="0.01"
                     value={formData.reservaLegal ?? ''}
                     onChange={(e) => setFormData({ ...formData, reservaLegal: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500">CAR (Cadastro Ambiental Rural)</label>
+                <label className="text-xs font-semibold text-theme-secondary">CAR (Cadastro Ambiental Rural)</label>
                 <input
                   value={formData.car ?? ''}
                   onChange={(e) => setFormData({ ...formData, car: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
                   placeholder="BA-0000000-XXXX.XXXX.XXXX.XXXX.XXXX"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
+                <label className="text-xs font-semibold text-theme-secondary flex items-center gap-1.5">
                   <MapPinned size={12} /> Localização (usada para alertas de clima)
                 </label>
                 <button
@@ -287,22 +287,22 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                       () => { /* silencioso: localização é opcional, não bloqueia o cadastro */ },
                     );
                   }}
-                  className="text-xs font-semibold text-[#2d6a4f] underline mt-1"
+                  className="text-xs font-semibold text-[var(--primary)] underline mt-1"
                 >
                   Usar minha localização atual (GPS)
                 </button>
                 {formData.location && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-theme-secondary mt-1">
                     {formData.location.lat.toFixed(5)}, {formData.location.lng.toFixed(5)}
                   </p>
                 )}
               </div>
 
               <div className="flex gap-2 pt-2">
-                <button type="submit" className="flex-1 bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white py-2.5 rounded-xl font-bold text-sm">
+                <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">
                   Salvar
                 </button>
-                <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">
+                <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">
                   Cancelar
                 </button>
               </div>

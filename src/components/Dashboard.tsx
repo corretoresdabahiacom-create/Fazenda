@@ -330,7 +330,7 @@ export default function Dashboard({
                   </span>
                 )}
                 {suggestion?.category && (
-                  <span className="text-[9px] uppercase bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-semibold">
+                  <span className="text-[9px] uppercase bg-theme-secondary text-theme-primary px-2 py-0.5 rounded-full font-semibold">
                     {suggestion.category}
                   </span>
                 )}
@@ -338,9 +338,9 @@ export default function Dashboard({
               
               {loadingSuggestion ? (
                 <div className="space-y-2 py-1">
-                  <div className="h-4 bg-gray-200 rounded-md w-1/3 animate-pulse" />
-                  <div className="h-3 bg-gray-200 rounded-md w-full animate-pulse" />
-                  <div className="h-3 bg-gray-200 rounded-md w-3/4 animate-pulse" />
+                  <div className="h-4 bg-theme-secondary rounded-md w-1/3 animate-pulse" />
+                  <div className="h-3 bg-theme-secondary rounded-md w-full animate-pulse" />
+                  <div className="h-3 bg-theme-secondary rounded-md w-3/4 animate-pulse" />
                 </div>
               ) : suggestionError ? (
                 <div>
@@ -383,7 +383,7 @@ export default function Dashboard({
           onClick={() => onNavigate?.('animals-scan')}
           className="btn-primary flex items-center gap-4 p-4 sm:p-6 rounded-3xl text-left group"
         >
-          <div className="bg-white/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
+          <div className="bg-theme-card/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
              <Scan size={24} />
           </div>
           <div className="text-left flex-1">
@@ -456,7 +456,7 @@ export default function Dashboard({
                     <p className="text-[10px] text-theme-secondary mt-0.5 truncate">{alert.description}</p>
                     <p className="text-[9px] text-theme-secondary font-mono mt-1 uppercase">Prazo: {alert.dueDate.split('-').reverse().join('/')}</p>
                   </div>
-                  <span className={`text-[8px] uppercase font-black px-2 py-0.5 rounded-full bg-white border shrink-0 ${textStyle}`}>
+                  <span className={`text-[8px] uppercase font-black px-2 py-0.5 rounded-full bg-theme-card border shrink-0 ${textStyle}`}>
                     {alertBadge}
                   </span>
                 </div>

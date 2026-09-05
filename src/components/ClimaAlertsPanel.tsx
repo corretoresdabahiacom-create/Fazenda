@@ -38,11 +38,11 @@ export default function ClimaAlertsPanel({ activeProperty }: { activeProperty: P
 
   if (!activeProperty?.location) {
     return (
-      <div className="mt-6 bg-white rounded-2xl border border-dashed border-gray-300 p-4">
-        <p className="text-sm font-bold text-gray-500 flex items-center gap-1.5">
+      <div className="mt-6 bg-theme-card rounded-2xl border border-dashed border-theme p-4">
+        <p className="text-sm font-bold text-theme-secondary flex items-center gap-1.5">
           <CloudRain size={16} /> Alertas Climáticos
         </p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-theme-secondary mt-1">
           Cadastre a localização da propriedade (em Propriedades → Editar → "Usar minha localização atual") para
           ativar os alertas de clima que influenciam pulverização, aplicação aérea e bem-estar animal.
         </p>
@@ -52,16 +52,16 @@ export default function ClimaAlertsPanel({ activeProperty }: { activeProperty: P
 
   if (loading) {
     return (
-      <div className="mt-6 bg-white rounded-2xl border border-gray-200 p-4">
-        <p className="text-sm text-gray-400">Buscando previsão do tempo...</p>
+      <div className="mt-6 bg-theme-card rounded-2xl border border-theme p-4">
+        <p className="text-sm text-theme-secondary">Buscando previsão do tempo...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mt-6 bg-white rounded-2xl border border-gray-200 p-4">
-        <p className="text-sm text-gray-400">{error}</p>
+      <div className="mt-6 bg-theme-card rounded-2xl border border-theme p-4">
+        <p className="text-sm text-theme-secondary">{error}</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function ClimaAlertsPanel({ activeProperty }: { activeProperty: P
 
   return (
     <div className="mt-6">
-      <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+      <h2 className="text-sm font-bold text-theme-secondary uppercase tracking-wide mb-3 flex items-center gap-1.5">
         <CloudRain size={16} /> Alertas Climáticos — hoje
       </h2>
       {snapshot.alerts.length === 0 ? (

@@ -184,7 +184,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
       case 'vacation':
         return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-bold text-[10px] uppercase border border-blue-200">Em Férias</span>;
       case 'inactive':
-        return <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full font-bold text-[10px] uppercase border border-gray-200">Inativo</span>;
+        return <span className="px-3 py-1 bg-theme-secondary text-theme-secondary rounded-full font-bold text-[10px] uppercase border border-theme">Inativo</span>;
       default:
         return null;
     }
@@ -217,7 +217,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder={activeTab === 'colaboradores' ? "Pesquisar por colaborador..." : "Pesquisar por pagamentos..."}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -266,7 +266,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Employee List Grid */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="bg-white rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
+            <div className="bg-theme-card rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -334,7 +334,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           {/* Details / History Column */}
           <div className="lg:col-span-1">
             {selectedEmployee ? (
-              <div className="bg-white border border-[#e5e0d8] rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden">
+              <div className="bg-theme-card border border-[#e5e0d8] rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 h-2 w-full bg-[#3d5a45]"></div>
                 
                 <div className="flex justify-between items-start">
@@ -452,7 +452,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
+          <div className="bg-theme-card rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -522,7 +522,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-2">
@@ -563,7 +563,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Função / Cargo</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-theme-card font-medium"
                     value={employeeFormData.role}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, role: e.target.value as EmployeeRole})}
                   >
@@ -587,7 +587,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Status Atual</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-theme-card font-medium"
                     value={employeeFormData.status}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, status: e.target.value as Employee['status']})}
                   >
@@ -614,7 +614,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                   <label className="text-xs font-bold uppercase text-orange-850 mb-1 block">Data do Aviso Prévio</label>
                   <input 
                     type="date" 
-                    className="w-full px-4 py-2 border border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500/25 focus:outline-none bg-white"
+                    className="w-full px-4 py-2 border border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500/25 focus:outline-none bg-theme-card"
                     value={employeeFormData.noticeDate || ''}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, noticeDate: e.target.value})}
                   />
@@ -648,7 +648,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-theme-card w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-2">
@@ -678,7 +678,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Colaborador</label>
                   {employees.length > 0 ? (
                     <select 
-                      className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-bold"
+                      className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-theme-card font-bold"
                       value={paymentFormData.employeeName}
                       onChange={(e) => {
                         const selectedEmp = employees.find(emp => emp.name === e.target.value);
@@ -721,7 +721,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <div className="col-span-1">
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Tipo de Pagamento</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-theme-card font-medium"
                     value={paymentFormData.paymentType}
                     onChange={(e) => setPaymentFormData({...paymentFormData, paymentType: e.target.value as PaymentType})}
                   >

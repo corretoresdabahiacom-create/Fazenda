@@ -92,10 +92,10 @@ export default function ConsultorRuralIA({
   return (
     <div className="p-4 md:p-6 space-y-4 flex flex-col h-full">
       <div>
-        <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-          <Sparkles className="text-[#2d6a4f]" size={20} /> Consultor Rural IA
+        <h1 className="text-xl font-bold text-theme-primary flex items-center gap-2">
+          <Sparkles className="text-[var(--primary)]" size={20} /> Consultor Rural IA
         </h1>
-        <p className="text-sm text-gray-500">Pergunte sobre clima, financeiro, talhões ou rebanho — a resposta usa os dados reais já cadastrados na sua fazenda (sem depender de nenhuma IA externa).</p>
+        <p className="text-sm text-theme-secondary">Pergunte sobre clima, financeiro, talhões ou rebanho — a resposta usa os dados reais já cadastrados na sua fazenda (sem depender de nenhuma IA externa).</p>
       </div>
 
       {messages.length === 0 && (
@@ -104,7 +104,7 @@ export default function ConsultorRuralIA({
             <button
               key={s}
               onClick={() => handleAsk(s)}
-              className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-full"
+              className="text-xs bg-theme-secondary hover:bg-theme-secondary text-theme-secondary px-3 py-2 rounded-full"
             >
               {s}
             </button>
@@ -117,12 +117,12 @@ export default function ConsultorRuralIA({
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
-                m.role === 'user' ? 'bg-[#2d6a4f] text-white' : 'bg-white border border-gray-200 text-gray-700'
+                m.role === 'user' ? 'bg-[var(--primary)] text-white' : 'bg-theme-card border border-theme text-theme-primary'
               }`}
             >
               <p className="whitespace-pre-wrap">{m.text}</p>
               {m.role === 'assistant' && m.basedOnRealData != null && (
-                <p className={`text-[10px] mt-2 flex items-center gap-1 ${m.basedOnRealData ? 'text-green-600' : 'text-gray-400'}`}>
+                <p className={`text-[10px] mt-2 flex items-center gap-1 ${m.basedOnRealData ? 'text-green-600' : 'text-theme-secondary'}`}>
                   {m.basedOnRealData ? <CheckCircle2 size={10} /> : <Info size={10} />}
                   {m.basedOnRealData ? 'Baseado em dados reais da sua fazenda' : 'Orientação geral (sem dado específico suficiente)'}
                 </p>
@@ -132,7 +132,7 @@ export default function ConsultorRuralIA({
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-gray-200 rounded-2xl px-4 py-2.5 flex items-center gap-2 text-sm text-gray-400">
+            <div className="bg-theme-card border border-theme rounded-2xl px-4 py-2.5 flex items-center gap-2 text-sm text-theme-secondary">
               <Loader2 size={14} className="animate-spin" /> Consultando...
             </div>
           </div>
@@ -147,12 +147,12 @@ export default function ConsultorRuralIA({
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ex: posso plantar milho semana que vem?"
-          className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/20"
+          className="flex-1 border border-theme rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/20"
         />
         <button
           type="submit"
           disabled={loading || !question.trim()}
-          className="bg-[#2d6a4f] hover:bg-[#1b4d3e] text-white rounded-xl px-4 py-2.5 disabled:opacity-50"
+          className="bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-xl px-4 py-2.5 disabled:opacity-50"
         >
           <Send size={16} />
         </button>

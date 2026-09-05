@@ -79,7 +79,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-y-0 right-0 w-full max-w-md bg-white border-l border-[#e5e0d8] shadow-2xl z-50 flex flex-col pointer-events-auto"
+            className="fixed inset-y-0 right-0 w-full max-w-md bg-theme-card border-l border-[#e5e0d8] shadow-2xl z-50 flex flex-col pointer-events-auto"
           >
             {/* Header */}
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
@@ -196,7 +196,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
                     badgeClasses = 'bg-amber-100 text-amber-800 border border-amber-200';
                     badgeText = 'VENCE HOJE!';
                   } else {
-                    cardClasses = 'border-l-4 border-l-[#3d5a45] border border-[#e5e0d8] bg-white hover:border-[#3d5a45]/30 transition-all shadow-sm';
+                    cardClasses = 'border-l-4 border-l-[#3d5a45] border border-[#e5e0d8] bg-theme-card hover:border-[#3d5a45]/30 transition-all shadow-sm';
                     badgeClasses = 'bg-[#3d5a45]/10 text-[#3d5a45] border border-[#3d5a45]/20';
                     badgeText = `Vence em ${alert.daysRemaining} ${alert.daysRemaining === 1 ? 'dia' : 'dias'}`;
                   }
@@ -229,7 +229,7 @@ export default function ObligationsDrawer({ isOpen, onClose, alerts, onMarkConcl
 
                       {/* Info layout */}
                       <div className="flex gap-3">
-                        <div className="p-2.5 rounded-xl bg-white border border-[#e5e0d8] text-[#3d5a45] h-fit self-start shadow-inner">
+                        <div className="p-2.5 rounded-xl bg-theme-card border border-[#e5e0d8] text-[#3d5a45] h-fit self-start shadow-inner">
                           {alert.type === 'task' ? (
                             <Calendar size={18} />
                           ) : (
