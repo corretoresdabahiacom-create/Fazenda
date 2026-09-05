@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles } from 'lucide-react';
+, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -567,6 +567,7 @@ export default function App() {
 
   const navItems = [
     { id: 'dashboard', label: 'Painel', icon: LayoutDashboard },
+    { id: 'clima', label: 'Clima Agora', icon: CloudSun },
     { id: 'properties', label: 'Propriedades', icon: Building2 },
     { id: 'pecuaria-pro', label: 'Pecuária Profissional', icon: Stethoscope },
     { id: 'agricultura', label: 'Agricultura', icon: Wheat },
@@ -590,6 +591,19 @@ export default function App() {
 
   const renderView = () => {
     switch (activeView) {
+      case 'clima':
+        return (
+          <iframe
+            title="Clima Agora"
+            src="https://climaagorav2.pages.dev"
+            className="w-full h-full border-0"
+            style={{ minHeight: 'calc(100vh - 64px)' }}
+            // allow: geolocalização precisa exigir isso explicitamente dentro
+            // de um iframe, senão o navegador bloqueia o pedido de
+            // localização do ClimaAgora mesmo que o usuário autorize.
+            allow="geolocation"
+          />
+        );
       case 'dashboard': 
         return (
           <Dashboard 
@@ -700,16 +714,17 @@ export default function App() {
           width: isSidebarOpen ? (isMobile ? 280 : 260) : (isMobile ? 0 : 80),
           x: isMobile && !isSidebarOpen ? -280 : 0
         }}
-        className={`bg-white border-r border-gray-200 flex flex-col z-40 shadow-sm ${
+        className={`bg-theme-card border-r border-theme flex flex-col z-40 shadow-theme ${
           isMobile ? 'fixed inset-y-0 left-0' : 'relative'
         }`}
       >
-        <div className="p-5 flex items-center justify-between border-b border-gray-200">
+        <div className="p-5 flex items-center justify-between border-b border-theme">
           {(isSidebarOpen || !isMobile) && (
             <motion.h1 
               initial={false}
               animate={{ opacity: isSidebarOpen ? 1 : 0 }}
-              className="font-serif italic font-bold text-xl text-[#2d6a4f] whitespace-nowrap"
+              className="font-serif italic font-bold text-xl whitespace-nowrap"
+              style={{ color: 'var(--primary)' }}
             >
               Fazenda Online
             </motion.h1>
@@ -717,7 +732,7 @@ export default function App() {
           {!isMobile && (
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+              className="p-1.5 bg-theme-secondary rounded-lg transition-colors text-theme-secondary"
             >
               {isSidebarOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -725,7 +740,7 @@ export default function App() {
           {isMobile && isSidebarOpen && (
             <button 
               onClick={() => setIsSidebarOpen(false)}
-              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+              className="p-1.5 bg-theme-secondary rounded-lg transition-colors text-theme-secondary"
             >
               <X size={18} />
             </button>
@@ -739,13 +754,14 @@ export default function App() {
               onClick={() => handleViewChange(item.id as View)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
                 activeView === item.id 
-                  ? 'bg-[#2d6a4f] text-white shadow-md' 
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'text-white shadow-md' 
+                  : 'text-theme-secondary bg-theme-card hover:bg-theme-secondary'
               }`}
+              style={activeView === item.id ? { background: 'var(--primary)' } : undefined}
             >
-              <item.icon size={19} className={activeView === item.id ? 'text-white' : 'text-gray-500'} />
+              <item.icon size={19} className={activeView === item.id ? 'text-white' : 'text-theme-secondary'} />
               {(isSidebarOpen || isMobile) && (
-                <span className={`font-medium text-sm ${activeView === item.id ? 'text-white' : 'text-gray-700'}`}>
+                <span className={`font-medium text-sm ${activeView === item.id ? 'text-white' : 'text-theme-secondary'}`}>
                   {item.label}
                 </span>
               )}
@@ -753,10 +769,10 @@ export default function App() {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-theme">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-theme-secondary hover:bg-red-950/30 hover:text-red-400 transition-colors"
           >
             <LogOut size={19} />
             {(isSidebarOpen || isMobile) && <span className="font-medium text-sm">Sair</span>}
@@ -765,15 +781,15 @@ export default function App() {
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gray-50">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden relative" style={{ background: 'var(--bg-primary)' }}>
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
+        <header className="sticky top-0 z-10 bg-theme-card border-b border-theme shadow-theme">
           <div className="px-4 md:px-6 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               {isMobile && (
                 <button 
                   onClick={() => setIsSidebarOpen(true)}
-                  className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700"
+                  className="p-2 -ml-2 bg-theme-secondary rounded-lg transition-colors text-theme-secondary"
                 >
                   <Menu size={20} />
                 </button>
@@ -782,27 +798,28 @@ export default function App() {
               {activeView !== 'dashboard' && (
                 <button 
                   onClick={() => setActiveView('dashboard')}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#2d6a4f]/10 text-[#2d6a4f] rounded-full hover:bg-[#2d6a4f]/20 transition-all group"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all group"
+                  style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}
                 >
                   <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
                   <span className="text-xs font-bold">Voltar</span>
                 </button>
               )}
 
-              <h2 className="text-base md:text-lg font-bold text-gray-800 capitalize truncate max-w-[120px] sm:max-w-none">
+              <h2 className="text-base md:text-lg font-bold text-theme-primary capitalize truncate max-w-[120px] sm:max-w-none">
                 {navItems.find(n => n.id === activeView)?.label}
               </h2>
 
               {properties.length > 0 && (
                 properties.length === 1 ? (
-                  <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
+                  <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-theme-secondary text-theme-secondary rounded-full text-xs font-semibold">
                     <Building2 size={12} /> {properties[0].name}
                   </span>
                 ) : (
                   <select
                     value={activePropertyId ?? ''}
                     onChange={(e) => setActivePropertyId(e.target.value)}
-                    className="hidden sm:block bg-gray-100 text-gray-700 text-xs font-semibold rounded-full px-3 py-1.5 border-0 focus:ring-2 focus:ring-[#2d6a4f]"
+                    className="hidden sm:block bg-theme-secondary text-theme-secondary text-xs font-semibold rounded-full px-3 py-1.5 border-0"
                     title="Propriedade ativa"
                   >
                     {properties.map((p) => (
@@ -815,8 +832,8 @@ export default function App() {
             
             <div className="flex items-center gap-1 sm:gap-2">
               {/* Date */}
-              <div className="hidden lg:flex items-center bg-gray-100 px-3 py-1.5 rounded-full">
-                <span className="text-xs font-mono text-gray-600 font-medium">
+              <div className="hidden lg:flex items-center bg-theme-secondary px-3 py-1.5 rounded-full">
+                <span className="text-xs font-mono text-theme-secondary font-medium">
                   {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </span>
               </div>
@@ -824,7 +841,7 @@ export default function App() {
               {/* Obligations Bell */}
               <button 
                 onClick={() => setIsObligationsOpen(true)}
-                className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600"
+                className="relative p-2 rounded-full bg-theme-secondary transition-colors text-theme-secondary"
                 title="Central de Obrigações"
               >
                 <Bell size={20} />
@@ -841,7 +858,8 @@ export default function App() {
               {/* Settings Button */}
               <button 
                 onClick={() => setActiveView('settings')}
-                className={`p-2 rounded-full transition-colors hover:bg-gray-100 ${activeView === 'settings' ? 'bg-[#2d6a4f]/10 text-[#2d6a4f]' : 'text-gray-600'}`}
+                className={`p-2 rounded-full transition-colors bg-theme-secondary ${activeView === 'settings' ? '' : 'text-theme-secondary'}`}
+                style={activeView === 'settings' ? { background: 'var(--primary-soft)', color: 'var(--primary)' } : undefined}
                 title="Configurações"
               >
                 <Settings size={20} />
@@ -934,7 +952,7 @@ export default function App() {
           </AnimatePresence>
         )}
 
-        <div className="p-4 md:p-6">
+        <div className={activeView === 'clima' ? '' : 'p-4 md:p-6'}>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
@@ -942,6 +960,7 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
+              className={activeView === 'clima' ? 'h-full' : ''}
             >
               {renderView()}
             </motion.div>

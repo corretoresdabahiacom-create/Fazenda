@@ -4,7 +4,9 @@ import { Sun, Moon } from 'lucide-react';
 export default function ThemeToggle() {
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
-    return saved === 'dark';
+    // Padrão agora é escuro (visual do AgroGestor) — só fica claro se o
+    // usuário já tinha escolhido explicitamente "light" antes.
+    return saved !== 'light';
   });
 
   useEffect(() => {

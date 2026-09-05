@@ -27,21 +27,21 @@
 }
 
 .dark {
-  --primary: #52b788;
-  --primary-dark: #40916c;
-  --primary-light: #74c69d;
-  --primary-soft: #1b4332;
-  --primary-hover: #40916c;
-  
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #141414;
-  --bg-tertiary: #1a1a1a;
-  --bg-card: #141414;
-  --text-primary: #ffffff;
-  --text-secondary: #e0e0e0;
-  --text-tertiary: #b0b0b0;
+  --primary: #4caf6e;
+  --primary-dark: #3d8f58;
+  --primary-light: #4caf6e;
+  --primary-soft: #16301f;
+  --primary-hover: #3d8f58;
+
+  --bg-primary: #10231a;
+  --bg-secondary: #16301f;
+  --bg-tertiary: #1c3a26;
+  --bg-card: #16301f;
+  --text-primary: #f2f5f0;
+  --text-secondary: #9db5a6;
+  --text-tertiary: #9db5a6;
   --text-on-primary: #ffffff;
-  --border-color: #2a2a2a;
+  --border-color: rgba(255, 255, 255, 0.08);
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
