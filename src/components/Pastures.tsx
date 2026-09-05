@@ -189,7 +189,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
       </AnimatePresence>
 
       {settings.farmName && (
-        <div className="bg-theme-card p-4 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-wrap items-center gap-6">
+        <div className="bg-white p-4 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-wrap items-center gap-6">
           <div className="flex items-center gap-3 pr-6 border-r border-[#e5e0d8]">
             <div className="bg-[#3d5a45]/10 p-2 rounded-xl">
               <MapIcon className="text-[#3d5a45]" size={20} />
@@ -239,7 +239,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           <input 
             type="text" 
             placeholder="Pesquisar pastos..." 
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -278,7 +278,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
             <motion.div 
               key={pasture.id}
               layout
-              className="bg-theme-card rounded-3xl border border-[#e5e0d8] shadow-sm hover:border-[#3d5a45]/40 transition-colors flex flex-col justify-between overflow-hidden"
+              className="bg-white rounded-3xl border border-[#e5e0d8] shadow-sm hover:border-[#3d5a45]/40 transition-colors flex flex-col justify-between overflow-hidden"
             >
               <div className="p-6 space-y-4">
                 <div className="flex justify-between items-start">
@@ -391,7 +391,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-3">
@@ -460,7 +460,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Finalidade do Pasto</label>
                   <select 
                     required
-                    className="w-full px-4 py-2 bg-theme-card border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                    className="w-full px-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
                     value={formData.purpose || 'engorda'}
                     onChange={(e) => setFormData({...formData, purpose: e.target.value as any})}
                   >
@@ -508,7 +508,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div>
                     <label className="text-[9px] font-bold uppercase text-[#8d8a86] mb-1 block">Loteamento Previsto</label>
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-bold text-slate-800 focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                       value={estimatorParams.animalCategory}
                       onChange={(e) => setEstimatorParams({...estimatorParams, animalCategory: e.target.value})}
                     >
@@ -522,7 +522,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div>
                     <label className="text-[9px] font-bold uppercase text-[#8d8a86] mb-1 block">Objetivo Produtivo</label>
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-bold text-slate-800 focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
                       value={estimatorParams.objective}
                       onChange={(e) => setEstimatorParams({...estimatorParams, objective: e.target.value})}
                     >
@@ -546,7 +546,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 </div>
 
                 {capacityJustification && (
-                  <div className="p-3 bg-theme-card border border-[#e5e0d8] rounded-xl text-[10px] text-[#3d5a45] font-medium leading-tight select-none">
+                  <div className="p-3 bg-white border border-[#e5e0d8] rounded-xl text-[10px] text-[#3d5a45] font-medium leading-tight select-none">
                     <p className="flex items-start gap-1"><AlertCircle size={12} className="text-[#3d5a45] shrink-0 mt-0.5" /> {capacityJustification}</p>
                   </div>
                 )}

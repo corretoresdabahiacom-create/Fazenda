@@ -123,7 +123,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
             <motion.div 
               key={task.id}
               layout
-              className={`bg-theme-card p-5 rounded-3xl border transition-all flex items-start gap-4 hover:border-[#3d5a45]/30 group relative ${
+              className={`bg-white p-5 rounded-3xl border transition-all flex items-start gap-4 hover:border-[#3d5a45]/30 group relative ${
                 task.completed ? 'opacity-55 border-transparent shadow-none bg-neutral-50/50' : 'border-[#e5e0d8] shadow-sm'
               }`}
             >
@@ -207,7 +207,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-theme-card w-full max-w-md rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] bg-[#fcfaf7] flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -271,7 +271,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Prioridade</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-theme-card font-medium"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-white font-medium"
                     value={formData.priority}
                     onChange={(e) => setFormData({...formData, priority: e.target.value as any})}
                   >
@@ -287,7 +287,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Designar Colaborador</label>
                   {employees && employees.length > 0 ? (
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-theme-card font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
+                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
                       value={formData.assignedTo || ''}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
                     >

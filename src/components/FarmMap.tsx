@@ -276,7 +276,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
   return (
     <div className="space-y-6">
       {/* Upper controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-theme-card border border-[#e5e0d8] rounded-3xl shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-white border border-[#e5e0d8] rounded-3xl shadow-sm">
         <div>
           <h1 className="font-serif italic font-bold text-3xl text-[#3d5a45] flex items-center gap-2">
             <MapIcon size={28} className="text-[#3d5a45] shrink-0" /> Mapa Interativo da Fazenda
@@ -292,7 +292,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
             onClick={() => setActiveSeason('aguas')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
               activeSeason === 'aguas' 
-                ? 'bg-theme-card text-[#3d5a45] shadow-sm border border-[#e5e0d8]' 
+                ? 'bg-white text-[#3d5a45] shadow-sm border border-[#e5e0d8]' 
                 : 'text-[#6c6964] hover:bg-[#ebe8e2]'
             }`}
           >
@@ -304,7 +304,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
             onClick={() => setActiveSeason('seca')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
               activeSeason === 'seca' 
-                ? 'bg-theme-card text-[#3d5a45] shadow-sm border border-[#e5e0d8]' 
+                ? 'bg-white text-[#3d5a45] shadow-sm border border-[#e5e0d8]' 
                 : 'text-[#6c6964] hover:bg-[#ebe8e2]'
             }`}
           >
@@ -318,7 +318,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
         {/* Left Side menu - pastures positioning queue & quick stats */}
         <div className="xl:col-span-1 space-y-6 flex flex-col">
           {/* Quick pasture creator/numeration directly on map */}
-          <div className="bg-theme-card border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
+          <div className="bg-white border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
             <h2 className="text-sm font-bold text-[#3d5a45] uppercase tracking-wider flex items-center gap-1.5">
               <Plus size={18} className="text-[#3d5a45]" /> Numerar Pasto no Mapa
             </h2>
@@ -344,7 +344,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     type="text"
                     required
                     placeholder="Ex: 5, P-10..."
-                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs font-bold focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-theme-card"
+                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs font-bold focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-white"
                     value={newDirectNumber}
                     onChange={(e) => setNewDirectNumber(e.target.value)}
                   />
@@ -354,7 +354,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   <input
                     type="text"
                     placeholder="Ex: Reserva, Beira-Rio..."
-                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-theme-card"
+                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-white"
                     value={newDirectName}
                     onChange={(e) => setNewDirectName(e.target.value)}
                   />
@@ -392,7 +392,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
           </div>
 
           {/* Occurrence Registration Card */}
-          <div className="bg-theme-card border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
+          <div className="bg-white border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
             <h2 className="text-sm font-bold text-[#3d5a45] uppercase tracking-wider flex items-center gap-1.5">
               <span className="text-[#3d5a45]">📍</span> Pin de Ocorrência
             </h2>
@@ -415,7 +415,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                 <div>
                   <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Tipo de Ocorrência</label>
                   <select
-                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs font-bold focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-theme-card"
+                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs font-bold focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-white"
                     value={occType}
                     onChange={(e) => setOccType(e.target.value as any)}
                   >
@@ -432,7 +432,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     type="text"
                     required
                     placeholder="Ex: Cerca caída, Nascente assoreada..."
-                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs font-bold focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-theme-card"
+                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs font-bold focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-white"
                     value={occTitle}
                     onChange={(e) => setOccTitle(e.target.value)}
                   />
@@ -443,7 +443,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   <textarea
                     placeholder="Descreva o que precisa ser feito..."
                     rows={2}
-                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-theme-card font-sans"
+                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-xs focus:ring-1 focus:ring-[#3d5a45] focus:outline-none bg-white font-sans"
                     value={occDescription}
                     onChange={(e) => setOccDescription(e.target.value)}
                   />
@@ -481,7 +481,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
           </div>
 
           {/* Unmapped list */}
-          <div className="bg-theme-card border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
+          <div className="bg-white border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#f5f2ed]">
               <h2 className="text-sm font-bold text-[#3d5a45] uppercase tracking-wider flex items-center gap-2">
                 <Layers size={16} /> Pastos Pendentes ({unmappedPastures.length})
@@ -512,7 +512,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                       <div className="flex items-center gap-1.5">
                         <span className={`text-[10px] font-black uppercase px-1.5 py-0.5 rounded ${
                           positioningPastureId === pasture.id 
-                            ? 'bg-theme-card/20 text-white' 
+                            ? 'bg-white/20 text-white' 
                             : 'bg-[#e5e0d8] text-[#5e5a56]'
                         }`}>
                           {pasture.number}
@@ -528,7 +528,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                       onClick={() => setPositioningPastureId(positioningPastureId === pasture.id ? null : pasture.id)}
                       className={`text-[10px] font-bold px-3 py-1.5 rounded-lg border transition-all ${
                         positioningPastureId === pasture.id
-                          ? 'bg-theme-card text-[#3d5a45] border-white font-black'
+                          ? 'bg-white text-[#3d5a45] border-white font-black'
                           : 'btn-outline py-1.5 px-3 text-[10px]'
                       }`}
                     >
@@ -541,7 +541,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
           </div>
 
           {/* Farm Map Settings Card */}
-          <div className="bg-theme-card border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
+          <div className="bg-white border border-[#e5e0d8] rounded-3xl p-5 shadow-sm space-y-4">
             <h2 className="text-sm font-bold text-[#3d5a45] uppercase tracking-wider flex items-center gap-2">
               <Settings2 size={16} /> Fundo do Mapa
             </h2>
@@ -597,7 +597,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
         </div>
 
         {/* Center/Right Map View container */}
-        <div className="xl:col-span-3 bg-theme-card border border-[#e5e0d8] rounded-3xl p-4 shadow-sm flex flex-col justify-between min-h-[600px] relative overflow-hidden">
+        <div className="xl:col-span-3 bg-white border border-[#e5e0d8] rounded-3xl p-4 shadow-sm flex flex-col justify-between min-h-[600px] relative overflow-hidden">
           {/* Header instructions for state machines */}
           <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#f5f2ed]">
             <div className="flex items-center gap-2">
@@ -731,9 +731,9 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     }}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-lg border-2 ${pinBg} ${pinBorder} cursor-pointer text-white text-xs font-black select-none whitespace-nowrap`}
                   >
-                    <span className="flex h-2 w-2 rounded-full bg-theme-card relative">
+                    <span className="flex h-2 w-2 rounded-full bg-white relative">
                       {!isOverstocked && (
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-theme-card opacity-75"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                       )}
                     </span>
                     <span>Pasto {pasture.number}</span>
@@ -743,7 +743,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   </div>
 
                   {/* Coordinate connection visual pin-leg */}
-                  <div className="w-[2px] h-[10px] bg-theme-card opacity-90 mx-auto -mt-[2px] shadow-sm" />
+                  <div className="w-[2px] h-[10px] bg-white opacity-90 mx-auto -mt-[2px] shadow-sm" />
                   <div className="w-1.5 h-1.5 rounded-full bg-black/40 mx-auto -mt-[3px]" />
                 </motion.div>
               );
@@ -782,7 +782,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     <span className="max-w-[100px] truncate">{occ.title}</span>
                   </div>
                   {/* Pin leg */}
-                  <div className="w-[1.5px] h-[8px] bg-theme-card opacity-90 mx-auto -mt-[1px] shadow-sm" />
+                  <div className="w-[1.5px] h-[8px] bg-white opacity-90 mx-auto -mt-[1px] shadow-sm" />
                   <div className="w-1 h-1 rounded-full bg-black/40 mx-auto -mt-[2px]" />
                 </motion.div>
               );
@@ -821,22 +821,22 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-theme-card rounded-3xl border border-[#e5e0d8] shadow-2xl max-w-lg w-full overflow-hidden text-left"
+              className="bg-white rounded-3xl border border-[#e5e0d8] shadow-2xl max-w-lg w-full overflow-hidden text-left"
             >
               {/* Header Colored based on purpose - usando verde escuro padrão */}
               <div className="p-6 text-white relative bg-gradient-to-r from-[#3d5a45] to-[#2d4a3a]">
                 <button
                   onClick={() => setSelectedPasture(null)}
-                  className="absolute right-4 top-4 text-white/80 hover:text-white bg-theme-card/10 hover:bg-theme-card/20 p-1.5 rounded-xl transition-all"
+                  className="absolute right-4 top-4 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-xl transition-all"
                 >
                   <X size={18} />
                 </button>
 
                 <div className="flex items-center gap-2">
-                  <span className="bg-theme-card/20 text-[11px] font-black tracking-widest px-2 py-0.5 rounded uppercase">
+                  <span className="bg-white/20 text-[11px] font-black tracking-widest px-2 py-0.5 rounded uppercase">
                     Pasto {selectedPasture.number}
                   </span>
-                  <span className="text-[11.5px] uppercase font-bold tracking-wider bg-theme-card/20 px-2 py-0.5 rounded">
+                  <span className="text-[11.5px] uppercase font-bold tracking-wider bg-white/20 px-2 py-0.5 rounded">
                     {selectedPasture.purpose === 'manutenção' ? '🌾 Manutenção' :
                      selectedPasture.purpose === 'finalização' ? '🌟 Finalização' : '🐂 Engorda'}
                   </span>
@@ -951,7 +951,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   ) : (
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                       {getPastureAnimals(selectedPasture.id).map(lot => {
-                        let badgeColor = 'bg-[#fcfaf7] text-theme-primary border-theme';
+                        let badgeColor = 'bg-[#fcfaf7] text-gray-800 border-gray-200';
                         let ownerDesc = 'Próprio';
                         if (lot.ownerName && lot.ownerName.toLowerCase() !== 'próprio' && lot.ownerName.toLowerCase() !== 'proprio') {
                           // Meia or Aluguel
@@ -959,7 +959,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                           badgeColor = 'bg-[#fef9c3] text-[#713f12] border-[#fde047]';
                         }
                         return (
-                          <div key={lot.id} className="p-3 bg-theme-card border border-[#e5e0d8] rounded-2xl flex items-center justify-between">
+                          <div key={lot.id} className="p-3 bg-white border border-[#e5e0d8] rounded-2xl flex items-center justify-between">
                             <div>
                               <div className="flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[#3d5a45]" />
@@ -1010,18 +1010,18 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-theme-card rounded-3xl border border-[#e5e0d8] shadow-2xl max-w-md w-full overflow-hidden text-left"
+              className="bg-white rounded-3xl border border-[#e5e0d8] shadow-2xl max-w-md w-full overflow-hidden text-left"
             >
               <div className={`p-6 text-white relative bg-gradient-to-r from-[#3d5a45] to-[#2d4a3a]`}>
                 <button
                   onClick={() => setSelectedOccurrence(null)}
-                  className="absolute right-4 top-4 text-white/80 hover:text-white bg-theme-card/10 hover:bg-theme-card/20 p-1.5 rounded-xl transition-all"
+                  className="absolute right-4 top-4 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-xl transition-all"
                 >
                   <X size={18} />
                 </button>
 
                 <div className="flex items-center gap-2">
-                  <span className="bg-theme-card/20 text-[10px] font-black tracking-widest px-2.5 py-0.5 rounded uppercase">
+                  <span className="bg-white/20 text-[10px] font-black tracking-widest px-2.5 py-0.5 rounded uppercase">
                     {selectedOccurrence.type === 'nascente' ? '💧 Nascente' :
                      selectedOccurrence.type === 'cerca' ? '🚧 Cerca Danificada' :
                      selectedOccurrence.type === 'recuperacao' ? '🌱 Em Recuperação' : '📍 Outra Ocorrência'}

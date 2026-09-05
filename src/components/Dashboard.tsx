@@ -285,8 +285,12 @@ export default function Dashboard({
           </div>
         </div>
         
-        {/* Local Date/Time Header */}
-        <div className="flex items-center gap-4 bg-theme-secondary p-4 rounded-2xl border border-theme">
+        {/* Local Date/Time Header — clicável, leva para o Clima Agora */}
+        <button
+          onClick={() => onNavigate?.('clima')}
+          className="flex items-center gap-4 bg-theme-secondary p-4 rounded-2xl border border-theme hover:border-primary/40 transition-colors text-left"
+          title="Ver Clima Agora"
+        >
           <div className="bg-theme-card p-2.5 rounded-xl shadow-theme text-primary">
             <CloudSun size={24} />
           </div>
@@ -294,7 +298,7 @@ export default function Dashboard({
             <div className="text-[10px] uppercase font-bold text-theme-secondary">{new Date().toLocaleDateString('pt-BR', { weekday: 'long' })}</div>
             <div className="text-sm font-bold text-primary">{new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}</div>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Sugestão Inteligente (AI Technical Advice) Card */}

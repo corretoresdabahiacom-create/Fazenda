@@ -137,7 +137,7 @@ export default function AIAnalyzer({ onResult, onClose, type, title }: Props) {
           <div className="flex items-center gap-3">
             <button 
               onClick={onClose}
-              className="p-2 text-white/60 hover:text-white hover:bg-theme-card/10 rounded-full transition-colors md:hidden"
+              className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-full transition-colors md:hidden"
               title="Voltar"
             >
               <ArrowLeft size={20} />
@@ -151,7 +151,7 @@ export default function AIAnalyzer({ onResult, onClose, type, title }: Props) {
           </div>
           <button 
             onClick={onClose}
-            className="p-2 text-white/60 hover:text-white hover:bg-theme-card/10 rounded-full transition-colors"
+            className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-full transition-colors"
           >
             <X size={24} />
           </button>
@@ -177,7 +177,7 @@ export default function AIAnalyzer({ onResult, onClose, type, title }: Props) {
                 />
               ) : (
                 <div className="flex flex-col items-center gap-4 text-white p-8 text-center">
-                  <div className="w-20 h-20 rounded-full bg-theme-card/5 flex items-center justify-center text-white/40">
+                  <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-white/40">
                     <Camera size={40} />
                   </div>
                   <div>
@@ -187,7 +187,7 @@ export default function AIAnalyzer({ onResult, onClose, type, title }: Props) {
                   </div>
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="mt-4 px-6 py-3 bg-theme-card text-[#1a1a1a] rounded-2xl font-bold hover:bg-theme-card/90"
+                    className="mt-4 px-6 py-3 bg-white text-[#1a1a1a] rounded-2xl font-bold hover:bg-white/90"
                   >
                     Selecionar Arquivo
                   </button>
@@ -232,7 +232,7 @@ export default function AIAnalyzer({ onResult, onClose, type, title }: Props) {
               <div className="flex items-center gap-8">
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-4 text-white/60 hover:text-white hover:bg-theme-card/10 rounded-full transition-colors active:scale-95"
+                  className="p-4 text-white/60 hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
                   title="Carregar da Galeria"
                 >
                   <RefreshCw size={24} />
@@ -240,9 +240,9 @@ export default function AIAnalyzer({ onResult, onClose, type, title }: Props) {
                 <button 
                   onClick={capturePhoto}
                   disabled={!stream}
-                  className="w-20 h-20 bg-theme-card rounded-full flex items-center justify-center border-4 border-white/20 active:scale-95 transition-transform disabled:opacity-50"
+                  className="w-20 h-20 bg-white rounded-full flex items-center justify-center border-4 border-white/20 active:scale-95 transition-transform disabled:opacity-50"
                 >
-                  <div className="w-16 h-16 bg-theme-card border-2 border-[#1a1a1a] rounded-full" />
+                  <div className="w-16 h-16 bg-white border-2 border-[#1a1a1a] rounded-full" />
                 </button>
                 <div className="w-12" /> {/* Spacer to center the capture button */}
               </div>
@@ -251,7 +251,7 @@ export default function AIAnalyzer({ onResult, onClose, type, title }: Props) {
                 <button 
                   onClick={reset}
                   disabled={isAnalyzing}
-                  className="flex-1 flex items-center justify-center gap-2 py-4 bg-theme-card/10 text-white rounded-2xl font-bold hover:bg-theme-card/20 transition-all active:scale-95 disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 py-4 bg-white/10 text-white rounded-2xl font-bold hover:bg-white/20 transition-all active:scale-95 disabled:opacity-50"
                 >
                   <RefreshCw size={20} />
                   Tentar Novamente

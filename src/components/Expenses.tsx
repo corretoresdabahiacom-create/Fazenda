@@ -191,7 +191,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder={activeTab === 'variaveis' ? "Pesquisar despesa..." : "Pesquisar custo fixo..."}
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -225,7 +225,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
       {activeTab === 'fixas' && (
         /* Fixed Cost Proportional Cards Dashboard */
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#fcfaf7] p-5 rounded-3xl border border-[#e5e0d8]">
-          <div className="bg-theme-card p-5 rounded-2xl border border-[#e5e0d8] flex items-center gap-4">
+          <div className="bg-white p-5 rounded-2xl border border-[#e5e0d8] flex items-center gap-4">
             <div className="p-3 bg-[#3d5a45]/10 text-[#3d5a45] rounded-xl">
               <Banknote size={24} />
             </div>
@@ -235,7 +235,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
             </div>
           </div>
 
-          <div className="bg-theme-card p-5 rounded-2xl border border-[#e5e0d8] flex items-center gap-4">
+          <div className="bg-white p-5 rounded-2xl border border-[#e5e0d8] flex items-center gap-4">
             <div className="p-3 bg-[#3d5a45]/10 text-[#3d5a45] rounded-xl">
               <TrendingUp size={24} />
             </div>
@@ -246,7 +246,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           </div>
 
           <div className="bg-[#3d5a45] text-white p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-            <div className="p-3 bg-theme-card/10 text-white rounded-xl">
+            <div className="p-3 bg-white/10 text-white rounded-xl">
               <Info size={24} />
             </div>
             <div>
@@ -259,7 +259,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
 
       {activeTab === 'variaveis' ? (
         /* Variable Expenses Table */
-        <div className="bg-theme-card rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
+        <div className="bg-white rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -327,7 +327,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
         /* Fixed Expenses list */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredFixed.map((f) => (
-            <div key={f.id} className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] space-y-4 hover:border-[#3d5a45]/30 transition-colors relative shadow-sm">
+            <div key={f.id} className="bg-white p-6 rounded-3xl border border-[#e5e0d8] space-y-4 hover:border-[#3d5a45]/30 transition-colors relative shadow-sm">
               <div className="flex justify-between items-start">
                 <div>
                   <span className="px-3 py-0.5 bg-[#3d5a45]/10 text-[#3d5a45] text-[10px] font-bold rounded-full uppercase block w-fit mb-1 border border-[#3d5a45]/20">{f.expenseType}</span>
@@ -371,7 +371,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-theme-card w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-3">
@@ -404,7 +404,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                       <div className="relative flex-1">
                         <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
                         <select 
-                          className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none appearance-none bg-theme-card font-bold"
+                          className="w-full pl-10 pr-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none appearance-none bg-white font-bold"
                           value={formData.type}
                           onChange={(e) => setFormData({...formData, type: e.target.value as any})}
                         >
@@ -425,7 +425,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                         <input 
                           type="text" 
                           placeholder="Ex: Energia, Ferramenta..." 
-                          className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg bg-theme-card text-sm"
+                          className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-lg bg-white text-sm"
                           value={newCustomType}
                           onChange={(e) => setNewCustomType(e.target.value)}
                         />
@@ -547,7 +547,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-3">
@@ -588,7 +588,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Categoria</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-theme-card font-medium"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-medium"
                     value={fixedFormData.expenseType}
                     onChange={(e) => setFixedFormData({...fixedFormData, expenseType: e.target.value})}
                   >

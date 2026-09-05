@@ -211,7 +211,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
               <input 
                 type="date"
                 required
-                className="w-full pl-8 pr-2 py-1.5 bg-theme-card dark:bg-zinc-800 border border-[#e5e0d8] dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-bold text-xs text-[#2d2a26] dark:text-zinc-100"
+                className="w-full pl-8 pr-2 py-1.5 bg-white dark:bg-zinc-800 border border-[#e5e0d8] dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-bold text-xs text-[#2d2a26] dark:text-zinc-100"
                 value={newWeightDate}
                 onChange={(e) => setNewWeightDate(e.target.value)}
               />
@@ -224,7 +224,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
                 step="0.1"
                 required
                 placeholder="Ex: 420 kg"
-                className="w-full pl-8 pr-2 py-1.5 bg-theme-card dark:bg-zinc-800 border border-[#e5e0d8] dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-bold text-xs text-[#2d2a26] dark:text-zinc-100"
+                className="w-full pl-8 pr-2 py-1.5 bg-white dark:bg-zinc-800 border border-[#e5e0d8] dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-bold text-xs text-[#2d2a26] dark:text-zinc-100"
                 value={newWeight}
                 onChange={(e) => setNewWeight(e.target.value)}
               />

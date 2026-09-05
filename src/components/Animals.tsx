@@ -286,7 +286,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
 
       {/* Tabs */}
       <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide animate-fade-in">
-        <div className="flex gap-2 bg-theme-card p-1 rounded-2xl border border-[#e5e0d8] w-fit shadow-sm min-w-max">
+        <div className="flex gap-2 bg-white p-1 rounded-2xl border border-[#e5e0d8] w-fit shadow-sm min-w-max">
           {[AnimalType.OWN, AnimalType.RENT, AnimalType.PARTIAL, AnimalType.THIRD_PARTY, AnimalType.OTHER, 'History'].map((tab) => (
             <button
               key={tab}
@@ -308,7 +308,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
           <input 
             type="text" 
             placeholder="Pesquisar por lote ou proprietário..." 
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -380,11 +380,11 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden mb-6"
           >
-            <div className="bg-theme-card border-2 border-[#3d5a45]/20 rounded-3xl p-6 md:p-8 shadow-xl space-y-5 relative overflow-hidden" id="quick-transfer-panel">
+            <div className="bg-white border-2 border-[#3d5a45]/20 rounded-3xl p-6 md:p-8 shadow-xl space-y-5 relative overflow-hidden" id="quick-transfer-panel">
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#3d5a45] via-[#4d6e56] to-[#d4a373]"></div>
 
               <div className="absolute top-5 right-5 z-10">
-                <button onClick={() => setShowQuickTransferPanel(false)} className="p-2 hover:bg-[#f5f2ed] rounded-xl transition-colors text-[#8d8a86] cursor-pointer border border-[#e5e0d8] bg-theme-card shadow-sm flex items-center justify-center">
+                <button onClick={() => setShowQuickTransferPanel(false)} className="p-2 hover:bg-[#f5f2ed] rounded-xl transition-colors text-[#8d8a86] cursor-pointer border border-[#e5e0d8] bg-white shadow-sm flex items-center justify-center">
                   <X size={16} />
                 </button>
               </div>
@@ -407,7 +407,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <div className="bg-[#fcfaf7] p-4 rounded-2xl border border-[#e5e0d8] shadow-sm">
                     <label className="text-[10px] font-black uppercase text-[#3d5a45] mb-2 block tracking-wider">1. Selecionar Lotes Ativos</label>
                     <select
-                      className="w-full px-4 py-2.5 bg-theme-card border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-sm bg-theme-card text-[#2d2a26]"
+                      className="w-full px-4 py-2.5 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-sm bg-white text-[#2d2a26]"
                       value={selectedTransferAnimalId}
                       onChange={(e) => {
                         setSelectedTransferAnimalId(e.target.value);
@@ -471,7 +471,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <div className="space-y-3">
                         <label className="text-[10px] font-black uppercase text-[#3d5a45] mb-2 block tracking-wider">2. Destinar ao Pasto de Destino</label>
                         <select
-                          className="w-full px-4 py-2.5 bg-theme-card border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-sm bg-theme-card text-[#2d2a26]"
+                          className="w-full px-4 py-2.5 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-sm bg-white text-[#2d2a26]"
                           value={newTransferPastureId}
                           onChange={(e) => setNewTransferPastureId(e.target.value)}
                         >
@@ -547,7 +547,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm hover:border-[#3d5a45]/30 hover:shadow-md transition-all relative overflow-hidden"
+              className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm hover:border-[#3d5a45]/30 hover:shadow-md transition-all relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-4">
                 {animal.isSold ? (
@@ -610,7 +610,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <span>Custos Comercialização:</span>
                       <span>R$ {((animal.saleDetails.shippingCost || 0) + (animal.saleDetails.funruralCost || 0) + (animal.saleDetails.taxesCost || 0) + (animal.saleDetails.otherSaleCosts || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="p-2.5 bg-theme-card border border-red-200 rounded-xl space-y-1 mt-1 text-[11px]">
+                    <div className="p-2.5 bg-white border border-red-200 rounded-xl space-y-1 mt-1 text-[11px]">
                       <div className="flex justify-between text-neutral-800 font-bold">
                         <span>Lucro Bruto Ciclo:</span>
                         <span className="text-[#3d5a45]">R$ {animal.saleDetails.grossProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
@@ -728,7 +728,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-theme-card w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-3">
@@ -876,7 +876,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <label className="text-[10px] font-bold uppercase text-orange-800 mb-1 block">Frete (Contratado)</label>
                     <input 
                       type="number"
-                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-theme-card text-xs font-bold"
+                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-white text-xs font-bold"
                       value={saleFormData.shippingCost || ''}
                       onChange={(e) => setSaleFormData({...saleFormData, shippingCost: Number(e.target.value)})}
                     />
@@ -886,7 +886,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <input 
                       type="number"
                       step="0.01"
-                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-theme-card text-xs font-bold"
+                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-white text-xs font-bold"
                       value={saleFormData.funruralCost || ''}
                       onChange={(e) => setSaleFormData({...saleFormData, funruralCost: Number(e.target.value)})}
                     />
@@ -895,7 +895,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <label className="text-[10px] font-bold uppercase text-orange-800 mb-1 block">Encargos/Tributos</label>
                     <input 
                       type="number"
-                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-theme-card text-xs font-bold"
+                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-white text-xs font-bold"
                       value={saleFormData.taxesCost || ''}
                       onChange={(e) => setSaleFormData({...saleFormData, taxesCost: Number(e.target.value)})}
                     />
@@ -904,7 +904,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <label className="text-[10px] font-bold uppercase text-orange-800 mb-1 block">Outras Despesas</label>
                     <input 
                       type="number"
-                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-theme-card text-xs font-bold"
+                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-white text-xs font-bold"
                       value={saleFormData.otherSaleCosts || ''}
                       onChange={(e) => setSaleFormData({...saleFormData, otherSaleCosts: Number(e.target.value)})}
                     />
@@ -1071,7 +1071,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-theme-card w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-3">
@@ -1100,7 +1100,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Espécie / Categoria</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-theme-card font-bold text-sm"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-white font-bold text-sm"
                     value={formData.category}
                     onChange={(e) => setFormData({...formData, category: e.target.value as AnimalCategory})}
                   >
@@ -1122,7 +1122,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Regime de Posse (Tipo)</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-theme-card font-medium"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-white font-medium"
                     value={formData.type}
                     onChange={(e) => setFormData({...formData, type: e.target.value as AnimalType})}
                   >
@@ -1182,7 +1182,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Alocação de Pasto</label>
                   <select 
                     required
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-theme-card font-medium text-sm"
+                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-white font-medium text-sm"
                     value={formData.currentPastureId}
                     onChange={(e) => setFormData({...formData, currentPastureId: e.target.value})}
                   >

@@ -138,7 +138,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder="Pesquisar estoque por item, fornecedor..." 
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -172,7 +172,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
             <motion.div 
               key={item.id}
               layout
-              className="bg-theme-card p-6 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-col justify-between hover:border-[#3d5a45]/40 transition-all group relative overflow-hidden"
+              className="bg-white p-6 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-col justify-between hover:border-[#3d5a45]/40 transition-all group relative overflow-hidden"
             >
               <div>
                 <div className="flex items-start justify-between">
@@ -264,7 +264,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
         {/* Right side change history analyzer */}
         <div className="xl:col-span-1">
           {selectedItemForHistory ? (
-            <div className="bg-theme-card border border-[#e5e0d8] rounded-3xl p-6 shadow-sm space-y-4">
+            <div className="bg-white border border-[#e5e0d8] rounded-3xl p-6 shadow-sm space-y-4">
               <div className="flex justify-between items-start">
                 <div>
                   <h4 className="text-xs font-black text-[#8d8a86] uppercase">Linha do Tempo</h4>
@@ -324,7 +324,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-3">
@@ -378,7 +378,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 bg-theme-card border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                  className="w-full px-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   placeholder="Ex: Sal Proteinado, Vacina Aftosa, Arame Farpado..."

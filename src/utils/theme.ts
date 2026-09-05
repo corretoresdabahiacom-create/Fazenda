@@ -6,12 +6,12 @@ export const getThemeStyles = () => {
   
   return {
     textPrimary: isDark ? '#f2f5f0' : '#212529',
-    textSecondary: isDark ? '#9db5a6' : '#495057',
-    textTertiary: isDark ? '#9db5a6' : '#6c757d',
-    bgCard: isDark ? '#16301f' : '#ffffff',
-    bgSecondary: isDark ? '#1c3a26' : '#f8f9fa',
-    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#dee2e6',
-    primary: isDark ? '#4caf6e' : '#2d6a4f',
+    textSecondary: isDark ? '#a9c2b3' : '#495057',
+    textTertiary: isDark ? '#a9c2b3' : '#6c757d',
+    bgCard: isDark ? '#1c3a26' : '#ffffff',
+    bgSecondary: isDark ? '#234529' : '#f8f9fa',
+    borderColor: isDark ? 'rgba(255, 255, 255, 0.10)' : '#dee2e6',
+    primary: isDark ? '#5fc785' : '#2d6a4f',
   };
 };
 

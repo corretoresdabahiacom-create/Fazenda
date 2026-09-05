@@ -4,14 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Google AI Studio App</title>
-    <script>
-      // Aplica o tema escuro imediatamente, antes do React carregar, pra
-      // não piscar a tela clara antiga por uma fração de segundo.
-      (function () {
-        var saved = localStorage.getItem('theme');
-        if (saved !== 'light') document.documentElement.classList.add('dark');
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>

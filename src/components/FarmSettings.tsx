@@ -251,7 +251,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-12">
-      <div className="bg-theme-card p-8 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-6">
+      <div className="bg-white p-8 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-6">
         <h3 className="text-xl font-bold flex items-center gap-2 text-[#3d5a45]">
           <Building2 size={24} /> Configurações da Fazenda
         </h3>
@@ -300,52 +300,6 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
               * A cidade informada é utilizada para o cálculo climático e taxas de lotação ideais.
             </p>
           </div>
-        </div>
-
-        {/* Improved Regional summary box with click interactive forecasts */}
-        <div className="bg-[#fcfaf7] p-6 rounded-2xl border border-[#e5e0d8] space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-bold flex items-center gap-2 text-[#3d5a45]">
-              <CloudSun size={18} /> Resumo Regional ({currentCityForWeather})
-            </h4>
-            <span className="text-[10px] text-[#6d6a66] font-semibold uppercase bg-[#eae6df] px-2 py-0.5 rounded-md">
-              Atual
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div 
-              onClick={() => setIsWeatherModalOpen(true)}
-              className="bg-theme-card p-4 rounded-xl border border-[#e5e0d8] shadow-sm cursor-pointer hover:border-[#3d5a45] hover:shadow-md transition-all active:scale-95 group relative overflow-hidden"
-              title="Clique para ver a previsão dos próximos 15 dias"
-            >
-              <div className="text-[10px] uppercase font-bold text-[#8d8a86] mb-1">Precipitação</div>
-              <div className="text-lg font-black text-[#222] flex items-baseline gap-1">
-                {weatherData.annualPrecipitation}mm
-                <span className="text-[11px] font-medium text-[#6d6a66]">/ano</span>
-              </div>
-              <div className="text-[10px] text-[#3d5a45] mt-1 font-bold flex items-center gap-1 group-hover:underline">
-                Previsão 15 dias <ChevronRight size={10} />
-              </div>
-            </div>
-
-            <div 
-              onClick={() => setIsWeatherModalOpen(true)}
-              className="bg-theme-card p-4 rounded-xl border border-[#e5e0d8] shadow-sm cursor-pointer hover:border-[#3d5a45] hover:shadow-md transition-all active:scale-95 group relative overflow-hidden"
-              title="Clique para ver a previsão dos próximos 15 dias"
-            >
-              <div className="text-[10px] uppercase font-bold text-[#8d8a86] mb-1">Temperatura Média</div>
-              <div className="text-lg font-black text-[#222]">
-                {weatherData.averageTemperature}°C
-              </div>
-              <div className="text-[10px] text-[#3d5a45] mt-1 font-bold flex items-center gap-1 group-hover:underline">
-                Previsão 15 dias <ChevronRight size={10} />
-              </div>
-            </div>
-          </div>
-          <p className="text-[10px] text-[#8d8a86] text-center italic mt-1">
-            💡 Dica: Toque nos cartões acima para visualizar os próximos 15 dias climáticos.
-          </p>
         </div>
 
         <button 
@@ -438,7 +392,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
               <div className="bg-[#3d5a45] text-white p-6 relative">
                 <button 
                   onClick={() => setIsWeatherModalOpen(false)}
-                  className="absolute right-4 top-4 text-white/80 hover:text-white p-1 rounded-full hover:bg-theme-card/10 transition-colors cursor-pointer"
+                  className="absolute right-4 top-4 text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   <X size={20} />
                 </button>
@@ -457,7 +411,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
                   {weatherData.forecast.map((day, idx) => (
                     <div 
                       key={idx} 
-                      className="bg-theme-card p-3 rounded-2xl border border-[#e5e0d8] text-center flex flex-col justify-between shadow-xs hover:border-[#3d5a45]/30 hover:shadow-xs transition-shadow"
+                      className="bg-white p-3 rounded-2xl border border-[#e5e0d8] text-center flex flex-col justify-between shadow-xs hover:border-[#3d5a45]/30 hover:shadow-xs transition-shadow"
                     >
                       <div>
                         <div className="text-[10px] font-black uppercase text-[#8d8a86]">
@@ -487,7 +441,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
                   ))}
                 </div>
 
-                <div className="bg-theme-card p-4 rounded-2xl border border-[#e5e0d8] text-center md:flex items-center justify-between gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-[#e5e0d8] text-center md:flex items-center justify-between gap-4">
                   <div className="text-left">
                     <span className="text-[10px] uppercase font-bold text-[#3d5a45] block">Capacidade Estimativa</span>
                     <p className="text-[11px] text-[#6d6a66] font-medium max-w-md leading-relaxed">
