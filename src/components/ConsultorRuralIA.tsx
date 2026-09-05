@@ -5,7 +5,10 @@
 
 import { useState } from 'react';
 import { Sparkles, Send, Loader2, CheckCircle2, Info } from 'lucide-react';
-import { AccountPayable, AccountReceivable, Talhao, IndividualAnimal, Property } from '../types';
+import {
+  AccountPayable, AccountReceivable, Talhao, IndividualAnimal, Property,
+  ReproductionEvent, HealthEvent, MilkProductionRecord, FarmDocument, Machine, MaintenanceRecord, InventoryItem,
+} from '../types';
 import { fetchWeatherSnapshot } from '../lib/weatherRules';
 import { answerRuralQuestion } from '../lib/ruralAdvisor';
 
@@ -21,17 +24,27 @@ interface Props {
   accountsReceivable: AccountReceivable[];
   talhoes: Talhao[];
   individualAnimals: IndividualAnimal[];
+  reproductionEvents: ReproductionEvent[];
+  healthEvents: HealthEvent[];
+  milkRecords: MilkProductionRecord[];
+  documents: FarmDocument[];
+  machines: Machine[];
+  maintenanceRecords: MaintenanceRecord[];
+  inventory: InventoryItem[];
 }
 
 const SUGGESTIONS = [
   'Posso pulverizar hoje?',
   'Qual meu saldo financeiro?',
-  'Quantos talhões estão ativos?',
-  'Como está o clima hoje?',
+  'Alguma vaca próxima do parto?',
+  'Tem alguma vacina pendente?',
+  'Tem documento vencendo?',
+  'Meu estoque está baixo?',
 ];
 
 export default function ConsultorRuralIA({
   activeProperty, accountsPayable, accountsReceivable, talhoes, individualAnimals,
+  reproductionEvents, healthEvents, milkRecords, documents, machines, maintenanceRecords, inventory,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState('');
@@ -61,6 +74,13 @@ export default function ConsultorRuralIA({
         accountsReceivable,
         talhoes,
         individualAnimals,
+        reproductionEvents,
+        healthEvents,
+        milkRecords,
+        documents,
+        machines,
+        maintenanceRecords,
+        inventory,
       });
 
       setMessages(prev => [...prev, { role: 'assistant', text: result.answer, basedOnRealData: result.basedOnRealData }]);

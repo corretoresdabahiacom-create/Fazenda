@@ -9,7 +9,12 @@
 // instantâneo, e nunca depende de nenhuma chave de API configurada.
 
 import { WeatherSnapshot } from './weatherRules';
-import { AccountPayable, AccountReceivable, Talhao, IndividualAnimal, TalhaoStatus, AccountStatus } from '../types';
+import {
+  AccountPayable, AccountReceivable, Talhao, IndividualAnimal, TalhaoStatus, AccountStatus,
+  ReproductionEvent, HealthEvent, MilkProductionRecord, FarmDocument, Machine, MaintenanceRecord,
+  InventoryItem,
+} from '../types';
+import { differenceInCalendarDays, format } from 'date-fns';
 
 export interface AdvisorContext {
   weather: WeatherSnapshot | null;
@@ -17,6 +22,13 @@ export interface AdvisorContext {
   accountsReceivable: AccountReceivable[];
   talhoes: Talhao[];
   individualAnimals: IndividualAnimal[];
+  reproductionEvents: ReproductionEvent[];
+  healthEvents: HealthEvent[];
+  milkRecords: MilkProductionRecord[];
+  documents: FarmDocument[];
+  machines: Machine[];
+  maintenanceRecords: MaintenanceRecord[];
+  inventory: InventoryItem[];
 }
 
 export interface AdvisorAnswer {
@@ -136,10 +148,95 @@ export function answerRuralQuestion(question: string, ctx: AdvisorContext): Advi
     };
   }
 
+  // ---- Reprodução / parto ----
+  if (q.includes('parto') || q.includes('prenh') || q.includes('gestacao') || q.includes('cria')) {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const upcoming = ctx.reproductionEvents
+      .filter(e => e.expectedBirthDate && e.expectedBirthDate >= today)
+      .sort((a, b) => (a.expectedBirthDate! < b.expectedBirthDate! ? -1 : 1));
+    if (upcoming.length === 0) {
+      return { answer: 'Não encontrei nenhuma previsão de parto futura cadastrada. Registre uma cobertura, inseminação ou IATF em Pecuária Profissional → Reprodução para eu calcular isso automaticamente.', basedOnRealData: true };
+    }
+    const next = upcoming[0];
+    const dias = differenceInCalendarDays(new Date(next.expectedBirthDate!), new Date());
+    return {
+      answer: `A próxima com previsão de parto é o animal ${next.animalEarTag}, previsto para ${format(new Date(next.expectedBirthDate!), 'dd/MM/yyyy')} (em ${dias} dias). ${upcoming.length > 1 ? `Tem mais ${upcoming.length - 1} previsão(ões) futura(s).` : ''}`,
+      basedOnRealData: true,
+    };
+  }
+
+  // ---- Sanidade / vacina ----
+  if (q.includes('vacina') || q.includes('vermifug') || q.includes('sanidade') || q.includes('reforco')) {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const upcoming = ctx.healthEvents
+      .filter(e => e.nextDoseDate && e.nextDoseDate >= today)
+      .sort((a, b) => (a.nextDoseDate! < b.nextDoseDate! ? -1 : 1));
+    if (upcoming.length === 0) {
+      return { answer: 'Não encontrei nenhum reforço de vacina/vermífugo pendente cadastrado.', basedOnRealData: true };
+    }
+    const next = upcoming[0];
+    return {
+      answer: `O próximo reforço é para o animal ${next.animalEarTag} (${next.productName}), em ${format(new Date(next.nextDoseDate!), 'dd/MM/yyyy')}. ${upcoming.length > 1 ? `Tem mais ${upcoming.length - 1} pendente(s).` : ''}`,
+      basedOnRealData: true,
+    };
+  }
+
+  // ---- Produção leiteira ----
+  if (q.includes('leite') || q.includes('producao leiteira') || q.includes('ordenha')) {
+    const currentMonth = format(new Date(), 'yyyy-MM');
+    const thisMonth = ctx.milkRecords.filter(r => r.date.startsWith(currentMonth));
+    const total = thisMonth.reduce((s, r) => s + r.liters, 0);
+    if (thisMonth.length === 0) {
+      return { answer: 'Nenhum registro de produção leiteira neste mês ainda. Registre em Pecuária Profissional → Produção Leiteira.', basedOnRealData: true };
+    }
+    return { answer: `Produção total registrada este mês: ${total.toFixed(1)} litros, em ${thisMonth.length} registro(s).`, basedOnRealData: true };
+  }
+
+  // ---- Documentos vencendo ----
+  if (q.includes('documento') || q.includes('car') || q.includes('licenca') || q.includes('itr') || q.includes('ccir')) {
+    const today = new Date();
+    const expiring = ctx.documents.filter(d => d.expirationDate && differenceInCalendarDays(new Date(d.expirationDate), today) <= 30);
+    if (expiring.length === 0) {
+      return { answer: `Você tem ${ctx.documents.length} documento(s) cadastrado(s), nenhum vencendo nos próximos 30 dias.`, basedOnRealData: true };
+    }
+    return {
+      answer: `Atenção: ${expiring.map(d => `${d.title} vence em ${format(new Date(d.expirationDate!), 'dd/MM/yyyy')}`).join('; ')}.`,
+      basedOnRealData: true,
+    };
+  }
+
+  // ---- Máquinas / manutenção ----
+  if (q.includes('maquina') || q.includes('trator') || q.includes('manutencao') || q.includes('revisao')) {
+    if (ctx.machines.length === 0) {
+      return { answer: 'Você ainda não tem nenhuma máquina cadastrada. Vá em Máquinas → Cadastro.', basedOnRealData: true };
+    }
+    const pending = ctx.maintenanceRecords.filter(m => {
+      const machine = ctx.machines.find(mm => mm.id === m.machineId);
+      return machine?.hourMeter != null && m.nextServiceHourMeter != null && machine.hourMeter >= m.nextServiceHourMeter;
+    });
+    if (pending.length === 0) {
+      return { answer: `Você tem ${ctx.machines.length} máquina(s) cadastrada(s), nenhuma com manutenção pendente pelo horímetro atual.`, basedOnRealData: true };
+    }
+    return { answer: `Atenção: ${pending.length} máquina(s) já passaram do horímetro previsto para a próxima revisão.`, basedOnRealData: true };
+  }
+
+  // ---- Estoque ----
+  if (q.includes('estoque') || q.includes('insumo') || q.includes('racao') || q.includes('acabando')) {
+    const critical = ctx.inventory.filter(i => i.criticalStock != null && i.quantity <= i.criticalStock);
+    const low = ctx.inventory.filter(i => i.minStock != null && i.quantity <= i.minStock && !critical.includes(i));
+    if (critical.length === 0 && low.length === 0) {
+      return { answer: `Estoque de ${ctx.inventory.length} item(ns), sem nenhum alerta de mínimo/crítico no momento.`, basedOnRealData: true };
+    }
+    return {
+      answer: `Atenção no estoque: ${critical.map(i => `${i.name} (crítico: ${i.quantity} ${i.unit})`).join(', ')}${critical.length && low.length ? '; ' : ''}${low.map(i => `${i.name} (baixo: ${i.quantity} ${i.unit})`).join(', ')}.`,
+      basedOnRealData: true,
+    };
+  }
+
   // ---- Não reconheceu a pergunta ----
   return {
     answer:
-      'Não entendi bem essa pergunta. Posso responder sobre: se pode pulverizar hoje, clima do dia, risco de geada/calor, saldo financeiro, quantos talhões estão ativos, ou quantos animais você tem cadastrados. Tenta reformular usando uma dessas palavras.',
+      'Não entendi bem essa pergunta. Posso responder sobre: clima/pulverização hoje, risco de geada/calor, saldo financeiro, talhões ativos, quantidade de animais, previsão de parto, vacinas pendentes, produção de leite, documentos vencendo, manutenção de máquinas, ou estoque baixo. Tenta reformular usando um desses temas.',
     basedOnRealData: false,
   };
 }

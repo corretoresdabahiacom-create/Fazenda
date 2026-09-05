@@ -641,7 +641,7 @@ export default function App() {
       case 'maquinas': return <Maquinas machines={machines} saveMachine={saveMachine} deleteMachine={deleteMachine} maintenanceRecords={maintenanceRecords} saveMaintenanceRecord={saveMaintenanceRecord} deleteMaintenanceRecord={deleteMaintenanceRecord} />;
       case 'rh-rural': return <RHRural teams={teams} saveTeam={saveTeam} deleteTeam={deleteTeam} workSchedules={workSchedules} saveWorkSchedule={saveWorkSchedule} deleteWorkSchedule={deleteWorkSchedule} trainings={trainings} saveTraining={saveTraining} deleteTraining={deleteTraining} ppeItems={ppeItems} savePPEItem={savePPEItem} deletePPEItem={deletePPEItem} certifications={certifications} saveCertification={saveCertification} deleteCertification={deleteCertification} />;
       case 'documentos': return <Documentos documents={documents} saveDocument={saveDocument} deleteDocument={deleteDocument} />;
-      case 'consultor-ia': return <ConsultorRuralIA activeProperty={activeProperty} accountsPayable={accountsPayable} accountsReceivable={accountsReceivable} talhoes={talhoes} individualAnimals={individualAnimals} />;
+      case 'consultor-ia': return <ConsultorRuralIA activeProperty={activeProperty} accountsPayable={accountsPayable} accountsReceivable={accountsReceivable} talhoes={talhoes} individualAnimals={individualAnimals} reproductionEvents={reproductionEvents} healthEvents={healthEvents} milkRecords={milkRecords} documents={documents} machines={machines} maintenanceRecords={maintenanceRecords} inventory={inventory} />;
       default: 
         return (
           <Dashboard 
