@@ -578,7 +578,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
   }, [expenses, fixedExpenses]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 legacy-light">
       {/* Upper Report Deck Navigation with PDF export */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">

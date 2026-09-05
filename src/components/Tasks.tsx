@@ -87,7 +87,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
   });
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 legacy-light">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-black text-[#2d2a26]">Painel de Tarefas Fazenda</h2>

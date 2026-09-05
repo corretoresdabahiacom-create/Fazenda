@@ -119,6 +119,19 @@ html, body, #root {
   color: var(--text-primary);
 }
 
+/* ===== TELAS "LEGADAS" (Planilha de Pesagem, Pastos, Animais, Despesas,
+   Funcionários, Tarefas, Estoque, Mapa, Configurações, Relatórios) — estas
+   sempre mantêm o visual claro/bege original delas, mesmo com o modo
+   escuro ativo no resto do app. Sem esta regra, campos de formulário sem
+   cor de texto definida herdam a cor de texto do tema geral (que fica
+   clara no modo escuro), ficando ilegíveis dentro dessas caixas sempre
+   claras. */
+.legacy-light input,
+.legacy-light textarea,
+.legacy-light select {
+  color: #2d2a26;
+}
+
 /* ===== RESPONSIVIDADE MOBILE ===== */
 * {
   box-sizing: border-box;

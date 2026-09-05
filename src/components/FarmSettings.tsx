@@ -250,7 +250,7 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto pb-12">
+    <div className="space-y-6 max-w-2xl mx-auto pb-12 legacy-light">
       <div className="bg-white p-8 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-6">
         <h3 className="text-xl font-bold flex items-center gap-2 text-[#3d5a45]">
           <Building2 size={24} /> Configurações da Fazenda

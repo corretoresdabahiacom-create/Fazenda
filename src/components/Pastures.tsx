@@ -173,7 +173,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 legacy-light">
       <AnimatePresence>
         {isAIScanning && (
           <AIAnalyzer 

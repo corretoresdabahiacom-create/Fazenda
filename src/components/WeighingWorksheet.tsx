@@ -325,7 +325,7 @@ export default function WeighingWorksheet() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 legacy-light">
       {/* View Selector Headers */}
       <div className="flex border-b border-[#e5e0d8] gap-4 mb-4">
         <button 

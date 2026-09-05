@@ -149,7 +149,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
   const hasNoHistory = !animal.weightHistory || animal.weightHistory.length === 0;
 
   return (
-    <div className="mt-4 p-4 border border-[#3d5a45]/20 bg-[#f9faf8] dark:bg-zinc-900/60 dark:border-zinc-800 rounded-2xl animate-fade-in space-y-4">
+    <div className="mt-4 p-4 border border-[#3d5a45]/20 bg-[#f9faf8] dark:bg-zinc-900/60 dark:border-zinc-800 rounded-2xl animate-fade-in space-y-4 legacy-light">
       <div className="flex justify-between items-center pb-2 border-b border-[#3d5a45]/10 dark:border-zinc-800">
         <h4 className="text-xs font-black uppercase text-[#3d5a45] dark:text-[#5fa875] tracking-wider flex items-center gap-1.5">
           <TrendingUp size={15} /> Evolução Histórica de Peso

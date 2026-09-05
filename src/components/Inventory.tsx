@@ -129,7 +129,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 legacy-light">
       <StockAlerts items={inventory} />
       {/* Top Filter and Search bar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">

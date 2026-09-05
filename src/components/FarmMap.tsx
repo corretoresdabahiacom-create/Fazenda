@@ -274,7 +274,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
   const unmappedPastures = pastures.filter(p => typeof p.mapX !== 'number' || typeof p.mapY !== 'number');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 legacy-light">
       {/* Upper controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-white border border-[#e5e0d8] rounded-3xl shadow-sm">
         <div>
