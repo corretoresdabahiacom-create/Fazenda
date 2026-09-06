@@ -8,6 +8,7 @@ import {
   X, ChevronDown, HelpCircle, LayoutDashboard, Building2, Beef, Wheat, Wallet,
   Tractor, UserCog, FileText, Sparkles, Users, Receipt, Package, PawPrint,
   Scale, MapIcon, Calendar, BarChart3, Leaf, Settings, CloudSun, Bell, Moon,
+  CreditCard, Image as ImageIcon, Smartphone, ShieldAlert,
 } from 'lucide-react';
 
 interface Section {
@@ -185,7 +186,33 @@ const SECTIONS: Section[] = [
     icon: Settings,
     title: 'Configurações',
     content: [
-      'Nome da fazenda, cidade/região (usada para cálculos climáticos) e outras preferências gerais do sistema.',
+      'Nome da fazenda, cidade/região (usada para cálculos climáticos), data de aniversário (opcional) e outras preferências gerais do sistema.',
+      'O botão "Ativar notificações push" permite receber avisos de vencimento e comunicados do administrador direto no seu celular, mesmo com o app fechado — pede sua permissão uma única vez.',
+    ],
+  },
+  {
+    icon: CreditCard,
+    title: 'Minha Assinatura',
+    content: [
+      'Mostra seu plano atual, valor mensal, data de validade e último pagamento.',
+      'Você pode cancelar sua assinatura a qualquer momento por aqui — o acesso continua até o fim do período já pago.',
+      'Se sua conta ficar "Suspensa" ou "Bloqueada" pelo administrador, o acesso ao restante do aplicativo fica temporariamente indisponível até a situação ser regularizada.',
+    ],
+  },
+  {
+    icon: ImageIcon,
+    title: 'Publicidade (carrossel no Painel)',
+    content: [
+      'Um espaço de anúncios pode aparecer no final do Painel, gerenciado pelo administrador — troca sozinho a cada 5 segundos, ou você pode navegar manualmente com as setas.',
+    ],
+  },
+  {
+    icon: Smartphone,
+    title: 'Instalar como aplicativo (PWA)',
+    content: [
+      'O Fazenda Online pode ser instalado no seu celular ou computador como um aplicativo de verdade, com ícone próprio — sem precisar baixar de nenhuma loja de aplicativos.',
+      'No Chrome/Edge, procure o botão "Instalar" na barra de endereço ou no menu do navegador. No iPhone (Safari), use "Compartilhar" → "Adicionar à Tela de Início".',
+      'Funciona parcialmente offline (você consegue reabrir o app sem internet, mas precisa de conexão para salvar ou carregar dados novos).',
     ],
   },
   {
@@ -210,6 +237,17 @@ const SECTIONS: Section[] = [
     content: [
       'Alterna entre modo claro e escuro. O padrão do sistema é o modo claro.',
       'Algumas telas mais antigas mantêm sempre o visual claro original, mesmo com o modo escuro ativado no restante do aplicativo — isso é proposital, para garantir que o texto continue sempre legível nelas.',
+    ],
+  },
+  {
+    icon: ShieldAlert,
+    title: 'Painel Admin (visível só para administradores)',
+    content: [
+      '"Visão Geral" mostra usuários ativos, assinaturas por status, receita e despesas do aplicativo.',
+      '"Usuários" lista todas as contas, com busca, filtro por status, e botões para ativar, suspender, bloquear, cancelar ou excluir qualquer uma.',
+      '"Notificações" envia avisos para todos os usuários, para um usuário específico, ou filtrado por cidade, região ou mês de aniversário — chegam tanto dentro do app quanto por notificação push (se configurada).',
+      '"Publicidade" cadastra os anúncios do carrossel exibido no Painel dos usuários — banner com imagem (upload direto, comprimida automaticamente), vídeo, texto, texto com link ou imagem com link.',
+      '"Despesas do App" é um registro manual dos custos do próprio negócio (hospedagem, taxas etc.), usado para calcular o resultado financeiro do aplicativo.',
     ],
   },
 ];

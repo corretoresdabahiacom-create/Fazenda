@@ -38,7 +38,9 @@ import {
   FarmTask,
   TransactionHistory,
   FarmSettings,
-  AccountStatus
+  AccountStatus,
+  Subscription,
+  SubscriptionStatus
 } from './types';
 
 import ThemeToggle from './components/ThemeToggle';
@@ -69,6 +71,8 @@ import ObligationsDrawer from './components/ObligationsDrawer';
 import HelpScreen from './components/HelpScreen';
 import AdminPanel from './components/AdminPanel';
 import MinhaAssinatura from './components/MinhaAssinatura';
+import { db } from './lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import WeighingWorksheet from './components/WeighingWorksheet';
 import NutritionCalculator from './components/NutritionCalculator';
 import { NotificationService } from './utils/notificationService';
@@ -187,6 +191,18 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isObligationsOpen, setIsObligationsOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [mySubscription, setMySubscription] = useState<Subscription | null>(null);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setMySubscription(null);
+      return;
+    }
+    const unsub = onSnapshot(doc(db, 'subscriptions', user.uid), (snap) => {
+      setMySubscription(snap.exists() ? (snap.data() as Subscription) : null);
+    }, () => setMySubscription(null));
+    return unsub;
+  }, [user?.uid]);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -751,6 +767,38 @@ export default function App() {
     }
   };
 
+  // Bloqueio de acesso por assinatura — nunca bloqueia o próprio admin
+  // (ele precisa entrar mesmo assim pra poder corrigir qualquer coisa).
+  // Contas "Atrasada" continuam entrando normalmente, só com um aviso —
+  // bloquear de cara por atraso seria punitivo demais pra uma falha
+  // pontual de pagamento.
+  const blockingStatuses = [SubscriptionStatus.BLOQUEADA, SubscriptionStatus.CANCELADA, SubscriptionStatus.SUSPENSA];
+  if (!isBootstrapAdmin && mySubscription && blockingStatuses.includes(mySubscription.status)) {
+    const reasonText: Record<string, string> = {
+      [SubscriptionStatus.BLOQUEADA]: 'Sua conta foi bloqueada pelo administrador.',
+      [SubscriptionStatus.CANCELADA]: 'Sua assinatura foi cancelada.',
+      [SubscriptionStatus.SUSPENSA]: 'Sua conta está suspensa temporariamente.',
+    };
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-theme-card p-4">
+        <div className="max-w-sm w-full text-center space-y-4">
+          <ShieldAlert size={48} className="text-red-500 mx-auto" />
+          <h1 className="text-xl font-bold text-theme-primary">Acesso indisponível</h1>
+          <p className="text-sm text-theme-secondary">{reasonText[mySubscription.status]}</p>
+          {mySubscription.suspendedReason && (
+            <p className="text-xs text-theme-secondary bg-theme-secondary rounded-xl p-3">{mySubscription.suspendedReason}</p>
+          )}
+          <p className="text-xs text-theme-secondary">
+            Dúvidas ou para regularizar, entre em contato: <strong>admmeuarmazem@gmail.com</strong>
+          </p>
+          <button onClick={handleLogout} className="text-xs font-semibold text-theme-secondary underline">
+            Sair da conta
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-theme-card overflow-hidden">
       {/* Sidebar Overlay */}
@@ -1023,6 +1071,14 @@ export default function App() {
         )}
 
         <div className={activeView === 'clima' ? '' : 'p-4 md:p-6'}>
+          {mySubscription?.status === SubscriptionStatus.ATRASADA && activeView !== 'minha-assinatura' && activeView !== 'clima' && (
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-3 mb-4 flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-xs text-red-700 font-semibold">⚠️ Seu pagamento está atrasado — regularize para evitar a suspensão do acesso.</p>
+              <button onClick={() => setActiveView('minha-assinatura')} className="text-xs font-bold text-red-700 underline shrink-0">
+                Ver assinatura
+              </button>
+            </div>
+          )}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
