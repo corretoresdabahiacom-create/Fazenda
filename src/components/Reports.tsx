@@ -340,7 +340,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(230, 243, 234);
-    doc.text(`Fazenda: ${settings?.farmName || "Fazenda Online"}  •  Cidade: ${settings?.city || "Sede Rural"}`, 22, y + 16);
+    doc.text(`Fazenda: ${settings?.farmName || "Agro Gestão"}  •  Cidade: ${settings?.city || "Sede Rural"}`, 22, y + 16);
     doc.text(`Período de Análise: ${format(dateInterval.start, 'dd/MM/yyyy')} a ${format(dateInterval.end, 'dd/MM/yyyy')}`, 22, y + 21);
     
     y += 33;

@@ -181,7 +181,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
       try {
         const parsed = JSON.parse(event.target?.result as string);
         if (!parsed.settings && !parsed.animals && !parsed.pastures) {
-          alert("Arquivo JSON inválido. Certifique-se de que é um arquivo de backup do Fazenda Online.");
+          alert("Arquivo JSON inválido. Certifique-se de que é um arquivo de backup do Agro Gestão.");
           return;
         }
         

@@ -184,7 +184,7 @@ function AnimaisTab({ animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -343,7 +343,7 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -656,7 +656,7 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -784,7 +784,7 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>

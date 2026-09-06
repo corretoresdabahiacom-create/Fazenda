@@ -1,4 +1,4 @@
-// Service Worker do Fazenda Online — cuida de duas coisas:
+// Service Worker do Agro Gestão — cuida de duas coisas:
 // 1) Cache básico para o app funcionar como PWA instalável.
 // 2) Recebimento de notificações push (Firebase Cloud Messaging) mesmo
 //    com o app fechado.
@@ -66,7 +66,7 @@ try {
   // Chamado quando chega uma notificação push com o app FECHADO ou em
   // segundo plano.
   messaging.onBackgroundMessage((payload) => {
-    const title = payload.notification?.title || 'Fazenda Online';
+    const title = payload.notification?.title || 'Agro Gestão';
     const options = {
       body: payload.notification?.body || '',
       icon: '/icon-192.png',

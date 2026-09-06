@@ -74,6 +74,40 @@ export async function getGoogleAccessToken(env: GoogleServiceAccountEnv, scope: 
   return data.access_token;
 }
 
+export async function firestoreGetDoc(
+  env: GoogleServiceAccountEnv,
+  collection: string,
+  docId: string,
+): Promise<Record<string, any> | null> {
+  const accessToken = await getGoogleAccessToken(env, 'https://www.googleapis.com/auth/datastore');
+  const projectId = env.FIREBASE_PROJECT_ID;
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${DATABASE_ID}/documents/${collection}/${docId}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Falha ao ler do Firestore: ${await res.text()}`);
+  const data = (await res.json()) as { fields?: Record<string, any> };
+  return data.fields ? fromFirestoreFields(data.fields) : {};
+}
+
+function fromFirestoreFields(fields: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(fields)) {
+    result[key] = fromFirestoreValue(value);
+  }
+  return result;
+}
+
+function fromFirestoreValue(value: any): any {
+  if ('stringValue' in value) return value.stringValue;
+  if ('integerValue' in value) return Number(value.integerValue);
+  if ('doubleValue' in value) return value.doubleValue;
+  if ('booleanValue' in value) return value.booleanValue;
+  if ('nullValue' in value) return null;
+  if ('arrayValue' in value) return (value.arrayValue.values || []).map(fromFirestoreValue);
+  if ('mapValue' in value) return fromFirestoreFields(value.mapValue.fields || {});
+  return null;
+}
+
 // Escreve (merge) num documento do Firestore usando a REST API, autenticado
 // como o Service Account — usado para atualizar assinaturas a partir de
 // webhooks de pagamento, sem precisar do SDK completo do Firebase Admin
@@ -134,3 +168,51 @@ function toFirestoreValue(value: any): any {
   }
   return { stringValue: String(value) };
 }
+
+// Verifica um token de autenticação do Firebase (enviado pelo app no
+// header Authorization: Bearer ...), confirmando a assinatura contra as
+// chaves públicas do Google (formato JWK, importável direto pelo
+// WebCrypto — mais simples e confiável do que fazer parsing manual de
+// certificado X.509) e checando issuer/audience/validade. Sem essa
+// verificação, qualquer pessoa poderia chamar os endpoints de criação de
+// assinatura fingindo ser outro usuário, só informando um uid arbitrário
+// no corpo da requisição.
+export async function verifyFirebaseIdToken(idToken: string, projectId: string): Promise<{ uid: string } | null> {
+  try {
+    const [headerB64, payloadB64, signatureB64] = idToken.split('.');
+    if (!headerB64 || !payloadB64 || !signatureB64) return null;
+
+    const decodeSegment = (s: string) => JSON.parse(atob(s.replace(/-/g, '+').replace(/_/g, '/')));
+    const header = decodeSegment(headerB64);
+    const payload = decodeSegment(payloadB64);
+
+    const now = Math.floor(Date.now() / 1000);
+    if (typeof payload.exp !== 'number' || payload.exp < now) return null;
+    if (payload.iss !== `https://securetoken.google.com/${projectId}`) return null;
+    if (payload.aud !== projectId) return null;
+    if (!payload.sub) return null;
+
+    const jwksRes = await fetch('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com');
+    const jwks = (await jwksRes.json()) as { keys: JsonWebKey[] };
+    const jwk = jwks.keys.find((k: any) => k.kid === header.kid);
+    if (!jwk) return null;
+
+    const publicKey = await crypto.subtle.importKey(
+      'jwk',
+      jwk,
+      { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+      false,
+      ['verify'],
+    );
+
+    const signedData = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
+    const signature = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
+    const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', publicKey, signature, signedData);
+    if (!valid) return null;
+
+    return { uid: payload.sub };
+  } catch {
+    return null;
+  }
+}
+

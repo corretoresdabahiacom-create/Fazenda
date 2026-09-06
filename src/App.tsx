@@ -354,7 +354,7 @@ export default function App() {
           </div>
           
           <h1 className="font-serif italic font-bold text-3xl text-[var(--primary)] mb-2 text-center">
-            {isRegistering ? 'Criar Nova Conta' : 'Fazenda Online'}
+            {isRegistering ? 'Criar Nova Conta' : 'Agro Gestão'}
           </h1>
           <p className="text-theme-secondary mb-6 text-sm text-center">
             {isRegistering 
@@ -552,9 +552,9 @@ export default function App() {
                   <div className="overflow-y-auto pr-2 space-y-4 text-xs text-theme-secondary leading-relaxed flex-1">
                     <p className="font-bold text-sm text-theme-primary">TERMOS DE USO — FAZENDA ONLINE</p>
 
-                    <p><strong>1. Aceitação dos Termos.</strong> Ao criar uma conta, marcar a caixa de aceite ou simplesmente usar o Fazenda Online, você concorda integralmente com estes Termos. Se você não concorda com algum ponto, a orientação é simples: não use o aplicativo, e caso já tenha instalado, desinstale-o. O uso continuado do aplicativo, a partir de agora, é considerado como sua concordância expressa com estes Termos.</p>
+                    <p><strong>1. Aceitação dos Termos.</strong> Ao criar uma conta, marcar a caixa de aceite ou simplesmente usar o Agro Gestão, você concorda integralmente com estes Termos. Se você não concorda com algum ponto, a orientação é simples: não use o aplicativo, e caso já tenha instalado, desinstale-o. O uso continuado do aplicativo, a partir de agora, é considerado como sua concordância expressa com estes Termos.</p>
 
-                    <p><strong>2. O que é o serviço.</strong> O Fazenda Online é um sistema de gestão rural (rebanho, agricultura, financeiro, clima e módulos correlatos) oferecido "como está" e "conforme disponível", sem garantia de disponibilidade ininterrupta, ausência de erros, ou adequação a uma finalidade específica.</p>
+                    <p><strong>2. O que é o serviço.</strong> O Agro Gestão é um sistema de gestão rural (rebanho, agricultura, financeiro, clima e módulos correlatos) oferecido "como está" e "conforme disponível", sem garantia de disponibilidade ininterrupta, ausência de erros, ou adequação a uma finalidade específica.</p>
 
                     <p><strong>3. Cadastro e responsabilidade pela conta.</strong> Você é responsável por manter a confidencialidade da sua senha e por todas as atividades realizadas na sua conta. Informações incorretas, desatualizadas ou incompletas cadastradas por você são de sua exclusiva responsabilidade.</p>
 
@@ -564,13 +564,13 @@ export default function App() {
 
                     <p><strong>6. Privacidade e LGPD.</strong> Tratamos seus dados pessoais em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018). Coletamos apenas os dados necessários para o funcionamento do aplicativo (como e-mail, nome da propriedade, cidade e, se você informar, data de aniversário). Você pode solicitar a qualquer momento a exclusão da sua conta e dos seus dados, entrando em contato pelo e-mail de suporte abaixo.</p>
 
-                    <p><strong>7. O que NÃO coletamos nem guardamos.</strong> O Fazenda Online não solicita, não processa e não armazena dados bancários, número de cartão de crédito, CVV, senhas de banco ou qualquer dado sensível de pagamento — essas informações, quando aplicável, são digitadas diretamente nas telas seguras dos gateways de pagamento parceiros (Mercado Pago, PayPal, processadoras de cartão), nunca dentro do nosso próprio sistema. Também não coletamos dados sensíveis (como origem racial, convicção religiosa, opinião política, dado de saúde ou biometria) além do estritamente necessário ao uso do aplicativo.</p>
+                    <p><strong>7. O que NÃO coletamos nem guardamos.</strong> O Agro Gestão não solicita, não processa e não armazena dados bancários, número de cartão de crédito, CVV, senhas de banco ou qualquer dado sensível de pagamento — essas informações, quando aplicável, são digitadas diretamente nas telas seguras dos gateways de pagamento parceiros (Mercado Pago, PayPal, processadoras de cartão), nunca dentro do nosso próprio sistema. Também não coletamos dados sensíveis (como origem racial, convicção religiosa, opinião política, dado de saúde ou biometria) além do estritamente necessário ao uso do aplicativo.</p>
 
                     <p><strong>8. Publicidade.</strong> O aplicativo pode exibir conteúdo publicitário de terceiros em espaço próprio na tela inicial. Não nos responsabilizamos pelo conteúdo, veracidade ou pelas transações realizadas com anunciantes — qualquer negociação com um anunciante é de responsabilidade exclusiva das partes envolvidas.</p>
 
-                    <p><strong>9. Limitação de responsabilidade.</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência, validação e decisão final sobre qualquer informação, cálculo, sugestão ou conselho gerado pelo aplicativo (incluindo previsões climáticas, cálculos financeiros, sugestões de manejo ou respostas do Consultor Rural) antes de qualquer tomada de decisão prática na sua atividade rural. Na máxima extensão permitida pela legislação aplicável, o Fazenda Online, seus desenvolvedores, administradores, sócios e parceiros não se responsabilizam civilmente por perdas, danos diretos, indiretos, lucros cessantes ou prejuízos patrimoniais decorrentes do uso ou da impossibilidade de uso do aplicativo. Esta cláusula limita responsabilidade civil na forma da lei — ela não afasta, e não tem o poder de afastar, eventual responsabilidade criminal, que é sempre apurada e determinada exclusivamente pelas autoridades e pelo Poder Judiciário competentes, conforme a legislação vigente.</p>
+                    <p><strong>9. Limitação de responsabilidade.</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência, validação e decisão final sobre qualquer informação, cálculo, sugestão ou conselho gerado pelo aplicativo (incluindo previsões climáticas, cálculos financeiros, sugestões de manejo ou respostas do Consultor Rural) antes de qualquer tomada de decisão prática na sua atividade rural. Na máxima extensão permitida pela legislação aplicável, o Agro Gestão, seus desenvolvedores, administradores, sócios e parceiros não se responsabilizam civilmente por perdas, danos diretos, indiretos, lucros cessantes ou prejuízos patrimoniais decorrentes do uso ou da impossibilidade de uso do aplicativo. Esta cláusula limita responsabilidade civil na forma da lei — ela não afasta, e não tem o poder de afastar, eventual responsabilidade criminal, que é sempre apurada e determinada exclusivamente pelas autoridades e pelo Poder Judiciário competentes, conforme a legislação vigente.</p>
 
-                    <p><strong>10. Manutenção e disponibilidade.</strong> O Fazenda Online pode sair do ar temporariamente para manutenção, atualizações ou correções, sem aviso prévio, sempre que necessário para o bom funcionamento do serviço. Em caso de encerramento definitivo do aplicativo, você será avisado com a maior antecedência possível e receberá de volta o valor proporcional aos dias não utilizados do mês já pago da sua assinatura.</p>
+                    <p><strong>10. Manutenção e disponibilidade.</strong> O Agro Gestão pode sair do ar temporariamente para manutenção, atualizações ou correções, sem aviso prévio, sempre que necessário para o bom funcionamento do serviço. Em caso de encerramento definitivo do aplicativo, você será avisado com a maior antecedência possível e receberá de volta o valor proporcional aos dias não utilizados do mês já pago da sua assinatura.</p>
 
                     <p><strong>11. Alterações destes Termos.</strong> Podemos atualizar estes Termos periodicamente para refletir mudanças no aplicativo ou na legislação. Mudanças relevantes serão comunicadas dentro do próprio aplicativo.</p>
 
@@ -828,7 +828,7 @@ export default function App() {
         <div className="max-w-sm w-full text-center space-y-4 py-8">
           <CreditCard size={48} className="text-[var(--primary)] mx-auto" />
           <h1 className="text-xl font-bold text-theme-primary">Seu teste grátis de 7 dias terminou</h1>
-          <p className="text-sm text-theme-secondary">Assine um plano para continuar usando o Fazenda Online.</p>
+          <p className="text-sm text-theme-secondary">Assine um plano para continuar usando o Agro Gestão.</p>
           <MinhaAssinatura uid={user?.uid || ''} />
           <button onClick={handleLogout} className="text-xs font-semibold text-theme-secondary underline">
             Sair da conta
@@ -872,7 +872,7 @@ export default function App() {
               className="font-serif italic font-bold text-xl whitespace-nowrap"
               style={{ color: 'var(--primary)' }}
             >
-              Fazenda Online
+              Agro Gestão
             </motion.h1>
           )}
           {!isMobile && (
@@ -1109,7 +1109,7 @@ export default function App() {
           </AnimatePresence>
         )}
 
-        <div className={activeView === 'clima' ? '' : 'p-4 md:p-6'}>
+        <div className={activeView === 'clima' ? '' : 'p-4 md:p-6 max-w-[1600px] mx-auto w-full'}>
           {mySubscription?.status === SubscriptionStatus.ATRASADA && activeView !== 'minha-assinatura' && activeView !== 'clima' && (
             <div className="bg-red-50 border border-red-200 rounded-2xl p-3 mb-4 flex items-center justify-between gap-3 flex-wrap">
               <p className="text-xs text-red-700 font-semibold">⚠️ Seu pagamento está atrasado — regularize para evitar a suspensão do acesso.</p>

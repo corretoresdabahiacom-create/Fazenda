@@ -1,6 +1,6 @@
 {
-  "name": "Fazenda Online",
-  "short_name": "Fazenda",
+  "name": "Agro Gestão",
+  "short_name": "Agro Gestão",
   "description": "Gestão completa de fazenda: rebanho, agricultura, financeiro, clima e mais.",
   "start_url": "/",
   "display": "standalone",

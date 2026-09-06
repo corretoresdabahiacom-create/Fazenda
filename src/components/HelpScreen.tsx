@@ -210,7 +210,7 @@ const SECTIONS: Section[] = [
     icon: Smartphone,
     title: 'Instalar como aplicativo (PWA)',
     content: [
-      'O Fazenda Online pode ser instalado no seu celular ou computador como um aplicativo de verdade, com ícone próprio — sem precisar baixar de nenhuma loja de aplicativos.',
+      'O Agro Gestão pode ser instalado no seu celular ou computador como um aplicativo de verdade, com ícone próprio — sem precisar baixar de nenhuma loja de aplicativos.',
       'No Chrome/Edge, procure o botão "Instalar" na barra de endereço ou no menu do navegador. No iPhone (Safari), use "Compartilhar" → "Adicionar à Tela de Início".',
       'Funciona parcialmente offline (você consegue reabrir o app sem internet, mas precisa de conexão para salvar ou carregar dados novos).',
     ],
@@ -260,7 +260,7 @@ export default function HelpScreen({ onClose }: { onClose: () => void }) {
       <div className="bg-theme-card w-full max-w-2xl md:rounded-3xl overflow-hidden flex flex-col h-full md:h-auto md:max-h-[85vh] shadow-2xl">
         <div className="p-5 border-b border-theme flex items-center justify-between shrink-0">
           <h2 className="text-lg font-bold text-theme-primary flex items-center gap-2">
-            <HelpCircle className="text-primary" size={22} /> Como usar o Fazenda Online
+            <HelpCircle className="text-primary" size={22} /> Como usar o Agro Gestão
           </h2>
           <button onClick={onClose} className="p-2 rounded-full bg-theme-secondary text-theme-secondary hover:opacity-80">
             <X size={18} />

@@ -103,7 +103,7 @@ class NotificationServiceManager {
       }
 
       this.sendLocalNotification(
-        '⚠️ Alertas da Fazenda Online',
+        '⚠️ Alertas da Agro Gestão',
         `${message} Clique para abrir a Central de Obrigações.`
       );
     }

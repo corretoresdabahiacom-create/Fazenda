@@ -7,8 +7,11 @@
 //   MERCADOPAGO_ACCESS_TOKEN  (Suas integrações > credenciais de produção
 //   ou de teste, em https://www.mercadopago.com.br/developers/panel)
 
+import { verifyFirebaseIdToken } from './_googleAuth';
+
 interface Env {
   MERCADOPAGO_ACCESS_TOKEN?: string;
+  FIREBASE_PROJECT_ID?: string;
 }
 
 // Preços fixos dos planos — mantidos aqui em espelho de src/types.ts
@@ -45,6 +48,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
 
+    // Confirma que quem está chamando é realmente o dono da conta —
+    // sem isso, qualquer pessoa poderia criar uma sessão de checkout
+    // informando o uid de outra pessoa.
+    const authHeader = request.headers.get('Authorization') || '';
+    const idToken = authHeader.replace(/^Bearer\s+/i, '');
+    const verified = env.FIREBASE_PROJECT_ID ? await verifyFirebaseIdToken(idToken, env.FIREBASE_PROJECT_ID) : null;
+    if (!verified || verified.uid !== uid) {
+      return new Response(JSON.stringify({ error: 'Não autorizado.' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const value = plan === 'Agro Total' ? customPrice : PLAN_PRICES[plan];
     if (!value || value <= 0) {
       return new Response(JSON.stringify({ error: 'Valor do plano inválido.' }), {
@@ -62,7 +78,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        reason: `Fazenda Online — Plano ${plan}`,
+        reason: `Agro Gestão — Plano ${plan}`,
         external_reference: uid,
         payer_email: email,
         back_url: backUrl,

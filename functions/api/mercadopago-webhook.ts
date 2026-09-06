@@ -63,16 +63,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const dataId = body?.data?.id || url.searchParams.get('data.id') || url.searchParams.get('id');
     const type = body?.type || url.searchParams.get('type') || url.searchParams.get('topic');
 
-    // Validação de autenticidade — se a chave secreta estiver configurada,
-    // qualquer notificação sem assinatura válida é descartada.
-    if (env.MERCADOPAGO_WEBHOOK_SECRET) {
-      const xSignature = request.headers.get('x-signature');
-      const xRequestId = request.headers.get('x-request-id');
-      const valid = xSignature ? await verifyMpSignature(xSignature, xRequestId, dataId, env.MERCADOPAGO_WEBHOOK_SECRET) : false;
-      if (!valid) {
-        console.warn('Assinatura de webhook do Mercado Pago inválida — notificação ignorada.');
-        return new Response('ok', { status: 200 }); // 200 para o MP não ficar retentando um payload malicioso
-      }
+    // Validação de autenticidade OBRIGATÓRIA — sem a chave secreta
+    // configurada, nenhuma notificação é processada (por segurança, nunca
+    // confiamos num aviso não assinado, mesmo que pareça legítimo).
+    if (!env.MERCADOPAGO_WEBHOOK_SECRET) {
+      console.warn('MERCADOPAGO_WEBHOOK_SECRET não configurado — notificação recusada por segurança.');
+      return new Response('ok', { status: 200 });
+    }
+    const xSignature = request.headers.get('x-signature');
+    const xRequestId = request.headers.get('x-request-id');
+    const valid = xSignature ? await verifyMpSignature(xSignature, xRequestId, dataId, env.MERCADOPAGO_WEBHOOK_SECRET) : false;
+    if (!valid) {
+      console.warn('Assinatura de webhook do Mercado Pago inválida — notificação ignorada.');
+      return new Response('ok', { status: 200 }); // 200 para o MP não ficar retentando um payload malicioso
     }
 
     if (!dataId || !type) {

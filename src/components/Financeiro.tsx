@@ -143,7 +143,7 @@ function ContasTab({ kind, items, costCenters, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>

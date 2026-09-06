@@ -132,7 +132,7 @@ function EscalasTab({ items, teams, onSave, onDelete }: { items: WorkSchedule[];
           <Plus size={18} /> Nova Escala
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Equipe</th><th className="text-left p-3">Dias</th><th className="text-left p-3">Horário</th><th className="p-3"></th></tr>
@@ -191,7 +191,7 @@ function TreinamentosTab({ items, onSave, onDelete }: { items: Training[]; onSav
           <Plus size={18} /> Novo Treinamento
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Data</th><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Treinamento</th><th className="text-left p-3">Fornecedor</th><th className="p-3"></th></tr>
@@ -244,7 +244,7 @@ function EpisTab({ items, onSave, onDelete }: { items: PPEItem[]; onSave: (p: PP
           <Plus size={18} /> Novo EPI
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Item</th><th className="text-left p-3">Entrega</th><th className="text-left p-3">Validade</th><th className="p-3"></th></tr>
@@ -297,7 +297,7 @@ function CertificacoesTab({ items, onSave, onDelete }: { items: Certification[];
           <Plus size={18} /> Nova Certificação
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Certificação</th><th className="text-left p-3">Emissão</th><th className="text-left p-3">Validade</th><th className="p-3"></th></tr>

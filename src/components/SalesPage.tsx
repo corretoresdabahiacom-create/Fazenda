@@ -91,7 +91,7 @@ const BENEFITS = [
 ];
 
 const FAQS = [
-  { q: 'Preciso entender de computador para usar?', a: 'Não. As telas foram pensadas para serem simples e diretas — se você usa WhatsApp, consegue usar o Fazenda Online.' },
+  { q: 'Preciso entender de computador para usar?', a: 'Não. As telas foram pensadas para serem simples e diretas — se você usa WhatsApp, consegue usar o Agro Gestão.' },
   { q: 'Meus dados ficam seguros?', a: 'Sim. Cada conta é isolada e só você tem acesso aos seus dados. Não guardamos números de cartão nem dados bancários — o pagamento acontece direto na página segura do Mercado Pago, Stripe ou PayPal.' },
   { q: 'Posso cancelar quando quiser?', a: 'Sim, a qualquer momento, direto pelo aplicativo em "Minha Assinatura" — sem precisar ligar ou mandar e-mail para cancelar.' },
   { q: 'E se eu não gostar depois de assinar?', a: 'Você tem 7 dias de teste grátis antes de qualquer cobrança, para conhecer o aplicativo com calma antes de decidir.' },
@@ -105,7 +105,7 @@ export default function SalesPage({ onClose, onStartTrial }: Props) {
     <div className="fixed inset-0 z-[80] bg-theme-card overflow-y-auto">
       <div className="sticky top-0 z-10 bg-theme-card/95 backdrop-blur border-b border-theme">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <span className="font-serif italic font-bold text-lg text-[var(--primary)]">Fazenda Online</span>
+          <span className="font-serif italic font-bold text-lg text-[var(--primary)]">Agro Gestão</span>
           <button onClick={onClose} className="p-2 rounded-full bg-theme-secondary text-theme-secondary">
             <X size={18} />
           </button>
@@ -153,7 +153,7 @@ export default function SalesPage({ onClose, onStartTrial }: Props) {
       {/* Benefícios */}
       <section className="max-w-5xl mx-auto px-4 py-14">
         <h2 className="font-serif italic font-bold text-2xl text-theme-primary text-center mb-2">
-          Tudo isso muda com o Fazenda Online
+          Tudo isso muda com o Agro Gestão
         </h2>
         <p className="text-theme-secondary text-sm text-center mb-10 max-w-lg mx-auto">
           Um aplicativo pensado do zero para a rotina real do campo — não uma planilha de escritório adaptada para o agro.

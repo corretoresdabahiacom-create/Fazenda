@@ -1072,7 +1072,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // merge:true preserva campos que não fazem parte de FarmSettings
       // (como o "role", que não pode ser sobrescrito por uma gravação normal
       // de configurações — ver firestore.rules).
-      await setDoc(doc(db, 'users', currentUid), s, { merge: true });
+      await setDoc(doc(db, 'users', currentUid), stripUndefined(s), { merge: true });
       console.log('✅ Settings salvas para usuário:', currentUid);
       // Sincroniza cidade/aniversário com o índice de usuários, usado pelo
       // Painel Admin para filtrar notificações por região/aniversário.
@@ -1836,7 +1836,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     const currentUid = user.uid;
     try {
-      await setDoc(doc(db, 'users', currentUid, 'transactions', transaction.id), transaction);
+      await setDoc(doc(db, 'users', currentUid, 'transactions', transaction.id), stripUndefined(transaction));
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/transactions/${transaction.id}`);
     }
@@ -1976,7 +1976,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setLoading(true);
 
       const s: FarmSettings = { 
-        farmName: 'Fazenda Online', 
+        farmName: 'Agro Gestão', 
         city: 'Uberaba - MG' 
       };
       await setDoc(doc(db, 'users', currentUid), s, { merge: true });

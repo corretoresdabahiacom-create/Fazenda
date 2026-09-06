@@ -419,8 +419,8 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
             </div>
             
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[85vh] space-y-4">
-              <div className="grid grid-cols-4 gap-4">
-                <div className="col-span-1">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div className="sm:col-span-1">
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Nº Pasto</label>
                   <input 
                     required
@@ -431,7 +431,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     placeholder="01"
                   />
                 </div>
-                <div className="col-span-3">
+                <div className="sm:col-span-3">
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Nome do Setor / Pasto</label>
                   <input 
                     required

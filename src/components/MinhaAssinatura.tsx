@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { Subscription, SubscriptionStatus, PlanTier, PLAN_PRICES } from '../types';
 import { CreditCard, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
@@ -46,9 +46,13 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
       paypal: '/api/create-subscription-paypal',
     };
     try {
+      const idToken = await auth.currentUser?.getIdToken();
       const res = await fetch(endpoints[selectedGateway], {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           uid,
           email: sub.email,
@@ -155,7 +159,7 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
           {checkoutError && <p className="text-xs text-red-500">{checkoutError}</p>}
           <div>
             <p className="text-xs font-semibold text-theme-secondary mb-1.5">Forma de pagamento</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {([
                 { id: 'mercadopago', label: 'Mercado Pago' },
                 { id: 'stripe', label: 'Cartão (Stripe)' },
