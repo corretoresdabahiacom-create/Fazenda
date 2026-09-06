@@ -22,6 +22,9 @@ const statusInfo: Record<string, { color: string; icon: typeof CheckCircle2; lab
 export default function MinhaAssinatura({ uid }: { uid: string }) {
   const [sub, setSub] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState<PlanTier>(PlanTier.UMA_FAZENDA);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!uid) return;
@@ -31,6 +34,34 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
     }, () => setLoading(false));
     return unsub;
   }, [uid]);
+
+  async function handleSubscribe() {
+    if (!sub) return;
+    setCheckingOut(true);
+    setCheckoutError(null);
+    try {
+      const res = await fetch('/api/create-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid,
+          email: sub.email,
+          plan: selectedPlan,
+          appUrl: window.location.origin,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.initPoint) {
+        setCheckoutError(data.error || 'Não foi possível iniciar o pagamento agora.');
+        return;
+      }
+      window.location.href = data.initPoint;
+    } catch {
+      setCheckoutError('Falha de conexão ao iniciar o pagamento. Tente novamente.');
+    } finally {
+      setCheckingOut(false);
+    }
+  }
 
   async function handleCancel() {
     if (!sub) return;
@@ -98,6 +129,30 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
         <p className="text-xs text-theme-secondary bg-theme-secondary rounded-xl p-3">
           O plano Agro Total tem valor combinado diretamente com nossa equipe — entre em contato pelo e-mail de suporte para qualquer ajuste.
         </p>
+      )}
+
+      {sub.status !== SubscriptionStatus.ATIVA && (
+        <div className="bg-theme-card rounded-2xl border border-theme p-5 space-y-3">
+          <h2 className="font-bold text-theme-primary text-sm">Assinar um plano</h2>
+          <div className="space-y-2">
+            {([PlanTier.UMA_FAZENDA, PlanTier.TRES_FAZENDAS, PlanTier.CINCO_FAZENDAS] as PlanTier[]).map((plan) => (
+              <label key={plan} className={`flex items-center justify-between border rounded-xl p-3 cursor-pointer ${selectedPlan === plan ? 'border-[var(--primary)] bg-[var(--primary-soft)]' : 'border-theme'}`}>
+                <span className="flex items-center gap-2 text-sm font-semibold text-theme-primary">
+                  <input type="radio" name="plan" checked={selectedPlan === plan} onChange={() => setSelectedPlan(plan)} />
+                  {plan}
+                </span>
+                <span className="text-sm font-bold text-[var(--primary)]">R$ {PLAN_PRICES[plan]?.toFixed(2)}/mês</span>
+              </label>
+            ))}
+          </div>
+          {checkoutError && <p className="text-xs text-red-500">{checkoutError}</p>}
+          <button onClick={handleSubscribe} disabled={checkingOut} className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-3 rounded-xl font-bold text-sm disabled:opacity-60">
+            {checkingOut ? 'Abrindo pagamento seguro...' : 'Assinar e pagar com Mercado Pago'}
+          </button>
+          <p className="text-[10px] text-theme-secondary text-center">
+            Você será redirecionado para a página segura do Mercado Pago — nunca guardamos dados do seu cartão neste aplicativo.
+          </p>
+        </div>
       )}
 
       {sub.status !== SubscriptionStatus.CANCELADA && sub.status !== SubscriptionStatus.BLOQUEADA && (
