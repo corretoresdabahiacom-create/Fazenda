@@ -184,11 +184,30 @@ function UsuariosTab({ users, subscriptions, adminEmail }: {
 
   const subByUser = (uid: string) => subscriptions.find(s => s.userId === uid);
 
+  function daysSince(dateStr?: string): number | null {
+    if (!dateStr) return null;
+    return Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  function trialPhase(sub?: Subscription): 'free' | 'extended' | null {
+    if (!sub || sub.status !== SubscriptionStatus.TRIAL || sub.externalSubscriptionId) return null;
+    const d = daysSince(sub.createdAt);
+    if (d === null) return null;
+    if (d < 3) return 'free';
+    if (d < 10) return 'extended';
+    return null;
+  }
+
   const filtered = users.filter(u => {
     if (search && !u.email.toLowerCase().includes(search.toLowerCase()) && !(u.displayName || '').toLowerCase().includes(search.toLowerCase())) return false;
     if (statusFilter !== 'todos') {
       const sub = subByUser(u.userId);
       if (statusFilter === 'excluido') return !!u.deleted;
+      if (statusFilter === 'teste_3d') return trialPhase(sub) === 'free';
+      if (statusFilter === 'teste_7d') return trialPhase(sub) === 'extended';
+      if (statusFilter === 'inativo_30') { const d = daysSince(u.lastLoginAt); return d !== null && d >= 30; }
+      if (statusFilter === 'inativo_60') { const d = daysSince(u.lastLoginAt); return d !== null && d >= 60; }
+      if (statusFilter === 'inativo_90') { const d = daysSince(u.lastLoginAt); return d !== null && d >= 90; }
       return sub?.status === statusFilter;
     }
     return true;
@@ -237,6 +256,11 @@ function UsuariosTab({ users, subscriptions, adminEmail }: {
           <option value="todos">Todos os status</option>
           {Object.values(SubscriptionStatus).map(s => <option key={s} value={s}>{s}</option>)}
           <option value="excluido">Excluídos</option>
+          <option value="teste_3d">Em teste grátis (3 dias)</option>
+          <option value="teste_7d">Em teste estendido (7 dias)</option>
+          <option value="inativo_30">Inativo há 30+ dias</option>
+          <option value="inativo_60">Inativo há 60+ dias</option>
+          <option value="inativo_90">Inativo há 90+ dias</option>
         </select>
       </div>
 
@@ -248,6 +272,7 @@ function UsuariosTab({ users, subscriptions, adminEmail }: {
               <th className="text-left p-3">Cidade/Região</th>
               <th className="text-left p-3">Plano</th>
               <th className="text-left p-3">Status</th>
+              <th className="text-left p-3">Última vez</th>
               <th className="p-3">Ações</th>
             </tr>
           </thead>
@@ -264,8 +289,16 @@ function UsuariosTab({ users, subscriptions, adminEmail }: {
                   <td className="p-3 text-theme-secondary">{sub?.plan || '—'}</td>
                   <td className="p-3">
                     <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${statusColor[sub?.status || ''] || 'bg-gray-100 text-gray-500'}`}>
-                      {u.deleted ? 'Excluído' : sub?.status || '—'}
+                      {u.deleted ? 'Excluído' : trialPhase(sub) === 'free' ? 'Teste 3 dias' : trialPhase(sub) === 'extended' ? 'Teste 7 dias' : sub?.status || '—'}
                     </span>
+                  </td>
+                  <td className="p-3">
+                    {(() => {
+                      const d = daysSince(u.lastLoginAt);
+                      if (d === null) return <span className="text-theme-secondary text-xs">—</span>;
+                      const color = d >= 90 ? 'text-red-600' : d >= 60 ? 'text-orange-600' : d >= 30 ? 'text-amber-600' : 'text-theme-secondary';
+                      return <span className={`text-xs font-semibold ${color}`}>{d === 0 ? 'Hoje' : `há ${d} dia(s)`}</span>;
+                    })()}
                   </td>
                   <td className="p-3">
                     <div className="flex gap-1 justify-end flex-wrap">
@@ -280,7 +313,7 @@ function UsuariosTab({ users, subscriptions, adminEmail }: {
               );
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={5} className="p-6 text-center text-theme-secondary text-sm">Nenhum usuário encontrado.</td></tr>
+              <tr><td colSpan={6} className="p-6 text-center text-theme-secondary text-sm">Nenhum usuário encontrado.</td></tr>
             )}
           </tbody>
         </table>
