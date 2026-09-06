@@ -126,10 +126,24 @@ html, body, #root {
    cor de texto definida herdam a cor de texto do tema geral (que fica
    clara no modo escuro), ficando ilegíveis dentro dessas caixas sempre
    claras. */
+.legacy-light {
+  color: #2d2a26;
+}
 .legacy-light input,
 .legacy-light textarea,
 .legacy-light select {
   color: #2d2a26;
+}
+
+/* Os menus suspensos (<select>) sempre abrem a lista de opções com fundo
+   claro, controlado pelo navegador/sistema operacional — isso não pode
+   ser estilizado de forma confiável para ficar escuro. Por isso, o texto
+   das opções precisa ficar sempre escuro, mesmo que o <select> em si siga
+   o tema (claro ou escuro) quando fechado — senão o texto claro do modo
+   escuro fica invisível contra o fundo branco da lista aberta. */
+select option {
+  color: #1f2937;
+  background-color: #ffffff;
 }
 
 /* ===== RESPONSIVIDADE MOBILE ===== */
