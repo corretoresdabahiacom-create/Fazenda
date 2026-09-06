@@ -1,8 +1,9 @@
-import { FarmTask, Expense, FixedExpense, FarmSettings, Animal, AnimalType } from '../types';
+import { FarmTask, Expense, FixedExpense, FarmSettings, Animal, AnimalType, HealthEvent, CropPlan, AccountPayable, AccountReceivable, ReproductionEvent, ReproductionEventType, Pasture, AccountStatus } from '../types';
+import { format } from 'date-fns';
 
 export interface ObligationAlert {
   id: string; // unique identifier for the alert item
-  type: 'task' | 'variable_expense' | 'fixed_expense' | 'animal_rent';
+  type: 'task' | 'variable_expense' | 'fixed_expense' | 'animal_rent' | 'vaccine' | 'crop_planting' | 'crop_harvest' | 'account_payable' | 'account_receivable' | 'weaning' | 'pasture_rotation';
   title: string;
   description: string;
   dueDate: string; // YYYY-MM-DD format
@@ -41,7 +42,13 @@ export function computeObligations(
   expenses: Expense[],
   fixedExpenses: FixedExpense[],
   settings: FarmSettings,
-  animals: Animal[] = []
+  animals: Animal[] = [],
+  healthEvents: HealthEvent[] = [],
+  cropPlans: CropPlan[] = [],
+  accountsPayable: AccountPayable[] = [],
+  accountsReceivable: AccountReceivable[] = [],
+  reproductionEvents: ReproductionEvent[] = [],
+  pastures: Pasture[] = []
 ): ObligationAlert[] {
   const alerts: ObligationAlert[] = [];
   const today = getLocalToday();
@@ -239,6 +246,147 @@ export function computeObligations(
           originalItem: { ...animal, monthKey: current.key }
         });
       }
+    }
+  });
+
+  // 5. Vacinas / Vermífugos (reforço/vencimento)
+  healthEvents.forEach(h => {
+    if (!h.nextDoseDate) return;
+    const dueDate = parseLocalISO(h.nextDoseDate);
+    const daysRemaining = getDaysDiff(dueDate, today);
+    if (daysRemaining <= 3 && !concludedKeys.includes(`vaccine-${h.id}`)) {
+      alerts.push({
+        id: `vaccine-${h.id}`,
+        type: 'vaccine',
+        title: `${h.type}: ${h.productName}`,
+        description: `Animal ${h.animalEarTag}${h.veterinarian ? ` | Vet: ${h.veterinarian}` : ''}`,
+        dueDate: h.nextDoseDate,
+        daysRemaining,
+        originalId: h.id,
+        originalItem: h
+      });
+    }
+  });
+
+  // 6. Plantio e Colheita (Planejamento Agrícola)
+  cropPlans.forEach(c => {
+    if (c.plantingDateEstimate && !concludedKeys.includes(`crop-plant-${c.id}`)) {
+      const dueDate = parseLocalISO(c.plantingDateEstimate);
+      const daysRemaining = getDaysDiff(dueDate, today);
+      if (daysRemaining <= 3) {
+        alerts.push({
+          id: `crop-plant-${c.id}`,
+          type: 'crop_planting',
+          title: `Plantio: ${c.cultura}`,
+          description: c.safra ? `Safra ${c.safra}` : 'Plantio planejado',
+          dueDate: c.plantingDateEstimate,
+          daysRemaining,
+          originalId: c.id,
+          originalItem: c
+        });
+      }
+    }
+    if (c.harvestDateEstimate && !concludedKeys.includes(`crop-harvest-${c.id}`)) {
+      const dueDate = parseLocalISO(c.harvestDateEstimate);
+      const daysRemaining = getDaysDiff(dueDate, today);
+      if (daysRemaining <= 3) {
+        alerts.push({
+          id: `crop-harvest-${c.id}`,
+          type: 'crop_harvest',
+          title: `Colheita: ${c.cultura}`,
+          description: c.safra ? `Safra ${c.safra}` : 'Colheita planejada',
+          dueDate: c.harvestDateEstimate,
+          daysRemaining,
+          originalId: c.id,
+          originalItem: c
+        });
+      }
+    }
+  });
+
+  // 7. Financeiro — Contas a Pagar e a Receber (duplicata, boleto, pagamentos)
+  accountsPayable.forEach(a => {
+    if (!a.dueDate || a.status === AccountStatus.PAGO) return;
+    if (concludedKeys.includes(`account-payable-${a.id}`)) return;
+    const dueDate = parseLocalISO(a.dueDate);
+    const daysRemaining = getDaysDiff(dueDate, today);
+    if (daysRemaining <= 3) {
+      alerts.push({
+        id: `account-payable-${a.id}`,
+        type: 'account_payable',
+        title: `A Pagar: ${a.description}`,
+        description: 'Financeiro',
+        dueDate: a.dueDate,
+        daysRemaining,
+        value: a.value,
+        originalId: a.id,
+        originalItem: a
+      });
+    }
+  });
+
+  accountsReceivable.forEach(a => {
+    if (!a.dueDate || a.status === AccountStatus.PAGO) return;
+    if (concludedKeys.includes(`account-receivable-${a.id}`)) return;
+    const dueDate = parseLocalISO(a.dueDate);
+    const daysRemaining = getDaysDiff(dueDate, today);
+    if (daysRemaining <= 3) {
+      alerts.push({
+        id: `account-receivable-${a.id}`,
+        type: 'account_receivable',
+        title: `A Receber: ${a.description}`,
+        description: 'Financeiro',
+        dueDate: a.dueDate,
+        daysRemaining,
+        value: a.value,
+        originalId: a.id,
+        originalItem: a
+      });
+    }
+  });
+
+  // 8. Apartação/Desmama — calculada automaticamente a partir do Parto
+  // (não precisa cadastrar de novo: assim que um Parto é registrado em
+  // Pecuária Profissional > Reprodução, a previsão de desmama já é
+  // estimada em ~210 dias, padrão comum para bovinos de corte).
+  const DIAS_ATE_DESMAMA = 210;
+  reproductionEvents.forEach(r => {
+    if (r.type !== ReproductionEventType.PARTO || !r.date) return;
+    if (concludedKeys.includes(`weaning-${r.id}`)) return;
+    const birthDate = parseLocalISO(r.date);
+    const weaningDate = new Date(birthDate);
+    weaningDate.setDate(weaningDate.getDate() + DIAS_ATE_DESMAMA);
+    const daysRemaining = getDaysDiff(weaningDate, today);
+    if (daysRemaining <= 3) {
+      alerts.push({
+        id: `weaning-${r.id}`,
+        type: 'weaning',
+        title: `Apartar/Desmamar: ${r.offspringEarTag || 'cria de ' + r.animalEarTag}`,
+        description: `Nascido em ${format(birthDate, 'dd/MM/yyyy')} — previsão de desmama (~${DIAS_ATE_DESMAMA} dias)`,
+        dueDate: `${weaningDate.getFullYear()}-${padZero(weaningDate.getMonth() + 1)}-${padZero(weaningDate.getDate())}`,
+        daysRemaining,
+        originalId: r.id,
+        originalItem: r
+      });
+    }
+  });
+
+  // 9. Remanejo de Pasto
+  pastures.forEach(p => {
+    if (!p.nextRotationDate || concludedKeys.includes(`pasture-rotation-${p.id}`)) return;
+    const dueDate = parseLocalISO(p.nextRotationDate);
+    const daysRemaining = getDaysDiff(dueDate, today);
+    if (daysRemaining <= 3) {
+      alerts.push({
+        id: `pasture-rotation-${p.id}`,
+        type: 'pasture_rotation',
+        title: `Remanejo de Pasto: ${p.name}`,
+        description: `Pasto nº ${p.number}`,
+        dueDate: p.nextRotationDate,
+        daysRemaining,
+        originalId: p.id,
+        originalItem: p
+      });
     }
   });
 

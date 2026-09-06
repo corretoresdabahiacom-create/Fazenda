@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun } from 'lucide-react';
+, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -37,7 +37,8 @@ import {
   Pasture, 
   FarmTask,
   TransactionHistory,
-  FarmSettings
+  FarmSettings,
+  AccountStatus
 } from './types';
 
 import ThemeToggle from './components/ThemeToggle';
@@ -65,6 +66,7 @@ import Reports from './components/Reports';
 import FarmSettingsComp from './components/FarmSettings';
 import FarmMap from './components/FarmMap';
 import ObligationsDrawer from './components/ObligationsDrawer';
+import HelpScreen from './components/HelpScreen';
 import WeighingWorksheet from './components/WeighingWorksheet';
 import NutritionCalculator from './components/NutritionCalculator';
 import { NotificationService } from './utils/notificationService';
@@ -182,6 +184,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isObligationsOpen, setIsObligationsOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -199,7 +202,10 @@ export default function App() {
   const [isSendingReset, setIsSendingReset] = useState(false);
 
   // Calculate obligations and state
-  const activeAlerts = computeObligations(tasks || [], expenses || [], fixedExpenses || [], settings || { farmName: '', city: '' }, animals || []);
+  const activeAlerts = computeObligations(
+    tasks || [], expenses || [], fixedExpenses || [], settings || { farmName: '', city: '' }, animals || [],
+    healthEvents || [], cropPlans || [], accountsPayable || [], accountsReceivable || [], reproductionEvents || [], pastures || []
+  );
   const activeAlertsCount = activeAlerts.length;
   const hasOverdue = activeAlerts.some(a => a.daysRemaining < 0);
   const overdueCount = activeAlerts.filter(a => a.daysRemaining < 0).length;
@@ -217,6 +223,23 @@ export default function App() {
         await updateSettings({
           ...settings,
           concludedObligations: [...currentConcluded, key]
+        });
+      }
+    } else if (alert.type === 'account_payable') {
+      await saveAccountPayable({ ...alert.originalItem, status: AccountStatus.PAGO, paidDate: new Date().toISOString().split('T')[0] });
+    } else if (alert.type === 'account_receivable') {
+      await saveAccountReceivable({ ...alert.originalItem, status: AccountStatus.PAGO, receivedDate: new Date().toISOString().split('T')[0] });
+    } else if (
+      alert.type === 'vaccine' || alert.type === 'crop_planting' ||
+      alert.type === 'crop_harvest' || alert.type === 'weaning' || alert.type === 'pasture_rotation'
+    ) {
+      // Eventos de ocorrência única (não recorrentes todo mês) — usa o
+      // próprio id do alerta como chave de conclusão.
+      const currentConcluded = settings.concludedObligations || [];
+      if (!currentConcluded.includes(alert.id)) {
+        await updateSettings({
+          ...settings,
+          concludedObligations: [...currentConcluded, alert.id]
         });
       }
     }
@@ -649,7 +672,7 @@ export default function App() {
       case 'nutrition': return <NutritionCalculator animals={animals} inventory={inventory} />;
       case 'settings': return <FarmSettingsComp settings={settings} setSettings={updateSettings} />;
       case 'properties': return <Properties properties={properties} activePropertyId={activePropertyId} onSetActive={setActivePropertyId} onSave={saveProperty} onDelete={deleteProperty} />;
-      case 'pecuaria-pro': return <PecuariaProfissional individualAnimals={individualAnimals} saveIndividualAnimal={saveIndividualAnimal} deleteIndividualAnimal={deleteIndividualAnimal} reproductionEvents={reproductionEvents} saveReproductionEvent={saveReproductionEvent} deleteReproductionEvent={deleteReproductionEvent} healthEvents={healthEvents} saveHealthEvent={saveHealthEvent} deleteHealthEvent={deleteHealthEvent} milkRecords={milkRecords} saveMilkRecord={saveMilkRecord} deleteMilkRecord={deleteMilkRecord} />;
+      case 'pecuaria-pro': return <PecuariaProfissional individualAnimals={individualAnimals} saveIndividualAnimal={saveIndividualAnimal} deleteIndividualAnimal={deleteIndividualAnimal} reproductionEvents={reproductionEvents} saveReproductionEvent={saveReproductionEvent} deleteReproductionEvent={deleteReproductionEvent} healthEvents={healthEvents} saveHealthEvent={saveHealthEvent} deleteHealthEvent={deleteHealthEvent} milkRecords={milkRecords} saveMilkRecord={saveMilkRecord} deleteMilkRecord={deleteMilkRecord} animals={animals} saveAnimal={saveAnimal} deleteAnimal={deleteAnimal} pastures={pastures} transactions={transactions} saveTransaction={saveTransaction} />;
       case 'agricultura': return <Agricultura talhoes={talhoes} saveTalhao={saveTalhao} deleteTalhao={deleteTalhao} cropPlans={cropPlans} saveCropPlan={saveCropPlan} deleteCropPlan={deleteCropPlan} fieldLogEntries={fieldLogEntries} saveFieldLogEntry={saveFieldLogEntry} deleteFieldLogEntry={deleteFieldLogEntry} pestRecords={pestRecords} savePestRecord={savePestRecord} deletePestRecord={deletePestRecord} irrigationRecords={irrigationRecords} saveIrrigationRecord={saveIrrigationRecord} deleteIrrigationRecord={deleteIrrigationRecord} activeProperty={activeProperty} />;
       case 'financeiro-completo': return <Financeiro accountsPayable={accountsPayable} saveAccountPayable={saveAccountPayable} deleteAccountPayable={deleteAccountPayable} accountsReceivable={accountsReceivable} saveAccountReceivable={saveAccountReceivable} deleteAccountReceivable={deleteAccountReceivable} costCenters={costCenters} saveCostCenter={saveCostCenter} deleteCostCenter={deleteCostCenter} />;
       case 'maquinas': return <Maquinas machines={machines} saveMachine={saveMachine} deleteMachine={deleteMachine} maintenanceRecords={maintenanceRecords} saveMaintenanceRecord={saveMaintenanceRecord} deleteMaintenanceRecord={deleteMaintenanceRecord} />;
@@ -852,6 +875,15 @@ export default function App() {
                 )}
               </button>
 
+              {/* Help Button */}
+              <button
+                onClick={() => setIsHelpOpen(true)}
+                className="p-2 rounded-full bg-theme-secondary text-theme-secondary transition-colors"
+                title="Ajuda — como usar o aplicativo"
+              >
+                <HelpCircle size={20} />
+              </button>
+
               {/* Theme Toggle */}
               <ThemeToggle />
               
@@ -867,6 +899,8 @@ export default function App() {
             </div>
           </div>
         </header>
+
+        {isHelpOpen && <HelpScreen onClose={() => setIsHelpOpen(false)} />}
 
         {/* Permission Restriction Banner */}
         {userRole === 'user' && (

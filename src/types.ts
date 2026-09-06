@@ -197,6 +197,7 @@ export interface Pasture {
   size: number; // In Hectares
   stockingHistory: { date: string, count: number }[];
   purpose?: 'engorda' | 'manutenção' | 'finalização';
+  nextRotationDate?: string; // data planejada para o próximo remanejo/troca de pasto
   mapX?: number;
   mapY?: number;
   aiAnalysis?: {

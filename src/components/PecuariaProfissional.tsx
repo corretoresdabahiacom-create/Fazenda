@@ -4,15 +4,17 @@
  */
 
 import React, { useState } from 'react';
-import { Plus, Edit3, Trash2, X, Tag, Heart, Syringe, Milk } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Tag, Heart, Syringe, Milk, Users } from 'lucide-react';
 import {
   IndividualAnimal, AnimalSex, LotGroup,
   ReproductionEvent, ReproductionEventType, GESTACAO_BOVINA_DIAS,
   HealthEvent, HealthEventType,
   MilkProductionRecord,
   AnimalCategory,
+  Animal, Pasture, TransactionHistory,
 } from '../types';
 import { format, addDays } from 'date-fns';
+import Animals from './Animals';
 
 interface Props {
   individualAnimals: IndividualAnimal[];
@@ -27,11 +29,20 @@ interface Props {
   milkRecords: MilkProductionRecord[];
   saveMilkRecord: (r: MilkProductionRecord) => Promise<void>;
   deleteMilkRecord: (id: string) => Promise<void>;
+  // Cadastro por Lote (reaproveita a tela "Animais" já existente, sem
+  // duplicar código — os dois lugares mostram e editam os mesmos dados)
+  animals: Animal[];
+  saveAnimal: (a: Animal) => Promise<void>;
+  deleteAnimal: (id: string) => Promise<void>;
+  pastures: Pasture[];
+  transactions: TransactionHistory[];
+  saveTransaction: (t: TransactionHistory) => Promise<void>;
 }
 
-type Tab = 'animais' | 'reproducao' | 'sanidade' | 'leite';
+type Tab = 'lotes' | 'animais' | 'reproducao' | 'sanidade' | 'leite';
 
 const TABS: { id: Tab; label: string; icon: typeof Tag }[] = [
+  { id: 'lotes', label: 'Cadastro por Lote', icon: Users },
   { id: 'animais', label: 'Cadastro Individual', icon: Tag },
   { id: 'reproducao', label: 'Reprodução', icon: Heart },
   { id: 'sanidade', label: 'Sanidade', icon: Syringe },
@@ -62,6 +73,16 @@ export default function PecuariaProfissional(props: Props) {
         ))}
       </div>
 
+      {tab === 'lotes' && (
+        <Animals
+          animals={props.animals}
+          onAdd={props.saveAnimal}
+          onDelete={props.deleteAnimal}
+          pastures={props.pastures}
+          transactions={props.transactions}
+          onAddTransaction={props.saveTransaction}
+        />
+      )}
       {tab === 'animais' && (
         <AnimaisTab
           animals={props.individualAnimals}

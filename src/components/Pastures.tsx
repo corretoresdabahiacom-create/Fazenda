@@ -76,6 +76,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
       capacitySeca: formData.capacitySeca || 0,
       size: formData.size || 0,
       purpose: formData.purpose || 'engorda',
+      nextRotationDate: formData.nextRotationDate,
       mapX: editingPasture?.mapX,
       mapY: editingPasture?.mapY,
       stockingHistory: editingPasture?.stockingHistory || []
@@ -468,6 +469,17 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     <option value="manutenção">🌾 Manutenção</option>
                     <option value="finalização">🌟 Finalização</option>
                   </select>
+                </div>
+
+                <div className="col-span-1">
+                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Próximo Remanejo (opcional)</label>
+                  <input
+                    type="date"
+                    className="w-full px-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                    value={formData.nextRotationDate || ''}
+                    onChange={(e) => setFormData({...formData, nextRotationDate: e.target.value || undefined})}
+                  />
+                  <p className="text-[10px] text-[#8d8a86] mt-1">Avisa na Central de Obrigações 2 dias antes.</p>
                 </div>
               </div>
 
