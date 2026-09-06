@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import {
   collection, onSnapshot, doc, setDoc, deleteDoc, query as fsQuery,
 } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import {
   Users, DollarSign, TrendingDown, Bell, Image as ImageIcon, Receipt,
   Trash2, Plus, X, ShieldOff, ShieldAlert, Ban, CheckCircle2, Search,
@@ -181,6 +181,30 @@ function UsuariosTab({ users, subscriptions, adminEmail }: {
 }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+
+  async function handleSyncAll() {
+    setSyncing(true);
+    setSyncMessage(null);
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      const res = await fetch('/api/admin-sync-users', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSyncMessage(data.error || 'Falha ao sincronizar.');
+      } else {
+        setSyncMessage(`${data.totalSynced} de ${data.totalSeen} conta(s) sincronizada(s) com sucesso.`);
+      }
+    } catch {
+      setSyncMessage('Falha de conexão ao sincronizar.');
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   const subByUser = (uid: string) => subscriptions.find(s => s.userId === uid);
 
@@ -242,6 +266,16 @@ function UsuariosTab({ users, subscriptions, adminEmail }: {
 
   return (
     <div className="space-y-3">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <button
+          onClick={handleSyncAll}
+          disabled={syncing}
+          className="flex items-center gap-2 bg-theme-secondary text-theme-primary px-4 py-2 rounded-xl font-semibold text-xs disabled:opacity-60"
+        >
+          {syncing ? 'Sincronizando...' : 'Sincronizar todos os usuários do Firebase'}
+        </button>
+      </div>
+      {syncMessage && <p className="text-xs text-theme-secondary bg-theme-secondary rounded-xl p-2">{syncMessage}</p>}
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />

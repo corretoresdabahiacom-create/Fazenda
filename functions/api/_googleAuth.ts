@@ -177,7 +177,7 @@ function toFirestoreValue(value: any): any {
 // verificação, qualquer pessoa poderia chamar os endpoints de criação de
 // assinatura fingindo ser outro usuário, só informando um uid arbitrário
 // no corpo da requisição.
-export async function verifyFirebaseIdToken(idToken: string, projectId: string): Promise<{ uid: string } | null> {
+export async function verifyFirebaseIdToken(idToken: string, projectId: string): Promise<{ uid: string; email?: string } | null> {
   try {
     const [headerB64, payloadB64, signatureB64] = idToken.split('.');
     if (!headerB64 || !payloadB64 || !signatureB64) return null;
@@ -210,7 +210,7 @@ export async function verifyFirebaseIdToken(idToken: string, projectId: string):
     const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', publicKey, signature, signedData);
     if (!valid) return null;
 
-    return { uid: payload.sub };
+    return { uid: payload.sub, email: payload.email };
   } catch {
     return null;
   }

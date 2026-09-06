@@ -9,6 +9,7 @@ import {
   ChevronDown, ArrowRight, ShieldCheck, Smartphone, FileWarning,
 } from 'lucide-react';
 import { PlanTier, PLAN_PRICES } from '../types';
+import Logo from './Logo';
 
 interface Props {
   onClose: () => void;
@@ -105,7 +106,10 @@ export default function SalesPage({ onClose, onStartTrial }: Props) {
     <div className="fixed inset-0 z-[80] bg-theme-card overflow-y-auto">
       <div className="sticky top-0 z-10 bg-theme-card/95 backdrop-blur border-b border-theme">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <span className="font-serif italic font-bold text-lg text-[var(--primary)]">Agro Gestão</span>
+          <div className="flex items-center gap-2">
+            <Logo size={26} />
+            <span className="font-serif italic font-bold text-lg text-[var(--primary)]">Agro Gestão</span>
+          </div>
           <button onClick={onClose} className="p-2 rounded-full bg-theme-secondary text-theme-secondary">
             <X size={18} />
           </button>

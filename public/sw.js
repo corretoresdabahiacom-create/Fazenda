@@ -3,8 +3,8 @@
 // 2) Recebimento de notificações push (Firebase Cloud Messaging) mesmo
 //    com o app fechado.
 
-const CACHE_NAME = 'fazenda-shell-v1';
-const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png'];
+const CACHE_NAME = 'agrogestao-shell-v2';
+const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png?v=2', '/icon-512.png?v=2'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

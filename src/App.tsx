@@ -72,6 +72,7 @@ import FarmMap from './components/FarmMap';
 import ObligationsDrawer from './components/ObligationsDrawer';
 import HelpScreen from './components/HelpScreen';
 import AdminPanel from './components/AdminPanel';
+import Logo from './components/Logo';
 import MinhaAssinatura from './components/MinhaAssinatura';
 import SalesPage from './components/SalesPage';
 import { db } from './lib/firebase';
@@ -349,8 +350,8 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-theme-card p-8 rounded-3xl border border-theme shadow-xl max-w-md w-full my-8"
         >
-          <div className="w-20 h-20 bg-[var(--primary)]/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Beef size={40} className="text-[var(--primary)]" />
+          <div className="w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <Logo size={80} />
           </div>
           
           <h1 className="font-serif italic font-bold text-3xl text-[var(--primary)] mb-2 text-center">
@@ -872,14 +873,16 @@ export default function App() {
       >
         <div className="p-5 flex items-center justify-between border-b border-theme">
           {(isSidebarOpen || !isMobile) && (
-            <motion.h1 
+            <motion.div
               initial={false}
               animate={{ opacity: isSidebarOpen ? 1 : 0 }}
-              className="font-serif italic font-bold text-xl whitespace-nowrap"
-              style={{ color: 'var(--primary)' }}
+              className="flex items-center gap-2 whitespace-nowrap overflow-hidden"
             >
-              Agro Gestão
-            </motion.h1>
+              <Logo size={28} />
+              <h1 className="font-serif italic font-bold text-xl" style={{ color: 'var(--primary)' }}>
+                Agro Gestão
+              </h1>
+            </motion.div>
           )}
           {!isMobile && (
             <button 
