@@ -428,10 +428,13 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (existing.role === 'admin' || existing.role === 'user') {
         return existing.role;
       }
-      // Primeiro acesso deste usuário: define o papel pela lista de
-      // bootstrap e grava no Firestore para todas as próximas vezes.
-      const email = (u.email || '').toLowerCase();
-      const role: 'admin' | 'user' = BOOTSTRAP_ADMIN_EMAILS.includes(email) ? 'admin' : 'user';
+      // Primeiro acesso deste usuário: cada conta hoje é uma fazenda
+      // isolada e independente (não existe ainda um recurso de "convidar
+      // equipe" para dentro da MESMA conta) — por isso, todo novo usuário
+      // vira admin dos PRÓPRIOS dados por padrão. A lista de bootstrap
+      // aqui deixou de ter função prática desde que o app virou
+      // multiusuário; mantida só por segurança/compatibilidade.
+      const role: 'admin' | 'user' = 'admin';
       await setDoc(ref, {
         farmName: existing.farmName ?? '',
         city: existing.city ?? '',

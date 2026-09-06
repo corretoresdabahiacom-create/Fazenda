@@ -200,32 +200,27 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow get: if isOwner(userId);
-      allow create: if canWrite(userId) && isValidUser(incoming())
-          && (
-            (isBootstrapAdminEmail() && incoming().role == 'admin') ||
-            (!isBootstrapAdminEmail() && incoming().role == 'user')
-          );
-      // Numa atualização normal, o papel do usuário nunca pode mudar — isso
-      // impede que alguém se autopromova a admin reescrevendo o próprio
-      // documento pelo console do navegador. Trocar de papel exige edição
-      // manual direto no Firebase Console (aceitável para o tamanho atual
-      // do projeto, sem custo de Cloud Functions).
+      // Cada conta hoje e uma fazenda isolada e independente -- nao existe
+      // um recurso de "convidar equipe" para dentro da MESMA conta, entao
+      // nao ha risco em todo novo usuario virar admin dos PROPRIOS dados
+      // (ele ja tem controle total sobre eles de qualquer forma, via
+      // isOwner). A antiga restricao por lista de e-mails fazia sentido
+      // quando o app era usado por uma fazenda so, compartilhada entre
+      // dono (admin) e funcionarios (somente leitura) -- deixou de se
+      // aplicar desde que o app virou multiusuario.
+      allow create: if canWrite(userId) && isValidUser(incoming()) && incoming().role == 'admin';
+      // Numa atualizacao normal, o papel do usuario nunca pode mudar sem
+      // passar pelo Firebase Console -- isso impede autopromocao indevida
+      // caso um recurso de equipe/convite seja adicionado no futuro.
       //
-      // Exceção: contas que já existiam ANTES desta funcionalidade (o
-      // documento já tinha farmName/city salvos, mas nunca teve "role")
-      // podem definir o papel pela primeira vez, seguindo a mesma regra de
-      // bootstrap usada na criação — sem isso, contas antigas ficavam
-      // travadas em "user" para sempre, mesmo sendo e-mail de admin.
+      // Excecao: contas que ja existiam ANTES desta funcionalidade, ou que
+      // ficaram presas em "user" pela regra antiga, podem se corrigir para
+      // "admin" automaticamente na proxima atualizacao.
       allow update: if canWrite(userId) && isValidUser(incoming())
           && (
             incoming().role == resource.data.role
-            || (
-              !('role' in resource.data) &&
-              (
-                (isBootstrapAdminEmail() && incoming().role == 'admin') ||
-                (!isBootstrapAdminEmail() && incoming().role == 'user')
-              )
-            )
+            || (!('role' in resource.data) && incoming().role == 'admin')
+            || (resource.data.role == 'user' && incoming().role == 'admin')
           );
 
       match /animals/{animalId} {
