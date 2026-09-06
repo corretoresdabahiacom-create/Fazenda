@@ -199,7 +199,7 @@ export default function App() {
   const [isSendingReset, setIsSendingReset] = useState(false);
 
   // Calculate obligations and state
-  const activeAlerts = computeObligations(tasks || [], expenses || [], fixedExpenses || [], settings || { farmName: '', city: '' });
+  const activeAlerts = computeObligations(tasks || [], expenses || [], fixedExpenses || [], settings || { farmName: '', city: '' }, animals || []);
   const activeAlertsCount = activeAlerts.length;
   const hasOverdue = activeAlerts.some(a => a.daysRemaining < 0);
   const overdueCount = activeAlerts.filter(a => a.daysRemaining < 0).length;
@@ -210,7 +210,7 @@ export default function App() {
       await saveTask({ ...alert.originalItem, completed: true });
     } else if (alert.type === 'variable_expense') {
       await saveExpense({ ...alert.originalItem, status: 'paid' });
-    } else if (alert.type === 'fixed_expense') {
+    } else if (alert.type === 'fixed_expense' || alert.type === 'animal_rent') {
       const key = alert.originalItem.monthKey;
       const currentConcluded = settings.concludedObligations || [];
       if (!currentConcluded.includes(key)) {

@@ -1,8 +1,8 @@
-import { FarmTask, Expense, FixedExpense, FarmSettings } from '../types';
+import { FarmTask, Expense, FixedExpense, FarmSettings, Animal, AnimalType } from '../types';
 
 export interface ObligationAlert {
   id: string; // unique identifier for the alert item
-  type: 'task' | 'variable_expense' | 'fixed_expense';
+  type: 'task' | 'variable_expense' | 'fixed_expense' | 'animal_rent';
   title: string;
   description: string;
   dueDate: string; // YYYY-MM-DD format
@@ -40,7 +40,8 @@ export function computeObligations(
   tasks: FarmTask[],
   expenses: Expense[],
   fixedExpenses: FixedExpense[],
-  settings: FarmSettings
+  settings: FarmSettings,
+  animals: Animal[] = []
 ): ObligationAlert[] {
   const alerts: ObligationAlert[] = [];
   const today = getLocalToday();
@@ -168,6 +169,74 @@ export function computeObligations(
           value: fixed.value,
           originalId: fixed.id,
           originalItem: { ...fixed, monthKey: current.key }
+        });
+      }
+    }
+  });
+
+  // 4. Processa Aluguel de Animais (vencimento mensal, mesmo padrão dos
+  // Custos Fixos: verifica o mês atual e o anterior, caso ainda não tenha
+  // sido marcado como pago).
+  animals.forEach(animal => {
+    if (animal.type !== AnimalType.RENT || !animal.rentDueDay) return;
+
+    const day = animal.rentDueDay;
+    if (isNaN(day) || day < 1 || day > 31) return;
+
+    const getMonthOccurrence = (year: number, monthZeroBased: number) => {
+      const lastDayOfMonth = new Date(year, monthZeroBased + 1, 0).getDate();
+      const targetDay = Math.min(day, lastDayOfMonth);
+      const dueDateStr = `${year}-${padZero(monthZeroBased + 1)}-${padZero(targetDay)}`;
+      return {
+        dateStr: dueDateStr,
+        date: new Date(year, monthZeroBased, targetDay),
+        key: `animal-rent-${animal.id}-${year}-${padZero(monthZeroBased + 1)}`
+      };
+    };
+
+    const current = getMonthOccurrence(currentYear, currentMonthNum);
+    const prevMonthNum = currentMonthNum === 0 ? 11 : currentMonthNum - 1;
+    const prevYear = currentMonthNum === 0 ? currentYear - 1 : currentYear;
+    const previous = getMonthOccurrence(prevYear, prevMonthNum);
+
+    const monthlyValue = animal.rentValue && animal.quantity ? animal.rentValue * animal.quantity : animal.rentValue;
+
+    // Mês anterior — se não foi pago, conta como atrasado.
+    if (!concludedKeys.includes(previous.key)) {
+      const daysDiffPrev = getDaysDiff(previous.date, today);
+      if (daysDiffPrev <= 3) {
+        alerts.push({
+          id: `animal-rent-prev-${animal.id}`,
+          type: 'animal_rent',
+          title: `Aluguel (Mês Ant.): ${animal.lotName || 'Lote'}`,
+          description: `Referente a ${padZero(prevMonthNum + 1)}/${prevYear}${animal.ownerName ? ` | ${animal.ownerName}` : ''}`,
+          dueDate: previous.dateStr,
+          daysRemaining: daysDiffPrev,
+          value: monthlyValue,
+          originalId: animal.id,
+          originalItem: { ...animal, monthKey: previous.key }
+        });
+      }
+    }
+
+    // Mês atual — só aparece "vencendo hoje" a partir das 8h da manhã;
+    // antes disso, ainda conta como "1 dia restante" (aviso, não urgente).
+    if (!concludedKeys.includes(current.key)) {
+      let daysDiffCurr = getDaysDiff(current.date, today);
+      if (daysDiffCurr === 0 && new Date().getHours() < 8) {
+        daysDiffCurr = 1;
+      }
+      if (daysDiffCurr <= 3) {
+        alerts.push({
+          id: `animal-rent-curr-${animal.id}`,
+          type: 'animal_rent',
+          title: `Aluguel: ${animal.lotName || 'Lote'}`,
+          description: `Referente a ${padZero(currentMonthNum + 1)}/${currentYear}${animal.ownerName ? ` | ${animal.ownerName}` : ''}`,
+          dueDate: current.dateStr,
+          daysRemaining: daysDiffCurr,
+          value: monthlyValue,
+          originalId: animal.id,
+          originalItem: { ...animal, monthKey: current.key }
         });
       }
     }

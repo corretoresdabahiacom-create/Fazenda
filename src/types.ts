@@ -164,6 +164,7 @@ export interface Animal {
   profit?: number;
   rentValue?: number; // For Rent
   paymentDate?: string; // For Rent
+  rentDueDay?: number; // Dia do mês (1-31) em que o aluguel vence, todo mês
   revenue?: number; // For Rent (value * duration)
   partnershipFarmShare?: number; // % that goes to farm for Meia (e.g. 50%)
   partnershipExitWeight?: number; // Weight at exit for Meia

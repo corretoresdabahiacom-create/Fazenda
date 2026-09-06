@@ -120,6 +120,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
       purchasePrice: formData.purchasePrice || 0,
       costs: formData.costs || 0,
       rentValue: formData.rentValue,
+      rentDueDay: formData.rentDueDay,
       partnershipFarmShare: formData.partnershipFarmShare,
       partnershipExitWeight: formData.partnershipExitWeight,
       formerOwnerName: formData.formerOwnerName,
@@ -1222,15 +1223,30 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 )}
 
                 {formData.type === AnimalType.RENT && (
-                  <div className="col-span-2">
-                    <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Valor do Aluguel (R$/mês por Cabeça)</label>
-                    <input 
-                      type="number" step="0.01"
-                      className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
-                      value={formData.rentValue || ''}
-                      onChange={(e) => setFormData({...formData, rentValue: Number(e.target.value)})}
-                      placeholder="Ex: 65"
-                    />
+                  <div className="col-span-2 space-y-3">
+                    <div>
+                      <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Valor do Aluguel (R$/mês por Cabeça)</label>
+                      <input 
+                        type="number" step="0.01"
+                        className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                        value={formData.rentValue || ''}
+                        onChange={(e) => setFormData({...formData, rentValue: Number(e.target.value)})}
+                        placeholder="Ex: 65"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold uppercase text-[#3d5a45] mb-1 block">Dia de Vencimento do Aluguel (todo mês)</label>
+                      <input 
+                        type="number" min="1" max="31"
+                        className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                        value={formData.rentDueDay || ''}
+                        onChange={(e) => setFormData({...formData, rentDueDay: e.target.value ? Math.min(31, Math.max(1, Number(e.target.value))) : undefined})}
+                        placeholder="Ex: 10"
+                      />
+                      <p className="text-[10px] text-[#8d8a86] mt-1">
+                        Você será avisado na Central de Obrigações 2 dias antes, no dia (a partir das 8h), e com destaque vermelho se passar do vencimento sem marcar como pago.
+                      </p>
+                    </div>
                   </div>
                 )}
 
