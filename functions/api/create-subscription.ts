@@ -87,6 +87,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           frequency_type: 'months',
           transaction_amount: value,
           currency_id: 'BRL',
+          free_trial: { frequency: 7, frequency_type: 'days' },
         },
       }),
     });

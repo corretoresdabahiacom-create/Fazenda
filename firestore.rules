@@ -35,7 +35,7 @@ service cloud.firestore {
     // -------------------------------------------------------------------------
 
     function isBootstrapAdminEmail() {
-      return isSignedIn() && request.auth.token.email in
+      return isSignedIn() && request.auth.token.email.lower() in
         ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
     }
 

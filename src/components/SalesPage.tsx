@@ -94,7 +94,7 @@ const FAQS = [
   { q: 'Preciso entender de computador para usar?', a: 'Não. As telas foram pensadas para serem simples e diretas — se você usa WhatsApp, consegue usar o Agro Gestão.' },
   { q: 'Meus dados ficam seguros?', a: 'Sim. Cada conta é isolada e só você tem acesso aos seus dados. Não guardamos números de cartão nem dados bancários — o pagamento acontece direto na página segura do Mercado Pago, Stripe ou PayPal.' },
   { q: 'Posso cancelar quando quiser?', a: 'Sim, a qualquer momento, direto pelo aplicativo em "Minha Assinatura" — sem precisar ligar ou mandar e-mail para cancelar.' },
-  { q: 'E se eu não gostar depois de assinar?', a: 'Você tem 7 dias de teste grátis antes de qualquer cobrança, para conhecer o aplicativo com calma antes de decidir.' },
+  { q: 'E se eu não gostar depois de assinar?', a: 'Você tem 3 dias de teste totalmente grátis, sem precisar cadastrar nenhum pagamento. Depois disso, se quiser continuar conhecendo o aplicativo, basta cadastrar uma forma de pagamento e ganha mais 7 dias de teste (10 no total) antes da primeira cobrança.' },
   { q: 'Funciona para qualquer tamanho de fazenda?', a: 'Sim — os planos variam pelo número de propriedades cadastradas, do produtor com uma fazenda até quem administra várias.' },
 ];
 
@@ -126,7 +126,7 @@ export default function SalesPage({ onClose, onStartTrial }: Props) {
             para você tomar decisão com dado na mão, não no chute.
           </p>
           <button onClick={onStartTrial} className="inline-flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-md">
-            Começar teste grátis de 7 dias <ArrowRight size={16} />
+            Começar grátis por 3 dias <ArrowRight size={16} />
           </button>
           <p className="text-[11px] text-theme-secondary mt-2">Sem cartão de crédito para começar. Cancele quando quiser.</p>
         </div>
@@ -194,7 +194,7 @@ export default function SalesPage({ onClose, onStartTrial }: Props) {
       {/* Preços */}
       <section className="max-w-5xl mx-auto px-4 py-14">
         <h2 className="font-serif italic font-bold text-2xl text-theme-primary text-center mb-2">Escolha o plano do tamanho da sua operação</h2>
-        <p className="text-theme-secondary text-sm text-center mb-10">7 dias grátis em qualquer plano, sem compromisso.</p>
+        <p className="text-theme-secondary text-sm text-center mb-10">3 dias grátis em qualquer plano, sem cartão — depois, mais 7 dias de teste ao cadastrar o pagamento.</p>
         <div className="grid md:grid-cols-4 gap-4">
           {([PlanTier.UMA_FAZENDA, PlanTier.TRES_FAZENDAS, PlanTier.CINCO_FAZENDAS] as PlanTier[]).map((plan, i) => (
             <div key={plan} className={`rounded-2xl border p-5 flex flex-col ${i === 1 ? 'border-[var(--primary)] shadow-lg relative' : 'border-theme'}`}>
@@ -250,7 +250,7 @@ export default function SalesPage({ onClose, onStartTrial }: Props) {
       <section className="bg-[var(--primary)] py-14">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <h2 className="font-serif italic font-bold text-2xl text-white mb-3">Pronto para organizar sua fazenda?</h2>
-          <p className="text-white/80 text-sm mb-6">7 dias grátis, sem cartão de crédito. Cancele quando quiser.</p>
+          <p className="text-white/80 text-sm mb-6">3 dias grátis, sem cartão. Cancele quando quiser.</p>
           <button onClick={onStartTrial} className="inline-flex items-center gap-2 bg-white text-[var(--primary)] px-6 py-3.5 rounded-xl font-bold text-sm shadow-md">
             Criar minha conta grátis <ArrowRight size={16} />
           </button>

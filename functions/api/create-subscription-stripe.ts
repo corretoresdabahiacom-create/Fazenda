@@ -90,7 +90,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       customer_email: email,
       client_reference_id: uid,
       metadata: { uid },
-      subscription_data: { metadata: { uid } },
+      subscription_data: { metadata: { uid }, trial_period_days: 7 },
       line_items: [
         {
           quantity: 1,

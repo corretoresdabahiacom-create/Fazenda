@@ -396,24 +396,24 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const dirRef = doc(db, 'userDirectory', u.uid);
       const dirSnap = await getDoc(dirRef);
-      await setDoc(dirRef, {
+      await setDoc(dirRef, stripUndefined({
         userId: u.uid,
         email: u.email || '',
         displayName: u.displayName || undefined,
         createdAt: dirSnap.exists() ? dirSnap.data().createdAt : new Date().toISOString(),
         lastLoginAt: new Date().toISOString(),
-      }, { merge: true });
+      }), { merge: true });
 
       const subRef = doc(db, 'subscriptions', u.uid);
       const subSnap = await getDoc(subRef);
       if (!subSnap.exists()) {
-        await setDoc(subRef, {
+        await setDoc(subRef, stripUndefined({
           userId: u.uid,
           email: u.email || '',
           plan: 'Agro Total',
           status: 'Teste',
           createdAt: new Date().toISOString(),
-        });
+        }));
       }
     } catch (err) {
       console.warn('Não foi possível sincronizar índice de usuário/assinatura:', err);

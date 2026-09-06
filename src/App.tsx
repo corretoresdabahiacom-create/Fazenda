@@ -534,7 +534,7 @@ export default function App() {
               onClick={() => setIsPlansOpen(true)}
               className="w-full flex items-center justify-center gap-3 bg-[var(--primary)]/10 border border-dashed border-[#2d6a4f]/50 hover:bg-[var(--primary)]/20 text-[var(--primary)] py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-xs cursor-pointer"
             >
-              Ver Planos e Assinar
+              Grátis por 3 dias — Ver Planos e Assinar
             </button>
           </div>
 
@@ -558,7 +558,7 @@ export default function App() {
 
                     <p><strong>3. Cadastro e responsabilidade pela conta.</strong> Você é responsável por manter a confidencialidade da sua senha e por todas as atividades realizadas na sua conta. Informações incorretas, desatualizadas ou incompletas cadastradas por você são de sua exclusiva responsabilidade.</p>
 
-                    <p><strong>4. Assinatura e pagamento.</strong> Alguns recursos do aplicativo podem exigir uma assinatura paga, cobrada de forma recorrente através de gateways de pagamento parceiros (como Mercado Pago, PayPal ou processadoras de cartão). O acesso pode ser suspenso ou bloqueado em caso de inadimplência, sem prejuízo da cobrança dos valores já devidos. Você pode cancelar sua assinatura a qualquer momento pela própria tela do aplicativo; o administrador também pode suspender, bloquear ou cancelar contas a seu critério, inclusive por uso indevido, fraude ou violação destes Termos.</p>
+                    <p><strong>4. Teste grátis e assinatura.</strong> Toda nova conta tem 3 dias de acesso completo e gratuito, sem necessidade de cadastrar qualquer forma de pagamento. Após esse período, você será convidado a cadastrar um meio de pagamento para continuar testando por mais 7 dias (10 dias no total). Encerrado esse prazo sem uma assinatura ativa, o acesso ao aplicativo é bloqueado até a regularização. Alguns recursos do aplicativo podem exigir uma assinatura paga, cobrada de forma recorrente através de gateways de pagamento parceiros (como Mercado Pago, Stripe ou PayPal). O acesso pode ser suspenso ou bloqueado em caso de inadimplência, sem prejuízo da cobrança dos valores já devidos. Você pode cancelar sua assinatura a qualquer momento pela própria tela do aplicativo; o administrador também pode suspender, bloquear ou cancelar contas a seu critério, inclusive por uso indevido, fraude ou violação destes Termos.</p>
 
                     <p><strong>5. Localização (GPS).</strong> Algumas funções (como alertas climáticos e o Consultor Rural) precisam saber onde fica sua propriedade, e por isso podem solicitar acesso à sua localização ou pedir que você a cadastre manualmente. Esse acesso é sempre opcional e usado exclusivamente para o funcionamento dessas funções — se você não permitir o acesso, apenas essas funções específicas ficam indisponíveis; o restante do aplicativo continua funcionando normalmente.</p>
 
@@ -815,19 +815,25 @@ export default function App() {
     );
   }
 
-  // Teste grátis de 7 dias — depois disso, sem uma assinatura ativa, o
-  // acesso fica bloqueado e só a tela de assinatura fica disponível.
+  // Novo fluxo de teste: 3 dias grátis sem precisar de cartão, depois um
+  // convite pra cadastrar pagamento e testar por mais 7 dias (10 no
+  // total). Se um meio de pagamento já foi cadastrado (externalSubscriptionId
+  // existe), o próprio gateway cuida do período de teste dele e cobra
+  // sozinho depois — o app só respeita o status que o webhook define.
   const trialDaysUsed = mySubscription?.status === SubscriptionStatus.TRIAL
     ? Math.floor((Date.now() - new Date(mySubscription.createdAt).getTime()) / (1000 * 60 * 60 * 24))
     : 0;
-  const trialExpired = mySubscription?.status === SubscriptionStatus.TRIAL && trialDaysUsed >= 7;
+  const hasPaymentMethodOnFile = !!mySubscription?.externalSubscriptionId;
+  const inFreePhase = trialDaysUsed < 3;
+  const inExtendedTrialWindow = trialDaysUsed >= 3 && trialDaysUsed < 10 && !hasPaymentMethodOnFile;
+  const trialExpired = mySubscription?.status === SubscriptionStatus.TRIAL && trialDaysUsed >= 10 && !hasPaymentMethodOnFile;
 
   if (!isBootstrapAdmin && trialExpired) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-theme-card p-4 overflow-y-auto">
         <div className="max-w-sm w-full text-center space-y-4 py-8">
           <CreditCard size={48} className="text-[var(--primary)] mx-auto" />
-          <h1 className="text-xl font-bold text-theme-primary">Seu teste grátis de 7 dias terminou</h1>
+          <h1 className="text-xl font-bold text-theme-primary">Seu período de teste terminou</h1>
           <p className="text-sm text-theme-secondary">Assine um plano para continuar usando o Agro Gestão.</p>
           <MinhaAssinatura uid={user?.uid || ''} />
           <button onClick={handleLogout} className="text-xs font-semibold text-theme-secondary underline">
@@ -1115,6 +1121,16 @@ export default function App() {
               <p className="text-xs text-red-700 font-semibold">⚠️ Seu pagamento está atrasado — regularize para evitar a suspensão do acesso.</p>
               <button onClick={() => setActiveView('minha-assinatura')} className="text-xs font-bold text-red-700 underline shrink-0">
                 Ver assinatura
+              </button>
+            </div>
+          )}
+          {!isBootstrapAdmin && inExtendedTrialWindow && activeView !== 'minha-assinatura' && activeView !== 'clima' && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 mb-4 flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-xs text-amber-800 font-semibold">
+                🎁 Seus 3 dias grátis acabaram — cadastre um pagamento para continuar com mais 7 dias de teste. Faltam {10 - trialDaysUsed} dia(s) antes do acesso ser bloqueado.
+              </p>
+              <button onClick={() => setActiveView('minha-assinatura')} className="text-xs font-bold text-amber-800 underline shrink-0">
+                Cadastrar pagamento
               </button>
             </div>
           )}

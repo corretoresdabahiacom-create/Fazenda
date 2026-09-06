@@ -79,9 +79,16 @@ async function getOrCreatePlanId(env: Env, apiBase: string, accessToken: string,
       name: `Assinatura Mensal — ${plan}`,
       billing_cycles: [
         {
+          frequency: { interval_unit: 'DAY', interval_count: 7 },
+          tenure_type: 'TRIAL',
+          sequence: 1,
+          total_cycles: 1,
+          pricing_scheme: { fixed_price: { value: '0', currency_code: 'BRL' } },
+        },
+        {
           frequency: { interval_unit: 'MONTH', interval_count: 1 },
           tenure_type: 'REGULAR',
-          sequence: 1,
+          sequence: 2,
           total_cycles: 0, // 0 = recorrência indefinida
           pricing_scheme: { fixed_price: { value: value.toFixed(2), currency_code: 'BRL' } },
         },
