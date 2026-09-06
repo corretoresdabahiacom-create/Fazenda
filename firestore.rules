@@ -461,7 +461,15 @@ service cloud.firestore {
       // reservado ao admin e ao webhook do gateway de pagamento (que usa
       // credenciais de servidor, não o SDK do cliente).
       allow create: if isSignedIn() && request.auth.uid == uid;
-      allow update: if isBootstrapAdminEmail();
+      // Atualização normal (mudar plano, valores, status para ativo etc.)
+      // é reservada ao admin. Exceção: o próprio usuário pode CANCELAR a
+      // própria assinatura (só mudar o status para "Cancelada", sem tocar
+      // em plano, gateway ou histórico de pagamento).
+      allow update: if isBootstrapAdminEmail() || (
+        isSignedIn() && request.auth.uid == uid &&
+        incoming().status == 'Cancelada' &&
+        incoming().plan == resource.data.plan
+      );
       allow delete: if isBootstrapAdminEmail();
     }
 

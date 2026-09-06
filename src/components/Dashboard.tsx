@@ -23,8 +23,11 @@ import { ptBR } from 'date-fns/locale';
 import { ObligationAlert } from '../utils/obligations';
 import ModulosResumo from './ModulosResumo';
 import ClimaAlertsPanel from './ClimaAlertsPanel';
+import AdCarousel from './AdCarousel';
+import AdminNotificationsBanner from './AdminNotificationsBanner';
 
 interface DashboardProps {
+  uid?: string;
   payments: EmployeePayment[];
   expenses: Expense[];
   animals: Animal[];
@@ -46,6 +49,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ 
+  uid,
   payments, 
   expenses, 
   animals, 
@@ -273,6 +277,7 @@ export default function Dashboard({
 
   return (
     <div className="container-fluid space-y-8">
+      {uid && <AdminNotificationsBanner uid={uid} />}
       {/* Farm Location Header */}
       <div className="bg-theme-card p-4 sm:p-6 rounded-3xl border border-theme shadow-theme flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -620,6 +625,8 @@ export default function Dashboard({
         documents={documents}
         onNavigate={onNavigate}
       />
+
+      <AdCarousel />
     </div>
   );
 }

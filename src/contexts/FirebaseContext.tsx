@@ -1049,6 +1049,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // de configurações — ver firestore.rules).
       await setDoc(doc(db, 'users', currentUid), s, { merge: true });
       console.log('✅ Settings salvas para usuário:', currentUid);
+      // Sincroniza cidade/aniversário com o índice de usuários, usado pelo
+      // Painel Admin para filtrar notificações por região/aniversário.
+      try {
+        await setDoc(doc(db, 'userDirectory', currentUid), stripUndefined({
+          city: s.city || undefined,
+          birthday: s.ownerBirthday || undefined,
+        }), { merge: true });
+      } catch (dirErr) {
+        console.warn('Não foi possível sincronizar índice de usuário:', dirErr);
+      }
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}`);
     }

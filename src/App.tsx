@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun, HelpCircle, ShieldAlert } from 'lucide-react';
+, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun, HelpCircle, ShieldAlert, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -68,6 +68,7 @@ import FarmMap from './components/FarmMap';
 import ObligationsDrawer from './components/ObligationsDrawer';
 import HelpScreen from './components/HelpScreen';
 import AdminPanel from './components/AdminPanel';
+import MinhaAssinatura from './components/MinhaAssinatura';
 import WeighingWorksheet from './components/WeighingWorksheet';
 import NutritionCalculator from './components/NutritionCalculator';
 import { NotificationService } from './utils/notificationService';
@@ -611,6 +612,7 @@ export default function App() {
     { id: 'reports', label: 'Relatórios', icon: BarChart3 },
     { id: 'nutrition', label: 'Cálculo Nutrição', icon: Leaf },
     { id: 'settings', label: 'Configurações', icon: Settings },
+    { id: 'minha-assinatura', label: 'Minha Assinatura', icon: CreditCard },
   ];
 
   const BOOTSTRAP_ADMIN_EMAILS_CLIENT = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
@@ -637,6 +639,8 @@ export default function App() {
       case 'admin-panel':
         if (!isBootstrapAdmin) return <div className="p-6 text-sm text-theme-secondary">Acesso restrito.</div>;
         return <AdminPanel adminEmail={user?.email || ''} />;
+      case 'minha-assinatura':
+        return <MinhaAssinatura uid={user?.uid || ''} />;
       case 'dashboard': 
         return (
           <Dashboard 
@@ -654,6 +658,7 @@ export default function App() {
             machines={machines}
             documents={documents}
             activeProperty={activeProperty}
+            uid={user?.uid}
             onNavigate={(view) => {
               if (view === 'animals-scan') {
                 setScanMode(true);
@@ -706,6 +711,7 @@ export default function App() {
             machines={machines}
             documents={documents}
             activeProperty={activeProperty}
+            uid={user?.uid}
             onNavigate={(view) => {
               if (view === 'animals-scan') {
                 setScanMode(true);

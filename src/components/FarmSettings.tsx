@@ -300,6 +300,19 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
               * A cidade informada é utilizada para o cálculo climático e taxas de lotação ideais.
             </p>
           </div>
+
+          <div>
+            <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Data de Aniversário (opcional)</label>
+            <input
+              type="date"
+              className="w-full px-4 py-3 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+              value={formData.ownerBirthday ? `2000-${formData.ownerBirthday}` : ''}
+              onChange={(e) => setFormData({...formData, ownerBirthday: e.target.value ? e.target.value.slice(5) : undefined})}
+            />
+            <p className="text-[10px] text-[#8d8a86] mt-2 italic px-1">
+              * Guardamos só o dia e o mês (não o ano) — usado apenas para eventuais mensagens de aniversário. Nunca é obrigatório.
+            </p>
+          </div>
         </div>
 
         <button 

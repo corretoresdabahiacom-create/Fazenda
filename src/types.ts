@@ -294,6 +294,7 @@ export interface FarmSettings {
   farmMapUrl?: string;
   farmMapFileName?: string;
   occurrences?: OccurrencePin[];
+  ownerBirthday?: string; // MM-DD, sem ano — usado para notificações de aniversário do admin
 }
 
 export interface WeighingRow {
