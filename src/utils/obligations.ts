@@ -1,9 +1,9 @@
-import { FarmTask, Expense, FixedExpense, FarmSettings, Animal, AnimalType, HealthEvent, CropPlan, AccountPayable, AccountReceivable, ReproductionEvent, ReproductionEventType, Pasture, AccountStatus } from '../types';
+import { FarmTask, Expense, FixedExpense, FarmSettings, Animal, AnimalType, HealthEvent, CropPlan, AccountPayable, AccountReceivable, ReproductionEvent, ReproductionEventType, Pasture, AccountStatus, BreedingSeason, ScheduledSpray, SprayStatus } from '../types';
 import { format } from 'date-fns';
 
 export interface ObligationAlert {
   id: string; // unique identifier for the alert item
-  type: 'task' | 'variable_expense' | 'fixed_expense' | 'animal_rent' | 'vaccine' | 'crop_planting' | 'crop_harvest' | 'account_payable' | 'account_receivable' | 'weaning' | 'pasture_rotation';
+  type: 'task' | 'variable_expense' | 'fixed_expense' | 'animal_rent' | 'vaccine' | 'crop_planting' | 'crop_harvest' | 'account_payable' | 'account_receivable' | 'weaning' | 'pasture_rotation' | 'breeding_season' | 'scheduled_spray';
   title: string;
   description: string;
   dueDate: string; // YYYY-MM-DD format
@@ -48,7 +48,9 @@ export function computeObligations(
   accountsPayable: AccountPayable[] = [],
   accountsReceivable: AccountReceivable[] = [],
   reproductionEvents: ReproductionEvent[] = [],
-  pastures: Pasture[] = []
+  pastures: Pasture[] = [],
+  breedingSeasons: BreedingSeason[] = [],
+  scheduledSprays: ScheduledSpray[] = []
 ): ObligationAlert[] {
   const alerts: ObligationAlert[] = [];
   const today = getLocalToday();
@@ -392,6 +394,45 @@ export function computeObligations(
         daysRemaining,
         originalId: p.id,
         originalItem: p
+      });
+    }
+  });
+
+  // 10. Estação de Monta — avisa quando a data de início se aproxima
+  breedingSeasons.forEach(b => {
+    if (concludedKeys.includes(`breeding-season-${b.id}`)) return;
+    const dueDate = parseLocalISO(b.startDate);
+    const daysRemaining = getDaysDiff(dueDate, today);
+    if (daysRemaining <= 3 && b.status !== 'Encerrada') {
+      alerts.push({
+        id: `breeding-season-${b.id}`,
+        type: 'breeding_season',
+        title: `Estação de Monta: ${b.name || 'início'}`,
+        description: `Método: ${b.method}${b.femaleLotGroup ? ` | Lote: ${b.femaleLotGroup}` : ''}`,
+        dueDate: b.startDate,
+        daysRemaining,
+        originalId: b.id,
+        originalItem: b
+      });
+    }
+  });
+
+  // 11. Pulverização Programada
+  scheduledSprays.forEach(s => {
+    if (concludedKeys.includes(`scheduled-spray-${s.id}`)) return;
+    if (s.status === SprayStatus.REALIZADA || s.status === SprayStatus.CANCELADA) return;
+    const dueDate = parseLocalISO(s.scheduledDate);
+    const daysRemaining = getDaysDiff(dueDate, today);
+    if (daysRemaining <= 3) {
+      alerts.push({
+        id: `scheduled-spray-${s.id}`,
+        type: 'scheduled_spray',
+        title: `Pulverização: ${s.product || 'produto não informado'}`,
+        description: s.target ? `Alvo: ${s.target}` : 'Pulverização programada',
+        dueDate: s.scheduledDate,
+        daysRemaining,
+        originalId: s.id,
+        originalItem: s
       });
     }
   });

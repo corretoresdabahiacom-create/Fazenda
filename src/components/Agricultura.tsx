@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, X, Sprout, CalendarRange, NotebookPen, Bug, Droplets, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, X, Sprout, CalendarRange, NotebookPen, Bug, Droplets, AlertTriangle, Syringe } from 'lucide-react';
 import {
   Talhao, TalhaoStatus, AreaUnit,
   CropPlan, Cultura, CropPlanStatus,
@@ -12,6 +12,7 @@ import {
   PestRecord, PestType, InfestationLevel,
   IrrigationRecord, IrrigationMethod,
   Property,
+  ScheduledSpray, SprayStatus,
 } from '../types';
 import { format } from 'date-fns';
 import { fetchWeatherSnapshot, WeatherSnapshot } from '../lib/weatherRules';
@@ -32,16 +33,20 @@ interface Props {
   irrigationRecords: IrrigationRecord[];
   saveIrrigationRecord: (r: IrrigationRecord) => Promise<void>;
   deleteIrrigationRecord: (id: string) => Promise<void>;
+  scheduledSprays: ScheduledSpray[];
+  saveScheduledSpray: (s: ScheduledSpray) => Promise<void>;
+  deleteScheduledSpray: (id: string) => Promise<void>;
   activeProperty?: Property | null;
 }
 
-type Tab = 'talhoes' | 'planejamento' | 'caderno' | 'pragas' | 'irrigacao';
+type Tab = 'talhoes' | 'planejamento' | 'caderno' | 'pragas' | 'pulverizacao' | 'irrigacao';
 
 const TABS: { id: Tab; label: string; icon: typeof Sprout }[] = [
   { id: 'talhoes', label: 'Talhões', icon: Sprout },
   { id: 'planejamento', label: 'Planejamento Agrícola', icon: CalendarRange },
   { id: 'caderno', label: 'Caderno de Campo', icon: NotebookPen },
   { id: 'pragas', label: 'Manejo de Pragas', icon: Bug },
+  { id: 'pulverizacao', label: 'Pulverização Programada', icon: Syringe },
   { id: 'irrigacao', label: 'Irrigação', icon: Droplets },
 ];
 
@@ -95,6 +100,15 @@ export default function Agricultura(props: Props) {
           talhoes={props.talhoes}
           onSave={props.savePestRecord}
           onDelete={props.deletePestRecord}
+        />
+      )}
+      {tab === 'pulverizacao' && (
+        <PulverizacaoTab
+          sprays={props.scheduledSprays}
+          talhoes={props.talhoes}
+          activeProperty={props.activeProperty}
+          onSave={props.saveScheduledSpray}
+          onDelete={props.deleteScheduledSpray}
         />
       )}
       {tab === 'irrigacao' && (
@@ -626,6 +640,197 @@ function PragasTab({ records, talhoes, onSave, onDelete }: {
 }
 
 // ---------- Irrigação ----------
+
+// ---------- Pulverização Programada ----------
+
+function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: {
+  sprays: ScheduledSpray[];
+  talhoes: Talhao[];
+  activeProperty?: Property | null;
+  onSave: (s: ScheduledSpray) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [editing, setEditing] = useState<ScheduledSpray | null>(null);
+  const [form, setForm] = useState<Partial<ScheduledSpray>>({ status: SprayStatus.PROGRAMADA });
+  const [weatherWarning, setWeatherWarning] = useState<WeatherSnapshot | null>(null);
+
+  // O aviso de clima só faz sentido pra data de HOJE — a previsão que
+  // consultamos aqui é a do dia atual, não uma previsão de longo prazo
+  // pra datas futuras distantes.
+  const isScheduledForToday = form.scheduledDate === format(new Date(), 'yyyy-MM-dd');
+
+  useEffect(() => {
+    if (!isOpen || !isScheduledForToday || !activeProperty?.location) {
+      setWeatherWarning(null);
+      return;
+    }
+    fetchWeatherSnapshot(activeProperty.location.lat, activeProperty.location.lng)
+      .then(setWeatherWarning)
+      .catch(() => setWeatherWarning(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, isScheduledForToday, activeProperty?.location?.lat, activeProperty?.location?.lng]);
+
+  const relevantAlerts = weatherWarning?.alerts.filter(
+    a => a.type === 'chuva_pulverizacao' || a.type === 'vento_aplicacao_aerea',
+  ) ?? [];
+
+  function openNew() {
+    setEditing(null);
+    setForm({ status: SprayStatus.PROGRAMADA, scheduledDate: format(new Date(), 'yyyy-MM-dd') });
+    setIsOpen(true);
+  }
+
+  function openEdit(s: ScheduledSpray) {
+    setEditing(s);
+    setForm(s);
+    setIsOpen(true);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const item: ScheduledSpray = {
+      id: editing?.id ?? `spray_${Date.now()}`,
+      talhaoId: form.talhaoId,
+      scheduledDate: form.scheduledDate || format(new Date(), 'yyyy-MM-dd'),
+      product: form.product,
+      target: form.target,
+      dosage: form.dosage,
+      sprayVolumePerHa: form.sprayVolumePerHa,
+      equipment: form.equipment,
+      preHarvestIntervalDays: form.preHarvestIntervalDays,
+      reentryIntervalHours: form.reentryIntervalHours,
+      hasAgronomicPrescription: form.hasAgronomicPrescription,
+      status: form.status ?? SprayStatus.PROGRAMADA,
+      notes: form.notes,
+      createdAt: editing?.createdAt ?? new Date().toISOString(),
+    };
+    await onSave(item);
+    setIsOpen(false);
+  }
+
+  const statusColor: Record<string, string> = {
+    [SprayStatus.PROGRAMADA]: 'bg-blue-50 text-blue-700',
+    [SprayStatus.REALIZADA]: 'bg-green-50 text-green-700',
+    [SprayStatus.ADIADA]: 'bg-amber-50 text-amber-700',
+    [SprayStatus.CANCELADA]: 'bg-gray-100 text-gray-500',
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-gray-400 bg-gray-50 rounded-xl p-3">
+        Planeje aplicações com antecedência, com os parâmetros que a receita agronômica normalmente exige: dose,
+        taxa de aplicação, carência antes da colheita e intervalo de reentrada de pessoas na área.
+      </p>
+      <div className="flex justify-end">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+          <Plus size={18} /> Nova Pulverização Programada
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {[...sprays].sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate)).map((s) => {
+          const talhao = talhoes.find(t => t.id === s.talhaoId);
+          return (
+            <div key={s.id} className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1">
+              <div className="flex items-start justify-between">
+                <h3 className="font-bold text-gray-800">{s.product || 'Produto não informado'}</h3>
+                <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${statusColor[s.status]}`}>{s.status}</span>
+              </div>
+              <p className="text-xs text-gray-500">{format(new Date(s.scheduledDate), 'dd/MM/yyyy')}{talhao ? ` — ${talhao.name}` : ''}</p>
+              {s.target && <p className="text-xs text-gray-500">Alvo: {s.target}</p>}
+              {s.dosage && <p className="text-xs text-gray-500">Dose: {s.dosage}{s.sprayVolumePerHa ? ` | ${s.sprayVolumePerHa} L/ha` : ''}</p>}
+              {(s.preHarvestIntervalDays || s.reentryIntervalHours) && (
+                <p className="text-xs text-amber-700">
+                  {s.preHarvestIntervalDays ? `Carência: ${s.preHarvestIntervalDays}d` : ''}
+                  {s.preHarvestIntervalDays && s.reentryIntervalHours ? ' | ' : ''}
+                  {s.reentryIntervalHours ? `Reentrada: ${s.reentryIntervalHours}h` : ''}
+                </p>
+              )}
+              <div className="flex gap-2 pt-2">
+                <button onClick={() => openEdit(s)} className="text-xs font-semibold text-gray-500">Editar</button>
+                <button onClick={() => confirm('Excluir?') && onDelete(s.id)} className="text-xs font-semibold text-red-400 ml-auto flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
+              </div>
+            </div>
+          );
+        })}
+        {sprays.length === 0 && (
+          <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhuma pulverização programada ainda.</p>
+        )}
+      </div>
+
+      {isOpen && (
+        <Modal title={editing ? 'Editar Pulverização' : 'Nova Pulverização Programada'} onClose={() => setIsOpen(false)}>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Talhão">
+                <select value={form.talhaoId ?? ''} onChange={e => setForm({ ...form, talhaoId: e.target.value || undefined })} className={inputCls}>
+                  <option value="">Selecione</option>
+                  {talhoes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              </Field>
+              <Field label="Data programada">
+                <input type="date" value={form.scheduledDate ?? ''} onChange={e => setForm({ ...form, scheduledDate: e.target.value })} className={inputCls} />
+              </Field>
+            </div>
+
+            {isScheduledForToday && relevantAlerts.length > 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2">
+                <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                <div className="text-xs text-amber-800">
+                  {relevantAlerts.map((a, i) => <p key={i}>{a.message}</p>)}
+                  <p className="italic mt-1">Aviso apenas — você pode salvar mesmo assim.</p>
+                </div>
+              </div>
+            )}
+
+            <Field label="Produto (defensivo)">
+              <input value={form.product ?? ''} onChange={e => setForm({ ...form, product: e.target.value })} className={inputCls} placeholder="Nome comercial do produto" />
+            </Field>
+            <Field label="Alvo (praga, doença ou erva daninha)">
+              <input value={form.target ?? ''} onChange={e => setForm({ ...form, target: e.target.value })} className={inputCls} />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Dose recomendada">
+                <input value={form.dosage ?? ''} onChange={e => setForm({ ...form, dosage: e.target.value })} className={inputCls} placeholder="Ex: 2 L/ha" />
+              </Field>
+              <Field label="Taxa de aplicação (L calda/ha)">
+                <input type="number" value={form.sprayVolumePerHa ?? ''} onChange={e => setForm({ ...form, sprayVolumePerHa: e.target.value ? Number(e.target.value) : undefined })} className={inputCls} />
+              </Field>
+            </div>
+            <Field label="Equipamento">
+              <input value={form.equipment ?? ''} onChange={e => setForm({ ...form, equipment: e.target.value })} className={inputCls} placeholder="Ex: pulverizador de barra, costal, drone, aéreo" />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Carência antes da colheita (dias)">
+                <input type="number" value={form.preHarvestIntervalDays ?? ''} onChange={e => setForm({ ...form, preHarvestIntervalDays: e.target.value ? Number(e.target.value) : undefined })} className={inputCls} />
+              </Field>
+              <Field label="Intervalo de reentrada (horas)">
+                <input type="number" value={form.reentryIntervalHours ?? ''} onChange={e => setForm({ ...form, reentryIntervalHours: e.target.value ? Number(e.target.value) : undefined })} className={inputCls} />
+              </Field>
+            </div>
+            <label className="flex items-center gap-2 text-xs text-gray-600">
+              <input type="checkbox" checked={form.hasAgronomicPrescription ?? false} onChange={e => setForm({ ...form, hasAgronomicPrescription: e.target.checked })} />
+              Há receituário agronômico assinado por profissional habilitado
+            </label>
+            <Field label="Status">
+              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as SprayStatus })} className={inputCls}>
+                {Object.values(SprayStatus).map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </Field>
+            <Field label="Observações">
+              <textarea value={form.notes ?? ''} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} className={inputCls} />
+            </Field>
+            <div className="flex gap-2 pt-2">
+              <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
+              <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">Cancelar</button>
+            </div>
+          </form>
+        </Modal>
+      )}
+    </div>
+  );
+}
 
 function IrrigacaoTab({ records, talhoes, onSave, onDelete }: {
   records: IrrigationRecord[];

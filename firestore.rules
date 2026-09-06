@@ -367,6 +367,20 @@ service cloud.firestore {
         allow update: if canWrite(userId) && isValidAgricultureRecord(incoming());
         allow delete: if canWrite(userId);
       }
+
+      match /breedingSeasons/{id} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(id) && isValidAgricultureRecord(incoming());
+        allow update: if canWrite(userId) && isValidAgricultureRecord(incoming());
+        allow delete: if canWrite(userId);
+      }
+
+      match /scheduledSprays/{id} {
+        allow list, get: if isOwner(userId);
+        allow create: if canWrite(userId) && isValidId(id) && isValidAgricultureRecord(incoming());
+        allow update: if canWrite(userId) && isValidAgricultureRecord(incoming());
+        allow delete: if canWrite(userId);
+      }
     
       match /costCenters/{costCenterId} {
         allow list, get: if isOwner(userId);

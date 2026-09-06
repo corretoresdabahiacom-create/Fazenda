@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Plus, Edit3, Trash2, X, Tag, Heart, Syringe, Milk, Users } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Tag, Heart, Syringe, Milk, Users, CalendarRange } from 'lucide-react';
 import {
   IndividualAnimal, AnimalSex, LotGroup,
   ReproductionEvent, ReproductionEventType, GESTACAO_BOVINA_DIAS,
@@ -12,6 +12,7 @@ import {
   MilkProductionRecord,
   AnimalCategory,
   Animal, Pasture, TransactionHistory,
+  BreedingSeason, BreedingMethod, BreedingSeasonStatus,
 } from '../types';
 import { format, addDays } from 'date-fns';
 import Animals from './Animals';
@@ -29,6 +30,9 @@ interface Props {
   milkRecords: MilkProductionRecord[];
   saveMilkRecord: (r: MilkProductionRecord) => Promise<void>;
   deleteMilkRecord: (id: string) => Promise<void>;
+  breedingSeasons: BreedingSeason[];
+  saveBreedingSeason: (b: BreedingSeason) => Promise<void>;
+  deleteBreedingSeason: (id: string) => Promise<void>;
   // Cadastro por Lote (reaproveita a tela "Animais" já existente, sem
   // duplicar código — os dois lugares mostram e editam os mesmos dados)
   animals: Animal[];
@@ -39,12 +43,13 @@ interface Props {
   saveTransaction: (t: TransactionHistory) => Promise<void>;
 }
 
-type Tab = 'lotes' | 'animais' | 'reproducao' | 'sanidade' | 'leite';
+type Tab = 'lotes' | 'animais' | 'reproducao' | 'estacao-monta' | 'sanidade' | 'leite';
 
 const TABS: { id: Tab; label: string; icon: typeof Tag }[] = [
   { id: 'lotes', label: 'Cadastro por Lote', icon: Users },
   { id: 'animais', label: 'Cadastro Individual', icon: Tag },
   { id: 'reproducao', label: 'Reprodução', icon: Heart },
+  { id: 'estacao-monta', label: 'Estação de Monta', icon: CalendarRange },
   { id: 'sanidade', label: 'Sanidade', icon: Syringe },
   { id: 'leite', label: 'Produção Leiteira', icon: Milk },
 ];
@@ -96,6 +101,14 @@ export default function PecuariaProfissional(props: Props) {
           animals={props.individualAnimals}
           onSave={props.saveReproductionEvent}
           onDelete={props.deleteReproductionEvent}
+        />
+      )}
+      {tab === 'estacao-monta' && (
+        <EstacaoMontaTab
+          seasons={props.breedingSeasons}
+          reproductionEvents={props.reproductionEvents}
+          onSave={props.saveBreedingSeason}
+          onDelete={props.deleteBreedingSeason}
         />
       )}
       {tab === 'sanidade' && (
@@ -419,6 +432,166 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
               <p className="text-xs text-theme-secondary">A previsão de parto é calculada automaticamente ({GESTACAO_BOVINA_DIAS} dias de gestação bovina).</p>
             )}
 
+            <SubmitRow onCancel={() => setIsOpen(false)} />
+          </form>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ---------- Estação de Monta ----------
+
+function EstacaoMontaTab({ seasons, reproductionEvents, onSave, onDelete }: {
+  seasons: BreedingSeason[];
+  reproductionEvents: ReproductionEvent[];
+  onSave: (b: BreedingSeason) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [editing, setEditing] = useState<BreedingSeason | null>(null);
+  const [form, setForm] = useState<Partial<BreedingSeason>>({ method: BreedingMethod.MONTA_NATURAL, status: BreedingSeasonStatus.PLANEJADA, durationDays: 90 });
+
+  function openNew() {
+    setEditing(null);
+    setForm({ method: BreedingMethod.MONTA_NATURAL, status: BreedingSeasonStatus.PLANEJADA, durationDays: 90, startDate: format(new Date(), 'yyyy-MM-dd') });
+    setIsOpen(true);
+  }
+
+  function openEdit(b: BreedingSeason) {
+    setEditing(b);
+    setForm(b);
+    setIsOpen(true);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const startDate = form.startDate || format(new Date(), 'yyyy-MM-dd');
+    const durationDays = form.durationDays ?? 90;
+    const endDate = format(addDays(new Date(startDate), durationDays), 'yyyy-MM-dd');
+    const item: BreedingSeason = {
+      id: editing?.id ?? `season_${Date.now()}`,
+      name: form.name || `Estação de Monta ${new Date(startDate).getFullYear()}`,
+      startDate,
+      durationDays,
+      endDate,
+      method: form.method ?? BreedingMethod.MONTA_NATURAL,
+      bullEarTags: form.bullEarTags,
+      bullToCowRatio: form.bullToCowRatio,
+      femaleLotGroup: form.femaleLotGroup,
+      femaleCount: form.femaleCount,
+      bullAndrologicalExamDone: form.bullAndrologicalExamDone,
+      status: form.status ?? BreedingSeasonStatus.PLANEJADA,
+      notes: form.notes,
+      createdAt: editing?.createdAt ?? new Date().toISOString(),
+    };
+    await onSave(item);
+    setIsOpen(false);
+  }
+
+  // Taxa de prenhez calculada automaticamente: entre os diagnósticos de
+  // prenhez registrados dentro da janela da estação (início até 30 dias
+  // após o fim, tempo para o diagnóstico ser feito), qual % deu positivo.
+  function pregnancyRate(season: BreedingSeason): { rate: number; total: number } | null {
+    if (!season.endDate) return null;
+    const windowEnd = format(addDays(new Date(season.endDate), 30), 'yyyy-MM-dd');
+    const diagnostics = reproductionEvents.filter(
+      e => e.type === ReproductionEventType.DIAGNOSTICO_PRENHEZ &&
+        e.date >= season.startDate && e.date <= windowEnd &&
+        e.pregnancyResult && e.pregnancyResult !== 'pendente'
+    );
+    if (diagnostics.length === 0) return null;
+    const positive = diagnostics.filter(d => d.pregnancyResult === 'positivo').length;
+    return { rate: (positive / diagnostics.length) * 100, total: diagnostics.length };
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-gray-400 bg-gray-50 rounded-xl p-3">
+        Período concentrado de reprodução (monta natural ou IA/IATF), usado para agrupar nascimentos numa época
+        favorável. Duração usual: 60 a 120 dias (mais comum 90), começando geralmente no início das águas.
+      </p>
+      <div className="flex justify-end">
+        <button onClick={openNew} className="flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-xl font-semibold text-sm">
+          <Plus size={18} /> Nova Estação de Monta
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {seasons.map((s) => {
+          const preg = pregnancyRate(s);
+          return (
+            <div key={s.id} className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1">
+              <div className="flex items-start justify-between">
+                <h3 className="font-bold text-gray-800">{s.name}</h3>
+                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-600">{s.status}</span>
+              </div>
+              <p className="text-xs text-gray-500">{format(new Date(s.startDate), 'dd/MM/yyyy')} → {s.endDate ? format(new Date(s.endDate), 'dd/MM/yyyy') : '—'} ({s.durationDays} dias)</p>
+              <p className="text-xs text-gray-500">Método: {s.method}</p>
+              {s.bullEarTags && <p className="text-xs text-gray-500">Touro(s): {s.bullEarTags}{s.bullToCowRatio ? ` (${s.bullToCowRatio})` : ''}</p>}
+              {s.femaleLotGroup && <p className="text-xs text-gray-500">Lote de fêmeas: {s.femaleLotGroup}{s.femaleCount ? ` (${s.femaleCount} cab.)` : ''}</p>}
+              {preg && (
+                <p className="text-xs font-bold text-[var(--primary)]">Taxa de prenhez: {preg.rate.toFixed(0)}% ({preg.total} diagnóstico(s))</p>
+              )}
+              <div className="flex gap-2 pt-2">
+                <button onClick={() => openEdit(s)} className="text-xs font-semibold text-gray-500">Editar</button>
+                <button onClick={() => confirm('Excluir?') && onDelete(s.id)} className="text-xs font-semibold text-red-400 ml-auto flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
+              </div>
+            </div>
+          );
+        })}
+        {seasons.length === 0 && (
+          <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhuma estação de monta cadastrada ainda.</p>
+        )}
+      </div>
+
+      {isOpen && (
+        <Modal title={editing ? 'Editar Estação de Monta' : 'Nova Estação de Monta'} onClose={() => setIsOpen(false)}>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <Field label="Nome">
+              <input value={form.name ?? ''} onChange={e => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="Ex: Estação de Monta 2026/2027" />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Data de início">
+                <input type="date" value={form.startDate ?? ''} onChange={e => setForm({ ...form, startDate: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Duração (dias)">
+                <input type="number" value={form.durationDays ?? 90} onChange={e => setForm({ ...form, durationDays: Number(e.target.value) })} className={inputCls} />
+              </Field>
+            </div>
+            <p className="text-[11px] text-gray-400">Usual entre 60 e 120 dias — 90 dias é o mais recomendado para maximizar resultados reprodutivos e produtivos.</p>
+            <Field label="Método">
+              <select value={form.method} onChange={e => setForm({ ...form, method: e.target.value as BreedingMethod })} className={inputCls}>
+                {Object.values(BreedingMethod).map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </Field>
+            {(form.method === BreedingMethod.MONTA_NATURAL || form.method === BreedingMethod.MISTA) && (
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Brinco(s) do(s) touro(s)">
+                  <input value={form.bullEarTags ?? ''} onChange={e => setForm({ ...form, bullEarTags: e.target.value })} className={inputCls} placeholder="Ex: T01, T02" />
+                </Field>
+                <Field label="Proporção touro:vaca">
+                  <input value={form.bullToCowRatio ?? ''} onChange={e => setForm({ ...form, bullToCowRatio: e.target.value })} className={inputCls} placeholder="Ex: 1:25" />
+                </Field>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Lote/grupo de fêmeas">
+                <input value={form.femaleLotGroup ?? ''} onChange={e => setForm({ ...form, femaleLotGroup: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Nº de fêmeas expostas">
+                <input type="number" value={form.femaleCount ?? ''} onChange={e => setForm({ ...form, femaleCount: e.target.value ? Number(e.target.value) : undefined })} className={inputCls} />
+              </Field>
+            </div>
+            <label className="flex items-center gap-2 text-xs text-gray-600">
+              <input type="checkbox" checked={form.bullAndrologicalExamDone ?? false} onChange={e => setForm({ ...form, bullAndrologicalExamDone: e.target.checked })} />
+              Exame andrológico do(s) touro(s) realizado
+            </label>
+            <Field label="Status">
+              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as BreedingSeasonStatus })} className={inputCls}>
+                {Object.values(BreedingSeasonStatus).map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </Field>
             <SubmitRow onCancel={() => setIsOpen(false)} />
           </form>
         </Modal>

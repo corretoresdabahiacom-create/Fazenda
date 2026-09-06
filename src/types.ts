@@ -841,6 +841,78 @@ export interface AppExpense {
 }
 
 // =====================================================================
+// ESTAÇÃO DE MONTA — período concentrado de reprodução (monta natural ou
+// IA/IATF), prática padrão em bovinocultura de corte para concentrar
+// nascimentos numa época favorável. Duração usual: 60 a 120 dias
+// (mais comum 90 dias), começando geralmente no início do período das
+// chuvas, quando as pastagens estão em melhor condição nutricional.
+// =====================================================================
+
+export enum BreedingMethod {
+  MONTA_NATURAL = "Monta Natural",
+  INSEMINACAO_ARTIFICIAL = "Inseminação Artificial",
+  IATF = "IATF",
+  MISTA = "Mista (Natural + IA)",
+}
+
+export enum BreedingSeasonStatus {
+  PLANEJADA = "Planejada",
+  EM_ANDAMENTO = "Em Andamento",
+  ENCERRADA = "Encerrada",
+}
+
+export interface BreedingSeason {
+  id: string;
+  propertyId?: string;
+  name?: string; // ex: "Estação de Monta 2026/2027"
+  startDate: string;
+  durationDays?: number; // padrão sugerido: 90 (usual entre 60 e 120)
+  endDate?: string; // calculado a partir de startDate + durationDays
+  method: BreedingMethod;
+  bullEarTags?: string; // brincos dos touros usados (monta natural), texto livre
+  bullToCowRatio?: string; // proporção touro:vaca na monta natural, ex: "1:25"
+  femaleLotGroup?: string; // lote/grupo de fêmeas envolvidas
+  femaleCount?: number; // quantidade de fêmeas expostas à reprodução
+  bullAndrologicalExamDone?: boolean; // exame andrológico do(s) touro(s) realizado
+  status: BreedingSeasonStatus;
+  notes?: string;
+  createdAt: string;
+}
+
+// =====================================================================
+// PULVERIZAÇÃO PROGRAMADA — planejamento de aplicações futuras de
+// defensivos, com os parâmetros técnicos que a receita agronômica exige:
+// dose, taxa de aplicação, período de carência (segurança antes da
+// colheita) e intervalo de reentrada de pessoas na área.
+// =====================================================================
+
+export enum SprayStatus {
+  PROGRAMADA = "Programada",
+  REALIZADA = "Realizada",
+  ADIADA = "Adiada",
+  CANCELADA = "Cancelada",
+}
+
+export interface ScheduledSpray {
+  id: string;
+  propertyId?: string;
+  talhaoId?: string;
+  scheduledDate: string;
+  product?: string; // nome comercial do defensivo
+  target?: string; // praga, doença ou erva daninha alvo
+  dosage?: string; // dose recomendada (conforme receituário agronômico)
+  sprayVolumePerHa?: number; // taxa de aplicação — litros de calda por hectare
+  equipment?: string; // ex: pulverizador de barra, costal, drone, aéreo
+  preHarvestIntervalDays?: number; // período de carência (dias) antes da colheita
+  reentryIntervalHours?: number; // intervalo de reentrada de pessoas na área (horas)
+  hasAgronomicPrescription?: boolean; // se há receituário agronômico assinado por profissional habilitado
+  status: SprayStatus;
+  notes?: string;
+  createdAt: string;
+}
+
+
+// =====================================================================
 // DOCUMENTOS — CAR, CCIR, ITR, contratos, licenças ambientais,
 // receituários agronômicos. Arquivos ficam no Firebase Storage; aqui só
 // guardamos os metadados + o link de download.

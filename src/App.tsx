@@ -40,7 +40,9 @@ import {
   FarmSettings,
   AccountStatus,
   Subscription,
-  SubscriptionStatus
+  SubscriptionStatus,
+  PlanTier,
+  PLAN_PRICES
 } from './types';
 
 import ThemeToggle from './components/ThemeToggle';
@@ -150,6 +152,12 @@ export default function App() {
     irrigationRecords,
     saveIrrigationRecord,
     deleteIrrigationRecord,
+    breedingSeasons,
+    saveBreedingSeason,
+    deleteBreedingSeason,
+    scheduledSprays,
+    saveScheduledSpray,
+    deleteScheduledSpray,
     costCenters,
     saveCostCenter,
     deleteCostCenter,
@@ -191,6 +199,7 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isObligationsOpen, setIsObligationsOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isPlansOpen, setIsPlansOpen] = useState(false);
   const [mySubscription, setMySubscription] = useState<Subscription | null>(null);
 
   useEffect(() => {
@@ -222,7 +231,8 @@ export default function App() {
   // Calculate obligations and state
   const activeAlerts = computeObligations(
     tasks || [], expenses || [], fixedExpenses || [], settings || { farmName: '', city: '' }, animals || [],
-    healthEvents || [], cropPlans || [], accountsPayable || [], accountsReceivable || [], reproductionEvents || [], pastures || []
+    healthEvents || [], cropPlans || [], accountsPayable || [], accountsReceivable || [], reproductionEvents || [], pastures || [],
+    breedingSeasons || [], scheduledSprays || []
   );
   const activeAlertsCount = activeAlerts.length;
   const hasOverdue = activeAlerts.some(a => a.daysRemaining < 0);
@@ -249,7 +259,8 @@ export default function App() {
       await saveAccountReceivable({ ...alert.originalItem, status: AccountStatus.PAGO, receivedDate: new Date().toISOString().split('T')[0] });
     } else if (
       alert.type === 'vaccine' || alert.type === 'crop_planting' ||
-      alert.type === 'crop_harvest' || alert.type === 'weaning' || alert.type === 'pasture_rotation'
+      alert.type === 'crop_harvest' || alert.type === 'weaning' || alert.type === 'pasture_rotation' ||
+      alert.type === 'breeding_season' || alert.type === 'scheduled_spray'
     ) {
       // Eventos de ocorrência única (não recorrentes todo mês) — usa o
       // próprio id do alerta como chave de conclusão.
@@ -513,22 +524,16 @@ export default function App() {
                 <div className="w-full border-t border-dashed border-theme"></div>
               </div>
               <div className="relative flex justify-center text-[10px] uppercase">
-                <span className="bg-theme-card px-2 text-theme-secondary font-semibold">Sem Internet ou Testando?</span>
+                <span className="bg-theme-card px-2 text-theme-secondary font-semibold">Ainda não decidiu?</span>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => {
-                if (!acceptedTerms) {
-                  setLoginError('Você deve aceitar os Termos e Condições para acessar o Modo Convidado.');
-                  return;
-                }
-                loginAsGuest();
-              }}
+              onClick={() => setIsPlansOpen(true)}
               className="w-full flex items-center justify-center gap-3 bg-[var(--primary)]/10 border border-dashed border-[#2d6a4f]/50 hover:bg-[var(--primary)]/20 text-[var(--primary)] py-3.5 px-6 rounded-xl font-bold transition-all shadow-sm active:scale-95 text-xs cursor-pointer"
             >
-              Entrar no Modo Convidado (Offline / Teste)
+              Ver Planos e Assinar
             </button>
           </div>
 
@@ -564,9 +569,11 @@ export default function App() {
 
                     <p><strong>9. Limitação de responsabilidade.</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência, validação e decisão final sobre qualquer informação, cálculo, sugestão ou conselho gerado pelo aplicativo (incluindo previsões climáticas, cálculos financeiros, sugestões de manejo ou respostas do Consultor Rural) antes de qualquer tomada de decisão prática na sua atividade rural. Na máxima extensão permitida pela legislação aplicável, o Fazenda Online, seus desenvolvedores, administradores, sócios e parceiros não se responsabilizam civilmente por perdas, danos diretos, indiretos, lucros cessantes ou prejuízos patrimoniais decorrentes do uso ou da impossibilidade de uso do aplicativo. Esta cláusula limita responsabilidade civil na forma da lei — ela não afasta, e não tem o poder de afastar, eventual responsabilidade criminal, que é sempre apurada e determinada exclusivamente pelas autoridades e pelo Poder Judiciário competentes, conforme a legislação vigente.</p>
 
-                    <p><strong>10. Alterações destes Termos.</strong> Podemos atualizar estes Termos periodicamente para refletir mudanças no aplicativo ou na legislação. Mudanças relevantes serão comunicadas dentro do próprio aplicativo.</p>
+                    <p><strong>10. Manutenção e disponibilidade.</strong> O Fazenda Online pode sair do ar temporariamente para manutenção, atualizações ou correções, sem aviso prévio, sempre que necessário para o bom funcionamento do serviço. Em caso de encerramento definitivo do aplicativo, você será avisado com a maior antecedência possível e receberá de volta o valor proporcional aos dias não utilizados do mês já pago da sua assinatura.</p>
 
-                    <p><strong>11. Suporte e contato.</strong> Dúvidas, solicitações relacionadas a dados pessoais (LGPD) ou suporte geral podem ser enviadas para: <strong className="text-theme-primary">admmeuarmazem@gmail.com</strong>.</p>
+                    <p><strong>11. Alterações destes Termos.</strong> Podemos atualizar estes Termos periodicamente para refletir mudanças no aplicativo ou na legislação. Mudanças relevantes serão comunicadas dentro do próprio aplicativo.</p>
+
+                    <p><strong>12. Suporte e contato.</strong> Dúvidas, solicitações relacionadas a dados pessoais (LGPD) ou suporte geral podem ser enviadas para: <strong className="text-theme-primary">admmeuarmazem@gmail.com</strong>.</p>
 
                     <p className="italic">Ao aceitar estes Termos, você confirma que leu, entendeu e concorda com todo o conteúdo acima. Se, a qualquer momento, você discordar de qualquer parte, o uso do aplicativo deve ser interrompido e ele deve ser desinstalado — continuar usando significa que você permitiu e aceitou.</p>
                   </div>
@@ -574,6 +581,44 @@ export default function App() {
                     <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs">Aceitar Termos</button>
                     <button onClick={() => setIsTermsOpen(false)} className="flex-1 border border-theme hover:bg-theme-secondary text-theme-primary py-2.5 px-4 rounded-xl font-semibold transition-all text-xs">Fechar</button>
                   </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
+          {/* Plans Modal */}
+          <AnimatePresence>
+            {isPlansOpen && (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-theme-card rounded-3xl border border-theme shadow-2xl p-6 max-w-lg w-full max-h-[85vh] flex flex-col"
+                >
+                  <h2 className="font-serif italic font-bold text-2xl text-[var(--primary)] mb-1">Planos</h2>
+                  <p className="text-xs text-theme-secondary mb-4">Crie sua conta gratuitamente e experimente por 7 dias — depois, escolha o plano ideal para o tamanho da sua operação.</p>
+                  <div className="overflow-y-auto pr-1 space-y-3 flex-1">
+                    {([PlanTier.UMA_FAZENDA, PlanTier.TRES_FAZENDAS, PlanTier.CINCO_FAZENDAS] as PlanTier[]).map((plan) => (
+                      <div key={plan} className="border border-theme rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                          <p className="font-bold text-theme-primary text-sm">{plan}</p>
+                          <p className="text-[11px] text-theme-secondary">Gestão completa para {plan.toLowerCase()}</p>
+                        </div>
+                        <p className="font-bold text-[var(--primary)] text-lg whitespace-nowrap">R$ {PLAN_PRICES[plan]?.toFixed(2)}<span className="text-[10px] text-theme-secondary font-normal">/mês</span></p>
+                      </div>
+                    ))}
+                    <div className="border border-dashed border-theme rounded-2xl p-4 text-center">
+                      <p className="font-bold text-theme-primary text-sm">{PlanTier.AGRO_TOTAL}</p>
+                      <p className="text-[11px] text-theme-secondary">Valor combinado com nossa equipe — fale conosco: admmeuarmazem@gmail.com</p>
+                    </div>
+                  </div>
+                  <button onClick={() => { setIsPlansOpen(false); setIsRegistering(true); }} className="mt-4 w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-3 rounded-xl font-bold text-sm">
+                    Criar minha conta e começar o teste grátis
+                  </button>
+                  <button onClick={() => setIsPlansOpen(false)} className="mt-2 w-full border border-theme text-theme-secondary py-2.5 rounded-xl font-semibold text-xs">
+                    Fechar
+                  </button>
                 </motion.div>
               </div>
             )}
@@ -723,8 +768,8 @@ export default function App() {
       case 'nutrition': return <NutritionCalculator animals={animals} inventory={inventory} />;
       case 'settings': return <FarmSettingsComp settings={settings} setSettings={updateSettings} uid={user?.uid} />;
       case 'properties': return <Properties properties={properties} activePropertyId={activePropertyId} onSetActive={setActivePropertyId} onSave={saveProperty} onDelete={deleteProperty} />;
-      case 'pecuaria-pro': return <PecuariaProfissional individualAnimals={individualAnimals} saveIndividualAnimal={saveIndividualAnimal} deleteIndividualAnimal={deleteIndividualAnimal} reproductionEvents={reproductionEvents} saveReproductionEvent={saveReproductionEvent} deleteReproductionEvent={deleteReproductionEvent} healthEvents={healthEvents} saveHealthEvent={saveHealthEvent} deleteHealthEvent={deleteHealthEvent} milkRecords={milkRecords} saveMilkRecord={saveMilkRecord} deleteMilkRecord={deleteMilkRecord} animals={animals} saveAnimal={saveAnimal} deleteAnimal={deleteAnimal} pastures={pastures} transactions={transactions} saveTransaction={saveTransaction} />;
-      case 'agricultura': return <Agricultura talhoes={talhoes} saveTalhao={saveTalhao} deleteTalhao={deleteTalhao} cropPlans={cropPlans} saveCropPlan={saveCropPlan} deleteCropPlan={deleteCropPlan} fieldLogEntries={fieldLogEntries} saveFieldLogEntry={saveFieldLogEntry} deleteFieldLogEntry={deleteFieldLogEntry} pestRecords={pestRecords} savePestRecord={savePestRecord} deletePestRecord={deletePestRecord} irrigationRecords={irrigationRecords} saveIrrigationRecord={saveIrrigationRecord} deleteIrrigationRecord={deleteIrrigationRecord} activeProperty={activeProperty} />;
+      case 'pecuaria-pro': return <PecuariaProfissional individualAnimals={individualAnimals} saveIndividualAnimal={saveIndividualAnimal} deleteIndividualAnimal={deleteIndividualAnimal} reproductionEvents={reproductionEvents} saveReproductionEvent={saveReproductionEvent} deleteReproductionEvent={deleteReproductionEvent} healthEvents={healthEvents} saveHealthEvent={saveHealthEvent} deleteHealthEvent={deleteHealthEvent} milkRecords={milkRecords} saveMilkRecord={saveMilkRecord} deleteMilkRecord={deleteMilkRecord} breedingSeasons={breedingSeasons} saveBreedingSeason={saveBreedingSeason} deleteBreedingSeason={deleteBreedingSeason} animals={animals} saveAnimal={saveAnimal} deleteAnimal={deleteAnimal} pastures={pastures} transactions={transactions} saveTransaction={saveTransaction} />;
+      case 'agricultura': return <Agricultura talhoes={talhoes} saveTalhao={saveTalhao} deleteTalhao={deleteTalhao} cropPlans={cropPlans} saveCropPlan={saveCropPlan} deleteCropPlan={deleteCropPlan} fieldLogEntries={fieldLogEntries} saveFieldLogEntry={saveFieldLogEntry} deleteFieldLogEntry={deleteFieldLogEntry} pestRecords={pestRecords} savePestRecord={savePestRecord} deletePestRecord={deletePestRecord} irrigationRecords={irrigationRecords} saveIrrigationRecord={saveIrrigationRecord} deleteIrrigationRecord={deleteIrrigationRecord} scheduledSprays={scheduledSprays} saveScheduledSpray={saveScheduledSpray} deleteScheduledSpray={deleteScheduledSpray} activeProperty={activeProperty} />;
       case 'financeiro-completo': return <Financeiro accountsPayable={accountsPayable} saveAccountPayable={saveAccountPayable} deleteAccountPayable={deleteAccountPayable} accountsReceivable={accountsReceivable} saveAccountReceivable={saveAccountReceivable} deleteAccountReceivable={deleteAccountReceivable} costCenters={costCenters} saveCostCenter={saveCostCenter} deleteCostCenter={deleteCostCenter} />;
       case 'maquinas': return <Maquinas machines={machines} saveMachine={saveMachine} deleteMachine={deleteMachine} maintenanceRecords={maintenanceRecords} saveMaintenanceRecord={saveMaintenanceRecord} deleteMaintenanceRecord={deleteMaintenanceRecord} />;
       case 'rh-rural': return <RHRural teams={teams} saveTeam={saveTeam} deleteTeam={deleteTeam} workSchedules={workSchedules} saveWorkSchedule={saveWorkSchedule} deleteWorkSchedule={deleteWorkSchedule} trainings={trainings} saveTraining={saveTraining} deleteTraining={deleteTraining} ppeItems={ppeItems} savePPEItem={savePPEItem} deletePPEItem={deletePPEItem} certifications={certifications} saveCertification={saveCertification} deleteCertification={deleteCertification} />;
@@ -791,6 +836,29 @@ export default function App() {
           <p className="text-xs text-theme-secondary">
             Dúvidas ou para regularizar, entre em contato: <strong>admmeuarmazem@gmail.com</strong>
           </p>
+          <button onClick={handleLogout} className="text-xs font-semibold text-theme-secondary underline">
+            Sair da conta
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Teste grátis de 7 dias — depois disso, sem uma assinatura ativa, o
+  // acesso fica bloqueado e só a tela de assinatura fica disponível.
+  const trialDaysUsed = mySubscription?.status === SubscriptionStatus.TRIAL
+    ? Math.floor((Date.now() - new Date(mySubscription.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+  const trialExpired = mySubscription?.status === SubscriptionStatus.TRIAL && trialDaysUsed >= 7;
+
+  if (!isBootstrapAdmin && trialExpired) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-theme-card p-4 overflow-y-auto">
+        <div className="max-w-sm w-full text-center space-y-4 py-8">
+          <CreditCard size={48} className="text-[var(--primary)] mx-auto" />
+          <h1 className="text-xl font-bold text-theme-primary">Seu teste grátis de 7 dias terminou</h1>
+          <p className="text-sm text-theme-secondary">Assine um plano para continuar usando o Fazenda Online.</p>
+          <MinhaAssinatura uid={user?.uid || ''} />
           <button onClick={handleLogout} className="text-xs font-semibold text-theme-secondary underline">
             Sair da conta
           </button>

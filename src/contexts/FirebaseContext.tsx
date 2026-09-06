@@ -12,7 +12,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType, googleProvider } from '../lib/firebase';
-import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord, Talhao, CropPlan, FieldLogEntry, PestRecord, IrrigationRecord, CostCenter, AccountPayable, AccountReceivable, Machine, MaintenanceRecord, Team, WorkSchedule, Training, PPEItem, Certification, FarmDocument } from '../types';
+import { Animal, Pasture, Expense, EmployeePayment, FarmTask, TransactionHistory, FarmSettings, InventoryItem, Employee, FixedExpense, WeighingSheet, ExpenseType, EmployeeRole, PaymentType, Property, PropertyType, IndividualAnimal, ReproductionEvent, HealthEvent, MilkProductionRecord, Talhao, CropPlan, FieldLogEntry, PestRecord, IrrigationRecord, CostCenter, AccountPayable, AccountReceivable, Machine, MaintenanceRecord, Team, WorkSchedule, Training, PPEItem, Certification, FarmDocument, BreedingSeason, ScheduledSpray } from '../types';
 
 interface FirebaseContextType {
   user: User | null;
@@ -92,6 +92,12 @@ interface FirebaseContextType {
   documents: FarmDocument[];
   saveDocument: (d: FarmDocument, file: File | null) => Promise<void>;
   deleteDocument: (id: string) => Promise<void>;
+  breedingSeasons: BreedingSeason[];
+  saveBreedingSeason: (bs: BreedingSeason) => Promise<void>;
+  deleteBreedingSeason: (id: string) => Promise<void>;
+  scheduledSprays: ScheduledSpray[];
+  saveScheduledSpray: (ss: ScheduledSpray) => Promise<void>;
+  deleteScheduledSpray: (id: string) => Promise<void>;
   animals: Animal[];
   pastures: Pasture[];
   expenses: Expense[];
@@ -333,6 +339,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
 
   const [animals, setAnimals] = useState<Animal[]>([]);
+  const [breedingSeasons, setBreedingSeasons] = useState<BreedingSeason[]>([]);
+  const [scheduledSprays, setScheduledSprays] = useState<ScheduledSpray[]>([]);
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
   const [accountsPayable, setAccountPayables] = useState<AccountPayable[]>([]);
   const [accountsReceivable, setAccountReceivables] = useState<AccountReceivable[]>([]);
@@ -734,6 +742,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setFieldLogEntries([]);
       setPestRecords([]);
       setIrrigationRecords([]);
+      setBreedingSeasons([]);
+      setScheduledSprays([]);
       setCostCenters([]);
       setAccountPayables([]);
       setAccountReceivables([]);
@@ -828,6 +838,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const documentsUnsub = onSnapshot(collection(db, 'users', userId, 'documents'), (snap) => {
       setDocuments(snap.docs.map(d => d.data() as FarmDocument));
     }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/documents`));
+
+
+    // Estação de Monta e Pulverização Programada
+    const breedingSeasonsUnsub = onSnapshot(collection(db, 'users', userId, 'breedingSeasons'), (snap) => {
+      setBreedingSeasons(snap.docs.map(d => d.data() as BreedingSeason));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/breedingSeasons`));
+
+    const scheduledSpraysUnsub = onSnapshot(collection(db, 'users', userId, 'scheduledSprays'), (snap) => {
+      setScheduledSprays(snap.docs.map(d => d.data() as ScheduledSpray));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, `users/${userId}/scheduledSprays`));
 
     // Fase 2 (multi-propriedade): carrega as propriedades do usuário. Na
     // PRIMEIRA VEZ que o usuário acessa depois desta atualização (sem
@@ -973,6 +993,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fieldLogEntriesUnsub();
       pestRecordsUnsub();
       irrigationRecordsUnsub();
+      breedingSeasonsUnsub();
+      scheduledSpraysUnsub();
       costCentersUnsub();
       accountsPayableUnsub();
       accountsReceivableUnsub();
@@ -1597,6 +1619,53 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  // Estação de Monta e Pulverização Programada
+  const saveBreedingSeason = async (bs: BreedingSeason) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...bs, propertyId: bs.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'breedingSeasons', bs.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/breedingSeasons/${bs.id}`);
+    }
+  };
+
+  const deleteBreedingSeason = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'breedingSeasons', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/breedingSeasons/${id}`);
+    }
+  };
+
+  const saveScheduledSpray = async (ss: ScheduledSpray) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      const toSave = stripUndefined({ ...ss, propertyId: ss.propertyId || activePropertyId || undefined });
+      await setDoc(doc(db, 'users', currentUid, 'scheduledSprays', ss.id), toSave);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${currentUid}/scheduledSprays/${ss.id}`);
+    }
+  };
+
+  const deleteScheduledSpray = async (id: string) => {
+    if (!user) return;
+    if (!checkWritePermission()) return;
+    const currentUid = user.uid;
+    try {
+      await deleteDoc(doc(db, 'users', currentUid, 'scheduledSprays', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `users/${currentUid}/scheduledSprays/${id}`);
+    }
+  };
+
   const saveAnimal = async (animal: Animal) => {
     if (!user) return;
     if (!checkWritePermission()) return;
@@ -2028,6 +2097,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const filteredFieldLogEntries = byActiveProperty(fieldLogEntries);
   const filteredPestRecords = byActiveProperty(pestRecords);
   const filteredIrrigationRecords = byActiveProperty(irrigationRecords);
+  const filteredBreedingSeasons = byActiveProperty(breedingSeasons);
+  const filteredScheduledSprays = byActiveProperty(scheduledSprays);
   const filteredCostCenters = byActiveProperty(costCenters);
   const filteredAccountPayables = byActiveProperty(accountsPayable);
   const filteredAccountReceivables = byActiveProperty(accountsReceivable);
@@ -2056,6 +2127,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fieldLogEntries: filteredFieldLogEntries, saveFieldLogEntry, deleteFieldLogEntry,
       pestRecords: filteredPestRecords, savePestRecord, deletePestRecord,
       irrigationRecords: filteredIrrigationRecords, saveIrrigationRecord, deleteIrrigationRecord,
+      breedingSeasons: filteredBreedingSeasons, saveBreedingSeason, deleteBreedingSeason,
+      scheduledSprays: filteredScheduledSprays, saveScheduledSpray, deleteScheduledSpray,
       costCenters: filteredCostCenters, saveCostCenter, deleteCostCenter,
       accountsPayable: filteredAccountPayables, saveAccountPayable, deleteAccountPayable,
       accountsReceivable: filteredAccountReceivables, saveAccountReceivable, deleteAccountReceivable,
