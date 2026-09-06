@@ -782,6 +782,7 @@ export interface UserDirectoryEntry {
   lastLoginAt?: string;
   deleted?: boolean;
   deletedAt?: string;
+  fcmTokens?: string[]; // tokens de notificação push dos dispositivos deste usuário
 }
 
 // Notificação enviada pelo admin — individual, para todos, ou filtrada.

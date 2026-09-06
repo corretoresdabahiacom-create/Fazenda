@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FarmSettings } from '../types';
+import { enablePushNotifications } from '../lib/pushNotifications';
 import { 
   Save, 
   MapPin, 
@@ -13,6 +14,7 @@ import {
   Thermometer, 
   Droplets, 
   CloudRain, 
+  Bell,
   Sun, 
   CloudLightning, 
   Cloud,
@@ -30,6 +32,7 @@ import { useFirebase } from '../contexts/FirebaseContext';
 interface Props {
   settings: FarmSettings;
   setSettings: (settings: FarmSettings) => Promise<void>;
+  uid?: string;
 }
 
 // Deterministic mock meteorological algorithm to return consistent actual weather values per location
@@ -113,7 +116,7 @@ function getWeatherData(city: string) {
   };
 }
 
-export default function FarmSettingsComp({ settings, setSettings }: Props) {
+export default function FarmSettingsComp({ settings, setSettings, uid }: Props) {
   const { 
     seedDatabase, 
     importBackupData,
@@ -136,6 +139,8 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
   const [isSaving, setIsSaving] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isWeatherModalOpen, setIsWeatherModalOpen] = useState(false);
+  const [pushStatus, setPushStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
+  const [pushError, setPushError] = useState<string | null>(null);
 
   useEffect(() => {
     setFormData(settings);
@@ -311,6 +316,34 @@ export default function FarmSettingsComp({ settings, setSettings }: Props) {
             />
             <p className="text-[10px] text-[#8d8a86] mt-2 italic px-1">
               * Guardamos só o dia e o mês (não o ano) — usado apenas para eventuais mensagens de aniversário. Nunca é obrigatório.
+            </p>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Notificações no celular</label>
+            <button
+              type="button"
+              onClick={async () => {
+                if (!uid) return;
+                setPushStatus('loading');
+                setPushError(null);
+                const result = await enablePushNotifications(uid);
+                if (result.ok) {
+                  setPushStatus('ok');
+                } else {
+                  setPushStatus('error');
+                  setPushError(result.reason || 'Não foi possível ativar.');
+                }
+              }}
+              disabled={pushStatus === 'loading' || pushStatus === 'ok'}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-[#e5e0d8] rounded-xl font-bold text-sm disabled:opacity-70"
+            >
+              <Bell size={16} />
+              {pushStatus === 'ok' ? 'Notificações ativadas ✓' : pushStatus === 'loading' ? 'Ativando...' : 'Ativar notificações push'}
+            </button>
+            {pushStatus === 'error' && <p className="text-[11px] text-red-500 mt-1">{pushError}</p>}
+            <p className="text-[10px] text-[#8d8a86] mt-2 italic px-1">
+              * Receba avisos de vencimento e comunicados do administrador direto no seu celular, mesmo com o app fechado.
             </p>
           </div>
         </div>

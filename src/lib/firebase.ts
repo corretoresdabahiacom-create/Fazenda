@@ -34,7 +34,7 @@ console.log('🔥 Firebase Config Loaded:', {
   authDomain: firebaseConfig.authDomain,
 });
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 // IMPORTANTE: o banco do Firestore deste projeto NÃO se chama "(default)"
 // — ele foi criado originalmente pelo Google AI Studio com um nome

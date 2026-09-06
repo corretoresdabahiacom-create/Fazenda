@@ -528,11 +528,31 @@ export default function App() {
                 >
                   <h2 className="font-serif italic font-bold text-2xl text-[var(--primary)] mb-4">Termos e Condições de Uso</h2>
                   <div className="overflow-y-auto pr-2 space-y-4 text-xs text-theme-secondary leading-relaxed flex-1">
-                    <p className="font-bold text-sm text-theme-primary">CONTRATO DE ISENÇÃO DE RESPONSABILIDADE - FAZENDA ONLINE</p>
-                    <p><strong>1. Isenção Geral de Responsabilidade:</strong> O Fazenda Online é oferecido aos usuários "como está" e "conforme disponível"...</p>
-                    <p><strong>2. Exclusão Total de Responsabilidade por Perdas e Danos:</strong> Sob nenhuma hipótese os desenvolvedores serão responsabilizados...</p>
-                    <p><strong>3. Responsabilidade do Produtor:</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência...</p>
-                    <p><strong>4. Aceitação Vinculativa:</strong> Ao concordar eletronicamente com estes termos, você dá plena e irrevogável quitação...</p>
+                    <p className="font-bold text-sm text-theme-primary">TERMOS DE USO — FAZENDA ONLINE</p>
+
+                    <p><strong>1. Aceitação dos Termos.</strong> Ao criar uma conta, marcar a caixa de aceite ou simplesmente usar o Fazenda Online, você concorda integralmente com estes Termos. Se você não concorda com algum ponto, a orientação é simples: não use o aplicativo, e caso já tenha instalado, desinstale-o. O uso continuado do aplicativo, a partir de agora, é considerado como sua concordância expressa com estes Termos.</p>
+
+                    <p><strong>2. O que é o serviço.</strong> O Fazenda Online é um sistema de gestão rural (rebanho, agricultura, financeiro, clima e módulos correlatos) oferecido "como está" e "conforme disponível", sem garantia de disponibilidade ininterrupta, ausência de erros, ou adequação a uma finalidade específica.</p>
+
+                    <p><strong>3. Cadastro e responsabilidade pela conta.</strong> Você é responsável por manter a confidencialidade da sua senha e por todas as atividades realizadas na sua conta. Informações incorretas, desatualizadas ou incompletas cadastradas por você são de sua exclusiva responsabilidade.</p>
+
+                    <p><strong>4. Assinatura e pagamento.</strong> Alguns recursos do aplicativo podem exigir uma assinatura paga, cobrada de forma recorrente através de gateways de pagamento parceiros (como Mercado Pago, PayPal ou processadoras de cartão). O acesso pode ser suspenso ou bloqueado em caso de inadimplência, sem prejuízo da cobrança dos valores já devidos. Você pode cancelar sua assinatura a qualquer momento pela própria tela do aplicativo; o administrador também pode suspender, bloquear ou cancelar contas a seu critério, inclusive por uso indevido, fraude ou violação destes Termos.</p>
+
+                    <p><strong>5. Localização (GPS).</strong> Algumas funções (como alertas climáticos e o Consultor Rural) precisam saber onde fica sua propriedade, e por isso podem solicitar acesso à sua localização ou pedir que você a cadastre manualmente. Esse acesso é sempre opcional e usado exclusivamente para o funcionamento dessas funções — se você não permitir o acesso, apenas essas funções específicas ficam indisponíveis; o restante do aplicativo continua funcionando normalmente.</p>
+
+                    <p><strong>6. Privacidade e LGPD.</strong> Tratamos seus dados pessoais em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018). Coletamos apenas os dados necessários para o funcionamento do aplicativo (como e-mail, nome da propriedade, cidade e, se você informar, data de aniversário). Você pode solicitar a qualquer momento a exclusão da sua conta e dos seus dados, entrando em contato pelo e-mail de suporte abaixo.</p>
+
+                    <p><strong>7. O que NÃO coletamos nem guardamos.</strong> O Fazenda Online não solicita, não processa e não armazena dados bancários, número de cartão de crédito, CVV, senhas de banco ou qualquer dado sensível de pagamento — essas informações, quando aplicável, são digitadas diretamente nas telas seguras dos gateways de pagamento parceiros (Mercado Pago, PayPal, processadoras de cartão), nunca dentro do nosso próprio sistema. Também não coletamos dados sensíveis (como origem racial, convicção religiosa, opinião política, dado de saúde ou biometria) além do estritamente necessário ao uso do aplicativo.</p>
+
+                    <p><strong>8. Publicidade.</strong> O aplicativo pode exibir conteúdo publicitário de terceiros em espaço próprio na tela inicial. Não nos responsabilizamos pelo conteúdo, veracidade ou pelas transações realizadas com anunciantes — qualquer negociação com um anunciante é de responsabilidade exclusiva das partes envolvidas.</p>
+
+                    <p><strong>9. Limitação de responsabilidade.</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência, validação e decisão final sobre qualquer informação, cálculo, sugestão ou conselho gerado pelo aplicativo (incluindo previsões climáticas, cálculos financeiros, sugestões de manejo ou respostas do Consultor Rural) antes de qualquer tomada de decisão prática na sua atividade rural. Na máxima extensão permitida pela legislação aplicável, o Fazenda Online, seus desenvolvedores, administradores, sócios e parceiros não se responsabilizam civilmente por perdas, danos diretos, indiretos, lucros cessantes ou prejuízos patrimoniais decorrentes do uso ou da impossibilidade de uso do aplicativo. Esta cláusula limita responsabilidade civil na forma da lei — ela não afasta, e não tem o poder de afastar, eventual responsabilidade criminal, que é sempre apurada e determinada exclusivamente pelas autoridades e pelo Poder Judiciário competentes, conforme a legislação vigente.</p>
+
+                    <p><strong>10. Alterações destes Termos.</strong> Podemos atualizar estes Termos periodicamente para refletir mudanças no aplicativo ou na legislação. Mudanças relevantes serão comunicadas dentro do próprio aplicativo.</p>
+
+                    <p><strong>11. Suporte e contato.</strong> Dúvidas, solicitações relacionadas a dados pessoais (LGPD) ou suporte geral podem ser enviadas para: <strong className="text-theme-primary">admmeuarmazem@gmail.com</strong>.</p>
+
+                    <p className="italic">Ao aceitar estes Termos, você confirma que leu, entendeu e concorda com todo o conteúdo acima. Se, a qualquer momento, você discordar de qualquer parte, o uso do aplicativo deve ser interrompido e ele deve ser desinstalado — continuar usando significa que você permitiu e aceitou.</p>
                   </div>
                   <div className="mt-6 flex gap-3 pt-3 border-t border-theme">
                     <button onClick={() => { setAcceptedTerms(true); setIsTermsOpen(false); }} className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 px-4 rounded-xl font-bold transition-all text-xs">Aceitar Termos</button>
@@ -685,7 +705,7 @@ export default function App() {
       case 'tasks': return <Tasks tasks={tasks} onSave={saveTask} onDelete={deleteTask} />;
       case 'reports': return <Reports payments={payments} expenses={expenses} animals={animals} transactions={transactions} pastures={pastures} />;
       case 'nutrition': return <NutritionCalculator animals={animals} inventory={inventory} />;
-      case 'settings': return <FarmSettingsComp settings={settings} setSettings={updateSettings} />;
+      case 'settings': return <FarmSettingsComp settings={settings} setSettings={updateSettings} uid={user?.uid} />;
       case 'properties': return <Properties properties={properties} activePropertyId={activePropertyId} onSetActive={setActivePropertyId} onSave={saveProperty} onDelete={deleteProperty} />;
       case 'pecuaria-pro': return <PecuariaProfissional individualAnimals={individualAnimals} saveIndividualAnimal={saveIndividualAnimal} deleteIndividualAnimal={deleteIndividualAnimal} reproductionEvents={reproductionEvents} saveReproductionEvent={saveReproductionEvent} deleteReproductionEvent={deleteReproductionEvent} healthEvents={healthEvents} saveHealthEvent={saveHealthEvent} deleteHealthEvent={deleteHealthEvent} milkRecords={milkRecords} saveMilkRecord={saveMilkRecord} deleteMilkRecord={deleteMilkRecord} animals={animals} saveAnimal={saveAnimal} deleteAnimal={deleteAnimal} pastures={pastures} transactions={transactions} saveTransaction={saveTransaction} />;
       case 'agricultura': return <Agricultura talhoes={talhoes} saveTalhao={saveTalhao} deleteTalhao={deleteTalhao} cropPlans={cropPlans} saveCropPlan={saveCropPlan} deleteCropPlan={deleteCropPlan} fieldLogEntries={fieldLogEntries} saveFieldLogEntry={saveFieldLogEntry} deleteFieldLogEntry={deleteFieldLogEntry} pestRecords={pestRecords} savePestRecord={savePestRecord} deletePestRecord={deletePestRecord} irrigationRecords={irrigationRecords} saveIrrigationRecord={saveIrrigationRecord} deleteIrrigationRecord={deleteIrrigationRecord} activeProperty={activeProperty} />;

@@ -17,6 +17,7 @@ import {
   AdminNotification, Advertisement, AdContentType, AppExpense,
 } from '../types';
 import { format } from 'date-fns';
+import { compressImageIfNeeded, fileToDataUrl } from '../lib/imageCompression';
 
 type Tab = 'visao_geral' | 'usuarios' | 'notificacoes' | 'anuncios' | 'despesas';
 
@@ -319,6 +320,35 @@ function NotificacoesTab({ notifications, users, adminEmail }: {
       createdBy: adminEmail,
     };
     await setDoc(doc(db, 'adminNotifications', item.id), item);
+
+    // Além de salvar o aviso (que aparece dentro do app), tenta também
+    // mandar um push de verdade pros celulares dos usuários alcançados —
+    // silenciosamente ignorado se o push ainda não estiver configurado.
+    const targetUsers = users.filter(u => {
+      if (u.deleted) return false;
+      if (targetType === 'all') return true;
+      if (targetType === 'individual') return u.userId === targetUserId;
+      if (targetType === 'filtered') {
+        if (filterCity && u.city?.toLowerCase() !== filterCity.toLowerCase()) return false;
+        if (filterRegion && u.region?.toLowerCase() !== filterRegion.toLowerCase()) return false;
+        if (filterBirthdayMonth && Number(u.birthday?.split('-')[0]) !== Number(filterBirthdayMonth)) return false;
+        return true;
+      }
+      return false;
+    });
+    const tokens = targetUsers.flatMap(u => u.fcmTokens || []);
+    if (tokens.length > 0) {
+      try {
+        await fetch('/api/send-push', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tokens, title: item.title, body: item.message }),
+        });
+      } catch {
+        // silencioso — o aviso já foi salvo e vai aparecer dentro do app de qualquer forma
+      }
+    }
+
     setIsOpen(false);
     setTitle(''); setMessage(''); setTargetUserId(''); setFilterCity(''); setFilterRegion(''); setFilterBirthdayMonth('');
   }
@@ -418,6 +448,30 @@ function NotificacoesTab({ notifications, users, adminEmail }: {
 function AnunciosTab({ ads, adminEmail }: { ads: Advertisement[]; adminEmail: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState<Partial<Advertisement>>({ type: AdContentType.TEXTO, active: true });
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const MAX_AD_IMAGE_BYTES = 650_000;
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const picked = e.target.files?.[0];
+    if (!picked) return;
+    setUploadError(null);
+    setUploading(true);
+    try {
+      const compressed = await compressImageIfNeeded(picked, MAX_AD_IMAGE_BYTES);
+      if (compressed.size > MAX_AD_IMAGE_BYTES) {
+        setUploadError(`Imagem ainda grande demais (${(compressed.size / 1024).toFixed(0)}KB) mesmo após comprimir. Tente uma foto menor.`);
+        return;
+      }
+      const dataUrl = await fileToDataUrl(compressed);
+      setForm(f => ({ ...f, imageUrl: dataUrl }));
+    } catch {
+      setUploadError('Não foi possível processar essa imagem.');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -509,10 +563,20 @@ function AnunciosTab({ ads, adminEmail }: { ads: Advertisement[]; adminEmail: st
                 </div>
               )}
               {(form.type === AdContentType.BANNER_IMAGEM || form.type === AdContentType.IMAGEM_LINK) && (
-                <p className="text-[11px] text-theme-secondary bg-theme-secondary rounded-lg p-2">
-                  Upload de imagem para anúncios ainda não está disponível nesta tela — por ora, use o campo de link
-                  abaixo apontando para uma imagem já hospedada em algum lugar (ex: seu site).
-                </p>
+                <div>
+                  <label className="text-xs font-semibold text-theme-secondary">Imagem (até ~650KB, comprimida automaticamente)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="w-full text-sm mt-1"
+                  />
+                  {uploading && <p className="text-[11px] text-theme-secondary mt-1">Processando imagem...</p>}
+                  {uploadError && <p className="text-[11px] text-red-500 mt-1">{uploadError}</p>}
+                  {form.imageUrl && !uploading && (
+                    <img src={form.imageUrl} alt="Pré-visualização" className="w-full max-h-32 object-cover rounded-xl mt-2" />
+                  )}
+                </div>
               )}
               {(form.type === AdContentType.TEXTO_LINK || form.type === AdContentType.IMAGEM_LINK || form.type === AdContentType.BANNER_IMAGEM) && (
                 <div>
@@ -521,7 +585,7 @@ function AnunciosTab({ ads, adminEmail }: { ads: Advertisement[]; adminEmail: st
                 </div>
               )}
               <div className="flex gap-2 pt-2">
-                <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
+                <button type="submit" disabled={uploading} className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-60">Salvar</button>
                 <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
               </div>
             </form>

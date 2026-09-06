@@ -482,9 +482,17 @@ service cloud.firestore {
     }
 
     match /adminNotifications/{id} {
-      // Qualquer usuário autenticado pode ler as notificações (para
-      // recebê-las no app) — só o admin pode criar/editar/excluir.
-      allow get, list: if isSignedIn();
+      // "Todos" e "filtrado" continuam legíveis por qualquer usuário
+      // logado (são avisos de alcance amplo, sem conteúdo sensível). Já
+      // uma notificação "individual" só pode ser lida pelo próprio
+      // destinatário ou pelo admin — sem essa regra, qualquer usuário
+      // logado conseguiria ler mensagens endereçadas a outra pessoa.
+      allow get, list: if isBootstrapAdminEmail() || (
+        isSignedIn() && (
+          resource.data.targetType != 'individual' ||
+          resource.data.targetUserId == request.auth.uid
+        )
+      );
       allow create, update, delete: if isBootstrapAdminEmail();
     }
 
