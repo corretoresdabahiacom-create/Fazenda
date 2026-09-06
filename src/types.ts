@@ -198,6 +198,7 @@ export interface Pasture {
   stockingHistory: { date: string, count: number }[];
   purpose?: 'engorda' | 'manutenção' | 'finalização';
   nextRotationDate?: string; // data planejada para o próximo remanejo/troca de pasto
+  nextRotationTime?: string; // horário planejado (HH:mm), opcional
   mapX?: number;
   mapY?: number;
   aiAnalysis?: {
@@ -696,6 +697,134 @@ export interface Certification {
   expirationDate?: string;
   notes?: string;
   createdAt: string;
+}
+
+// =====================================================================
+// ASSINATURA / COBRANÇA / ADMIN — dados de conta e pagamento, separados
+// dos dados da fazenda em si. Vivem numa coleção própria no Firestore
+// (não dentro de users/{uid}/...), porque o painel admin precisa listar
+// TODOS os usuários — algo que a estrutura de dados por fazenda não
+// permite fazer com segurança.
+// =====================================================================
+
+export enum PlanTier {
+  UMA_FAZENDA = "1 Fazenda",
+  TRES_FAZENDAS = "3 Fazendas",
+  CINCO_FAZENDAS = "5 Fazendas",
+  AGRO_TOTAL = "Agro Total",
+}
+
+// Preço padrão de cada plano — null no Agro Total porque esse é
+// negociado/definido manualmente pelo admin por cliente.
+export const PLAN_PRICES: Record<PlanTier, number | null> = {
+  [PlanTier.UMA_FAZENDA]: 29.90,
+  [PlanTier.TRES_FAZENDAS]: 49.90,
+  [PlanTier.CINCO_FAZENDAS]: 79.90,
+  [PlanTier.AGRO_TOTAL]: null,
+};
+
+export const PLAN_MAX_PROPERTIES: Record<PlanTier, number | null> = {
+  [PlanTier.UMA_FAZENDA]: 1,
+  [PlanTier.TRES_FAZENDAS]: 3,
+  [PlanTier.CINCO_FAZENDAS]: 5,
+  [PlanTier.AGRO_TOTAL]: null, // combinado com o cliente
+};
+
+export enum SubscriptionStatus {
+  TRIAL = "Teste",
+  ATIVA = "Ativa",
+  ATRASADA = "Atrasada", // pagamento não confirmado no prazo
+  CANCELADA = "Cancelada", // cancelada pelo usuário ou pelo admin
+  SUSPENSA = "Suspensa", // pausa temporária definida pelo admin
+  BLOQUEADA = "Bloqueada", // bloqueio definitivo definido pelo admin
+}
+
+export enum PaymentGateway {
+  MERCADO_PAGO = "mercadopago",
+  PAYPAL = "paypal",
+  STRIPE = "stripe",
+}
+
+export interface Subscription {
+  userId: string; // = uid do Firebase Auth, também é o id do documento
+  email: string;
+  plan: PlanTier;
+  customPrice?: number; // usado só no plano Agro Total
+  status: SubscriptionStatus;
+  gateway?: PaymentGateway;
+  externalSubscriptionId?: string; // id da assinatura no gateway de pagamento
+  externalCustomerId?: string;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  lastPaymentDate?: string;
+  lastPaymentValue?: number;
+  paymentHistory?: { date: string; value: number; gateway: PaymentGateway; status: string }[];
+  createdAt: string;
+  canceledAt?: string;
+  canceledBy?: 'user' | 'admin';
+  suspendedReason?: string;
+  suspendedBy?: string; // e-mail do admin que suspendeu/bloqueou
+}
+
+// Índice leve de usuários — criado/atualizado no cadastro e no login,
+// separado dos dados de fazenda, para o admin conseguir listar e filtrar
+// usuários (por cidade, região, aniversário etc.) sem precisar de acesso
+// direto a cada conta individual.
+export interface UserDirectoryEntry {
+  userId: string;
+  email: string;
+  displayName?: string;
+  city?: string;
+  region?: string; // estado/UF
+  birthday?: string; // MM-DD, sem o ano, por privacidade
+  createdAt: string;
+  lastLoginAt?: string;
+  deleted?: boolean;
+  deletedAt?: string;
+}
+
+// Notificação enviada pelo admin — individual, para todos, ou filtrada.
+export interface AdminNotification {
+  id: string;
+  title: string;
+  message: string;
+  targetType: 'all' | 'individual' | 'filtered';
+  targetUserId?: string; // usado quando targetType === 'individual'
+  filter?: {
+    status?: SubscriptionStatus[];
+    city?: string;
+    region?: string;
+    birthdayMonth?: number; // 1-12
+  };
+  createdAt: string;
+  createdBy: string; // e-mail do admin
+  readBy?: string[]; // uids que já visualizaram
+}
+
+// Publicidade exibida na tela inicial, acima do rodapé — carrossel
+// controlado pelo admin.
+export enum AdContentType {
+  BANNER_IMAGEM = "Banner (imagem)",
+  VIDEO = "Vídeo",
+  TEXTO = "Texto",
+  TEXTO_LINK = "Texto + Link",
+  IMAGEM_LINK = "Imagem + Link",
+}
+
+export interface Advertisement {
+  id: string;
+  type: AdContentType;
+  title?: string;
+  text?: string;
+  imageUrl?: string; // base64 (mesma abordagem gratuita usada em Documentos)
+  videoUrl?: string; // link externo (YouTube/Vimeo embed), não upload direto
+  linkUrl?: string;
+  active: boolean;
+  order: number; // posição no carrossel
+  startDate?: string; // opcional: veiculação programada
+  endDate?: string;
+  createdAt: string;
+  createdBy: string;
 }
 
 // =====================================================================

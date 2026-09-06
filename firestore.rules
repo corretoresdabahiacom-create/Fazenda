@@ -445,5 +445,46 @@ service cloud.firestore {
         allow delete: if canWrite(userId);
       }
     }
+
+    // -------------------------------------------------------------------------
+    // ASSINATURA / ADMIN — coleções de nível superior (fora de users/{uid}),
+    // porque o painel admin precisa listar TODOS os usuários. O usuário comum
+    // só enxerga o próprio registro; só o e-mail de bootstrap admin
+    // (isBootstrapAdminEmail) pode listar, editar ou excluir qualquer um.
+    // -------------------------------------------------------------------------
+
+    match /subscriptions/{uid} {
+      allow get: if isSignedIn() && (request.auth.uid == uid || isBootstrapAdminEmail());
+      allow list: if isBootstrapAdminEmail();
+      // O próprio usuário só pode criar sua assinatura inicial (ex: iniciar
+      // um teste grátis) — nunca alterar status, gateway ou valores, isso é
+      // reservado ao admin e ao webhook do gateway de pagamento (que usa
+      // credenciais de servidor, não o SDK do cliente).
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isBootstrapAdminEmail();
+      allow delete: if isBootstrapAdminEmail();
+    }
+
+    match /userDirectory/{uid} {
+      allow get: if isSignedIn() && (request.auth.uid == uid || isBootstrapAdminEmail());
+      allow list: if isBootstrapAdminEmail();
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && (request.auth.uid == uid || isBootstrapAdminEmail());
+      allow delete: if isBootstrapAdminEmail();
+    }
+
+    match /adminNotifications/{id} {
+      // Qualquer usuário autenticado pode ler as notificações (para
+      // recebê-las no app) — só o admin pode criar/editar/excluir.
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isBootstrapAdminEmail();
+    }
+
+    match /advertisements/{id} {
+      // Qualquer usuário autenticado pode ler os anúncios ativos — só o
+      // admin pode gerenciar o conteúdo.
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isBootstrapAdminEmail();
+    }
   }
 }

@@ -77,6 +77,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
       size: formData.size || 0,
       purpose: formData.purpose || 'engorda',
       nextRotationDate: formData.nextRotationDate,
+      nextRotationTime: formData.nextRotationTime,
       mapX: editingPasture?.mapX,
       mapY: editingPasture?.mapY,
       stockingHistory: editingPasture?.stockingHistory || []
@@ -473,13 +474,21 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
 
                 <div className="col-span-1">
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Próximo Remanejo (opcional)</label>
-                  <input
-                    type="date"
-                    className="w-full px-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
-                    value={formData.nextRotationDate || ''}
-                    onChange={(e) => setFormData({...formData, nextRotationDate: e.target.value || undefined})}
-                  />
-                  <p className="text-[10px] text-[#8d8a86] mt-1">Avisa na Central de Obrigações 2 dias antes.</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="date"
+                      className="flex-1 px-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                      value={formData.nextRotationDate || ''}
+                      onChange={(e) => setFormData({...formData, nextRotationDate: e.target.value || undefined})}
+                    />
+                    <input
+                      type="time"
+                      className="w-28 px-2 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                      value={formData.nextRotationTime || ''}
+                      onChange={(e) => setFormData({...formData, nextRotationTime: e.target.value || undefined})}
+                    />
+                  </div>
+                  <p className="text-[10px] text-[#8d8a86] mt-1">Avisa na Central de Obrigações 2 dias antes. Se definir um horário, o aviso do dia só fica "urgente" a partir dele.</p>
                 </div>
               </div>
 

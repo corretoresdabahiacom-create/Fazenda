@@ -375,13 +375,19 @@ export function computeObligations(
   pastures.forEach(p => {
     if (!p.nextRotationDate || concludedKeys.includes(`pasture-rotation-${p.id}`)) return;
     const dueDate = parseLocalISO(p.nextRotationDate);
-    const daysRemaining = getDaysDiff(dueDate, today);
+    let daysRemaining = getDaysDiff(dueDate, today);
+    if (daysRemaining === 0 && p.nextRotationTime) {
+      const [h, m] = p.nextRotationTime.split(':').map(Number);
+      const now = new Date();
+      const notYet = now.getHours() < h || (now.getHours() === h && now.getMinutes() < m);
+      if (notYet) daysRemaining = 1;
+    }
     if (daysRemaining <= 3) {
       alerts.push({
         id: `pasture-rotation-${p.id}`,
         type: 'pasture_rotation',
         title: `Remanejo de Pasto: ${p.name}`,
-        description: `Pasto nº ${p.number}`,
+        description: `Pasto nº ${p.number}${p.nextRotationTime ? ` às ${p.nextRotationTime}` : ''}`,
         dueDate: p.nextRotationDate,
         daysRemaining,
         originalId: p.id,
