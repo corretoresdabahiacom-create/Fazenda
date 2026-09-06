@@ -516,5 +516,11 @@ service cloud.firestore {
       // Despesas do próprio negócio do aplicativo — só o admin acessa.
       allow get, list, create, update, delete: if isBootstrapAdminEmail();
     }
+
+    match /paymentConfigPaypal/{id} {
+      // Cache interno de IDs de Produto/Plano do PayPal — só acessado
+      // pelo backend (Service Account), nunca pelo app do cliente.
+      allow get, list, create, update, delete: if isBootstrapAdminEmail();
+    }
   }
 }

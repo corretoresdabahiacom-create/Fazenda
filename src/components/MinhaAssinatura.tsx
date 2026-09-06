@@ -23,6 +23,7 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
   const [sub, setSub] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<PlanTier>(PlanTier.UMA_FAZENDA);
+  const [selectedGateway, setSelectedGateway] = useState<'mercadopago' | 'stripe' | 'paypal'>('mercadopago');
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
@@ -39,8 +40,13 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
     if (!sub) return;
     setCheckingOut(true);
     setCheckoutError(null);
+    const endpoints: Record<string, string> = {
+      mercadopago: '/api/create-subscription',
+      stripe: '/api/create-subscription-stripe',
+      paypal: '/api/create-subscription-paypal',
+    };
     try {
-      const res = await fetch('/api/create-subscription', {
+      const res = await fetch(endpoints[selectedGateway], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -51,11 +57,12 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
         }),
       });
       const data = await res.json();
-      if (!res.ok || !data.initPoint) {
+      const redirectUrl = data.initPoint || data.checkoutUrl || data.approvalLink;
+      if (!res.ok || !redirectUrl) {
         setCheckoutError(data.error || 'Não foi possível iniciar o pagamento agora.');
         return;
       }
-      window.location.href = data.initPoint;
+      window.location.href = redirectUrl;
     } catch {
       setCheckoutError('Falha de conexão ao iniciar o pagamento. Tente novamente.');
     } finally {
@@ -146,11 +153,30 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
             ))}
           </div>
           {checkoutError && <p className="text-xs text-red-500">{checkoutError}</p>}
+          <div>
+            <p className="text-xs font-semibold text-theme-secondary mb-1.5">Forma de pagamento</p>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { id: 'mercadopago', label: 'Mercado Pago' },
+                { id: 'stripe', label: 'Cartão (Stripe)' },
+                { id: 'paypal', label: 'PayPal' },
+              ] as const).map((g) => (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => setSelectedGateway(g.id)}
+                  className={`text-xs font-bold py-2 rounded-xl border ${selectedGateway === g.id ? 'border-[var(--primary)] bg-[var(--primary-soft)] text-[var(--primary)]' : 'border-theme text-theme-secondary'}`}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <button onClick={handleSubscribe} disabled={checkingOut} className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-3 rounded-xl font-bold text-sm disabled:opacity-60">
-            {checkingOut ? 'Abrindo pagamento seguro...' : 'Assinar e pagar com Mercado Pago'}
+            {checkingOut ? 'Abrindo pagamento seguro...' : 'Assinar agora'}
           </button>
           <p className="text-[10px] text-theme-secondary text-center">
-            Você será redirecionado para a página segura do Mercado Pago — nunca guardamos dados do seu cartão neste aplicativo.
+            Você será redirecionado para a página segura do provedor escolhido — nunca guardamos dados do seu cartão neste aplicativo.
           </p>
         </div>
       )}

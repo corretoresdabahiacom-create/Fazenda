@@ -73,6 +73,7 @@ import ObligationsDrawer from './components/ObligationsDrawer';
 import HelpScreen from './components/HelpScreen';
 import AdminPanel from './components/AdminPanel';
 import MinhaAssinatura from './components/MinhaAssinatura';
+import SalesPage from './components/SalesPage';
 import { db } from './lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import WeighingWorksheet from './components/WeighingWorksheet';
@@ -586,43 +587,13 @@ export default function App() {
             )}
           </AnimatePresence>
 
-          {/* Plans Modal */}
-          <AnimatePresence>
-            {isPlansOpen && (
-              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-theme-card rounded-3xl border border-theme shadow-2xl p-6 max-w-lg w-full max-h-[85vh] flex flex-col"
-                >
-                  <h2 className="font-serif italic font-bold text-2xl text-[var(--primary)] mb-1">Planos</h2>
-                  <p className="text-xs text-theme-secondary mb-4">Crie sua conta gratuitamente e experimente por 7 dias — depois, escolha o plano ideal para o tamanho da sua operação.</p>
-                  <div className="overflow-y-auto pr-1 space-y-3 flex-1">
-                    {([PlanTier.UMA_FAZENDA, PlanTier.TRES_FAZENDAS, PlanTier.CINCO_FAZENDAS] as PlanTier[]).map((plan) => (
-                      <div key={plan} className="border border-theme rounded-2xl p-4 flex items-center justify-between">
-                        <div>
-                          <p className="font-bold text-theme-primary text-sm">{plan}</p>
-                          <p className="text-[11px] text-theme-secondary">Gestão completa para {plan.toLowerCase()}</p>
-                        </div>
-                        <p className="font-bold text-[var(--primary)] text-lg whitespace-nowrap">R$ {PLAN_PRICES[plan]?.toFixed(2)}<span className="text-[10px] text-theme-secondary font-normal">/mês</span></p>
-                      </div>
-                    ))}
-                    <div className="border border-dashed border-theme rounded-2xl p-4 text-center">
-                      <p className="font-bold text-theme-primary text-sm">{PlanTier.AGRO_TOTAL}</p>
-                      <p className="text-[11px] text-theme-secondary">Valor combinado com nossa equipe — fale conosco: admmeuarmazem@gmail.com</p>
-                    </div>
-                  </div>
-                  <button onClick={() => { setIsPlansOpen(false); setIsRegistering(true); }} className="mt-4 w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-3 rounded-xl font-bold text-sm">
-                    Criar minha conta e começar o teste grátis
-                  </button>
-                  <button onClick={() => setIsPlansOpen(false)} className="mt-2 w-full border border-theme text-theme-secondary py-2.5 rounded-xl font-semibold text-xs">
-                    Fechar
-                  </button>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
+          {/* Sales Page (full-screen funnel) */}
+          {isPlansOpen && (
+            <SalesPage
+              onClose={() => setIsPlansOpen(false)}
+              onStartTrial={() => { setIsPlansOpen(false); setIsRegistering(true); }}
+            />
+          )}
 
           {/* Forgot Password Modal */}
           <AnimatePresence>
