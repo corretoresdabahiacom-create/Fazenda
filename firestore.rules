@@ -486,5 +486,10 @@ service cloud.firestore {
       allow get, list: if isSignedIn();
       allow create, update, delete: if isBootstrapAdminEmail();
     }
+
+    match /appExpenses/{id} {
+      // Despesas do próprio negócio do aplicativo — só o admin acessa.
+      allow get, list, create, update, delete: if isBootstrapAdminEmail();
+    }
   }
 }

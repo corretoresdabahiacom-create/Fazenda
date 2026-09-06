@@ -380,6 +380,38 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // seguro para contas novas é "user".
   const BOOTSTRAP_ADMIN_EMAILS = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
 
+  // Sincroniza o índice de usuários (para o Painel Admin listar contas) e
+  // garante que toda conta tenha um registro de assinatura — começando em
+  // "Teste" na primeira vez. Roda em paralelo ao resolveUserRole, sem
+  // travar o login se falhar (o admin panel é secundário ao uso normal).
+  async function syncUserDirectoryAndSubscription(u: User) {
+    try {
+      const dirRef = doc(db, 'userDirectory', u.uid);
+      const dirSnap = await getDoc(dirRef);
+      await setDoc(dirRef, {
+        userId: u.uid,
+        email: u.email || '',
+        displayName: u.displayName || undefined,
+        createdAt: dirSnap.exists() ? dirSnap.data().createdAt : new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+      }, { merge: true });
+
+      const subRef = doc(db, 'subscriptions', u.uid);
+      const subSnap = await getDoc(subRef);
+      if (!subSnap.exists()) {
+        await setDoc(subRef, {
+          userId: u.uid,
+          email: u.email || '',
+          plan: 'Agro Total',
+          status: 'Teste',
+          createdAt: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      console.warn('Não foi possível sincronizar índice de usuário/assinatura:', err);
+    }
+  }
+
   async function resolveUserRole(u: User): Promise<'admin' | 'user'> {
     const ref = doc(db, 'users', u.uid);
     try {
@@ -477,6 +509,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
         setUser(u);
         const role = await resolveUserRole(u);
+        syncUserDirectoryAndSubscription(u);
         setUserRole(role);
         localStorage.setItem('gestao_fazenda_user_role', role);
         setIsDemoMode(false);
@@ -509,6 +542,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
         setUser(u);
         const role = await resolveUserRole(u);
+        syncUserDirectoryAndSubscription(u);
         setUserRole(role);
         localStorage.setItem('gestao_fazenda_user_role', role);
         setIsDemoMode(false);
@@ -534,6 +568,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const u = credential.user;
         setUser(u);
         const defaultRole = await resolveUserRole(u);
+        syncUserDirectoryAndSubscription(u);
         setUserRole(defaultRole);
         localStorage.setItem('gestao_fazenda_user_role', defaultRole);
         setIsDemoMode(false);
@@ -562,6 +597,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setUser(u);
       
       const defaultRole = await resolveUserRole(u);
+      syncUserDirectoryAndSubscription(u);
 
       setUserRole(defaultRole);
       localStorage.setItem('gestao_fazenda_user_role', defaultRole);
@@ -594,6 +630,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const u = result.user;
       setUser(u);
       const defaultRole = await resolveUserRole(u);
+      syncUserDirectoryAndSubscription(u);
       setUserRole(defaultRole);
       localStorage.setItem('gestao_fazenda_user_role', defaultRole);
       setIsDemoMode(false);
@@ -644,6 +681,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // O papel agora vem sempre do Firestore (fonte da verdade), nunca
         // mais é adivinhado a partir do e-mail a cada carregamento do app.
         const role = await resolveUserRole(u);
+        syncUserDirectoryAndSubscription(u);
         localStorage.setItem('gestao_fazenda_user_role', role);
         setUserRole(role);
         setLoading(false);

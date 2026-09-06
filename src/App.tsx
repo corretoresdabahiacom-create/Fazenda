@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun, HelpCircle } from 'lucide-react';
+, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun, HelpCircle, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -67,6 +67,7 @@ import FarmSettingsComp from './components/FarmSettings';
 import FarmMap from './components/FarmMap';
 import ObligationsDrawer from './components/ObligationsDrawer';
 import HelpScreen from './components/HelpScreen';
+import AdminPanel from './components/AdminPanel';
 import WeighingWorksheet from './components/WeighingWorksheet';
 import NutritionCalculator from './components/NutritionCalculator';
 import { NotificationService } from './utils/notificationService';
@@ -612,6 +613,12 @@ export default function App() {
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
 
+  const BOOTSTRAP_ADMIN_EMAILS_CLIENT = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
+  const isBootstrapAdmin = !!user?.email && BOOTSTRAP_ADMIN_EMAILS_CLIENT.includes(user.email.toLowerCase());
+  if (isBootstrapAdmin) {
+    navItems.push({ id: 'admin-panel', label: 'Painel Admin', icon: ShieldAlert });
+  }
+
   const renderView = () => {
     switch (activeView) {
       case 'clima':
@@ -627,6 +634,9 @@ export default function App() {
             allow="geolocation"
           />
         );
+      case 'admin-panel':
+        if (!isBootstrapAdmin) return <div className="p-6 text-sm text-theme-secondary">Acesso restrito.</div>;
+        return <AdminPanel adminEmail={user?.email || ''} />;
       case 'dashboard': 
         return (
           <Dashboard 

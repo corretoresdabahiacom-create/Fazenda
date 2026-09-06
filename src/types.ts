@@ -827,6 +827,17 @@ export interface Advertisement {
   createdBy: string;
 }
 
+// Despesa do NEGÓCIO do aplicativo (hospedagem, taxas de gateway etc.) —
+// diferente das despesas de cada fazenda cliente. Só o admin vê isso.
+export interface AppExpense {
+  id: string;
+  description: string;
+  category: string;
+  value: number;
+  date: string;
+  createdAt: string;
+}
+
 // =====================================================================
 // DOCUMENTOS — CAR, CCIR, ITR, contratos, licenças ambientais,
 // receituários agronômicos. Arquivos ficam no Firebase Storage; aqui só
