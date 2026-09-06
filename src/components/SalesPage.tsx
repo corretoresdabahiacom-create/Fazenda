@@ -94,7 +94,7 @@ const FAQS = [
   { q: 'Preciso entender de computador para usar?', a: 'Não. As telas foram pensadas para serem simples e diretas — se você usa WhatsApp, consegue usar o Agro Gestão.' },
   { q: 'Meus dados ficam seguros?', a: 'Sim. Cada conta é isolada e só você tem acesso aos seus dados. Não guardamos números de cartão nem dados bancários — o pagamento acontece direto na página segura do Mercado Pago, Stripe ou PayPal.' },
   { q: 'Posso cancelar quando quiser?', a: 'Sim, a qualquer momento, direto pelo aplicativo em "Minha Assinatura" — sem precisar ligar ou mandar e-mail para cancelar.' },
-  { q: 'E se eu não gostar depois de assinar?', a: 'Você tem 3 dias de teste totalmente grátis, sem precisar cadastrar nenhum pagamento. Depois disso, se quiser continuar conhecendo o aplicativo, basta cadastrar uma forma de pagamento e ganha mais 7 dias de teste (10 no total) antes da primeira cobrança.' },
+  { q: 'E se eu não gostar depois de assinar?', a: 'Você tem 3 dias de teste totalmente grátis, sem precisar cadastrar nenhum pagamento. Depois disso, se quiser continuar conhecendo o aplicativo, basta assinar um plano — você ganha mais 7 dias podendo cancelar a qualquer momento sem pagar nada. Só é cobrado se você não cancelar até o fim desse prazo.' },
   { q: 'Funciona para qualquer tamanho de fazenda?', a: 'Sim — os planos variam pelo número de propriedades cadastradas, do produtor com uma fazenda até quem administra várias.' },
 ];
 
@@ -194,7 +194,7 @@ export default function SalesPage({ onClose, onStartTrial }: Props) {
       {/* Preços */}
       <section className="max-w-5xl mx-auto px-4 py-14">
         <h2 className="font-serif italic font-bold text-2xl text-theme-primary text-center mb-2">Escolha o plano do tamanho da sua operação</h2>
-        <p className="text-theme-secondary text-sm text-center mb-10">3 dias grátis em qualquer plano, sem cartão — depois, mais 7 dias de teste ao cadastrar o pagamento.</p>
+        <p className="text-theme-secondary text-sm text-center mb-10">3 dias grátis em qualquer plano, sem cartão — depois, mais 7 dias podendo cancelar sem cobrança.</p>
         <div className="grid md:grid-cols-4 gap-4">
           {([PlanTier.UMA_FAZENDA, PlanTier.TRES_FAZENDAS, PlanTier.CINCO_FAZENDAS] as PlanTier[]).map((plan, i) => (
             <div key={plan} className={`rounded-2xl border p-5 flex flex-col ${i === 1 ? 'border-[var(--primary)] shadow-lg relative' : 'border-theme'}`}>

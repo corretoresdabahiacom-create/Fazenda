@@ -197,7 +197,7 @@ const SECTIONS: Section[] = [
     title: 'Minha Assinatura',
     content: [
       'Toda conta nova tem 3 dias de acesso completo e grátis, sem precisar cadastrar nenhum pagamento.',
-      'Depois dos 3 dias, esta tela convida você a cadastrar uma forma de pagamento para ganhar mais 7 dias de teste (10 no total) antes da primeira cobrança — a cobrança só começa de fato depois desses 7 dias extras.',
+      'Depois dos 3 dias, esta tela convida você a assinar um plano para ganhar mais 7 dias de teste (10 no total) — nesses 7 dias você pode cancelar a qualquer momento sem pagar nada. Se não cancelar até lá, a primeira mensalidade é debitada automaticamente.',
       'Se os 10 dias passarem sem uma forma de pagamento cadastrada, o acesso fica bloqueado até você assinar um plano.',
       'Mostra seu plano atual, valor mensal, data de validade e último pagamento, além de recomendar os outros planos disponíveis.',
       'Você pode cancelar sua assinatura a qualquer momento por aqui — o acesso continua até o fim do período já pago.',

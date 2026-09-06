@@ -119,7 +119,7 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
   if (inFreePhase) {
     info = { color: 'text-[var(--primary)] bg-[var(--primary-soft)] border-[var(--primary)]/30', icon: Gift, label: `Você está no seu teste grátis de 3 dias — restam ${daysLeftFree} dia(s), sem precisar de cartão.` };
   } else if (inExtendedTrial) {
-    info = { color: 'text-amber-700 bg-amber-50 border-amber-200', icon: AlertTriangle, label: `Cadastre um pagamento para ganhar mais 7 dias de teste — restam ${daysLeftExtended} dia(s) antes do acesso ser bloqueado.` };
+    info = { color: 'text-amber-700 bg-amber-50 border-amber-200', icon: AlertTriangle, label: `Assine um plano para ganhar mais 7 dias de teste grátis, podendo cancelar a qualquer momento sem cobrança — restam ${daysLeftExtended} dia(s) antes do acesso ser bloqueado.` };
   }
 
   const showUpsell = sub.status !== SubscriptionStatus.ATIVA;
@@ -217,11 +217,11 @@ export default function MinhaAssinatura({ uid }: { uid: string }) {
             </div>
           </div>
           <button onClick={handleSubscribe} disabled={checkingOut} className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-3 rounded-xl font-bold text-sm disabled:opacity-60">
-            {checkingOut ? 'Abrindo pagamento seguro...' : inFreePhase ? 'Cadastrar pagamento (mais 7 dias de teste)' : 'Assinar agora'}
+            {checkingOut ? 'Abrindo pagamento seguro...' : inFreePhase || inExtendedTrial ? 'Assinar plano (mais 7 dias grátis)' : 'Assinar agora'}
           </button>
           <p className="text-[10px] text-theme-secondary text-center">
             Você será redirecionado para a página segura do provedor escolhido — nunca guardamos dados do seu cartão neste aplicativo.
-            {inFreePhase || inExtendedTrial ? ' A cobrança só começa depois dos 7 dias de teste extra.' : ''}
+            {inFreePhase || inExtendedTrial ? ' Você tem 7 dias para cancelar sem que nenhum valor seja cobrado — a primeira mensalidade só sai automaticamente se você não cancelar até lá.' : ''}
           </p>
         </div>
       )}
