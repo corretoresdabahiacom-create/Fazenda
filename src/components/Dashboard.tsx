@@ -258,10 +258,10 @@ export default function Dashboard({
     let averageMonthlyGainKg = 0;
     if (totalAnimalsWithHistory > 0) {
       averageMonthlyGainKg = totalWeightedMonthlyGain / totalAnimalsWithHistory;
-    } else {
-      // High-validity farm average default simulation (14.5 kg / head / month representing 475g GMD)
-      averageMonthlyGainKg = 14.8;
     }
+    // Sem nenhum dado real (nem histórico de peso individual, nem
+    // planilha de pesagem com 2+ registros), não fabricamos um número —
+    // hasRealHistory continua false e o card mostra "sem dados".
 
     const averageMonthlyGainArrobas = averageMonthlyGainKg / 15;
 
@@ -500,9 +500,9 @@ export default function Dashboard({
         />
         <StatCard 
           title="Ganho de Peso Mensal" 
-          value={`+${weightGainMetrics.averageMonthlyGainKg.toFixed(1)} kg/cab`} 
+          value={weightGainMetrics.hasRealHistory ? `+${weightGainMetrics.averageMonthlyGainKg.toFixed(1)} kg/cab` : '—'} 
           icon={<Scale className="text-emerald-600" />}
-          trend={`GMD: ${weightGainMetrics.dailyGainGrams.toFixed(0)}g/dia • (${weightGainMetrics.hasRealHistory ? 'Real' : 'Projeção'})`}
+          trend={weightGainMetrics.hasRealHistory ? `GMD: ${weightGainMetrics.dailyGainGrams.toFixed(0)}g/dia` : 'Registre 2+ pesagens para calcular'}
           onClick={() => onNavigate?.('weighing')}
         />
         <StatCard 

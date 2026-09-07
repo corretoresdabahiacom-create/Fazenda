@@ -7,7 +7,7 @@ import React, { useState, useMemo } from 'react';
 import { Animal } from '../types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Scale, Plus, Calendar, TrendingUp } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 
 interface Props {
   animal: Animal;
@@ -22,7 +22,8 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
   );
   const [isSeeding, setIsSeeding] = useState(false);
 
-  // Parse chronological chart data
+  // Parse chronological chart data — sem histórico real, o gráfico fica
+  // vazio (nunca inventamos pontos fictícios de peso).
   const chartData = useMemo(() => {
     if (animal.weightHistory && animal.weightHistory.length > 0) {
       return [...animal.weightHistory]
@@ -33,21 +34,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
           rawDate: h.date
         }));
     }
-
-    // Default simulation if empty so the rancher sees a starter path representing progress
-    const entryDate = parseISO(animal.entryDate);
-    const today = new Date();
-    
-    const startWeight = Math.max(50, Math.round(animal.averageWeight * 0.82));
-    const midWeight = Math.max(60, Math.round(animal.averageWeight * 0.91));
-    const midTime = entryDate.getTime() + (today.getTime() - entryDate.getTime()) / 2;
-    const midDate = new Date(midTime);
-
-    return [
-      { formattedDate: format(entryDate, 'dd/MM/y'), peso: startWeight, rawDate: animal.entryDate },
-      { formattedDate: format(midDate, 'dd/MM/y'), peso: midWeight, rawDate: midDate.toISOString().split('T')[0] },
-      { formattedDate: format(today, 'dd/MM/y'), peso: animal.averageWeight, rawDate: today.toISOString().split('T')[0] }
-    ];
+    return [];
   }, [animal]);
 
   // Handle logging a new weight
@@ -66,17 +53,9 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
 
     let updatedHistory = animal.weightHistory ? [...animal.weightHistory] : [];
 
-    // If history was empty, materialize the simulation points first
-    if (updatedHistory.length === 0) {
-      const entryDate = animal.entryDate;
-      const startWeight = Math.max(50, Math.round(animal.averageWeight * 0.82));
-      const todayStr = new Date().toISOString().split('T')[0];
-      
-      updatedHistory.push({ date: entryDate, weight: startWeight });
-      updatedHistory.push({ date: todayStr, weight: animal.averageWeight });
-    }
-
-    // Push new point
+    // Push new point (nunca inventamos um ponto de partida fictício —
+    // se for a primeira pesagem, ela simplesmente começa o histórico
+    // sozinha).
     updatedHistory.push({
       date: newWeightDate,
       weight: weightVal
@@ -106,47 +85,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
     }
   };
 
-  // Quick helper to seed weight history
-  const handleSeedMockHistory = async () => {
-    if (userRole === 'user') return;
-    const entryDate = parseISO(animal.entryDate);
-    const today = new Date();
-    
-    const p1 = Math.max(50, Math.round(animal.averageWeight * 0.8));
-    const p2 = Math.max(55, Math.round(animal.averageWeight * 0.88));
-    const p3 = Math.max(60, Math.round(animal.averageWeight * 0.95));
-    
-    const tEntry = entryDate.getTime();
-    const tDiff = today.getTime() - tEntry;
-    
-    const d1 = new Date(tEntry).toISOString().split('T')[0];
-    const d2 = new Date(tEntry + tDiff * 0.33).toISOString().split('T')[0];
-    const d3 = new Date(tEntry + tDiff * 0.66).toISOString().split('T')[0];
-    const d4 = today.toISOString().split('T')[0];
-
-    const mockHistory = [
-      { date: d1, weight: p1 },
-      { date: d2, weight: p2 },
-      { date: d3, weight: p3 },
-      { date: d4, weight: animal.averageWeight }
-    ];
-
-    const updatedAnimal: Animal = {
-      ...animal,
-      weightHistory: mockHistory
-    };
-
-    try {
-      setIsSeeding(true);
-      await onUpdateAnimal(updatedAnimal);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-
-  const hasNoHistory = !animal.weightHistory || animal.weightHistory.length === 0;
+  const hasNoHistory = chartData.length === 0;
 
   return (
     <div className="mt-4 p-4 border border-[#3d5a45]/20 bg-[#f9faf8] dark:bg-zinc-900/60 dark:border-zinc-800 rounded-2xl animate-fade-in space-y-4 legacy-light">
@@ -154,17 +93,13 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
         <h4 className="text-xs font-black uppercase text-[#3d5a45] dark:text-[#5fa875] tracking-wider flex items-center gap-1.5">
           <TrendingUp size={15} /> Evolução Histórica de Peso
         </h4>
-        {hasNoHistory && userRole !== 'user' && (
-          <button
-            onClick={handleSeedMockHistory}
-            disabled={isSeeding}
-            className="btn-outline text-[9px] px-2 py-0.5 disabled:opacity-50"
-          >
-            {isSeeding ? 'Confirmando...' : 'Gerar Histórico Realista'}
-          </button>
-        )}
       </div>
 
+      {hasNoHistory ? (
+        <p className="text-xs text-theme-secondary text-center py-8">
+          Nenhuma pesagem registrada ainda — registre abaixo para começar o histórico.
+        </p>
+      ) : (
       <div className="h-44 w-full text-xs font-semibold pt-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 5 }}>
@@ -201,6 +136,7 @@ export default function WeightHistoryPanel({ animal, onUpdateAnimal, userRole }:
           </LineChart>
         </ResponsiveContainer>
       </div>
+      )}
 
       {userRole !== 'user' && (
         <form onSubmit={handleAddWeighing} className="pt-2 border-t border-[#3d5a45]/10 dark:border-zinc-800 space-y-2">
