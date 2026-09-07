@@ -9,16 +9,25 @@ import {
 } from 'lucide-react';
 
 const PRODUCTS: { id: string; label: string }[] = [
-  { id: 'boi_gordo', label: 'Boi Gordo' },
+  { id: 'boi_gordo', label: 'Boi Gordo, Vaca, Novilho e Novilha' },
+  { id: 'cafe', label: 'Café (Arábica/Conilon)' },
+  { id: 'algodao', label: 'Algodão' },
   { id: 'soja', label: 'Soja' },
   { id: 'milho', label: 'Milho' },
-  { id: 'cafe', label: 'Café' },
-  { id: 'algodao', label: 'Algodão' },
-  { id: 'acucar', label: 'Açúcar' },
   { id: 'trigo', label: 'Trigo' },
+  { id: 'laranja', label: 'Laranja' },
+  { id: 'acucar', label: 'Açúcar' },
   { id: 'suinos', label: 'Suínos' },
   { id: 'frango', label: 'Frango' },
   { id: 'leite', label: 'Leite' },
+  { id: 'arroz', label: 'Arroz' },
+  { id: 'feijao', label: 'Feijão' },
+  { id: 'cacau', label: 'Cacau' },
+  { id: 'amendoim', label: 'Amendoim' },
+  { id: 'sorgo', label: 'Sorgo' },
+  { id: 'ovos', label: 'Ovos' },
+  { id: 'mandioca', label: 'Mandioca' },
+  { id: 'frutas', label: 'Frutas (Manga, Limão e outras)' },
 ];
 
 interface CambioEntry {
@@ -32,6 +41,8 @@ interface CambioData {
   usd: CambioEntry | null;
   eur: CambioEntry | null;
   jpy: CambioEntry | null;
+  xau: CambioEntry | null;
+  btc: CambioEntry | null;
 }
 
 interface ParsedTable {
@@ -48,7 +59,58 @@ interface CotacoesResponse {
   error?: string;
 }
 
-function CambioCard({ label, entry, flag }: { label: string; entry: CambioEntry | null; flag: string }) {
+// Para Boi Gordo, o Datagro publica "Indicador do Boi", "Indicador da
+// Vaca" e "Indicador da Novilha" como tabelas SEPARADAS, mas todas usam
+// exatamente os mesmos estados como chave — dá pra juntar numa tabela só,
+// lado a lado, sem misturar granularidades diferentes (a tabela por
+// MUNICÍPIO da Scot Consultoria não tem Novilho/Novilha nessa mesma
+// fonte, por isso não aparece combinada com ela).
+function buildBoiVacaNovilhaTable(tables: ParsedTable[]): ParsedTable | null {
+  const find = (match: RegExp) => tables.find(t => match.test(t.heading));
+  const boi = find(/indicador do boi\b/i);
+  const vaca = find(/indicador da vaca\b/i);
+  const novilha = find(/indicador da novilha\b/i);
+  if (!boi || !vaca || !novilha) return null;
+
+  const toMap = (t: ParsedTable) => {
+    const map: Record<string, string> = {};
+    for (const row of t.rows.slice(1)) {
+      if (row[0] && row[1]) map[row[0].trim()] = row[1].trim();
+    }
+    return map;
+  };
+  const boiMap = toMap(boi);
+  const vacaMap = toMap(vaca);
+  const novilhaMap = toMap(novilha);
+
+  const estados = Object.keys(boiMap);
+  const rows: string[][] = [['Estado', 'Boi (R$/@)', 'Vaca (R$/@)', 'Novilha (R$/@)']];
+  for (const estado of estados) {
+    rows.push([estado, boiMap[estado] || '—', vacaMap[estado] || '—', novilhaMap[estado] || '—']);
+  }
+
+  return {
+    heading: 'Boi, Vaca e Novilha por Estado (comparativo)',
+    source: 'Datagro',
+    rows,
+  };
+}
+
+// Identifica se uma tabela é de preço futuro (B3) ou preço atual/à vista
+// — usa tanto o título quanto o cabeçalho da própria tabela, já que
+// "B3" aparece em títulos de indicadores à vista também (o método CEPEA
+// foi desenvolvido em parceria com a B3, mas o preço em si é à vista).
+function classifyTable(table: ParsedTable): 'futuro' | 'atual' {
+  const heading = table.heading.toLowerCase();
+  const firstRow = (table.rows[0] || []).join(' ').toLowerCase();
+  const isFutures =
+    /pregão|futuro|vencimento/.test(heading) ||
+    /contrato|vencimento|mês\s*\/\s*ano/.test(firstRow) ||
+    /^(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\/\d{2,4}/i.test((table.rows[1]?.[0] || ''));
+  return isFutures ? 'futuro' : 'atual';
+}
+
+function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry: CambioEntry | null; flag: string; decimals?: number }) {
   if (!entry) {
     return (
       <div className="bg-theme-card rounded-2xl border border-theme p-4">
@@ -69,11 +131,11 @@ function CambioCard({ label, entry, flag }: { label: string; entry: CambioEntry 
       <div className="grid grid-cols-2 gap-2">
         <div>
           <p className="text-[10px] uppercase text-theme-secondary">Compra</p>
-          <p className="text-sm font-bold text-theme-primary">R$ {entry.compra.toFixed(4)}</p>
+          <p className="text-sm font-bold text-theme-primary">R$ {entry.compra.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</p>
         </div>
         <div>
           <p className="text-[10px] uppercase text-theme-secondary">Venda</p>
-          <p className="text-sm font-bold text-theme-primary">R$ {entry.venda.toFixed(4)}</p>
+          <p className="text-sm font-bold text-theme-primary">R$ {entry.venda.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</p>
         </div>
       </div>
     </div>
@@ -136,10 +198,12 @@ export default function Cotacoes() {
         {cambioError && (
           <p className="text-xs text-red-500 bg-red-50 rounded-xl p-2 mb-2">{cambioError}</p>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <CambioCard label="Dólar Comercial (USD)" entry={cambio?.usd ?? null} flag="🇺🇸" />
-          <CambioCard label="Euro (EUR)" entry={cambio?.eur ?? null} flag="🇪🇺" />
-          <CambioCard label="Iene Japonês (JPY)" entry={cambio?.jpy ?? null} flag="🇯🇵" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <CambioCard label="Dólar Comercial (USD)" entry={cambio?.usd ?? null} flag="🇺🇸" decimals={4} />
+          <CambioCard label="Euro (EUR)" entry={cambio?.eur ?? null} flag="🇪🇺" decimals={4} />
+          <CambioCard label="Iene Japonês (JPY)" entry={cambio?.jpy ?? null} flag="🇯🇵" decimals={4} />
+          <CambioCard label="Ouro (grama)" entry={cambio?.xau ?? null} flag="🥇" decimals={2} />
+          <CambioCard label="Bitcoin (BTC)" entry={cambio?.btc ?? null} flag="₿" decimals={2} />
         </div>
       </div>
 
@@ -166,6 +230,11 @@ export default function Cotacoes() {
             className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm"
           />
         </div>
+        {produto === 'boi_gordo' && (
+          <p className="text-[10px] text-theme-secondary">
+            Boi, Vaca e Novilha aparecem comparados por estado logo abaixo. A tabela por município (Scot Consultoria) só traz Boi e Vaca nessa granularidade na fonte original — Novilho/Novilha por município não existe na fonte consultada.
+          </p>
+        )}
       </div>
 
       {loading && <p className="text-sm text-theme-secondary text-center py-8">Buscando cotações...</p>}
@@ -188,14 +257,47 @@ export default function Cotacoes() {
           {data.tables.length === 0 && (
             <p className="text-sm text-theme-secondary text-center py-8">Nenhuma cotação encontrada para este produto no momento.</p>
           )}
+          {produto === 'boi_gordo' && (() => {
+            const combined = buildBoiVacaNovilhaTable(data.tables);
+            if (!combined) return null;
+            const filteredRows = filterRows(combined.rows);
+            if (regionFilter.trim() && filteredRows.length <= 1) return null;
+            return (
+              <div className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/30 overflow-hidden overflow-x-auto">
+                <div className="p-4 pb-2">
+                  <h3 className="font-bold text-theme-primary text-sm">{combined.heading}</h3>
+                  <p className="text-[10px] text-theme-secondary">Fonte: {combined.source} — Boi, Vaca e Novilha comparados lado a lado por estado.</p>
+                </div>
+                <table className="w-full text-sm">
+                  <tbody className="divide-y divide-theme">
+                    {filteredRows.slice(0, 20).map((row, ri) => (
+                      <tr key={ri} className={ri === 0 ? 'bg-theme-secondary font-bold' : ''}>
+                        {row.map((cell, ci) => (
+                          <td key={ci} className="p-2.5 text-xs text-theme-secondary whitespace-nowrap">{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
           {data.tables.map((table, i) => {
             const filteredRows = filterRows(table.rows);
             if (regionFilter.trim() && filteredRows.length === 0) return null;
+            const kind = classifyTable(table);
             return (
               <div key={i} className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
-                <div className="p-4 pb-2">
-                  <h3 className="font-bold text-theme-primary text-sm">{table.heading || 'Cotação'}</h3>
-                  {table.source && <p className="text-[10px] text-theme-secondary">Fonte: {table.source}</p>}
+                <div className="p-4 pb-2 flex items-start justify-between gap-2">
+                  <div>
+                    <h3 className="font-bold text-theme-primary text-sm">{table.heading || 'Cotação'}</h3>
+                    {table.source && <p className="text-[10px] text-theme-secondary">Fonte: {table.source}</p>}
+                  </div>
+                  <span className={`shrink-0 text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ${
+                    kind === 'futuro' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+                  }`}>
+                    {kind === 'futuro' ? 'Futuro B3' : 'Atual'}
+                  </span>
                 </div>
                 <table className="w-full text-sm">
                   <tbody className="divide-y divide-theme">

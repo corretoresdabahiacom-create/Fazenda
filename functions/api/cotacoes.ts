@@ -10,15 +10,24 @@
 
 const PRODUCT_SLUGS: Record<string, string> = {
   boi_gordo: 'boi-gordo',
-  soja: 'soja',
-  milho: 'milho',
   cafe: 'cafe',
   algodao: 'algodao',
-  acucar: 'sucroenergetico',
+  soja: 'soja',
+  milho: 'milho',
   trigo: 'trigo',
+  laranja: 'laranja',
+  acucar: 'sucroenergetico',
   suinos: 'suinos',
   frango: 'frango',
   leite: 'leite',
+  arroz: 'arroz',
+  feijao: 'feijao',
+  cacau: 'cacau',
+  amendoim: 'amendoim',
+  sorgo: 'sorgo',
+  ovos: 'ovos',
+  mandioca: 'mandioca',
+  frutas: 'frutas',
 };
 
 interface ParsedTable {
@@ -115,11 +124,15 @@ export const onRequestGet: PagesFunction = async (context) => {
 
     const sourceUrl = `https://www.noticiasagricolas.com.br/cotacoes/${slug}`;
     const res = await fetch(sourceUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AgroGestaoBot/1.0)' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml',
+      },
     });
 
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: `Falha ao buscar cotações (${res.status}).`, sourceUrl }), {
+      const bodyText = await res.text().catch(() => '');
+      return new Response(JSON.stringify({ error: `Falha ao buscar cotações (status ${res.status}): ${bodyText.slice(0, 200)}`, sourceUrl }), {
         status: 502,
         headers: { 'Content-Type': 'application/json' },
       });

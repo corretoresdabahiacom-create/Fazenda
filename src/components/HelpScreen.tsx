@@ -33,8 +33,10 @@ const SECTIONS: Section[] = [
     icon: DollarSign,
     title: 'Cotações',
     content: [
-      'No topo, mostra o câmbio comercial (compra e venda) do Dólar, Euro e Iene em tempo real.',
-      'Escolha o produto (Boi Gordo, Soja, Milho, Café, Algodão, Açúcar, Trigo, Suínos, Frango, Leite) para ver o preço à vista (CEPEA/ESALQ), o preço futuro na B3 (com os vencimentos disponíveis) e os preços regionais.',
+      'No topo, mostra o câmbio comercial (compra e venda) do Dólar, Euro, Iene, Ouro e Bitcoin em tempo real.',
+      'Escolha entre 19 produtos (Boi Gordo, Vaca, Novilha, Café Arábica/Conilon, Algodão, Soja, Milho, Trigo, Laranja, Açúcar, Suínos, Frango, Leite, Arroz, Feijão, Cacau, Amendoim, Sorgo, Ovos, Mandioca, Frutas e mais) para ver o preço à vista, o preço futuro na B3 e os preços regionais.',
+      'Cada tabela mostra um selo "Atual" (preço à vista/indicador de referência) ou "Futuro B3" (contratos futuros negociados na bolsa) para você nunca confundir os dois.',
+      'Para Boi Gordo, Boi/Vaca/Novilha aparecem comparados lado a lado por estado — a tabela por município só traz Boi e Vaca na fonte original.',
       'Use o campo de busca para filtrar por região, estado ou cidade (ex: "SP", "Goiás", "Barretos") — funciona em qualquer uma das tabelas mostradas.',
       'Os dados vêm de fontes públicas do mercado (CEPEA/ESALQ, B3, Scot Consultoria, Datagro, IMEA), consolidadas pelo Notícias Agrícolas — o link para a fonte completa fica no fim da tela.',
     ],
