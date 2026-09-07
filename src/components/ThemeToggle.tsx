@@ -6,7 +6,9 @@ export default function ThemeToggle() {
     const saved = localStorage.getItem('theme');
     // Padrão volta a ser claro — só fica escuro se o usuário escolher
     // explicitamente pelo botão.
-    return saved === 'dark';
+    // Padrão é o modo verde (escuro) — só fica claro se o usuário
+    // escolher explicitamente pelo botão.
+    return saved !== 'light';
   });
 
   useEffect(() => {

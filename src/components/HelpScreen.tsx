@@ -240,7 +240,7 @@ const SECTIONS: Section[] = [
     icon: Moon,
     title: 'Alternância de tema (ícone de lua/sol no topo)',
     content: [
-      'Alterna entre modo claro e escuro. O padrão do sistema é o modo claro.',
+      'Alterna entre modo verde (escuro) e modo claro. O padrão do sistema é o modo verde.',
       'Algumas telas mais antigas mantêm sempre o visual claro original, mesmo com o modo escuro ativado no restante do aplicativo — isso é proposital, para garantir que o texto continue sempre legível nelas.',
     ],
   },

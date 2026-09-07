@@ -70,12 +70,12 @@ export default function AdminPanel({ adminEmail }: { adminEmail: string }) {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-4">
+    <div className="p-4 md:p-6 space-y-3">
       <div>
-        <h1 className="text-xl font-bold text-theme-primary flex items-center gap-2">
-          <ShieldAlert className="text-primary" size={20} /> Painel Admin
+        <h1 className="text-base font-bold text-theme-primary flex items-center gap-1.5">
+          <ShieldAlert className="text-primary" size={16} /> Painel Admin
         </h1>
-        <p className="text-sm text-theme-secondary">Logado como {adminEmail} — visível só para administradores do sistema.</p>
+        <p className="text-[11px] text-theme-secondary">Logado como {adminEmail} — visível só para administradores do sistema.</p>
       </div>
 
       <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
@@ -83,11 +83,11 @@ export default function AdminPanel({ adminEmail }: { adminEmail: string }) {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all ${
               tab === t.id ? 'bg-theme-card text-primary shadow-sm' : 'text-theme-secondary'
             }`}
           >
-            <t.icon size={14} /> {t.label}
+            <t.icon size={12} /> {t.label}
           </button>
         ))}
       </div>
