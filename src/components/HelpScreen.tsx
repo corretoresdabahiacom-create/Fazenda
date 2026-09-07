@@ -8,7 +8,7 @@ import {
   X, ChevronDown, HelpCircle, LayoutDashboard, Building2, Beef, Wheat, Wallet,
   Tractor, UserCog, FileText, Sparkles, Users, Receipt, Package, PawPrint,
   Scale, MapIcon, Calendar, BarChart3, Leaf, Settings, CloudSun, Bell, Moon,
-  CreditCard, Image as ImageIcon, Smartphone, ShieldAlert,
+  CreditCard, Image as ImageIcon, Smartphone, ShieldAlert, DollarSign,
 } from 'lucide-react';
 
 interface Section {
@@ -27,6 +27,16 @@ const SECTIONS: Section[] = [
       'O card de data (com o ícone de sol/nuvem) é clicável e leva direto para o Clima Agora.',
       'O painel "Alertas Climáticos" mostra restrições do dia (chuva forte, vento, calor, geada) para a propriedade ativa — depende da localização estar cadastrada em Propriedades.',
       'O painel "Outros módulos" resume Financeiro, Agricultura, Pecuária Profissional, Máquinas e Documentos, com atalho direto ao clicar em cada card.',
+    ],
+  },
+  {
+    icon: DollarSign,
+    title: 'Cotações',
+    content: [
+      'No topo, mostra o câmbio comercial (compra e venda) do Dólar, Euro e Iene em tempo real.',
+      'Escolha o produto (Boi Gordo, Soja, Milho, Café, Algodão, Açúcar, Trigo, Suínos, Frango, Leite) para ver o preço à vista (CEPEA/ESALQ), o preço futuro na B3 (com os vencimentos disponíveis) e os preços regionais.',
+      'Use o campo de busca para filtrar por região, estado ou cidade (ex: "SP", "Goiás", "Barretos") — funciona em qualquer uma das tabelas mostradas.',
+      'Os dados vêm de fontes públicas do mercado (CEPEA/ESALQ, B3, Scot Consultoria, Datagro, IMEA), consolidadas pelo Notícias Agrícolas — o link para a fonte completa fica no fim da tela.',
     ],
   },
   {

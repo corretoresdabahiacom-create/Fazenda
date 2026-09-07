@@ -27,7 +27,7 @@ import {
   Moon,
   Leaf,
   LogIn
-, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun, HelpCircle, ShieldAlert, CreditCard } from 'lucide-react';
+, Building2 , Stethoscope , Wheat , Wallet, Tractor, UserCog , FileText , Sparkles, CloudSun, HelpCircle, ShieldAlert, CreditCard, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   EmployeePayment, 
@@ -73,6 +73,7 @@ import ObligationsDrawer from './components/ObligationsDrawer';
 import HelpScreen from './components/HelpScreen';
 import AdminPanel from './components/AdminPanel';
 import Logo from './components/Logo';
+import Cotacoes from './components/Cotacoes';
 import MinhaAssinatura from './components/MinhaAssinatura';
 import SalesPage from './components/SalesPage';
 import { db } from './lib/firebase';
@@ -645,6 +646,7 @@ export default function App() {
 
   const navItems = [
     { id: 'dashboard', label: 'Painel', icon: LayoutDashboard },
+    { id: 'cotacoes', label: 'Cotações', icon: DollarSign },
     { id: 'clima', label: 'Clima Agora', icon: CloudSun },
     { id: 'properties', label: 'Propriedades', icon: Building2 },
     { id: 'pecuaria-pro', label: 'Pecuária Profissional', icon: Stethoscope },
@@ -676,6 +678,8 @@ export default function App() {
 
   const renderView = () => {
     switch (activeView) {
+      case 'cotacoes':
+        return <Cotacoes />;
       case 'clima':
         return (
           <iframe
