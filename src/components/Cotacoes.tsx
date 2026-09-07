@@ -43,6 +43,8 @@ interface CambioData {
   jpy: CambioEntry | null;
   xau: CambioEntry | null;
   btc: CambioEntry | null;
+  dolarFuturoB3: { valor: string; vencimento: string } | null;
+  fonte?: string;
 }
 
 interface ParsedTable {
@@ -205,6 +207,15 @@ export default function Cotacoes() {
           <CambioCard label="Ouro (grama)" entry={cambio?.xau ?? null} flag="🥇" decimals={2} />
           <CambioCard label="Bitcoin (BTC)" entry={cambio?.btc ?? null} flag="₿" decimals={2} />
         </div>
+        {cambio?.dolarFuturoB3 && (
+          <div className="mt-2 bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-between">
+            <p className="text-xs font-semibold text-blue-800">
+              📈 Dólar Futuro (B3){cambio.dolarFuturoB3.vencimento ? ` — vencimento ${cambio.dolarFuturoB3.vencimento}` : ''}
+            </p>
+            <p className="text-sm font-bold text-blue-800">{cambio.dolarFuturoB3.valor}</p>
+          </div>
+        )}
+        {cambio?.fonte && <p className="text-[10px] text-theme-secondary mt-1.5">{cambio.fonte}</p>}
       </div>
 
       <div className="bg-theme-card rounded-2xl border border-theme p-4 space-y-3">
