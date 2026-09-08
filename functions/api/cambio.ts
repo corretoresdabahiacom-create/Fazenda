@@ -98,9 +98,32 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY', debug: string[]): Promis
 }
 
 async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
-  // Fonte principal: CoinGecko — nativa em BRL, historicamente mais
-  // estável a partir de IPs de datacenter do que exchanges como a
-  // Binance (que já bloqueou com 403 numa tentativa anterior).
+  // Fonte principal: Mercado Bitcoin — maior exchange de criptomoedas do
+  // Brasil, API pública nativa em BRL, sem os bloqueios por região que
+  // exchanges internacionais como a Binance costumam aplicar.
+  try {
+    const res = await fetch('https://api.mercadobitcoin.net/api/v4/tickers?symbols=BTC-BRL', {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as any[];
+      const entry = data?.[0];
+      if (entry?.last) {
+        return {
+          compra: Number(entry.buy || entry.last),
+          venda: Number(entry.sell || entry.last),
+          variacaoPct: 0,
+          atualizadoEm: new Date().toISOString(),
+        };
+      }
+    } else {
+      debug.push(`Mercado Bitcoin BTC-BRL: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`Mercado Bitcoin BTC-BRL: ${e?.message || String(e)}`);
+  }
+
+  // Reserva 1: CoinGecko.
   try {
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true',
@@ -124,7 +147,7 @@ async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promis
     debug.push(`CoinGecko BTC: ${e?.message || String(e)}`);
   }
 
-  // Reserva: Binance (BRL direto, depois via USDT convertido).
+  // Reserva 2: Binance (BRL direto, depois via USDT convertido).
   try {
     const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCBRL', {
       headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
@@ -173,8 +196,14 @@ async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promis
   return null;
 }
 
-async function fetchGold(usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
+async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | null, debug: string[]): Promise<CambioEntry | null> {
   const GRAMS_PER_TROY_OUNCE = 31.1035;
+
+  // Fonte extra: se a B3 (via Notícias Agrícolas) já trouxe um valor de
+  // Ouro na mesma busca do Dólar Futuro, usa direto — já vem em reais.
+  if (ouroFuturoBrl && ouroFuturoBrl > 0) {
+    return { compra: ouroFuturoBrl, venda: ouroFuturoBrl, variacaoPct: 0, atualizadoEm: new Date().toISOString() };
+  }
 
   if (!usdBrl) {
     debug.push('Ouro: não foi possível calcular porque nenhuma cotação de dólar ficou disponível.');
@@ -235,18 +264,26 @@ async function fetchGold(usdBrl: CambioEntry | null, debug: string[]): Promise<C
   return null;
 }
 
-async function fetchDolarFuturoB3(): Promise<{ valor: string; vencimento: string } | null> {
+async function fetchB3Extras(): Promise<{ dolarFuturo: { valor: string; vencimento: string } | null; ouroFuturoBrl: number | null }> {
   try {
     const res = await fetch('https://www.noticiasagricolas.com.br/cotacoes', {
       headers: { 'User-Agent': BROWSER_UA },
     });
-    if (!res.ok) return null;
+    if (!res.ok) return { dolarFuturo: null, ouroFuturoBrl: null };
     const html = await res.text();
-    const match = html.match(/D[oó]lar\s*Fut[^<]*<\/t[dh]>\s*<t[dh][^>]*>([^<]+)<\/t[dh]>\s*<t[dh][^>]*>([^<]*)<\/t[dh]>/i);
-    if (!match) return null;
-    return { valor: match[1].trim(), vencimento: match[2]?.trim() || '' };
+
+    const dolarMatch = html.match(/D[oó]lar\s*Fut[^<]*<\/t[dh]>\s*<t[dh][^>]*>([^<]+)<\/t[dh]>\s*<t[dh][^>]*>([^<]*)<\/t[dh]>/i);
+    const dolarFuturo = dolarMatch ? { valor: dolarMatch[1].trim(), vencimento: dolarMatch[2]?.trim() || '' } : null;
+
+    // Tentativa extra: se a mesma página listar "Ouro" na tabela B3
+    // (contrato futuro, R$/grama), aproveita — senão, outras fontes de
+    // ouro entram em ação normalmente.
+    const ouroMatch = html.match(/\bOuro\b[^<]*<\/t[dh]>\s*<t[dh][^>]*>([^<]+)<\/t[dh]>/i);
+    const ouroFuturoBrl = ouroMatch ? Number(ouroMatch[1].replace(/\./g, '').replace(',', '.').replace(/[^\d.]/g, '')) || null : null;
+
+    return { dolarFuturo, ouroFuturoBrl };
   } catch {
-    return null;
+    return { dolarFuturo: null, ouroFuturoBrl: null };
   }
 }
 
@@ -263,22 +300,22 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const debug: string[] = [];
 
   try {
-    const [usd, eur, jpy, dolarFuturo] = await Promise.all([
+    const [usd, eur, jpy, b3Extras] = await Promise.all([
       fetchMoeda('USD', debug),
       fetchMoeda('EUR', debug),
       fetchMoeda('JPY', debug),
-      fetchDolarFuturoB3(),
+      fetchB3Extras(),
     ]);
 
     const [btc, xau] = await Promise.all([
       fetchBitcoin(usd, debug),
-      fetchGold(usd, debug),
+      fetchGold(usd, b3Extras.ouroFuturoBrl, debug),
     ]);
 
     const response = new Response(JSON.stringify({
       usd, eur, jpy, xau, btc,
-      dolarFuturoB3: dolarFuturo,
-      fonte: 'Banco Central do Brasil (PTAX oficial) — Bitcoin/Ouro via Binance, Dólar Futuro via B3/Notícias Agrícolas',
+      dolarFuturoB3: b3Extras.dolarFuturo,
+      fonte: 'Banco Central do Brasil (PTAX oficial) — Bitcoin via Mercado Bitcoin, Ouro via B3/Stooq, Dólar Futuro via B3/Notícias Agrícolas',
       debug: debug.length > 0 ? debug : undefined,
     }), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': forceRefresh ? 'no-store' : 'public, max-age=180' },
