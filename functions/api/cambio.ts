@@ -199,6 +199,32 @@ async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promis
 async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | null, debug: string[]): Promise<CambioEntry | null> {
   const GRAMS_PER_TROY_OUNCE = 31.1035;
 
+  // Fonte principal: XAUS.com — API dedicada e gratuita, sem chave, que
+  // combina LBMA (autoridade oficial mundial do preço do ouro), Kitco e
+  // goldprice.org com rejeição de outliers. Já devolve direto em reais
+  // por grama, sem precisarmos calcular a conversão nós mesmos.
+  try {
+    const res = await fetch('https://xaus.com/api/v1/spot?currency=BRL&unit=gram', {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as any;
+      const price = data?.xau?.price;
+      if (price && data?.data_state?.status !== 'unavailable') {
+        return {
+          compra: Number((price * 0.98).toFixed(2)),
+          venda: Number(price.toFixed(2)),
+          variacaoPct: 0,
+          atualizadoEm: data.price_as_of || data.updated_at || new Date().toISOString(),
+        };
+      }
+    } else {
+      debug.push(`XAUS.com: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`XAUS.com: ${e?.message || String(e)}`);
+  }
+
   // Fonte extra: se a B3 (via Notícias Agrícolas) já trouxe um valor de
   // Ouro na mesma busca do Dólar Futuro, usa direto — já vem em reais.
   if (ouroFuturoBrl && ouroFuturoBrl > 0) {
@@ -206,7 +232,7 @@ async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | nul
   }
 
   if (!usdBrl) {
-    debug.push('Ouro: não foi possível calcular porque nenhuma cotação de dólar ficou disponível.');
+    debug.push('Ouro: fontes principais falharam e nenhuma cotação de dólar ficou disponível para as reservas.');
     return null;
   }
 

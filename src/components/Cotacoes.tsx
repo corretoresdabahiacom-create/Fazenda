@@ -101,6 +101,74 @@ function findRegionRow(table: ParsedTable, region: string): string[] | null {
   return table.rows.slice(1).find(row => row.some(cell => cell.toLowerCase().includes(term))) || null;
 }
 
+// Extrai os nomes de cidade/região que realmente aparecem nos dados
+// carregados para o produto atual — usado para popular a lista de
+// sugestões do campo de busca, mostrando só o que existe de verdade.
+function extractAvailableRegions(tables: ParsedTable[]): string[] {
+  const found = new Set<string>();
+  for (const table of tables) {
+    for (const row of table.rows.slice(1)) {
+      const cell = row[0]?.trim();
+      // Filtra cabeçalhos e valores que claramente não são nome de lugar
+      // (números, datas, "Fechamento:", etc.)
+      if (cell && cell.length >= 2 && cell.length <= 40 && !/^\d/.test(cell) && !/fechamento|r\$|us\$/i.test(cell)) {
+        found.add(cell);
+      }
+    }
+  }
+  return Array.from(found).sort();
+}
+
+// Monta a "planilha" resumo: uma linha por categoria de produto, com o
+// preço da região escolhida (ou geral, se nenhuma) e o preço futuro na
+// B3 lado a lado — construída a partir das mesmas tabelas já carregadas.
+interface SummaryRow {
+  produto: string;
+  precoRegiao: string;
+  regiaoEncontrada: boolean;
+  precoFuturo: string;
+}
+
+function buildSummaryRows(tables: ParsedTable[], matchers: { label: string; pattern: RegExp }[] | undefined, produtoLabel: string, region: string): SummaryRow[] {
+  const rows: SummaryRow[] = [];
+
+  function priceFromRow(row: string[] | undefined): string {
+    if (!row) return '—';
+    // Pega a primeira célula que parece um valor numérico (preço).
+    const priceCell = row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c));
+    return priceCell || row[row.length - 1] || '—';
+  }
+
+  if (matchers) {
+    for (const m of matchers) {
+      const atualTable = tables.find(t => m.pattern.test(t.heading) && classifyTable(t) === 'atual');
+      const futuroTable = tables.find(t => m.pattern.test(t.heading) && classifyTable(t) === 'futuro');
+      if (!atualTable && !futuroTable) continue;
+
+      const regionRow = atualTable ? findRegionRow(atualTable, region) : null;
+      const fallbackRow = atualTable?.rows[1];
+      rows.push({
+        produto: m.label,
+        precoRegiao: priceFromRow(regionRow || fallbackRow),
+        regiaoEncontrada: !!regionRow,
+        precoFuturo: priceFromRow(futuroTable?.rows[1]),
+      });
+    }
+  } else {
+    const atualTable = tables.find(t => classifyTable(t) === 'atual');
+    const futuroTable = tables.find(t => classifyTable(t) === 'futuro');
+    const regionRow = atualTable ? findRegionRow(atualTable, region) : null;
+    rows.push({
+      produto: produtoLabel,
+      precoRegiao: priceFromRow(regionRow || atualTable?.rows[1]),
+      regiaoEncontrada: !!regionRow,
+      precoFuturo: priceFromRow(futuroTable?.rows[1]),
+    });
+  }
+
+  return rows;
+}
+
 function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry: CambioEntry | null; flag: string; decimals?: number }) {
   if (!entry) {
     return (
@@ -211,6 +279,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     }
   }
   const otherTables = data ? data.tables.filter(t => !categorizedHeadings.has(t.heading)) : [];
+  const availableRegions = data ? extractAvailableRegions(data.tables) : [];
 
   return (
     <div className="space-y-4">
@@ -302,10 +371,19 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               value={ESTADOS.includes(region) ? '' : region}
               onChange={e => setRegion(e.target.value)}
               placeholder="...ou digite cidade/região específica"
+              list="cidades-disponiveis"
               className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm"
             />
+            <datalist id="cidades-disponiveis">
+              {availableRegions.map(r => <option key={r} value={r} />)}
+            </datalist>
           </div>
         </div>
+        {availableRegions.length > 0 && (
+          <p className="text-[10px] text-theme-secondary">
+            {availableRegions.length} região(ões)/cidade(s) disponível(is) para este produto — comece a digitar no campo de busca para ver a lista.
+          </p>
+        )}
       </div>
 
       {loading && <p className="text-sm text-theme-secondary text-center py-8">Buscando cotações...</p>}
@@ -325,6 +403,48 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
       {!loading && !error && data && (
         <div className="space-y-4">
+          {(() => {
+            const productLabel = PRODUCTS.find(p => p.id === produto)?.label || produto;
+            const summaryRows = buildSummaryRows(data.tables, matchers, productLabel, region);
+            if (summaryRows.length === 0) return null;
+            return (
+              <div className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/30 overflow-hidden overflow-x-auto">
+                <div className="p-4 pb-2">
+                  <h3 className="font-bold text-theme-primary text-sm">
+                    Resumo — {region ? `preço em ${region}` : 'preço geral'} × Futuro B3
+                  </h3>
+                  <p className="text-[10px] text-theme-secondary">
+                    {region && !summaryRows.some(r => r.regiaoEncontrada) && 'Região não encontrada nos dados — mostrando preço geral. '}
+                    Fonte: Notícias Agrícolas (CEPEA/ESALQ, B3, Scot Consultoria, Datagro)
+                  </p>
+                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-theme-secondary">
+                      <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Produto</th>
+                      <th className="text-left p-2.5 text-xs font-bold text-theme-primary">
+                        Preço {region || 'Geral'} <span className="font-normal text-theme-secondary">(Atual)</span>
+                      </th>
+                      <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Futuro B3</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-theme">
+                    {summaryRows.map((row, i) => (
+                      <tr key={i}>
+                        <td className="p-2.5 text-xs font-semibold text-theme-primary">{row.produto}</td>
+                        <td className="p-2.5 text-xs text-theme-secondary">
+                          {row.precoRegiao}
+                          {region && !row.regiaoEncontrada && <span className="text-[9px] block text-amber-600">(geral, região não encontrada)</span>}
+                        </td>
+                        <td className="p-2.5 text-xs text-theme-secondary">{row.precoFuturo}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
+
           {matchers && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {matchers.map(m => {
