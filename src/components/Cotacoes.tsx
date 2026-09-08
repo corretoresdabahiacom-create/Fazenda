@@ -110,6 +110,14 @@ interface RegionMatch {
   exact: boolean; // true = achou a cidade/região exata; false = achou o local mais próximo (mesmo estado)
 }
 
+function detectCurrency(headerRow: string[] | undefined): string {
+  if (!headerRow) return 'R$';
+  const joined = headerRow.join(' ');
+  if (/us\$/i.test(joined)) return 'US$';
+  if (/r\$/i.test(joined)) return 'R$';
+  return 'R$'; // dados brasileiros de CEPEA/B3/Scot/Datagro são quase sempre em reais
+}
+
 function findRegionRow(table: ParsedTable, region: string, uf?: string, estadoNome?: string): RegionMatch | null {
   if (!region) return null;
   const term = region.toLowerCase();
@@ -389,32 +397,6 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
       {!loading && !error && data && (
         <div className="space-y-4">
-          {data.mercadoInternacional && (
-            <div className="bg-theme-card rounded-2xl border border-theme p-4">
-              <h3 className="font-bold text-theme-primary text-sm mb-2">Mercado Internacional — {PRODUCTS.find(p => p.id === produto)?.label}</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-theme-secondary rounded-xl p-3">
-                  <p className="text-[10px] font-bold text-theme-secondary uppercase">🇧🇷 Brasil</p>
-                  <p className="text-xs text-theme-secondary mt-1">Ver tabela "Futuro B3" abaixo</p>
-                </div>
-                <div className="bg-theme-secondary rounded-xl p-3">
-                  <p className="text-[10px] font-bold text-theme-secondary uppercase">🇺🇸 Estados Unidos</p>
-                  <p className="text-sm font-bold text-theme-primary mt-1">{data.mercadoInternacional.valor.toFixed(4)}</p>
-                  <p className="text-[9px] text-theme-secondary">{data.mercadoInternacional.unidade}</p>
-                </div>
-                <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                  <p className="text-[10px] font-bold text-theme-secondary uppercase">🇪🇺 Europa</p>
-                  <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
-                </div>
-                <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                  <p className="text-[10px] font-bold text-theme-secondary uppercase">🇨🇳 China</p>
-                  <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
-                </div>
-              </div>
-              <p className="text-[10px] text-theme-secondary mt-2">Fonte: {data.mercadoInternacional.fonte} (contrato futuro de referência internacional).</p>
-            </div>
-          )}
-
           {matchers && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {matchers.map(m => {
@@ -432,6 +414,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-bold text-theme-primary text-sm">{m.label}</h3>
                       <Badge kind={atualTable ? 'atual' : 'futuro'} />
+                      <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">{detectCurrency(table.rows[0])}</span>
                       {region && !regionMatch && <span className="text-[9px] text-theme-secondary">(região não encontrada, mostrando geral)</span>}
                       {region && regionMatch && !regionMatch.exact && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
                     </div>
@@ -478,6 +461,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 <div className="p-4 pb-2 flex items-center gap-2">
                   <h3 className="font-bold text-theme-primary text-sm">{table.heading || 'Cotação'}</h3>
                   <Badge kind={kind} />
+                  <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">{detectCurrency(table.rows[0])}</span>
                   {usedNearest && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
                 </div>
                 {table.source && <p className="text-[10px] text-theme-secondary px-4 -mt-1 pb-2">Fonte: {table.source}</p>}
@@ -495,6 +479,44 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               </div>
             );
           })}
+
+          {data.mercadoInternacional && (() => {
+            const futuroTable = data.tables.find(t => classifyTable(t) === 'futuro');
+            const brasilRow = futuroTable?.rows[1];
+            const brasilPreco = brasilRow?.find(c => /\d/.test(c)) || brasilRow?.[brasilRow.length - 1];
+            return (
+              <div className="bg-theme-card rounded-2xl border border-theme p-4">
+                <h3 className="font-bold text-theme-primary text-sm mb-2">Mercado Internacional — {PRODUCTS.find(p => p.id === produto)?.label}</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="bg-theme-secondary rounded-xl p-3">
+                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇧🇷 Brasil</p>
+                    {brasilPreco ? (
+                      <>
+                        <p className="text-sm font-bold text-theme-primary mt-1">{brasilPreco}</p>
+                        <p className="text-[9px] text-theme-secondary">R$ (B3)</p>
+                      </>
+                    ) : (
+                      <p className="text-xs text-theme-secondary mt-1">Ver "Futuro B3" acima</p>
+                    )}
+                  </div>
+                  <div className="bg-theme-secondary rounded-xl p-3">
+                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇺🇸 Estados Unidos</p>
+                    <p className="text-sm font-bold text-theme-primary mt-1">{data.mercadoInternacional.valor.toFixed(4)}</p>
+                    <p className="text-[9px] text-theme-secondary">{data.mercadoInternacional.unidade}</p>
+                  </div>
+                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇪🇺 Europa</p>
+                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
+                  </div>
+                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇨🇳 China</p>
+                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
+                  </div>
+                </div>
+                <p className="text-[10px] text-theme-secondary mt-2">Fonte: B3/Notícias Agrícolas (Brasil) e {data.mercadoInternacional.fonte} (Estados Unidos) — contratos futuros de referência.</p>
+              </div>
+            );
+          })()}
 
           <a
             href={data.sourceUrl}

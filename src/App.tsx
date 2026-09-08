@@ -945,42 +945,42 @@ export default function App() {
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative" style={{ background: 'var(--bg-primary)' }}>
         {/* Header */}
         <header className="sticky top-0 z-10 bg-theme-card border-b border-theme shadow-theme">
-          <div className="px-4 md:px-6 py-3 flex items-center justify-between">
+          <div className="px-4 md:px-6 py-2 flex items-center justify-between">
             <div className="flex items-center gap-3">
               {isMobile && (
                 <button 
                   onClick={() => setIsSidebarOpen(true)}
-                  className="p-2 -ml-2 bg-theme-secondary rounded-lg transition-colors text-theme-secondary"
+                  className="p-1.5 -ml-2 bg-theme-secondary rounded-lg transition-colors text-theme-secondary"
                 >
-                  <Menu size={20} />
+                  <Menu size={18} />
                 </button>
               )}
               
               {activeView !== 'dashboard' && (
                 <button 
                   onClick={() => setActiveView('dashboard')}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all group"
+                  className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all group"
                   style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}
                 >
-                  <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
-                  <span className="text-xs font-bold">Voltar</span>
+                  <ArrowLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
+                  <span className="text-[11px] font-bold">Voltar</span>
                 </button>
               )}
 
-              <h2 className="text-base md:text-lg font-bold text-theme-primary capitalize truncate max-w-[120px] sm:max-w-none">
+              <h2 className="text-sm md:text-base font-bold text-theme-primary capitalize truncate max-w-[120px] sm:max-w-none">
                 {navItems.find(n => n.id === activeView)?.label}
               </h2>
 
               {properties.length > 0 && (
                 properties.length === 1 ? (
-                  <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-theme-secondary text-theme-secondary rounded-full text-xs font-semibold">
-                    <Building2 size={12} /> {properties[0].name}
+                  <span className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-theme-secondary text-theme-secondary rounded-full text-[11px] font-semibold">
+                    <Building2 size={11} /> {properties[0].name}
                   </span>
                 ) : (
                   <select
                     value={activePropertyId ?? ''}
                     onChange={(e) => setActivePropertyId(e.target.value)}
-                    className="hidden sm:block bg-theme-secondary text-theme-secondary text-xs font-semibold rounded-full px-3 py-1.5 border-0"
+                    className="hidden sm:block bg-theme-secondary text-theme-secondary text-[11px] font-semibold rounded-full px-2.5 py-1 border-0"
                     title="Propriedade ativa"
                   >
                     {properties.map((p) => (
@@ -993,8 +993,8 @@ export default function App() {
             
             <div className="flex items-center gap-1 sm:gap-2">
               {/* Date */}
-              <div className="hidden lg:flex items-center bg-theme-secondary px-3 py-1.5 rounded-full">
-                <span className="text-xs font-mono text-theme-secondary font-medium">
+              <div className="hidden lg:flex items-center bg-theme-secondary px-2.5 py-1 rounded-full">
+                <span className="text-[11px] font-mono text-theme-secondary font-medium">
                   {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </span>
               </div>
@@ -1002,10 +1002,10 @@ export default function App() {
               {/* Obligations Bell */}
               <button 
                 onClick={() => setIsObligationsOpen(true)}
-                className="relative p-2 rounded-full bg-theme-secondary transition-colors text-theme-secondary"
+                className="relative p-1.5 rounded-full bg-theme-secondary transition-colors text-theme-secondary"
                 title="Central de Obrigações"
               >
-                <Bell size={20} />
+                <Bell size={18} />
                 {activeAlertsCount > 0 && (
                   <span className={`absolute -top-1 -right-1 w-5 h-5 rounded-full ${hasOverdue ? 'bg-red-500 animate-pulse' : 'bg-amber-500'} text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white`}>
                     {activeAlertsCount > 9 ? '9+' : activeAlertsCount}
@@ -1016,10 +1016,10 @@ export default function App() {
               {/* Help Button */}
               <button
                 onClick={() => setIsHelpOpen(true)}
-                className="p-2 rounded-full bg-theme-secondary text-theme-secondary transition-colors"
+                className="p-1.5 rounded-full bg-theme-secondary text-theme-secondary transition-colors"
                 title="Ajuda — como usar o aplicativo"
               >
-                <HelpCircle size={20} />
+                <HelpCircle size={18} />
               </button>
 
               {/* Theme Toggle */}
@@ -1028,11 +1028,11 @@ export default function App() {
               {/* Settings Button */}
               <button 
                 onClick={() => setActiveView('settings')}
-                className={`p-2 rounded-full transition-colors bg-theme-secondary ${activeView === 'settings' ? '' : 'text-theme-secondary'}`}
+                className={`p-1.5 rounded-full transition-colors bg-theme-secondary ${activeView === 'settings' ? '' : 'text-theme-secondary'}`}
                 style={activeView === 'settings' ? { background: 'var(--primary-soft)', color: 'var(--primary)' } : undefined}
                 title="Configurações"
               >
-                <Settings size={20} />
+                <Settings size={18} />
               </button>
             </div>
           </div>
