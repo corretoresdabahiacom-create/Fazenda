@@ -369,9 +369,14 @@ function NotificacoesTab({ notifications, users, adminEmail }: {
   const [filterCity, setFilterCity] = useState('');
   const [filterRegion, setFilterRegion] = useState('');
   const [filterBirthdayMonth, setFilterBirthdayMonth] = useState('');
+  const [sending, setSending] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null);
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
+    setSending(true);
+    setFeedback(null);
+
     const item: AdminNotification = {
       id: `notif_${Date.now()}`,
       title: title || 'Aviso',
@@ -386,11 +391,19 @@ function NotificacoesTab({ notifications, users, adminEmail }: {
       createdAt: new Date().toISOString(),
       createdBy: adminEmail,
     };
-    await setDoc(doc(db, 'adminNotifications', item.id), item);
 
-    // Além de salvar o aviso (que aparece dentro do app), tenta também
-    // mandar um push de verdade pros celulares dos usuários alcançados —
-    // silenciosamente ignorado se o push ainda não estiver configurado.
+    // 1) Salva o aviso — se isso falhar, é um erro real e precisa aparecer.
+    try {
+      await setDoc(doc(db, 'adminNotifications', item.id), item);
+    } catch (err: any) {
+      setFeedback({ type: 'error', text: 'Falha ao salvar o aviso: ' + (err?.message || 'erro desconhecido') + '. Nada foi enviado.' });
+      setSending(false);
+      return;
+    }
+
+    // 2) Tenta mandar o push de verdade — se falhar, o aviso já foi salvo
+    // (aparece dentro do app), mas o usuário precisa saber que o push em
+    // si não chegou nos celulares.
     const targetUsers = users.filter(u => {
       if (u.deleted) return false;
       if (targetType === 'all') return true;
@@ -404,19 +417,37 @@ function NotificacoesTab({ notifications, users, adminEmail }: {
       return false;
     });
     const tokens = targetUsers.flatMap(u => u.fcmTokens || []);
-    if (tokens.length > 0) {
+
+    if (tokens.length === 0) {
+      setFeedback({ type: 'warning', text: `Aviso salvo e vai aparecer dentro do app para ${targetUsers.length} usuário(s) — mas nenhum deles tem notificação push configurada no celular ainda, então só o push mesmo não foi enviado.` });
+    } else {
       try {
-        await fetch('/api/send-push', {
+        const res = await fetch('/api/send-push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tokens, title: item.title, body: item.message }),
         });
-      } catch {
-        // silencioso — o aviso já foi salvo e vai aparecer dentro do app de qualquer forma
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setFeedback({ type: 'warning', text: `Aviso salvo (aparece dentro do app), mas o push falhou: ${data.error || `HTTP ${res.status}`}.` });
+        } else {
+          const results: { ok: boolean }[] = data.results || [];
+          const succeeded = results.filter(r => r.ok).length;
+          const failed = results.length - succeeded;
+          if (succeeded === 0 && results.length > 0) {
+            setFeedback({ type: 'warning', text: `Aviso salvo (aparece dentro do app), mas o push falhou em todos os ${failed} dispositivo(s) — os tokens podem estar expirados ou o Firebase Cloud Messaging ainda não está totalmente configurado.` });
+          } else if (failed > 0) {
+            setFeedback({ type: 'warning', text: `Aviso salvo. Push entregue em ${succeeded} dispositivo(s), mas falhou em ${failed}.` });
+          } else {
+            setFeedback({ type: 'success', text: `Enviado com sucesso — aviso salvo e push disparado para ${tokens.length} dispositivo(s) de ${targetUsers.length} usuário(s).` });
+          }
+        }
+      } catch (err: any) {
+        setFeedback({ type: 'warning', text: 'Aviso salvo (aparece dentro do app), mas houve falha de conexão ao tentar enviar o push: ' + (err?.message || 'erro desconhecido') });
       }
     }
 
-    setIsOpen(false);
+    setSending(false);
     setTitle(''); setMessage(''); setTargetUserId(''); setFilterCity(''); setFilterRegion(''); setFilterBirthdayMonth('');
   }
 
@@ -498,9 +529,23 @@ function NotificacoesTab({ notifications, users, adminEmail }: {
                   </div>
                 </div>
               )}
+              {feedback && (
+                <div className={`rounded-xl p-3 text-xs font-semibold ${
+                  feedback.type === 'success' ? 'bg-green-50 text-green-700' :
+                  feedback.type === 'warning' ? 'bg-amber-50 text-amber-700' :
+                  'bg-red-50 text-red-700'
+                }`}>
+                  {feedback.type === 'success' ? '✅ ' : feedback.type === 'warning' ? '⚠️ ' : '❌ '}
+                  {feedback.text}
+                </div>
+              )}
               <div className="flex gap-2 pt-2">
-                <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Enviar</button>
-                <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
+                <button type="submit" disabled={sending} className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-60">
+                  {sending ? 'Enviando...' : 'Enviar'}
+                </button>
+                <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">
+                  {feedback ? 'Fechar' : 'Cancelar'}
+                </button>
               </div>
             </form>
           </div>
