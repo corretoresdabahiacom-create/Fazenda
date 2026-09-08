@@ -210,16 +210,19 @@ async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | nul
     return null;
   }
 
-  // Fonte principal: Stooq (cotação internacional em dólar).
+  // Fonte principal: Stooq (cotação internacional em dólar) — usando o
+  // endpoint de download de dados (/q/d/l/), confirmado como o formato
+  // correto e testado (o endpoint usado antes, /q/l/, estava incorreto
+  // e por isso vinha dando 404).
   try {
-    const res = await fetch('https://stooq.com/q/l/?s=xauusd&f=sd2t2c&h&e=csv', {
+    const res = await fetch('https://stooq.com/q/d/l/?s=xauusd&i=d', {
       headers: { 'User-Agent': BROWSER_UA },
     });
     if (res.ok) {
       const csv = await res.text();
       const lines = csv.trim().split('\n');
-      const cols = lines[1]?.split(',') || [];
-      const closeUsdPerOz = Number(cols[3]);
+      const cols = lines[lines.length - 1]?.split(',') || []; // Date,Open,High,Low,Close,Volume
+      const closeUsdPerOz = Number(cols[4]);
       if (closeUsdPerOz > 0) {
         const usdPerGram = closeUsdPerOz / GRAMS_PER_TROY_OUNCE;
         const brlPerGram = usdPerGram * usdBrl.venda;
