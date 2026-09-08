@@ -877,7 +877,7 @@ export default function App() {
           isMobile ? 'fixed inset-y-0 left-0' : 'relative'
         }`}
       >
-        <div className="p-5 flex items-center justify-between border-b border-theme">
+        <div className="p-5 flex items-center justify-between border-b border-theme" style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top, 0px))' }}>
           {(isSidebarOpen || !isMobile) && (
             <motion.div
               initial={false}
@@ -944,7 +944,10 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative" style={{ background: 'var(--bg-primary)' }}>
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-theme-card border-b border-theme shadow-theme">
+        <header
+          className="sticky top-0 z-10 bg-theme-card border-b border-theme shadow-theme"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        >
           <div className="px-4 md:px-6 py-2 flex items-center justify-between">
             <div className="flex items-center gap-3">
               {isMobile && (

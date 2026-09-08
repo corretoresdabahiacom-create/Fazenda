@@ -21,6 +21,19 @@ import { compressImageIfNeeded, fileToDataUrl } from '../lib/imageCompression';
 
 type Tab = 'visao_geral' | 'usuarios' | 'notificacoes' | 'anuncios' | 'despesas';
 
+// Remove campos com valor undefined antes de gravar no Firestore — ele
+// recusa a gravação inteira se qualquer campo vier como undefined.
+function stripUndefined<T extends Record<string, any>>(obj: T): T {
+  const clean: any = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v === undefined) continue;
+    clean[k] = v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Date)
+      ? stripUndefined(v)
+      : v;
+  }
+  return clean;
+}
+
 const TABS: { id: Tab; label: string; icon: typeof Users }[] = [
   { id: 'visao_geral', label: 'Visão Geral', icon: TrendingDown },
   { id: 'usuarios', label: 'Usuários', icon: Users },
@@ -239,20 +252,20 @@ function UsuariosTab({ users, subscriptions, adminEmail }: {
 
   async function updateStatus(uid: string, status: SubscriptionStatus, reason?: string) {
     const existing = subByUser(uid);
-    await setDoc(doc(db, 'subscriptions', uid), {
+    await setDoc(doc(db, 'subscriptions', uid), stripUndefined({
       ...(existing || { userId: uid, email: users.find(u => u.userId === uid)?.email || '', plan: PlanTier.AGRO_TOTAL, createdAt: new Date().toISOString() }),
       status,
       suspendedReason: reason,
       suspendedBy: adminEmail,
-    }, { merge: true });
+    }), { merge: true });
   }
 
   async function toggleDeleted(u: UserDirectoryEntry) {
-    await setDoc(doc(db, 'userDirectory', u.userId), {
+    await setDoc(doc(db, 'userDirectory', u.userId), stripUndefined({
       ...u,
       deleted: !u.deleted,
       deletedAt: !u.deleted ? new Date().toISOString() : undefined,
-    }, { merge: true });
+    }), { merge: true });
   }
 
   const statusColor: Record<string, string> = {
@@ -394,7 +407,7 @@ function NotificacoesTab({ notifications, users, adminEmail }: {
 
     // 1) Salva o aviso — se isso falhar, é um erro real e precisa aparecer.
     try {
-      await setDoc(doc(db, 'adminNotifications', item.id), item);
+      await setDoc(doc(db, 'adminNotifications', item.id), stripUndefined(item));
     } catch (err: any) {
       setFeedback({ type: 'error', text: 'Falha ao salvar o aviso: ' + (err?.message || 'erro desconhecido') + '. Nada foi enviado.' });
       setSending(false);
@@ -600,7 +613,7 @@ function AnunciosTab({ ads, adminEmail }: { ads: Advertisement[]; adminEmail: st
       createdAt: new Date().toISOString(),
       createdBy: adminEmail,
     };
-    await setDoc(doc(db, 'advertisements', item.id), item);
+    await setDoc(doc(db, 'advertisements', item.id), stripUndefined(item));
     setIsOpen(false);
     setForm({ type: AdContentType.TEXTO, active: true });
   }
