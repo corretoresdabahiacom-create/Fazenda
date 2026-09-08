@@ -28,6 +28,7 @@ import AdminNotificationsBanner from './AdminNotificationsBanner';
 
 interface DashboardProps {
   uid?: string;
+  onSaveSettings?: (s: FarmSettings) => Promise<void>;
   payments: EmployeePayment[];
   expenses: Expense[];
   animals: Animal[];
@@ -50,6 +51,7 @@ interface DashboardProps {
 
 export default function Dashboard({ 
   uid,
+  onSaveSettings,
   payments, 
   expenses, 
   animals, 
@@ -69,6 +71,61 @@ export default function Dashboard({
   documents = [],
   activeProperty = null,
 }: DashboardProps) {
+  const [detectingLocation, setDetectingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const applyDetectedLocation = useCallback(async (lat: number, lon: number) => {
+    try {
+      const res = await fetch(`/api/reverse-geocode?lat=${lat}&lon=${lon}`);
+      const data = await res.json();
+      if (!res.ok || !data.label) {
+        setLocationError('Localização obtida, mas não foi possível identificar a cidade.');
+        return;
+      }
+      if (onSaveSettings) {
+        await onSaveSettings({ ...settings, city: data.label, location: { lat, lng: lon } });
+      }
+    } catch {
+      setLocationError('Não foi possível identificar a cidade a partir da localização.');
+    } finally {
+      setDetectingLocation(false);
+    }
+  }, [onSaveSettings, settings]);
+
+  const handleDetectLocation = useCallback(() => {
+    setLocationError(null);
+    if (!navigator.geolocation) {
+      setLocationError('Geolocalização não é suportada neste navegador.');
+      return;
+    }
+    setDetectingLocation(true);
+
+    // Primeira tentativa: alta precisão (GPS real), ideal para celular.
+    // Se falhar por qualquer motivo que não seja permissão negada, tenta
+    // de novo de forma mais tolerante (sem exigir GPS, prazo maior) —
+    // funciona melhor em computadores sem chip de GPS, que dependem de
+    // localização por Wi-Fi/IP.
+    navigator.geolocation.getCurrentPosition(
+      (pos) => applyDetectedLocation(pos.coords.latitude, pos.coords.longitude),
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setDetectingLocation(false);
+          setLocationError('Permissão de localização negada. Você pode digitar a cidade manualmente em Configurações.');
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => applyDetectedLocation(pos.coords.latitude, pos.coords.longitude),
+          () => {
+            setDetectingLocation(false);
+            setLocationError('Não foi possível obter sua localização. Digite a cidade manualmente em Configurações.');
+          },
+          { timeout: 20000, maximumAge: 300000, enableHighAccuracy: false },
+        );
+      },
+      { timeout: 8000, maximumAge: 300000, enableHighAccuracy: true },
+    );
+  }, [applyDetectedLocation]);
+
   const totalExpenses = useMemo(() => {
     const expensesTotal = expenses.reduce((acc, curr) => acc + curr.value, 0);
     const paymentsTotal = payments.reduce((acc, curr) => acc + curr.totalValue, 0);
@@ -287,7 +344,17 @@ export default function Dashboard({
               <MapPin size={16} className="text-primary" />
               {settings.city || 'Cidade não informada'}
             </div>
+            {!settings.city && (
+              <button
+                onClick={handleDetectLocation}
+                disabled={detectingLocation}
+                className="text-xs font-bold text-primary underline disabled:opacity-60"
+              >
+                {detectingLocation ? 'Detectando...' : 'Detectar minha localização'}
+              </button>
+            )}
           </div>
+          {locationError && <p className="text-xs text-red-500 mt-1">{locationError}</p>}
         </div>
         
         {/* Local Date/Time Header — clicável, leva para o Clima Agora */}

@@ -716,6 +716,7 @@ export default function App() {
             documents={documents}
             activeProperty={activeProperty}
             uid={user?.uid}
+            onSaveSettings={updateSettings}
             onNavigate={(view) => {
               if (view === 'animals-scan') {
                 setScanMode(true);
@@ -769,6 +770,7 @@ export default function App() {
             documents={documents}
             activeProperty={activeProperty}
             uid={user?.uid}
+            onSaveSettings={updateSettings}
             onNavigate={(view) => {
               if (view === 'animals-scan') {
                 setScanMode(true);
