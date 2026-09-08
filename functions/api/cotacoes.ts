@@ -31,6 +31,22 @@ const PRODUCT_SLUGS: Record<string, string> = {
   frutas: 'frutas',
 };
 
+// Contratos futuros internacionais de referência (via Yahoo Finance,
+// mesma fonte já usada com sucesso para o ouro) — cobre os EUA, que
+// concentram os principais mercados futuros agrícolas do mundo (CBOT em
+// Chicago, ICE em Nova York, CME). Não encontramos uma fonte gratuita e
+// confiável equivalente para China e Europa até o momento — sinalizado
+// como indisponível em vez de inventar um número.
+const US_FUTURES_TICKER: Record<string, { ticker: string; unidade: string }> = {
+  boi_gordo: { ticker: 'LE=F', unidade: 'US$/lb (CME)' },
+  soja: { ticker: 'ZS=F', unidade: 'US$/bushel (CBOT)' },
+  milho: { ticker: 'ZC=F', unidade: 'US$/bushel (CBOT)' },
+  trigo: { ticker: 'ZW=F', unidade: 'US$/bushel (CBOT)' },
+  cafe: { ticker: 'KC=F', unidade: 'US$/lb (ICE-NY)' },
+  algodao: { ticker: 'CT=F', unidade: 'US$/lb (ICE-NY)' },
+  acucar: { ticker: 'SB=F', unidade: 'US$/lb (ICE-NY)' },
+};
+
 const OTHER_PRODUCT_KEYWORDS: Record<string, RegExp> = {
   boi_gordo: /\b(algodão|soja|milho|trigo|café|arroz|feijão|cacau|amendoim|sorgo|laranja)\b/i,
   cafe: /\b(algodão|soja|milho|trigo|boi gordo|arroz|feijão|cacau|amendoim|sorgo|laranja)\b/i,
@@ -116,6 +132,26 @@ function parseTables(html: string): ParsedTable[] {
   return tables;
 }
 
+async function fetchMercadoInternacional(produto: string): Promise<{ pais: string; valor: number; unidade: string; fonte: string } | null> {
+  const config = US_FUTURES_TICKER[produto];
+  if (!config) return null;
+  try {
+    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${config.ticker}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+        Accept: 'application/json',
+      },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as any;
+    const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    if (!price) return null;
+    return { pais: 'Estados Unidos', valor: price, unidade: config.unidade, fonte: 'Yahoo Finance' };
+  } catch {
+    return null;
+  }
+}
+
 export const onRequestGet: PagesFunction = async (context) => {
   try {
     const url = new URL(context.request.url);
@@ -155,10 +191,13 @@ export const onRequestGet: PagesFunction = async (context) => {
       tables = tables.filter(t => !otherProductPattern.test(t.heading));
     }
 
+    const mercadoInternacional = await fetchMercadoInternacional(productKey);
+
     return new Response(JSON.stringify({
       produto: productKey,
       sourceUrl,
       tables,
+      mercadoInternacional,
       fetchedAt: new Date().toISOString(),
       debug: showDebug ? {
         htmlLength: html.length,

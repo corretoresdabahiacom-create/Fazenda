@@ -90,6 +90,7 @@ interface CotacoesResponse {
   produto: string;
   sourceUrl: string;
   tables: ParsedTable[];
+  mercadoInternacional?: { pais: string; valor: number; unidade: string; fonte: string } | null;
   fetchedAt: string;
   error?: string;
 }
@@ -109,7 +110,7 @@ interface RegionMatch {
   exact: boolean; // true = achou a cidade/região exata; false = achou o local mais próximo (mesmo estado)
 }
 
-function findRegionRow(table: ParsedTable, region: string, uf?: string): RegionMatch | null {
+function findRegionRow(table: ParsedTable, region: string, uf?: string, estadoNome?: string): RegionMatch | null {
   if (!region) return null;
   const term = region.toLowerCase();
 
@@ -117,11 +118,14 @@ function findRegionRow(table: ParsedTable, region: string, uf?: string): RegionM
   if (exactMatch) return { row: exactMatch, exact: true };
 
   // Não achou a cidade/região exata — procura o local mais próximo,
-  // usando o mesmo estado (por sigla ou nome) como aproximação.
-  if (uf) {
-    const nearestMatch = table.rows.slice(1).find(row => row.some(cell => new RegExp(`\\b${uf}\\b`, 'i').test(cell)));
-    if (nearestMatch) return { row: nearestMatch, exact: false };
-  }
+  // usando o mesmo estado (por sigla OU nome completo, ex: fontes como a
+  // Scot Consultoria usam "Bahia Sul"/"Bahia Oeste", não a sigla "BA").
+  const nearestMatch = table.rows.slice(1).find(row => row.some(cell => {
+    if (uf && new RegExp(`\\b${uf}\\b`, 'i').test(cell)) return true;
+    if (estadoNome && cell.toLowerCase().includes(estadoNome.toLowerCase())) return true;
+    return false;
+  }));
+  if (nearestMatch) return { row: nearestMatch, exact: false };
 
   return null;
 }
@@ -385,6 +389,32 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
       {!loading && !error && data && (
         <div className="space-y-4">
+          {data.mercadoInternacional && (
+            <div className="bg-theme-card rounded-2xl border border-theme p-4">
+              <h3 className="font-bold text-theme-primary text-sm mb-2">Mercado Internacional — {PRODUCTS.find(p => p.id === produto)?.label}</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-theme-secondary rounded-xl p-3">
+                  <p className="text-[10px] font-bold text-theme-secondary uppercase">🇧🇷 Brasil</p>
+                  <p className="text-xs text-theme-secondary mt-1">Ver tabela "Futuro B3" abaixo</p>
+                </div>
+                <div className="bg-theme-secondary rounded-xl p-3">
+                  <p className="text-[10px] font-bold text-theme-secondary uppercase">🇺🇸 Estados Unidos</p>
+                  <p className="text-sm font-bold text-theme-primary mt-1">{data.mercadoInternacional.valor.toFixed(4)}</p>
+                  <p className="text-[9px] text-theme-secondary">{data.mercadoInternacional.unidade}</p>
+                </div>
+                <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                  <p className="text-[10px] font-bold text-theme-secondary uppercase">🇪🇺 Europa</p>
+                  <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
+                </div>
+                <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                  <p className="text-[10px] font-bold text-theme-secondary uppercase">🇨🇳 China</p>
+                  <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-theme-secondary mt-2">Fonte: {data.mercadoInternacional.fonte} (contrato futuro de referência internacional).</p>
+            </div>
+          )}
+
           {matchers && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {matchers.map(m => {
@@ -393,7 +423,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 const table = atualTable || futuroTable;
                 if (!table) return null;
                 const uf = ESTADOS.includes(region) ? UF_POR_ESTADO[region] : selectedState ? UF_POR_ESTADO[selectedState] : undefined;
-                const regionMatch = findRegionRow(table, region, uf);
+                const estadoNome = ESTADOS.includes(region) ? region : selectedState || undefined;
+                const regionMatch = findRegionRow(table, region, uf, estadoNome);
                 const displayRow = regionMatch?.row || table.rows[1];
                 if (!displayRow) return null;
                 return (
@@ -428,10 +459,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             let usedNearest = false;
             if (region && kind === 'atual') {
               const uf = ESTADOS.includes(region) ? UF_POR_ESTADO[region] : selectedState ? UF_POR_ESTADO[selectedState] : undefined;
+              const estadoNome = ESTADOS.includes(region) ? region : selectedState || undefined;
               const term = region.toLowerCase();
               let filtered = table.rows.slice(1).filter(r => r.some(c => c.toLowerCase().includes(term)));
-              if (filtered.length === 0 && uf) {
-                filtered = table.rows.slice(1).filter(r => r.some(c => new RegExp(`\\b${uf}\\b`, 'i').test(c)));
+              if (filtered.length === 0 && (uf || estadoNome)) {
+                filtered = table.rows.slice(1).filter(r => r.some(c => {
+                  if (uf && new RegExp(`\\b${uf}\\b`, 'i').test(c)) return true;
+                  if (estadoNome && c.toLowerCase().includes(estadoNome.toLowerCase())) return true;
+                  return false;
+                }));
                 usedNearest = filtered.length > 0;
               }
               if (filtered.length === 0) return null; // sem nada pra essa região nem estado, não mostra a tabela
