@@ -74,6 +74,7 @@ import HelpScreen from './components/HelpScreen';
 import AdminPanel from './components/AdminPanel';
 import Logo from './components/Logo';
 import Cotacoes from './components/Cotacoes';
+import { enablePushNotifications } from './lib/pushNotifications';
 import MinhaAssinatura from './components/MinhaAssinatura';
 import SalesPage from './components/SalesPage';
 import { db } from './lib/firebase';
@@ -298,6 +299,27 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [activeAlerts]);
+
+  // Ativação automática de notificações push — pede a permissão do
+  // navegador sozinho, pouco depois do login, sem precisar que o usuário
+  // vá até Configurações e clique em nada. O usuário pode desativar isso
+  // a qualquer momento em Configurações (settings.pushNotificationsDisabled),
+  // e nesse caso nunca mais tentamos pedir de novo automaticamente. Se o
+  // navegador já tiver uma resposta anterior (concedida ou negada), também
+  // não perguntamos de novo — só na primeira vez.
+  useEffect(() => {
+    if (!user?.uid || !settings || settings.pushNotificationsDisabled) return;
+    if (typeof Notification === 'undefined' || Notification.permission !== 'default') return;
+
+    const already = sessionStorage.getItem('push_auto_prompt_done');
+    if (already) return;
+    sessionStorage.setItem('push_auto_prompt_done', '1');
+
+    const timer = setTimeout(() => {
+      enablePushNotifications(user.uid).catch(() => {});
+    }, 3000); // pequeno atraso para não competir com o carregamento inicial da tela
+    return () => clearTimeout(timer);
+  }, [user?.uid, settings]);
 
   const handleViewChange = (view: View) => {
     setActiveView(view);
@@ -570,13 +592,17 @@ export default function App() {
 
                     <p><strong>8. Publicidade.</strong> O aplicativo pode exibir conteúdo publicitário de terceiros em espaço próprio na tela inicial. Não nos responsabilizamos pelo conteúdo, veracidade ou pelas transações realizadas com anunciantes — qualquer negociação com um anunciante é de responsabilidade exclusiva das partes envolvidas.</p>
 
-                    <p><strong>9. Limitação de responsabilidade.</strong> Cabe única e exclusivamente ao usuário e produtor rural a conferência, validação e decisão final sobre qualquer informação, cálculo, sugestão ou conselho gerado pelo aplicativo (incluindo previsões climáticas, cálculos financeiros, sugestões de manejo ou respostas do Consultor Rural) antes de qualquer tomada de decisão prática na sua atividade rural. Na máxima extensão permitida pela legislação aplicável, o Agro Gestão, seus desenvolvedores, administradores, sócios e parceiros não se responsabilizam civilmente por perdas, danos diretos, indiretos, lucros cessantes ou prejuízos patrimoniais decorrentes do uso ou da impossibilidade de uso do aplicativo. Esta cláusula limita responsabilidade civil na forma da lei — ela não afasta, e não tem o poder de afastar, eventual responsabilidade criminal, que é sempre apurada e determinada exclusivamente pelas autoridades e pelo Poder Judiciário competentes, conforme a legislação vigente.</p>
+                    <p><strong>9. Isenção de responsabilidade e limitação de responsabilidade.</strong> Todo conteúdo informativo exibido pelo Agro Gestão — incluindo, sem limitação, previsões e alertas climáticos, cotações e preços de mercado (atuais, futuros/B3 e internacionais, de boi gordo, grãos, café, moedas, ouro, criptoativos e quaisquer outros produtos), dados e sugestões relacionados a animais, rebanho, reprodução e sanidade, dados e recomendações de agricultura e manejo de lavoura, cálculos financeiros, e respostas geradas pelo Consultor Rural (incluindo por inteligência artificial) — é fornecido exclusivamente a título de referência e apoio à decisão, sem qualquer garantia de exatidão, integralidade, atualidade ou adequação a uma finalidade específica. Este conteúdo NÃO constitui aconselhamento profissional de nenhuma natureza (financeiro, agronômico, veterinário, contábil, jurídico ou de investimento) e não substitui a avaliação de um profissional qualificado.</p>
+                    <p>Parte relevante desse conteúdo é obtida de fontes de terceiros (como CEPEA/ESALQ, B3, Banco Central do Brasil, Scot Consultoria, Datagro, Notícias Agrícolas, exchanges de criptoativos, serviços de geolocalização e provedores de dados meteorológicos), sobre as quais o Agro Gestão não tem controle, não audita e não garante a correção, atualidade ou disponibilidade contínua. Falhas, atrasos, indisponibilidades ou imprecisões nessas fontes podem refletir diretamente no aplicativo, sem que isso configure defeito do serviço.</p>
+                    <p>É de responsabilidade única e exclusiva do usuário e produtor rural conferir, validar de forma independente e decidir, por sua conta e risco, sobre qualquer ação prática tomada com base nas informações do aplicativo — incluindo, sem limitação, decisões de compra, venda, investimento, plantio, colheita, aplicação de insumos, manejo sanitário ou reprodutivo do rebanho, ou qualquer outra decisão operacional, comercial ou financeira da atividade rural. Na máxima extensão permitida pela legislação aplicável, o Agro Gestão, seus desenvolvedores, sócios, administradores, a empresa responsável pelo aplicativo e seus parceiros (incluindo provedores de dados, gateways de pagamento e fontes de informação de terceiros citadas acima) não se responsabilizam civilmente por qualquer perda, dano direto, indireto, incidental, consequencial, lucro cessante, perda de oportunidade ou prejuízo patrimonial de qualquer natureza decorrente de decisões tomadas — ou deixadas de tomar — com base, total ou parcial, em informações fornecidas pelo aplicativo, ainda que o Agro Gestão tenha sido avisado da possibilidade de tais danos. Esta cláusula limita responsabilidade civil na forma da lei — ela não afasta, e não tem o poder de afastar, eventual responsabilidade criminal, que é sempre apurada e determinada exclusivamente pelas autoridades e pelo Poder Judiciário competentes, conforme a legislação vigente.</p>
 
                     <p><strong>10. Manutenção e disponibilidade.</strong> O Agro Gestão pode sair do ar temporariamente para manutenção, atualizações ou correções, sem aviso prévio, sempre que necessário para o bom funcionamento do serviço. Em caso de encerramento definitivo do aplicativo, você será avisado com a maior antecedência possível e receberá de volta o valor proporcional aos dias não utilizados do mês já pago da sua assinatura.</p>
 
                     <p><strong>11. Alterações destes Termos.</strong> Podemos atualizar estes Termos periodicamente para refletir mudanças no aplicativo ou na legislação. Mudanças relevantes serão comunicadas dentro do próprio aplicativo.</p>
 
                     <p><strong>12. Suporte e contato.</strong> Dúvidas, solicitações relacionadas a dados pessoais (LGPD) ou suporte geral podem ser enviadas para: <strong className="text-theme-primary">admmeuarmazem@gmail.com</strong>.</p>
+
+                    <p><strong>13. Notificações push.</strong> Pouco depois do login, o aplicativo pode solicitar automaticamente ao seu navegador ou celular permissão para enviar notificações push (avisos de vencimento, comunicados do administrador e outros lembretes), sem necessidade de ação manual sua além da própria permissão do navegador. Essa solicitação automática é ativada por padrão, mas pode ser desativada a qualquer momento na tela de Configurações, através da opção "Pedir permissão de notificação automaticamente ao entrar no app" — mesmo desativada essa opção, você continua podendo ativar as notificações manualmente quando quiser, pela mesma tela. Independentemente dessa configuração, a permissão final de exibir notificações é sempre controlada pelo seu próprio navegador ou sistema operacional, podendo ser revogada por você a qualquer momento diretamente nas configurações do dispositivo.</p>
 
                     <p className="italic">Ao aceitar estes Termos, você confirma que leu, entendeu e concorda com todo o conteúdo acima. Se, a qualquer momento, você discordar de qualquer parte, o uso do aplicativo deve ser interrompido e ele deve ser desinstalado — continuar usando significa que você permitiu e aceitou.</p>
                   </div>

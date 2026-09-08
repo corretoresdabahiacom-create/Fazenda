@@ -295,6 +295,7 @@ export interface FarmSettings {
   farmMapFileName?: string;
   occurrences?: OccurrencePin[];
   ownerBirthday?: string; // MM-DD, sem ano — usado para notificações de aniversário do admin
+  pushNotificationsDisabled?: boolean; // true = usuário desativou a ativação automática de notificações push
 }
 
 export interface WeighingRow {

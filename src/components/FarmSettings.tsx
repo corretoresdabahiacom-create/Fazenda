@@ -345,6 +345,21 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
             <p className="text-[10px] text-[#8d8a86] mt-2 italic px-1">
               * Receba avisos de vencimento e comunicados do administrador direto no seu celular, mesmo com o app fechado.
             </p>
+
+            <label className="flex items-center gap-2 mt-3 px-1 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!formData.pushNotificationsDisabled}
+                onChange={(e) => setFormData({ ...formData, pushNotificationsDisabled: !e.target.checked })}
+                className="w-4 h-4 accent-[#3d5a45]"
+              />
+              <span className="text-xs text-[#3d5a45] font-semibold">
+                Pedir permissão de notificação automaticamente ao entrar no app
+              </span>
+            </label>
+            <p className="text-[10px] text-[#8d8a86] mt-1 italic px-1">
+              * Ligado por padrão. Desmarque aqui se preferir ativar manualmente (pelo botão acima) ou não usar notificações push. Não precisa salvar separado — some junto com o botão "Salvar" no fim da tela.
+            </p>
           </div>
         </div>
 

@@ -201,7 +201,7 @@ const SECTIONS: Section[] = [
     title: 'Configurações',
     content: [
       'Nome da fazenda, cidade/região (usada para cálculos climáticos), data de aniversário (opcional) e outras preferências gerais do sistema.',
-      'O botão "Ativar notificações push" permite receber avisos de vencimento e comunicados do administrador direto no seu celular, mesmo com o app fechado — pede sua permissão uma única vez.',
+      'Pouco depois do login, o app pede sozinho a permissão de notificação — não precisa procurar o botão. O botão "Ativar notificações push" continua disponível para ativar manualmente a qualquer momento, e há uma opção logo abaixo dele para desligar esse pedido automático, se preferir.',
     ],
   },
   {
