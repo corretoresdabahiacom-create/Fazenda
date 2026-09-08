@@ -37,6 +37,15 @@ const ESTADOS = [
   'Rondônia', 'Roraima', 'Santa Catarina', 'São Paulo', 'Sergipe', 'Tocantins',
 ];
 
+const UF_POR_ESTADO: Record<string, string> = {
+  'Acre': 'AC', 'Alagoas': 'AL', 'Amapá': 'AP', 'Amazonas': 'AM', 'Bahia': 'BA', 'Ceará': 'CE',
+  'Distrito Federal': 'DF', 'Espírito Santo': 'ES', 'Goiás': 'GO', 'Maranhão': 'MA',
+  'Mato Grosso': 'MT', 'Mato Grosso do Sul': 'MS', 'Minas Gerais': 'MG', 'Pará': 'PA',
+  'Paraíba': 'PB', 'Paraná': 'PR', 'Pernambuco': 'PE', 'Piauí': 'PI', 'Rio de Janeiro': 'RJ',
+  'Rio Grande do Norte': 'RN', 'Rio Grande do Sul': 'RS', 'Rondônia': 'RO', 'Roraima': 'RR',
+  'Santa Catarina': 'SC', 'São Paulo': 'SP', 'Sergipe': 'SE', 'Tocantins': 'TO',
+};
+
 const CATEGORY_MATCHERS: Record<string, { label: string; pattern: RegExp }[]> = {
   boi_gordo: [
     { label: 'Boi Gordo', pattern: /indicador do boi\b/i },
@@ -104,16 +113,22 @@ function findRegionRow(table: ParsedTable, region: string): string[] | null {
 // Extrai os nomes de cidade/região que realmente aparecem nos dados
 // carregados para o produto atual — usado para popular a lista de
 // sugestões do campo de busca, mostrando só o que existe de verdade.
-function extractAvailableRegions(tables: ParsedTable[]): string[] {
+// Se um estado for informado, filtra só as cidades daquele estado
+// (reconhece tanto o nome completo quanto a sigla, ex: "SP Barretos").
+function extractAvailableRegions(tables: ParsedTable[], estadoFiltro?: string): string[] {
   const found = new Set<string>();
+  const uf = estadoFiltro ? UF_POR_ESTADO[estadoFiltro] : undefined;
   for (const table of tables) {
     for (const row of table.rows.slice(1)) {
       const cell = row[0]?.trim();
-      // Filtra cabeçalhos e valores que claramente não são nome de lugar
-      // (números, datas, "Fechamento:", etc.)
-      if (cell && cell.length >= 2 && cell.length <= 40 && !/^\d/.test(cell) && !/fechamento|r\$|us\$/i.test(cell)) {
-        found.add(cell);
+      if (!cell || cell.length < 2 || cell.length > 40 || /^\d/.test(cell) || /fechamento|r\$|us\$/i.test(cell)) continue;
+      if (estadoFiltro) {
+        const cellLower = cell.toLowerCase();
+        const matchesUf = uf && new RegExp(`\\b${uf}\\b`, 'i').test(cell);
+        const matchesNome = cellLower.includes(estadoFiltro.toLowerCase());
+        if (!matchesUf && !matchesNome) continue;
       }
+      found.add(cell);
     }
   }
   return Array.from(found).sort();
@@ -169,6 +184,54 @@ function buildSummaryRows(tables: ParsedTable[], matchers: { label: string; patt
   return rows;
 }
 
+// Monta a planilha detalhada: várias linhas com as cidades da região
+// escolhida (quando houver) mais os principais mercados de referência do
+// país, todas com preço atual e o mesmo preço futuro B3 ao lado (o
+// contrato futuro não varia por cidade — é o mesmo em todo o país).
+interface DetailedRow {
+  cidade: string;
+  precoAtual: string;
+  tipo: 'regional' | 'nacional';
+}
+
+function buildDetailedRows(tables: ParsedTable[], estadoFiltro: string, uf?: string): DetailedRow[] {
+  const rows: DetailedRow[] = [];
+  const seen = new Set<string>();
+
+  const atualTables = tables.filter(t => classifyTable(t) === 'atual' && t.rows.length > 3);
+  const richestTable = atualTables.sort((a, b) => b.rows.length - a.rows.length)[0];
+  if (!richestTable) return rows;
+
+  function priceFromRow(row: string[]): string {
+    const priceCell = row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c));
+    return priceCell || row[row.length - 1] || '—';
+  }
+
+  if (estadoFiltro) {
+    for (const row of richestTable.rows.slice(1)) {
+      const cell = row[0]?.trim();
+      if (!cell) continue;
+      const matches = cell.toLowerCase().includes(estadoFiltro.toLowerCase()) || (uf && new RegExp(`\\b${uf}\\b`, 'i').test(cell));
+      if (matches && !seen.has(cell)) {
+        seen.add(cell);
+        rows.push({ cidade: cell, precoAtual: priceFromRow(row), tipo: 'regional' });
+      }
+    }
+  }
+
+  let nationalCount = 0;
+  for (const row of richestTable.rows.slice(1)) {
+    if (nationalCount >= 5) break;
+    const cell = row[0]?.trim();
+    if (!cell || seen.has(cell)) continue;
+    seen.add(cell);
+    rows.push({ cidade: cell, precoAtual: priceFromRow(row), tipo: 'nacional' });
+    nationalCount++;
+  }
+
+  return rows;
+}
+
 function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry: CambioEntry | null; flag: string; decimals?: number }) {
   if (!entry) {
     return (
@@ -219,6 +282,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [region, setRegion] = useState(defaultRegion || '');
+  const [selectedState, setSelectedState] = useState('');
   const [detectingRegion, setDetectingRegion] = useState(false);
 
   useEffect(() => {
@@ -279,7 +343,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     }
   }
   const otherTables = data ? data.tables.filter(t => !categorizedHeadings.has(t.heading)) : [];
-  const availableRegions = data ? extractAvailableRegions(data.tables) : [];
+  const availableRegions = data ? extractAvailableRegions(data.tables, selectedState || undefined) : [];
 
   return (
     <div className="space-y-4">
@@ -351,7 +415,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
             <select
               value={ESTADOS.includes(region) ? region : ''}
-              onChange={e => setRegion(e.target.value)}
+              onChange={e => { setRegion(e.target.value); setSelectedState(e.target.value); }}
               className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none"
             >
               <option value="">Todas as regiões</option>
@@ -437,6 +501,47 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                           {region && !row.regiaoEncontrada && <span className="text-[9px] block text-amber-600">(geral, região não encontrada)</span>}
                         </td>
                         <td className="p-2.5 text-xs text-theme-secondary">{row.precoFuturo}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
+
+          {(() => {
+            const uf = ESTADOS.includes(region) ? UF_POR_ESTADO[region] : undefined;
+            const detailedRows = buildDetailedRows(data.tables, selectedState, uf);
+            if (detailedRows.length === 0) return null;
+            const futuroTable = data.tables.find(t => classifyTable(t) === 'futuro');
+            const futuroPreco = futuroTable?.rows[1]?.find(c => /\d/.test(c)) || futuroTable?.rows[1]?.[futuroTable.rows[1].length - 1] || '—';
+            return (
+              <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+                <div className="p-4 pb-2">
+                  <h3 className="font-bold text-theme-primary text-sm">Cidades e principais mercados</h3>
+                  <p className="text-[10px] text-theme-secondary">
+                    {selectedState ? `Cidades de ${selectedState} e os principais mercados de referência do país.` : 'Principais mercados de referência do país (escolha um estado para ver cidades específicas).'}
+                  </p>
+                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-theme-secondary">
+                      <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Cidade/Mercado</th>
+                      <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Preço Atual</th>
+                      <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Futuro B3</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-theme">
+                    {detailedRows.map((row, i) => (
+                      <tr key={i}>
+                        <td className="p-2.5 text-xs font-semibold text-theme-primary">
+                          {row.cidade}
+                          <span className={`ml-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${row.tipo === 'regional' ? 'bg-green-50 text-green-700' : 'bg-theme-secondary text-theme-secondary'}`}>
+                            {row.tipo === 'regional' ? 'Região' : 'Nacional'}
+                          </span>
+                        </td>
+                        <td className="p-2.5 text-xs text-theme-secondary">{row.precoAtual}</td>
+                        <td className="p-2.5 text-xs text-theme-secondary">{futuroPreco}</td>
                       </tr>
                     ))}
                   </tbody>

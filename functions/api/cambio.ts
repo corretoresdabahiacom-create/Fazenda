@@ -199,7 +199,37 @@ async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promis
 async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | null, debug: string[]): Promise<CambioEntry | null> {
   const GRAMS_PER_TROY_OUNCE = 31.1035;
 
-  // Fonte principal: XAUS.com — API dedicada e gratuita, sem chave, que
+  // Fonte principal: Yahoo Finance — cotação do contrato futuro de ouro
+  // do COMEX (GC=F), fonte extremamente estabelecida e usada por
+  // incontáveis ferramentas financeiras sem bloqueio por automação.
+  if (usdBrl) {
+    try {
+      const res = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC=F', {
+        headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as any;
+        const usdPerOz = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        if (usdPerOz > 0) {
+          const usdPerGram = usdPerOz / GRAMS_PER_TROY_OUNCE;
+          const brlPerGram = usdPerGram * usdBrl.venda;
+          return {
+            compra: Number((brlPerGram * 0.98).toFixed(2)),
+            venda: Number(brlPerGram.toFixed(2)),
+            variacaoPct: 0,
+            atualizadoEm: new Date().toISOString(),
+          };
+        }
+        debug.push('Yahoo Finance GC=F: resposta sem regularMarketPrice utilizável.');
+      } else {
+        debug.push(`Yahoo Finance GC=F: HTTP ${res.status}`);
+      }
+    } catch (e: any) {
+      debug.push(`Yahoo Finance GC=F: ${e?.message || String(e)}`);
+    }
+  }
+
+  // Reserva 1: XAUS.com — API dedicada e gratuita, sem chave, que
   // combina LBMA (autoridade oficial mundial do preço do ouro), Kitco e
   // goldprice.org com rejeição de outliers. Já devolve direto em reais
   // por grama, sem precisarmos calcular a conversão nós mesmos.
@@ -210,7 +240,7 @@ async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | nul
     if (res.ok) {
       const data = (await res.json()) as any;
       const price = data?.xau?.price;
-      if (price && data?.data_state?.status !== 'unavailable') {
+      if (price > 0) {
         return {
           compra: Number((price * 0.98).toFixed(2)),
           venda: Number(price.toFixed(2)),
@@ -218,6 +248,7 @@ async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | nul
           atualizadoEm: data.price_as_of || data.updated_at || new Date().toISOString(),
         };
       }
+      debug.push(`XAUS.com: resposta sem xau.price utilizável (${JSON.stringify(data).slice(0, 150)}).`);
     } else {
       debug.push(`XAUS.com: HTTP ${res.status}`);
     }
@@ -225,7 +256,7 @@ async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | nul
     debug.push(`XAUS.com: ${e?.message || String(e)}`);
   }
 
-  // Fonte extra: se a B3 (via Notícias Agrícolas) já trouxe um valor de
+  // Reserva 2: se a B3 (via Notícias Agrícolas) já trouxe um valor de
   // Ouro na mesma busca do Dólar Futuro, usa direto — já vem em reais.
   if (ouroFuturoBrl && ouroFuturoBrl > 0) {
     return { compra: ouroFuturoBrl, venda: ouroFuturoBrl, variacaoPct: 0, atualizadoEm: new Date().toISOString() };
