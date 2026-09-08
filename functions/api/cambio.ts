@@ -30,9 +30,9 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY', debug: string[]): Promis
   function buildUrl(dateStr: string): string {
     const encodedDate = `%27${dateStr}%27`;
     if (moeda === 'USD') {
-      return `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao=${encodedDate}&$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim`;
+      return `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao=${encodedDate}&$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao`;
     }
-    return `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda=%27${moeda}%27&@dataCotacao=${encodedDate}&$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim`;
+    return `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda=%27${moeda}%27&@dataCotacao=${encodedDate}&$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao`;
   }
 
   for (let i = 0; i < 7; i++) {
@@ -55,7 +55,10 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY', debug: string[]): Promis
         continue;
       }
 
-      const fechamento = values.find(v => v.tipoBoletim === 'Fechamento') || values[values.length - 1];
+      // Sem o campo tipoBoletim (não existe no tipo retornado pelo BCB
+      // para o Dólar), usamos o último valor do dia — a API já devolve
+      // em ordem cronológica, então é o mais recente/final.
+      const fechamento = values[values.length - 1];
       const compra = Number(fechamento.cotacaoCompra);
       const venda = Number(fechamento.cotacaoVenda);
       if (!compra || !venda) continue;
@@ -95,6 +98,33 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY', debug: string[]): Promis
 }
 
 async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
+  // Fonte principal: CoinGecko — nativa em BRL, historicamente mais
+  // estável a partir de IPs de datacenter do que exchanges como a
+  // Binance (que já bloqueou com 403 numa tentativa anterior).
+  try {
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true',
+      { headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' } },
+    );
+    if (res.ok) {
+      const data = (await res.json()) as any;
+      const brl = data?.bitcoin?.brl;
+      if (brl) {
+        return {
+          compra: Number(brl),
+          venda: Number(brl),
+          variacaoPct: Number((data.bitcoin.brl_24h_change || 0).toFixed(2)),
+          atualizadoEm: new Date().toISOString(),
+        };
+      }
+    } else {
+      debug.push(`CoinGecko BTC: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`CoinGecko BTC: ${e?.message || String(e)}`);
+  }
+
+  // Reserva: Binance (BRL direto, depois via USDT convertido).
   try {
     const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCBRL', {
       headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
@@ -132,31 +162,12 @@ async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promis
             atualizadoEm: new Date().toISOString(),
           };
         }
+      } else {
+        debug.push(`Binance BTCUSDT: HTTP ${res.status}`);
       }
     } catch (e: any) {
       debug.push(`Binance BTCUSDT: ${e?.message || String(e)}`);
     }
-  }
-
-  try {
-    const res = await fetch(
-      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true',
-      { headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' } },
-    );
-    if (res.ok) {
-      const data = (await res.json()) as any;
-      const brl = data?.bitcoin?.brl;
-      if (brl) {
-        return {
-          compra: Number(brl),
-          venda: Number(brl),
-          variacaoPct: Number((data.bitcoin.brl_24h_change || 0).toFixed(2)),
-          atualizadoEm: new Date().toISOString(),
-        };
-      }
-    }
-  } catch (e: any) {
-    debug.push(`CoinGecko BTC: ${e?.message || String(e)}`);
   }
 
   return null;
@@ -170,29 +181,7 @@ async function fetchGold(usdBrl: CambioEntry | null, debug: string[]): Promise<C
     return null;
   }
 
-  try {
-    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT', {
-      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
-    });
-    if (res.ok) {
-      const data = (await res.json()) as any;
-      if (data.lastPrice) {
-        const usdPerGram = Number(data.lastPrice) / GRAMS_PER_TROY_OUNCE;
-        const brlPerGram = usdPerGram * usdBrl.venda;
-        return {
-          compra: Number((brlPerGram * 0.98).toFixed(2)),
-          venda: Number(brlPerGram.toFixed(2)),
-          variacaoPct: Number(Number(data.priceChangePercent).toFixed(2)),
-          atualizadoEm: new Date().toISOString(),
-        };
-      }
-    } else {
-      debug.push(`Binance PAXGUSDT: HTTP ${res.status}`);
-    }
-  } catch (e: any) {
-    debug.push(`Binance PAXGUSDT: ${e?.message || String(e)}`);
-  }
-
+  // Fonte principal: Stooq (cotação internacional em dólar).
   try {
     const res = await fetch('https://stooq.com/q/l/?s=xauusd&f=sd2t2c&h&e=csv', {
       headers: { 'User-Agent': BROWSER_UA },
@@ -217,6 +206,30 @@ async function fetchGold(usdBrl: CambioEntry | null, debug: string[]): Promise<C
     }
   } catch (e: any) {
     debug.push(`Stooq XAUUSD: ${e?.message || String(e)}`);
+  }
+
+  // Reserva: Binance PAXG (token com lastro real em ouro físico).
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT', {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as any;
+      if (data.lastPrice) {
+        const usdPerGram = Number(data.lastPrice) / GRAMS_PER_TROY_OUNCE;
+        const brlPerGram = usdPerGram * usdBrl.venda;
+        return {
+          compra: Number((brlPerGram * 0.98).toFixed(2)),
+          venda: Number(brlPerGram.toFixed(2)),
+          variacaoPct: Number(Number(data.priceChangePercent).toFixed(2)),
+          atualizadoEm: new Date().toISOString(),
+        };
+      }
+    } else {
+      debug.push(`Binance PAXGUSDT: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`Binance PAXGUSDT: ${e?.message || String(e)}`);
   }
 
   return null;
