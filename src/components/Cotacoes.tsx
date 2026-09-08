@@ -68,6 +68,7 @@ interface CambioData {
   btc: CambioEntry | null;
   dolarFuturoB3: { valor: string; vencimento: string } | null;
   fonte?: string;
+  debug?: string[];
 }
 
 interface ParsedTable {
@@ -188,7 +189,10 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         try {
           const res = await fetch(`/api/reverse-geocode?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
           const json = await res.json();
-          if (json.state) setRegion(json.state);
+          // Prioriza a cidade (mais preciso, casa com tabelas por
+          // município) — só cai pro estado se a cidade não vier.
+          if (json.city) setRegion(json.city);
+          else if (json.state) setRegion(json.state);
         } finally {
           setDetectingRegion(false);
         }
@@ -228,6 +232,26 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           <CambioCard label="Ouro (grama)" entry={cambio?.xau ?? null} flag="🥇" decimals={2} />
           <CambioCard label="Bitcoin (BTC)" entry={cambio?.btc ?? null} flag="₿" decimals={2} />
         </div>
+        {(!cambio?.usd || !cambio?.xau) && (
+          <button
+            onClick={() => {
+              fetch('/api/cambio?debug=1')
+                .then(res => res.json())
+                .then(json => setCambio(json));
+            }}
+            className="mt-2 text-xs font-semibold text-theme-secondary underline flex items-center gap-1"
+          >
+            <RefreshCw size={12} /> Tentar buscar de novo agora (ignora o cache)
+          </button>
+        )}
+        {cambio?.debug && cambio.debug.length > 0 && (
+          <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
+            <p className="text-[10px] font-bold text-amber-800 uppercase mb-1">Detalhes técnicos (para diagnóstico)</p>
+            {cambio.debug.map((line, i) => (
+              <p key={i} className="text-[10px] text-amber-800 font-mono">{line}</p>
+            ))}
+          </div>
+        )}
         {cambio?.dolarFuturoB3 && (
           <div className="mt-2 bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-between">
             <p className="text-xs font-semibold text-blue-800">
