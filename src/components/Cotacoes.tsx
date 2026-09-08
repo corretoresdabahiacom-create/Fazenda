@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import {
-  DollarSign, TrendingUp, TrendingDown, Search, RefreshCw, ExternalLink, AlertTriangle,
+  DollarSign, TrendingUp, TrendingDown, Search, RefreshCw, ExternalLink, AlertTriangle, MapPin, Navigation,
 } from 'lucide-react';
 
 const PRODUCTS: { id: string; label: string }[] = [
@@ -29,6 +29,29 @@ const PRODUCTS: { id: string; label: string }[] = [
   { id: 'mandioca', label: 'Mandioca' },
   { id: 'frutas', label: 'Frutas (Manga, Limão e outras)' },
 ];
+
+const ESTADOS = [
+  'Acre', 'Alagoas', 'Amapá', 'Amazonas', 'Bahia', 'Ceará', 'Distrito Federal', 'Espírito Santo',
+  'Goiás', 'Maranhão', 'Mato Grosso', 'Mato Grosso do Sul', 'Minas Gerais', 'Pará', 'Paraíba',
+  'Paraná', 'Pernambuco', 'Piauí', 'Rio de Janeiro', 'Rio Grande do Norte', 'Rio Grande do Sul',
+  'Rondônia', 'Roraima', 'Santa Catarina', 'São Paulo', 'Sergipe', 'Tocantins',
+];
+
+const CATEGORY_MATCHERS: Record<string, { label: string; pattern: RegExp }[]> = {
+  boi_gordo: [
+    { label: 'Boi Gordo', pattern: /indicador do boi\b/i },
+    { label: 'Vaca', pattern: /indicador da vaca\b/i },
+    { label: 'Novilha', pattern: /indicador da novilha\b/i },
+    { label: 'Garrote (jovem/≈ Novilho)', pattern: /garrote/i },
+    { label: 'Bezerro', pattern: /bezerr/i },
+  ],
+  cafe: [
+    { label: 'Café Arábica', pattern: /ar[aá]bica/i },
+    { label: 'Café Conilon (Robusta)', pattern: /conilon|robusta/i },
+  ],
+};
+
+const FUTURES_PATTERN = /pregão|futuro|vencimento/i;
 
 interface CambioEntry {
   compra: number;
@@ -61,55 +84,20 @@ interface CotacoesResponse {
   error?: string;
 }
 
-// Para Boi Gordo, o Datagro publica "Indicador do Boi", "Indicador da
-// Vaca" e "Indicador da Novilha" como tabelas SEPARADAS, mas todas usam
-// exatamente os mesmos estados como chave — dá pra juntar numa tabela só,
-// lado a lado, sem misturar granularidades diferentes (a tabela por
-// MUNICÍPIO da Scot Consultoria não tem Novilho/Novilha nessa mesma
-// fonte, por isso não aparece combinada com ela).
-function buildBoiVacaNovilhaTable(tables: ParsedTable[]): ParsedTable | null {
-  const find = (match: RegExp) => tables.find(t => match.test(t.heading));
-  const boi = find(/indicador do boi\b/i);
-  const vaca = find(/indicador da vaca\b/i);
-  const novilha = find(/indicador da novilha\b/i);
-  if (!boi || !vaca || !novilha) return null;
-
-  const toMap = (t: ParsedTable) => {
-    const map: Record<string, string> = {};
-    for (const row of t.rows.slice(1)) {
-      if (row[0] && row[1]) map[row[0].trim()] = row[1].trim();
-    }
-    return map;
-  };
-  const boiMap = toMap(boi);
-  const vacaMap = toMap(vaca);
-  const novilhaMap = toMap(novilha);
-
-  const estados = Object.keys(boiMap);
-  const rows: string[][] = [['Estado', 'Boi (R$/@)', 'Vaca (R$/@)', 'Novilha (R$/@)']];
-  for (const estado of estados) {
-    rows.push([estado, boiMap[estado] || '—', vacaMap[estado] || '—', novilhaMap[estado] || '—']);
-  }
-
-  return {
-    heading: 'Boi, Vaca e Novilha por Estado (comparativo)',
-    source: 'Datagro',
-    rows,
-  };
-}
-
-// Identifica se uma tabela é de preço futuro (B3) ou preço atual/à vista
-// — usa tanto o título quanto o cabeçalho da própria tabela, já que
-// "B3" aparece em títulos de indicadores à vista também (o método CEPEA
-// foi desenvolvido em parceria com a B3, mas o preço em si é à vista).
 function classifyTable(table: ParsedTable): 'futuro' | 'atual' {
   const heading = table.heading.toLowerCase();
   const firstRow = (table.rows[0] || []).join(' ').toLowerCase();
   const isFutures =
-    /pregão|futuro|vencimento/.test(heading) ||
+    FUTURES_PATTERN.test(heading) ||
     /contrato|vencimento|mês\s*\/\s*ano/.test(firstRow) ||
     /^(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\/\d{2,4}/i.test((table.rows[1]?.[0] || ''));
   return isFutures ? 'futuro' : 'atual';
+}
+
+function findRegionRow(table: ParsedTable, region: string): string[] | null {
+  if (!region) return null;
+  const term = region.toLowerCase();
+  return table.rows.slice(1).find(row => row.some(cell => cell.toLowerCase().includes(term))) || null;
 }
 
 function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry: CambioEntry | null; flag: string; decimals?: number }) {
@@ -144,14 +132,25 @@ function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry
   );
 }
 
-export default function Cotacoes() {
+function Badge({ kind }: { kind: 'atual' | 'futuro' }) {
+  return (
+    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap ${
+      kind === 'futuro' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+    }`}>
+      {kind === 'futuro' ? 'Futuro B3' : 'Atual'}
+    </span>
+  );
+}
+
+export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) {
   const [cambio, setCambio] = useState<CambioData | null>(null);
   const [cambioError, setCambioError] = useState<string | null>(null);
   const [produto, setProduto] = useState('boi_gordo');
   const [data, setData] = useState<CotacoesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [regionFilter, setRegionFilter] = useState('');
+  const [region, setRegion] = useState(defaultRegion || '');
+  const [detectingRegion, setDetectingRegion] = useState(false);
 
   useEffect(() => {
     fetch('/api/cambio')
@@ -181,11 +180,33 @@ export default function Cotacoes() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produto]);
 
-  function filterRows(rows: string[][]): string[][] {
-    if (!regionFilter.trim()) return rows;
-    const term = regionFilter.trim().toLowerCase();
-    return rows.filter(row => row.some(cell => cell.toLowerCase().includes(term)));
+  function handleDetectRegion() {
+    if (!navigator.geolocation) return;
+    setDetectingRegion(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const res = await fetch(`/api/reverse-geocode?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+          const json = await res.json();
+          if (json.state) setRegion(json.state);
+        } finally {
+          setDetectingRegion(false);
+        }
+      },
+      () => setDetectingRegion(false),
+      { timeout: 10000, maximumAge: 300000, enableHighAccuracy: false },
+    );
   }
+
+  const matchers = CATEGORY_MATCHERS[produto];
+  const categorizedHeadings = new Set<string>();
+  if (matchers && data) {
+    for (const m of matchers) {
+      const t = data.tables.find(t => m.pattern.test(t.heading) && !FUTURES_PATTERN.test(t.heading));
+      if (t) categorizedHeadings.add(t.heading);
+    }
+  }
+  const otherTables = data ? data.tables.filter(t => !categorizedHeadings.has(t.heading)) : [];
 
   return (
     <div className="space-y-4">
@@ -232,20 +253,35 @@ export default function Cotacoes() {
             </button>
           ))}
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
-          <input
-            value={regionFilter}
-            onChange={e => setRegionFilter(e.target.value)}
-            placeholder="Filtrar por região, estado ou cidade (ex: SP, Goiás, Barretos)..."
-            className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm"
-          />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
+            <select
+              value={ESTADOS.includes(region) ? region : ''}
+              onChange={e => setRegion(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none"
+            >
+              <option value="">Todas as regiões</option>
+              {ESTADOS.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+            </select>
+          </div>
+          <button
+            onClick={handleDetectRegion}
+            disabled={detectingRegion}
+            className="flex items-center justify-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-theme text-theme-secondary disabled:opacity-60"
+          >
+            <Navigation size={14} /> {detectingRegion ? 'Detectando...' : 'Usar minha localização'}
+          </button>
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
+            <input
+              value={ESTADOS.includes(region) ? '' : region}
+              onChange={e => setRegion(e.target.value)}
+              placeholder="...ou digite cidade/região específica"
+              className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm"
+            />
+          </div>
         </div>
-        {produto === 'boi_gordo' && (
-          <p className="text-[10px] text-theme-secondary">
-            Boi, Vaca e Novilha aparecem comparados por estado logo abaixo. A tabela por município (Scot Consultoria) só traz Boi e Vaca nessa granularidade na fonte original — Novilho/Novilha por município não existe na fonte consultada.
-          </p>
-        )}
       </div>
 
       {loading && <p className="text-sm text-theme-secondary text-center py-8">Buscando cotações...</p>}
@@ -265,54 +301,52 @@ export default function Cotacoes() {
 
       {!loading && !error && data && (
         <div className="space-y-4">
-          {data.tables.length === 0 && (
+          {matchers && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {matchers.map(m => {
+                const atualTable = data.tables.find(t => m.pattern.test(t.heading) && classifyTable(t) === 'atual');
+                const futuroTable = data.tables.find(t => m.pattern.test(t.heading) && classifyTable(t) === 'futuro');
+                const table = atualTable || futuroTable;
+                if (!table) return null;
+                const regionRow = findRegionRow(table, region);
+                const displayRow = regionRow || table.rows[1];
+                if (!displayRow) return null;
+                return (
+                  <div key={m.label} className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/20 p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-bold text-theme-primary text-sm">{m.label}</h3>
+                      <Badge kind={atualTable ? 'atual' : 'futuro'} />
+                      {!regionRow && region && <span className="text-[9px] text-theme-secondary">(região não encontrada, mostrando geral)</span>}
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      {displayRow.map((cell, i) => (
+                        <span key={i} className="text-xs text-theme-secondary">{cell}</span>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-theme-secondary mt-1.5">Fonte: {table.source || 'Notícias Agrícolas'}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {otherTables.length === 0 && !matchers && data.tables.length === 0 && (
             <p className="text-sm text-theme-secondary text-center py-8">Nenhuma cotação encontrada para este produto no momento.</p>
           )}
-          {produto === 'boi_gordo' && (() => {
-            const combined = buildBoiVacaNovilhaTable(data.tables);
-            if (!combined) return null;
-            const filteredRows = filterRows(combined.rows);
-            if (regionFilter.trim() && filteredRows.length <= 1) return null;
-            return (
-              <div className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/30 overflow-hidden overflow-x-auto">
-                <div className="p-4 pb-2">
-                  <h3 className="font-bold text-theme-primary text-sm">{combined.heading}</h3>
-                  <p className="text-[10px] text-theme-secondary">Fonte: {combined.source} — Boi, Vaca e Novilha comparados lado a lado por estado.</p>
-                </div>
-                <table className="w-full text-sm">
-                  <tbody className="divide-y divide-theme">
-                    {filteredRows.slice(0, 20).map((row, ri) => (
-                      <tr key={ri} className={ri === 0 ? 'bg-theme-secondary font-bold' : ''}>
-                        {row.map((cell, ci) => (
-                          <td key={ci} className="p-2.5 text-xs text-theme-secondary whitespace-nowrap">{cell}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            );
-          })()}
-          {data.tables.map((table, i) => {
-            const filteredRows = filterRows(table.rows);
-            if (regionFilter.trim() && filteredRows.length === 0) return null;
+          {otherTables.map((table, i) => {
+            const rows = region ? [table.rows[0], ...table.rows.slice(1).filter(r => r.some(c => c.toLowerCase().includes(region.toLowerCase())))] : table.rows;
+            if (region && rows.length <= 1) return null;
             const kind = classifyTable(table);
             return (
               <div key={i} className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
-                <div className="p-4 pb-2 flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-bold text-theme-primary text-sm">{table.heading || 'Cotação'}</h3>
-                    {table.source && <p className="text-[10px] text-theme-secondary">Fonte: {table.source}</p>}
-                  </div>
-                  <span className={`shrink-0 text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ${
-                    kind === 'futuro' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
-                  }`}>
-                    {kind === 'futuro' ? 'Futuro B3' : 'Atual'}
-                  </span>
+                <div className="p-4 pb-2 flex items-center gap-2">
+                  <h3 className="font-bold text-theme-primary text-sm">{table.heading || 'Cotação'}</h3>
+                  <Badge kind={kind} />
                 </div>
+                {table.source && <p className="text-[10px] text-theme-secondary px-4 -mt-1 pb-2">Fonte: {table.source}</p>}
                 <table className="w-full text-sm">
                   <tbody className="divide-y divide-theme">
-                    {filteredRows.slice(0, 20).map((row, ri) => (
+                    {rows.slice(0, 20).map((row, ri) => (
                       <tr key={ri} className={ri === 0 ? 'bg-theme-secondary font-bold' : ''}>
                         {row.map((cell, ci) => (
                           <td key={ci} className="p-2.5 text-xs text-theme-secondary whitespace-nowrap">{cell}</td>
@@ -324,6 +358,7 @@ export default function Cotacoes() {
               </div>
             );
           })}
+
           <a
             href={data.sourceUrl}
             target="_blank"

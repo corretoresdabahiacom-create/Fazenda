@@ -1,10 +1,9 @@
-// Busca câmbio comercial (Dólar, Euro, Iene) direto do Banco Central do
-// Brasil — API PTAX oficial (olinda.bcb.gov.br), sem limite de uso, sem
-// necessidade de chave, e muito mais confiável que APIs de terceiros.
-// Ouro e Bitcoin (que o Banco Central não cobre) continuam vindo da
-// AwesomeAPI, como informação extra — se falhar, só esses dois ficam
-// indisponíveis, sem derrubar dólar/euro/iene. O Dólar Futuro (B3) vem
-// do mesmo Notícias Agrícolas usado nas cotações agropecuárias.
+// Busca câmbio comercial (Dólar, Euro, Iene, Ouro, Bitcoin) com cadeia de
+// fontes de reserva: se a fonte principal falhar, tenta automaticamente
+// uma segunda fonte, para nunca depender de um único provedor instável.
+// Também devolve detalhes de erro por moeda em "debug" (acrescente
+// ?debug=1 na URL para forçar atualização sem cache e ver os detalhes),
+// para facilitar diagnosticar se algo falhar de novo.
 
 interface Env {
   AWESOMEAPI_TOKEN?: string;
@@ -23,11 +22,31 @@ function toMMDDYYYY(d: Date): string {
   return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
 }
 
-// PTAX não tem cotação em fins de semana/feriados — tenta hoje e vai
-// voltando dia a dia até achar (no máximo 7 tentativas). Tenta também 2
-// variações de sintaxe OData da URL, já que a documentação do Banco
-// Central mostra exemplos inconsistentes entre si.
-async function fetchPtax(moeda: 'USD' | 'EUR' | 'JPY'): Promise<CambioEntry | null> {
+async function fetchAwesomeApi(env: Env, pairs: string): Promise<Record<string, any> | { __error: string }> {
+  try {
+    const tokenParam = env.AWESOMEAPI_TOKEN ? `&token=${env.AWESOMEAPI_TOKEN}` : '';
+    const res = await fetch(`https://economia.awesomeapi.com.br/json/last/${pairs}${tokenParam}`, {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    const text = await res.text();
+    if (!res.ok) return { __error: `AwesomeAPI HTTP ${res.status}: ${text.slice(0, 200)}` };
+    return JSON.parse(text);
+  } catch (e: any) {
+    return { __error: `AwesomeAPI exception: ${e?.message || String(e)}` };
+  }
+}
+
+function formatAwesome(entry: any): CambioEntry | null {
+  if (!entry || entry.__error) return null;
+  return {
+    compra: Number(entry.bid),
+    venda: Number(entry.ask),
+    variacaoPct: Number(entry.pctChange),
+    atualizadoEm: entry.create_date,
+  };
+}
+
+async function fetchMoeda(env: Env, moeda: 'USD' | 'EUR' | 'JPY', debug: string[]): Promise<CambioEntry | null> {
   function buildUrls(dateStr: string): string[] {
     if (moeda === 'USD') {
       return [
@@ -41,9 +60,6 @@ async function fetchPtax(moeda: 'USD' | 'EUR' | 'JPY'): Promise<CambioEntry | nu
     ];
   }
 
-  let previousDayCompra: number | null = null;
-  let lastErrorDetail = '';
-
   for (let i = 0; i < 7; i++) {
     const d = new Date();
     d.setDate(d.getDate() - i);
@@ -51,11 +67,9 @@ async function fetchPtax(moeda: 'USD' | 'EUR' | 'JPY'): Promise<CambioEntry | nu
 
     for (const url of buildUrls(dateStr)) {
       try {
-        const res = await fetch(url, {
-          headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
-        });
+        const res = await fetch(url, { headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' } });
         if (!res.ok) {
-          lastErrorDetail = `HTTP ${res.status} em ${url}`;
+          debug.push(`BCB ${moeda} ${dateStr}: HTTP ${res.status}`);
           continue;
         }
         const data = (await res.json()) as { value?: any[] };
@@ -67,45 +81,26 @@ async function fetchPtax(moeda: 'USD' | 'EUR' | 'JPY'): Promise<CambioEntry | nu
         const venda = Number(fechamento.cotacaoVenda);
         if (!compra || !venda) continue;
 
-        const variacaoPct = previousDayCompra
-          ? Number((((compra - previousDayCompra) / previousDayCompra) * 100).toFixed(2))
-          : 0;
-
-        return { compra, venda, variacaoPct, atualizadoEm: fechamento.dataHoraCotacao };
+        return { compra, venda, variacaoPct: 0, atualizadoEm: fechamento.dataHoraCotacao };
       } catch (e: any) {
-        lastErrorDetail = e?.message || String(e);
+        debug.push(`BCB ${moeda} ${dateStr}: ${e?.message || String(e)}`);
         continue;
       }
     }
   }
-  console.warn(`fetchPtax(${moeda}) falhou após todas as tentativas. Último erro: ${lastErrorDetail}`);
-  return null;
-}
 
-// Busca o Dólar Futuro negociado na B3, a partir da mesma fonte usada
-// para as cotações agropecuárias (tabela "BRASIL (B3)" da página inicial
-// de cotações do Notícias Agrícolas).
-async function fetchDolarFuturoB3(): Promise<{ valor: string; vencimento: string } | null> {
-  try {
-    const res = await fetch('https://www.noticiasagricolas.com.br/cotacoes', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
-      },
-    });
-    if (!res.ok) return null;
-    const html = await res.text();
-    // Procura a linha da tabela que menciona "Dólar" perto de "B3" — o
-    // HTML da tabela resumo tem o padrão <td>Dólar Fut</td>...<td>valor</td>
-    const match = html.match(/D[oó]lar\s*Fut[^<]*<\/t[dh]>\s*<t[dh][^>]*>([^<]+)<\/t[dh]>\s*<t[dh][^>]*>([^<]*)<\/t[dh]>/i);
-    if (!match) return null;
-    return { valor: match[1].trim(), vencimento: match[2]?.trim() || '' };
-  } catch {
+  debug.push(`BCB falhou para ${moeda} em todas as tentativas — usando reserva AwesomeAPI.`);
+  const awesome = await fetchAwesomeApi(env, `${moeda}-BRL`);
+  if ('__error' in awesome) {
+    debug.push(`Reserva AwesomeAPI para ${moeda}: ${awesome.__error}`);
     return null;
   }
+  const entry = formatAwesome(awesome[`${moeda}BRL`]);
+  if (!entry) debug.push(`Reserva AwesomeAPI para ${moeda}: resposta sem dados utilizáveis.`);
+  return entry;
 }
 
-async function fetchBitcoin(env: Env): Promise<CambioEntry | null> {
-  // Fonte principal: CoinGecko, gratuita, sem chave, nativa em BRL.
+async function fetchBitcoin(env: Env, debug: string[]): Promise<CambioEntry | null> {
   try {
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true',
@@ -122,40 +117,25 @@ async function fetchBitcoin(env: Env): Promise<CambioEntry | null> {
           atualizadoEm: new Date().toISOString(),
         };
       }
+      debug.push('CoinGecko BTC: resposta sem campo bitcoin.brl.');
+    } else {
+      debug.push(`CoinGecko BTC: HTTP ${res.status}`);
     }
-  } catch {
-    // segue para a reserva
+  } catch (e: any) {
+    debug.push(`CoinGecko BTC: ${e?.message || String(e)}`);
   }
 
-  // Reserva: AwesomeAPI.
-  try {
-    const tokenParam = env.AWESOMEAPI_TOKEN ? `&token=${env.AWESOMEAPI_TOKEN}` : '';
-    const res = await fetch(`https://economia.awesomeapi.com.br/json/last/BTC-BRL${tokenParam}`);
-    if (res.ok) {
-      const data = (await res.json()) as any;
-      const entry = data?.BTCBRL;
-      if (entry) {
-        return {
-          compra: Number(entry.bid),
-          venda: Number(entry.ask),
-          variacaoPct: Number(entry.pctChange),
-          atualizadoEm: entry.create_date,
-        };
-      }
-    }
-  } catch {
-    // ambas as fontes falharam
+  const awesome = await fetchAwesomeApi(env, 'BTC-BRL');
+  if ('__error' in awesome) {
+    debug.push(`Reserva AwesomeAPI para BTC: ${awesome.__error}`);
+    return null;
   }
-  return null;
+  return formatAwesome(awesome.BTCBRL);
 }
 
-async function fetchGold(env: Env, usdBrl: CambioEntry | null): Promise<CambioEntry | null> {
+async function fetchGold(env: Env, usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
   const GRAMS_PER_TROY_OUNCE = 31.1035;
 
-  // Fonte principal: cotação internacional do ouro em dólar (Stooq,
-  // gratuita e sem chave), convertida para reais usando nosso próprio
-  // câmbio (já confiável, vindo do Banco Central) — assim não dependemos
-  // de nenhum provedor terceiro já sobrecarregado para o valor em BRL.
   if (usdBrl) {
     try {
       const res = await fetch('https://stooq.com/q/l/?s=xauusd&f=sd2t2c&h&e=csv', {
@@ -170,81 +150,95 @@ async function fetchGold(env: Env, usdBrl: CambioEntry | null): Promise<CambioEn
           const usdPerGram = closeUsdPerOz / GRAMS_PER_TROY_OUNCE;
           const brlPerGram = usdPerGram * usdBrl.venda;
           return {
-            compra: Number((brlPerGram * 0.98).toFixed(2)), // aproximação de spread compra/venda
+            compra: Number((brlPerGram * 0.98).toFixed(2)),
             venda: Number(brlPerGram.toFixed(2)),
             variacaoPct: 0,
             atualizadoEm: new Date().toISOString(),
           };
         }
+        debug.push(`Stooq XAUUSD: valor inválido na resposta (${csv.slice(0, 100)}).`);
+      } else {
+        debug.push(`Stooq XAUUSD: HTTP ${res.status}`);
       }
-    } catch {
-      // segue para a reserva
+    } catch (e: any) {
+      debug.push(`Stooq XAUUSD: ${e?.message || String(e)}`);
     }
+  } else {
+    debug.push('Ouro: pulou cálculo via Stooq porque o dólar não foi obtido.');
   }
 
-  // Reserva: AwesomeAPI (XAU-BRL, cotado por onça — convertemos pra grama).
-  try {
-    const tokenParam = env.AWESOMEAPI_TOKEN ? `&token=${env.AWESOMEAPI_TOKEN}` : '';
-    const res = await fetch(`https://economia.awesomeapi.com.br/json/last/XAU-BRL${tokenParam}`);
-    if (res.ok) {
-      const data = (await res.json()) as any;
-      const entry = data?.XAUBRL;
-      if (entry) {
-        return {
-          compra: Number((Number(entry.bid) / GRAMS_PER_TROY_OUNCE).toFixed(2)),
-          venda: Number((Number(entry.ask) / GRAMS_PER_TROY_OUNCE).toFixed(2)),
-          variacaoPct: Number(entry.pctChange),
-          atualizadoEm: entry.create_date,
-        };
-      }
-    }
-  } catch {
-    // ambas as fontes falharam
+  const awesome = await fetchAwesomeApi(env, 'XAU-BRL');
+  if ('__error' in awesome) {
+    debug.push(`Reserva AwesomeAPI para XAU: ${awesome.__error}`);
+    return null;
   }
-  return null;
+  const entry = awesome.XAUBRL;
+  if (!entry) {
+    debug.push('Reserva AwesomeAPI para XAU: resposta sem dados utilizáveis.');
+    return null;
+  }
+  return {
+    compra: Number((Number(entry.bid) / GRAMS_PER_TROY_OUNCE).toFixed(2)),
+    venda: Number((Number(entry.ask) / GRAMS_PER_TROY_OUNCE).toFixed(2)),
+    variacaoPct: Number(entry.pctChange),
+    atualizadoEm: entry.create_date,
+  };
+}
+
+async function fetchDolarFuturoB3(): Promise<{ valor: string; vencimento: string } | null> {
+  try {
+    const res = await fetch('https://www.noticiasagricolas.com.br/cotacoes', {
+      headers: { 'User-Agent': BROWSER_UA },
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const match = html.match(/D[oó]lar\s*Fut[^<]*<\/t[dh]>\s*<t[dh][^>]*>([^<]+)<\/t[dh]>\s*<t[dh][^>]*>([^<]*)<\/t[dh]>/i);
+    if (!match) return null;
+    return { valor: match[1].trim(), vencimento: match[2]?.trim() || '' };
+  } catch {
+    return null;
+  }
 }
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const cache = (caches as any).default;
-  const cacheKey = new Request('https://cache.internal/cambio-v2', context.request);
-  const cached = await cache.match(cacheKey);
-  if (cached) return cached;
+  const cacheKey = new Request('https://cache.internal/cambio-v3', context.request);
+  const forceRefresh = new URL(context.request.url).searchParams.has('debug');
+
+  if (!forceRefresh) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return cached;
+  }
+
+  const debug: string[] = [];
 
   try {
     const [usd, eur, jpy, dolarFuturo] = await Promise.all([
-      fetchPtax('USD'),
-      fetchPtax('EUR'),
-      fetchPtax('JPY'),
+      fetchMoeda(context.env, 'USD', debug),
+      fetchMoeda(context.env, 'EUR', debug),
+      fetchMoeda(context.env, 'JPY', debug),
       fetchDolarFuturoB3(),
     ]);
 
-    // Ouro depende do dólar já calculado (convertemos USD -> BRL usando
-    // nosso próprio câmbio confiável), por isso roda depois.
     const [btc, xau] = await Promise.all([
-      fetchBitcoin(context.env),
-      fetchGold(context.env, usd),
+      fetchBitcoin(context.env, debug),
+      fetchGold(context.env, usd, debug),
     ]);
-
-    if (!usd && !eur && !jpy) {
-      return new Response(JSON.stringify({ error: 'Não foi possível buscar o câmbio no Banco Central agora. Tente novamente em instantes.' }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
 
     const response = new Response(JSON.stringify({
       usd, eur, jpy, xau, btc,
       dolarFuturoB3: dolarFuturo,
-      fonte: 'Banco Central do Brasil (PTAX) — Bitcoin via CoinGecko, Ouro calculado via Stooq + câmbio BCB, Dólar Futuro via B3/Notícias Agrícolas',
+      fonte: 'Banco Central (PTAX) + AwesomeAPI de reserva — Bitcoin via CoinGecko, Ouro via Stooq+câmbio BCB',
+      debug: debug.length > 0 ? debug : undefined,
     }), {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=180' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': forceRefresh ? 'no-store' : 'public, max-age=180' },
     });
 
-    context.waitUntil(cache.put(cacheKey, response.clone()));
+    if (!forceRefresh) context.waitUntil(cache.put(cacheKey, response.clone()));
     return response;
   } catch (error: any) {
     console.error('cambio error:', error);
-    return new Response(JSON.stringify({ error: 'Falha ao buscar câmbio: ' + (error.message || String(error)) }), {
+    return new Response(JSON.stringify({ error: 'Falha ao buscar câmbio: ' + (error.message || String(error)), debug }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

@@ -679,7 +679,7 @@ export default function App() {
   const renderView = () => {
     switch (activeView) {
       case 'cotacoes':
-        return <Cotacoes />;
+        return <Cotacoes defaultRegion={settings.city} />;
       case 'clima':
         return (
           <iframe
