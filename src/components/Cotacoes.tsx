@@ -208,6 +208,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [cambio, setCambio] = useState<CambioData | null>(null);
   const [cambioError, setCambioError] = useState<string | null>(null);
   const [produto, setProduto] = useState('boi_gordo');
+  const [produtoTemp, setProdutoTemp] = useState('boi_gordo');
+  const [isProdutoModalOpen, setIsProdutoModalOpen] = useState(false);
   const [data, setData] = useState<CotacoesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -327,19 +329,16 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       </div>
 
       <div className="bg-theme-card rounded-2xl border border-theme p-4 space-y-3">
-        <div className="flex flex-wrap gap-1.5">
-          {PRODUCTS.map(p => (
-            <button
-              key={p.id}
-              onClick={() => setProduto(p.id)}
-              className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-all ${
-                produto === p.id ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+        <button
+          onClick={() => { setProdutoTemp(produto); setIsProdutoModalOpen(true); }}
+          className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-theme bg-theme-secondary text-left"
+        >
+          <div>
+            <p className="text-[10px] uppercase text-theme-secondary font-bold">Produto selecionado</p>
+            <p className="text-sm font-bold text-theme-primary">{PRODUCTS.find(p => p.id === produto)?.label}</p>
+          </div>
+          <span className="text-xs font-bold text-[var(--primary)]">Trocar</span>
+        </button>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
@@ -380,6 +379,47 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         )}
       </div>
 
+      {isProdutoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-theme-card rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-theme">
+              <h3 className="font-bold text-theme-primary text-sm">Escolha o produto</h3>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2">
+              {PRODUCTS.map(p => (
+                <label
+                  key={p.id}
+                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer ${produtoTemp === p.id ? 'bg-[var(--primary-soft)]' : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="produto-modal"
+                    checked={produtoTemp === p.id}
+                    onChange={() => setProdutoTemp(p.id)}
+                    className="accent-[var(--primary)]"
+                  />
+                  <span className={`text-sm ${produtoTemp === p.id ? 'font-bold text-[var(--primary)]' : 'text-theme-primary'}`}>{p.label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="p-4 border-t border-theme flex gap-2">
+              <button
+                onClick={() => setIsProdutoModalOpen(false)}
+                className="flex-1 py-2.5 rounded-xl border border-theme text-theme-secondary font-semibold text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { setProduto(produtoTemp); setIsProdutoModalOpen(false); }}
+                className="flex-1 py-2.5 rounded-xl bg-[var(--primary)] text-white font-bold text-sm"
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading && <p className="text-sm text-theme-secondary text-center py-8">Buscando cotações...</p>}
 
       {error && (
@@ -395,142 +435,170 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         </div>
       )}
 
-      {!loading && !error && data && (
-        <div className="space-y-4">
-          {matchers && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {matchers.map(m => {
-                const atualTable = data.tables.find(t => m.pattern.test(t.heading) && classifyTable(t) === 'atual');
-                const futuroTable = data.tables.find(t => m.pattern.test(t.heading) && classifyTable(t) === 'futuro');
-                const table = atualTable || futuroTable;
-                if (!table) return null;
-                const uf = ESTADOS.includes(region) ? UF_POR_ESTADO[region] : selectedState ? UF_POR_ESTADO[selectedState] : undefined;
-                const estadoNome = ESTADOS.includes(region) ? region : selectedState || undefined;
-                const regionMatch = findRegionRow(table, region, uf, estadoNome);
-                const displayRow = regionMatch?.row || table.rows[1];
-                if (!displayRow) return null;
-                return (
-                  <div key={m.label} className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/20 p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-bold text-theme-primary text-sm">{m.label}</h3>
-                      <Badge kind={atualTable ? 'atual' : 'futuro'} />
-                      <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">{detectCurrency(table.rows[0])}</span>
-                      {region && !regionMatch && <span className="text-[9px] text-theme-secondary">(região não encontrada, mostrando geral)</span>}
-                      {region && regionMatch && !regionMatch.exact && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
-                    </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1">
-                      {displayRow.map((cell, i) => (
-                        <span key={i} className="text-xs text-theme-secondary">{cell}</span>
-                      ))}
-                    </div>
-                    <p className="text-[10px] text-theme-secondary mt-1.5">Fonte: {table.source || 'Notícias Agrícolas'}</p>
-                  </div>
-                );
-              })}
+      {!loading && !error && data && (() => {
+        const uf = ESTADOS.includes(region) ? UF_POR_ESTADO[region] : selectedState ? UF_POR_ESTADO[selectedState] : undefined;
+        const estadoNome = ESTADOS.includes(region) ? region : selectedState || undefined;
+
+        // Renderiza um card de categoria (Boi Gordo, Vaca, Café Arábica
+        // etc.), filtrando pelo tipo (atual ou futuro) pedido.
+        function renderCategoryCard(m: { label: string; pattern: RegExp }, kind: 'atual' | 'futuro') {
+          const table = data!.tables.find(t => m.pattern.test(t.heading) && classifyTable(t) === kind);
+          if (!table) return null;
+          const regionMatch = kind === 'atual' ? findRegionRow(table, region, uf, estadoNome) : null;
+          const displayRow = regionMatch?.row || table.rows[1];
+          if (!displayRow) return null;
+          return (
+            <div key={`${m.label}-${kind}`} className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/20 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-bold text-theme-primary text-sm">{m.label}</h3>
+                <Badge kind={kind} />
+                <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">{detectCurrency(table.rows[0])}</span>
+                {kind === 'atual' && region && !regionMatch && <span className="text-[9px] text-theme-secondary">(região não encontrada, mostrando geral)</span>}
+                {kind === 'atual' && region && regionMatch && !regionMatch.exact && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {displayRow.map((cell, i) => (
+                  <span key={i} className="text-xs text-theme-secondary">{cell}</span>
+                ))}
+              </div>
+              <p className="text-[10px] text-theme-secondary mt-1.5">Fonte: {table.source || 'Notícias Agrícolas'}</p>
             </div>
-          )}
+          );
+        }
 
-          {otherTables.length === 0 && !matchers && data.tables.length === 0 && (
-            <p className="text-sm text-theme-secondary text-center py-8">Nenhuma cotação encontrada para este produto no momento.</p>
-          )}
-          {otherTables.map((table, i) => {
-            const kind = classifyTable(table);
-            // Tabelas de Futuro B3 não têm cidade/região (são só meses de
-            // contrato) — nunca filtra elas por região, senão somem sem
-            // necessidade nenhuma.
-            let rows = table.rows;
-            let usedNearest = false;
-            if (region && kind === 'atual') {
-              const uf = ESTADOS.includes(region) ? UF_POR_ESTADO[region] : selectedState ? UF_POR_ESTADO[selectedState] : undefined;
-              const estadoNome = ESTADOS.includes(region) ? region : selectedState || undefined;
-              const term = region.toLowerCase();
-              let filtered = table.rows.slice(1).filter(r => r.some(c => c.toLowerCase().includes(term)));
-              if (filtered.length === 0 && (uf || estadoNome)) {
-                filtered = table.rows.slice(1).filter(r => r.some(c => {
-                  if (uf && new RegExp(`\\b${uf}\\b`, 'i').test(c)) return true;
-                  if (estadoNome && c.toLowerCase().includes(estadoNome.toLowerCase())) return true;
-                  return false;
-                }));
-                usedNearest = filtered.length > 0;
-              }
-              if (filtered.length === 0) return null; // sem nada pra essa região nem estado, não mostra a tabela
-              rows = [table.rows[0], ...filtered];
+        // Renderiza uma tabela "solta" (produtos sem categorias
+        // específicas), filtrando pelo tipo pedido.
+        function renderRawTable(table: ParsedTable, key: number) {
+          const kind = classifyTable(table);
+          let rows = table.rows;
+          let usedNearest = false;
+          if (region && kind === 'atual') {
+            const term = region.toLowerCase();
+            let filtered = table.rows.slice(1).filter(r => r.some(c => c.toLowerCase().includes(term)));
+            if (filtered.length === 0 && (uf || estadoNome)) {
+              filtered = table.rows.slice(1).filter(r => r.some(c => {
+                if (uf && new RegExp(`\\b${uf}\\b`, 'i').test(c)) return true;
+                if (estadoNome && c.toLowerCase().includes(estadoNome.toLowerCase())) return true;
+                return false;
+              }));
+              usedNearest = filtered.length > 0;
             }
-            return (
-              <div key={i} className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
-                <div className="p-4 pb-2 flex items-center gap-2">
-                  <h3 className="font-bold text-theme-primary text-sm">{table.heading || 'Cotação'}</h3>
-                  <Badge kind={kind} />
-                  <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">{detectCurrency(table.rows[0])}</span>
-                  {usedNearest && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
-                </div>
-                {table.source && <p className="text-[10px] text-theme-secondary px-4 -mt-1 pb-2">Fonte: {table.source}</p>}
-                <table className="w-full text-sm">
-                  <tbody className="divide-y divide-theme">
-                    {rows.slice(0, 20).map((row, ri) => (
-                      <tr key={ri} className={ri === 0 ? 'bg-theme-secondary font-bold' : ''}>
-                        {row.map((cell, ci) => (
-                          <td key={ci} className="p-2.5 text-xs text-theme-secondary whitespace-nowrap">{cell}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            if (filtered.length === 0) return null;
+            rows = [table.rows[0], ...filtered];
+          }
+          return (
+            <div key={key} className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+              <div className="p-4 pb-2 flex items-center gap-2">
+                <h3 className="font-bold text-theme-primary text-sm">{table.heading || 'Cotação'}</h3>
+                <Badge kind={kind} />
+                <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">{detectCurrency(table.rows[0])}</span>
+                {usedNearest && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
               </div>
-            );
-          })}
+              {table.source && <p className="text-[10px] text-theme-secondary px-4 -mt-1 pb-2">Fonte: {table.source}</p>}
+              <table className="w-full text-sm">
+                <tbody className="divide-y divide-theme">
+                  {rows.slice(0, 20).map((row, ri) => (
+                    <tr key={ri} className={ri === 0 ? 'bg-theme-secondary font-bold' : ''}>
+                      {row.map((cell, ci) => (
+                        <td key={ci} className="p-2.5 text-xs text-theme-secondary whitespace-nowrap">{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
 
-          {data.mercadoInternacional && (() => {
-            const futuroTable = data.tables.find(t => classifyTable(t) === 'futuro');
-            const brasilRow = futuroTable?.rows[1];
-            const brasilPreco = brasilRow?.find(c => /\d/.test(c)) || brasilRow?.[brasilRow.length - 1];
-            return (
-              <div className="bg-theme-card rounded-2xl border border-theme p-4">
-                <h3 className="font-bold text-theme-primary text-sm mb-2">Mercado Internacional — {PRODUCTS.find(p => p.id === produto)?.label}</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="bg-theme-secondary rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇧🇷 Brasil</p>
-                    {brasilPreco ? (
-                      <>
-                        <p className="text-sm font-bold text-theme-primary mt-1">{brasilPreco}</p>
-                        <p className="text-[9px] text-theme-secondary">R$ (B3)</p>
-                      </>
-                    ) : (
-                      <p className="text-xs text-theme-secondary mt-1">Ver "Futuro B3" acima</p>
-                    )}
-                  </div>
-                  <div className="bg-theme-secondary rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇺🇸 Estados Unidos</p>
-                    <p className="text-sm font-bold text-theme-primary mt-1">{data.mercadoInternacional.valor.toFixed(4)}</p>
-                    <p className="text-[9px] text-theme-secondary">{data.mercadoInternacional.unidade}</p>
-                  </div>
-                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇪🇺 Europa</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
-                  </div>
-                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇨🇳 China</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
+        const atualOtherTables = otherTables.filter(t => classifyTable(t) === 'atual');
+        const futuroOtherTables = otherTables.filter(t => classifyTable(t) === 'futuro');
+
+        const atualCards = matchers ? matchers.map(m => renderCategoryCard(m, 'atual')).filter(Boolean) : [];
+        const futuroCards = matchers ? matchers.map(m => renderCategoryCard(m, 'futuro')).filter(Boolean) : [];
+
+        const nadaEncontrado = atualCards.length === 0 && atualOtherTables.length === 0
+          && futuroCards.length === 0 && futuroOtherTables.length === 0;
+
+        return (
+          <div className="space-y-4">
+            {nadaEncontrado && (
+              <p className="text-sm text-theme-secondary text-center py-8">Nenhuma cotação encontrada para este produto no momento.</p>
+            )}
+
+            {/* 1. Preço Atual — Brasil */}
+            {(atualCards.length > 0 || atualOtherTables.length > 0) && (
+              <div className="space-y-2">
+                <h2 className="text-sm font-bold text-theme-primary flex items-center gap-1.5">🇧🇷 Preço Atual — Brasil</h2>
+                {atualCards.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{atualCards}</div>}
+                {atualOtherTables.map((t, i) => renderRawTable(t, i))}
+              </div>
+            )}
+
+            {/* 2. Futuro B3 */}
+            {(futuroCards.length > 0 || futuroOtherTables.length > 0) && (
+              <div className="space-y-2">
+                <h2 className="text-sm font-bold text-theme-primary flex items-center gap-1.5">📈 Futuro B3</h2>
+                {futuroCards.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{futuroCards}</div>}
+                {futuroOtherTables.map((t, i) => renderRawTable(t, i + 1000))}
+              </div>
+            )}
+
+            {/* 3. Mercado Internacional */}
+            {data.mercadoInternacional && (() => {
+              const futuroTable = data.tables.find(t => classifyTable(t) === 'futuro');
+              const brasilRow = futuroTable?.rows[1];
+              const brasilPreco = brasilRow?.find(c => /\d/.test(c)) || brasilRow?.[brasilRow.length - 1];
+              return (
+                <div className="space-y-2">
+                  <h2 className="text-sm font-bold text-theme-primary flex items-center gap-1.5">🌍 Mercado Internacional</h2>
+                  <div className="bg-theme-card rounded-2xl border border-theme p-4">
+                    <h3 className="font-bold text-theme-primary text-sm mb-2">{PRODUCTS.find(p => p.id === produto)?.label}</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="bg-theme-secondary rounded-xl p-3">
+                        <p className="text-[10px] font-bold text-theme-secondary uppercase">🇧🇷 Brasil</p>
+                        {brasilPreco ? (
+                          <>
+                            <p className="text-sm font-bold text-theme-primary mt-1">{brasilPreco}</p>
+                            <p className="text-[9px] text-theme-secondary">R$ (B3)</p>
+                          </>
+                        ) : (
+                          <p className="text-xs text-theme-secondary mt-1">Ver "Futuro B3" acima</p>
+                        )}
+                      </div>
+                      <div className="bg-theme-secondary rounded-xl p-3">
+                        <p className="text-[10px] font-bold text-theme-secondary uppercase">🇺🇸 Estados Unidos</p>
+                        <p className="text-sm font-bold text-theme-primary mt-1">{data.mercadoInternacional.valor.toFixed(4)}</p>
+                        <p className="text-[9px] text-theme-secondary">{data.mercadoInternacional.unidade}</p>
+                      </div>
+                      <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                        <p className="text-[10px] font-bold text-theme-secondary uppercase">🇪🇺 Europa</p>
+                        <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
+                      </div>
+                      <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                        <p className="text-[10px] font-bold text-theme-secondary uppercase">🇨🇳 China</p>
+                        <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável encontrada</p>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-theme-secondary mt-2">Fonte: B3/Notícias Agrícolas (Brasil) e {data.mercadoInternacional.fonte} (Estados Unidos) — contratos futuros de referência.</p>
                   </div>
                 </div>
-                <p className="text-[10px] text-theme-secondary mt-2">Fonte: B3/Notícias Agrícolas (Brasil) e {data.mercadoInternacional.fonte} (Estados Unidos) — contratos futuros de referência.</p>
-              </div>
-            );
-          })()}
+              );
+            })()}
 
-          <a
-            href={data.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 text-xs font-semibold text-theme-secondary py-2"
-          >
-            Ver fonte completa em noticiasagricolas.com.br <ExternalLink size={12} />
-          </a>
-          <p className="text-[10px] text-theme-secondary text-center">
-            Dados de mercado consolidados via Notícias Agrícolas (CEPEA/ESALQ, B3, Scot Consultoria, Datagro, IMEA). Atualizado em {new Date(data.fetchedAt).toLocaleString('pt-BR')}.
-          </p>
-        </div>
-      )}
+            <a
+              href={data.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 text-xs font-semibold text-theme-secondary py-2"
+            >
+              Ver fonte completa em noticiasagricolas.com.br <ExternalLink size={12} />
+            </a>
+            <p className="text-[10px] text-theme-secondary text-center">
+              Dados de mercado consolidados via Notícias Agrícolas (CEPEA/ESALQ, B3, Scot Consultoria, Datagro, IMEA). Atualizado em {new Date(data.fetchedAt).toLocaleString('pt-BR')}.
+            </p>
+          </div>
+        );
+      })()}
     </div>
   );
 }
