@@ -100,7 +100,55 @@ async function fetchMoeda(env: Env, moeda: 'USD' | 'EUR' | 'JPY', debug: string[
   return entry;
 }
 
-async function fetchBitcoin(env: Env, debug: string[]): Promise<CambioEntry | null> {
+async function fetchBitcoin(env: Env, usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
+  // Fonte principal: Binance — direto em BRL quando possível.
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCBRL', {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as any;
+      if (data.lastPrice) {
+        return {
+          compra: Number(data.bidPrice) || Number(data.lastPrice),
+          venda: Number(data.askPrice) || Number(data.lastPrice),
+          variacaoPct: Number(Number(data.priceChangePercent).toFixed(2)),
+          atualizadoEm: new Date().toISOString(),
+        };
+      }
+    } else {
+      debug.push(`Binance BTCBRL: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`Binance BTCBRL: ${e?.message || String(e)}`);
+  }
+
+  // Reserva 1: Binance em USDT, convertido pelo nosso câmbio (BCB).
+  if (usdBrl) {
+    try {
+      const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', {
+        headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as any;
+        if (data.lastPrice) {
+          const priceBrl = Number(data.lastPrice) * usdBrl.venda;
+          return {
+            compra: Number((priceBrl * 0.999).toFixed(2)),
+            venda: Number(priceBrl.toFixed(2)),
+            variacaoPct: Number(Number(data.priceChangePercent).toFixed(2)),
+            atualizadoEm: new Date().toISOString(),
+          };
+        }
+      } else {
+        debug.push(`Binance BTCUSDT: HTTP ${res.status}`);
+      }
+    } catch (e: any) {
+      debug.push(`Binance BTCUSDT: ${e?.message || String(e)}`);
+    }
+  }
+
+  // Reserva 2: CoinGecko.
   try {
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true',
@@ -117,7 +165,6 @@ async function fetchBitcoin(env: Env, debug: string[]): Promise<CambioEntry | nu
           atualizadoEm: new Date().toISOString(),
         };
       }
-      debug.push('CoinGecko BTC: resposta sem campo bitcoin.brl.');
     } else {
       debug.push(`CoinGecko BTC: HTTP ${res.status}`);
     }
@@ -125,6 +172,7 @@ async function fetchBitcoin(env: Env, debug: string[]): Promise<CambioEntry | nu
     debug.push(`CoinGecko BTC: ${e?.message || String(e)}`);
   }
 
+  // Reserva 3: AwesomeAPI.
   const awesome = await fetchAwesomeApi(env, 'BTC-BRL');
   if ('__error' in awesome) {
     debug.push(`Reserva AwesomeAPI para BTC: ${awesome.__error}`);
@@ -136,6 +184,36 @@ async function fetchBitcoin(env: Env, debug: string[]): Promise<CambioEntry | nu
 async function fetchGold(env: Env, usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
   const GRAMS_PER_TROY_OUNCE = 31.1035;
 
+  // Fonte principal: Binance PAXG (token com lastro 1:1 em ouro físico,
+  // 1 PAXG = 1 onça troy), convertido pelo nosso câmbio (BCB).
+  if (usdBrl) {
+    try {
+      const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT', {
+        headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as any;
+        if (data.lastPrice) {
+          const usdPerGram = Number(data.lastPrice) / GRAMS_PER_TROY_OUNCE;
+          const brlPerGram = usdPerGram * usdBrl.venda;
+          return {
+            compra: Number((brlPerGram * 0.98).toFixed(2)),
+            venda: Number(brlPerGram.toFixed(2)),
+            variacaoPct: Number(Number(data.priceChangePercent).toFixed(2)),
+            atualizadoEm: new Date().toISOString(),
+          };
+        }
+      } else {
+        debug.push(`Binance PAXGUSDT: HTTP ${res.status}`);
+      }
+    } catch (e: any) {
+      debug.push(`Binance PAXGUSDT: ${e?.message || String(e)}`);
+    }
+  } else {
+    debug.push('Ouro: pulou Binance/Stooq porque o dólar não foi obtido.');
+  }
+
+  // Reserva 1: Stooq (cotação internacional em dólar).
   if (usdBrl) {
     try {
       const res = await fetch('https://stooq.com/q/l/?s=xauusd&f=sd2t2c&h&e=csv', {
@@ -156,17 +234,15 @@ async function fetchGold(env: Env, usdBrl: CambioEntry | null, debug: string[]):
             atualizadoEm: new Date().toISOString(),
           };
         }
-        debug.push(`Stooq XAUUSD: valor inválido na resposta (${csv.slice(0, 100)}).`);
       } else {
         debug.push(`Stooq XAUUSD: HTTP ${res.status}`);
       }
     } catch (e: any) {
       debug.push(`Stooq XAUUSD: ${e?.message || String(e)}`);
     }
-  } else {
-    debug.push('Ouro: pulou cálculo via Stooq porque o dólar não foi obtido.');
   }
 
+  // Reserva 2: AwesomeAPI.
   const awesome = await fetchAwesomeApi(env, 'XAU-BRL');
   if ('__error' in awesome) {
     debug.push(`Reserva AwesomeAPI para XAU: ${awesome.__error}`);
@@ -221,7 +297,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     ]);
 
     const [btc, xau] = await Promise.all([
-      fetchBitcoin(context.env, debug),
+      fetchBitcoin(context.env, usd, debug),
       fetchGold(context.env, usd, debug),
     ]);
 
