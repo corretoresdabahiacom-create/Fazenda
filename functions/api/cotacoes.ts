@@ -78,7 +78,14 @@ function parseTables(html: string): ParsedTable[] {
     HEADING_RE.lastIndex = 0;
     let lastHeadingMatch: RegExpExecArray | null = null;
     while ((headingMatch = HEADING_RE.exec(gap)) !== null) {
-      lastHeadingMatch = headingMatch;
+      // Só aceita como título candidato um texto curto (título de
+      // verdade tem no máximo ~100 caracteres) — textos longos entre
+      // tabelas costumam ser manchete de notícia, não título de tabela,
+      // e misturavam produtos/classificações errados quando aceitos.
+      const candidateText = stripTags(headingMatch[2]);
+      if (candidateText.length > 0 && candidateText.length <= 100) {
+        lastHeadingMatch = headingMatch;
+      }
     }
     if (lastHeadingMatch) heading = stripTags(lastHeadingMatch[2]);
 
