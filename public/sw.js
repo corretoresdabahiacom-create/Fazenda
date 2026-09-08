@@ -53,12 +53,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-com
 
 try {
   firebase.initializeApp({
-    apiKey: 'COLE_AQUI_SEU_VITE_FIREBASE_API_KEY',
-    authDomain: 'COLE_AQUI_SEU_VITE_FIREBASE_AUTH_DOMAIN',
-    projectId: 'COLE_AQUI_SEU_VITE_FIREBASE_PROJECT_ID',
-    storageBucket: 'COLE_AQUI_SEU_VITE_FIREBASE_STORAGE_BUCKET',
-    messagingSenderId: 'COLE_AQUI_SEU_VITE_FIREBASE_MESSAGING_SENDER_ID',
-    appId: 'COLE_AQUI_SEU_VITE_FIREBASE_APP_ID',
+    apiKey: 'AIzaSyA1G7Pxzk8e_eUHSIhyKnQxzrk9DYGLZfU',
+    authDomain: 'fazenda-online-4a6a6.firebaseapp.com',
+    projectId: 'fazenda-online-4a6a6',
+    storageBucket: 'fazenda-online-4a6a6.firebasestorage.app',
+    messagingSenderId: '459270761665',
+    appId: '1:459270761665:web:bcfe341adbc4086a4c7840',
   });
 
   const messaging = firebase.messaging();
