@@ -245,6 +245,34 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produto]);
 
+  const [agrolinkData, setAgrolinkData] = useState<{ rows: { produto: string; preco: string; data: string }[]; sourceUrl: string; totalProdutosListados: number } | null>(null);
+  const [agrolinkLoading, setAgrolinkLoading] = useState(false);
+  const [agrolinkError, setAgrolinkError] = useState<string | null>(null);
+
+  // Busca cotações específicas da cidade exata (não só do estado) no
+  // Agrolink — fonte com cobertura por município que complementa a
+  // principal (Notícias Agrícolas). Só dispara quando tanto a cidade
+  // quanto o estado estão definidos (região livre + estado do dropdown).
+  useEffect(() => {
+    const cidadeEspecifica = region && !ESTADOS.includes(region) ? region : '';
+    const estado = ESTADOS.includes(region) ? region : selectedState;
+    if (!cidadeEspecifica || !estado) {
+      setAgrolinkData(null);
+      setAgrolinkError(null);
+      return;
+    }
+    setAgrolinkLoading(true);
+    setAgrolinkError(null);
+    fetch(`/api/agrolink-regional?cidade=${encodeURIComponent(cidadeEspecifica)}&estado=${encodeURIComponent(estado)}`)
+      .then(res => res.json())
+      .then(json => {
+        if (json.error) setAgrolinkError(json.error);
+        else setAgrolinkData(json);
+      })
+      .catch(() => setAgrolinkError('Não foi possível buscar cotações do Agrolink para essa cidade agora.'))
+      .finally(() => setAgrolinkLoading(false));
+  }, [region, selectedState]);
+
   function handleDetectRegion() {
     if (!navigator.geolocation) return;
     setDetectingRegion(true);
@@ -521,6 +549,45 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
         return (
           <div className="space-y-4">
+            {(agrolinkLoading || agrolinkData || agrolinkError) && (
+              <div className="bg-theme-card rounded-2xl border-2 border-blue-200 overflow-hidden">
+                <div className="p-4 pb-2">
+                  <h2 className="text-sm font-bold text-theme-primary flex items-center gap-1.5">📍 Cotações em {region} (Agrolink)</h2>
+                  <p className="text-[10px] text-theme-secondary">Fonte com cobertura por cidade exata — complementa os dados acima.</p>
+                </div>
+                {agrolinkLoading && <p className="text-xs text-theme-secondary text-center py-4">Buscando cotações da cidade...</p>}
+                {agrolinkError && <p className="text-xs text-amber-600 px-4 pb-4">{agrolinkError}</p>}
+                {agrolinkData && agrolinkData.rows.length === 0 && (
+                  <p className="text-xs text-theme-secondary px-4 pb-4">Nenhum preço coletado para {region} nos últimos dias — o Agrolink lista o produto, mas ainda não tem valor informado para essa cidade.</p>
+                )}
+                {agrolinkData && agrolinkData.rows.length > 0 && (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-theme-secondary">
+                        <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Produto</th>
+                        <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Preço (R$)</th>
+                        <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Data</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-theme">
+                      {agrolinkData.rows.slice(0, 15).map((r, i) => (
+                        <tr key={i}>
+                          <td className="p-2.5 text-xs text-theme-secondary">{r.produto}</td>
+                          <td className="p-2.5 text-xs font-bold text-theme-primary">{r.preco}</td>
+                          <td className="p-2.5 text-xs text-theme-secondary whitespace-nowrap">{r.data}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                {agrolinkData && (
+                  <a href={agrolinkData.sourceUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 text-xs font-semibold text-theme-secondary py-2 border-t border-theme">
+                    Ver todas as {agrolinkData.totalProdutosListados} cotações de {region} no Agrolink <ExternalLink size={12} />
+                  </a>
+                )}
+              </div>
+            )}
+
             {nadaEncontrado && (
               <p className="text-sm text-theme-secondary text-center py-8">Nenhuma cotação encontrada para este produto no momento.</p>
             )}
