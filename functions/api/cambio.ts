@@ -1,13 +1,17 @@
-// Busca câmbio comercial (Dólar, Euro, Iene, Ouro, Bitcoin) com cadeia de
-// fontes de reserva: se a fonte principal falhar, tenta automaticamente
-// uma segunda fonte, para nunca depender de um único provedor instável.
-// Também devolve detalhes de erro por moeda em "debug" (acrescente
-// ?debug=1 na URL para forçar atualização sem cache e ver os detalhes),
-// para facilitar diagnosticar se algo falhar de novo.
+// Busca câmbio comercial (Dólar, Euro, Iene, Ouro, Bitcoin) — fonte
+// oficial (Banco Central) sempre que possível, com reservas comprovadas
+// funcionando neste ambiente (Binance) quando a oficial falhar.
+//
+// A AwesomeAPI foi REMOVIDA da cadeia — confirmado por testes reais que
+// ela está com a cota gratuita esgotada (erro 429 QuotaExceeded
+// persistente), então mantê-la só atrasava a resposta sem ajudar.
+//
+// Bug corrigido nesta versão: as URLs do Banco Central (PTAX) estavam
+// devolvendo HTTP 400 porque as aspas simples ao redor da data não
+// estavam com URL-encoding (deviam ser %27, não o caractere ' literal) —
+// confirmado contra um exemplo real de código em produção.
 
-interface Env {
-  AWESOMEAPI_TOKEN?: string;
-}
+interface Env {}
 
 interface CambioEntry {
   compra: number;
@@ -22,86 +26,75 @@ function toMMDDYYYY(d: Date): string {
   return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
 }
 
-async function fetchAwesomeApi(env: Env, pairs: string): Promise<Record<string, any> | { __error: string }> {
-  try {
-    const tokenParam = env.AWESOMEAPI_TOKEN ? `&token=${env.AWESOMEAPI_TOKEN}` : '';
-    const res = await fetch(`https://economia.awesomeapi.com.br/json/last/${pairs}${tokenParam}`, {
-      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
-    });
-    const text = await res.text();
-    if (!res.ok) return { __error: `AwesomeAPI HTTP ${res.status}: ${text.slice(0, 200)}` };
-    return JSON.parse(text);
-  } catch (e: any) {
-    return { __error: `AwesomeAPI exception: ${e?.message || String(e)}` };
-  }
-}
-
-function formatAwesome(entry: any): CambioEntry | null {
-  if (!entry || entry.__error) return null;
-  return {
-    compra: Number(entry.bid),
-    venda: Number(entry.ask),
-    variacaoPct: Number(entry.pctChange),
-    atualizadoEm: entry.create_date,
-  };
-}
-
-async function fetchMoeda(env: Env, moeda: 'USD' | 'EUR' | 'JPY', debug: string[]): Promise<CambioEntry | null> {
-  function buildUrls(dateStr: string): string[] {
+async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY', debug: string[]): Promise<CambioEntry | null> {
+  function buildUrl(dateStr: string): string {
+    const encodedDate = `%27${dateStr}%27`;
     if (moeda === 'USD') {
-      return [
-        `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao='${dateStr}')?$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim`,
-        `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='${dateStr}'&$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim`,
-      ];
+      return `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao=${encodedDate}&$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim`;
     }
-    return [
-      `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda='${moeda}',dataCotacao='${dateStr}')?$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim`,
-      `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda='${moeda}'&@dataCotacao='${dateStr}'&$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim`,
-    ];
+    return `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda=%27${moeda}%27&@dataCotacao=${encodedDate}&$top=10&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim`;
   }
 
   for (let i = 0; i < 7; i++) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const dateStr = toMMDDYYYY(d);
+    const url = buildUrl(dateStr);
 
-    for (const url of buildUrls(dateStr)) {
-      try {
-        const res = await fetch(url, { headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' } });
-        if (!res.ok) {
-          debug.push(`BCB ${moeda} ${dateStr}: HTTP ${res.status}`);
-          continue;
-        }
-        const data = (await res.json()) as { value?: any[] };
-        const values = data.value || [];
-        if (values.length === 0) continue;
-
-        const fechamento = values.find(v => v.tipoBoletim === 'Fechamento') || values[values.length - 1];
-        const compra = Number(fechamento.cotacaoCompra);
-        const venda = Number(fechamento.cotacaoVenda);
-        if (!compra || !venda) continue;
-
-        return { compra, venda, variacaoPct: 0, atualizadoEm: fechamento.dataHoraCotacao };
-      } catch (e: any) {
-        debug.push(`BCB ${moeda} ${dateStr}: ${e?.message || String(e)}`);
+    try {
+      const res = await fetch(url, { headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' } });
+      if (!res.ok) {
+        const bodyText = await res.text().catch(() => '');
+        debug.push(`BCB ${moeda} ${dateStr}: HTTP ${res.status} — ${bodyText.slice(0, 150)}`);
         continue;
       }
+      const data = (await res.json()) as { value?: any[] };
+      const values = data.value || [];
+      if (values.length === 0) {
+        debug.push(`BCB ${moeda} ${dateStr}: sem cotação para essa data (fim de semana/feriado?).`);
+        continue;
+      }
+
+      const fechamento = values.find(v => v.tipoBoletim === 'Fechamento') || values[values.length - 1];
+      const compra = Number(fechamento.cotacaoCompra);
+      const venda = Number(fechamento.cotacaoVenda);
+      if (!compra || !venda) continue;
+
+      return { compra, venda, variacaoPct: 0, atualizadoEm: fechamento.dataHoraCotacao };
+    } catch (e: any) {
+      debug.push(`BCB ${moeda} ${dateStr}: ${e?.message || String(e)}`);
+      continue;
     }
   }
 
-  debug.push(`BCB falhou para ${moeda} em todas as tentativas — usando reserva AwesomeAPI.`);
-  const awesome = await fetchAwesomeApi(env, `${moeda}-BRL`);
-  if ('__error' in awesome) {
-    debug.push(`Reserva AwesomeAPI para ${moeda}: ${awesome.__error}`);
-    return null;
+  if (moeda === 'USD') {
+    debug.push('BCB falhou para USD em todas as tentativas — usando reserva Binance (USDT/BRL).');
+    try {
+      const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=USDTBRL', {
+        headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as any;
+        if (data.lastPrice) {
+          return {
+            compra: Number(data.bidPrice) || Number(data.lastPrice),
+            venda: Number(data.askPrice) || Number(data.lastPrice),
+            variacaoPct: Number(Number(data.priceChangePercent).toFixed(2)),
+            atualizadoEm: new Date().toISOString(),
+          };
+        }
+      } else {
+        debug.push(`Binance USDTBRL: HTTP ${res.status}`);
+      }
+    } catch (e: any) {
+      debug.push(`Binance USDTBRL: ${e?.message || String(e)}`);
+    }
   }
-  const entry = formatAwesome(awesome[`${moeda}BRL`]);
-  if (!entry) debug.push(`Reserva AwesomeAPI para ${moeda}: resposta sem dados utilizáveis.`);
-  return entry;
+
+  return null;
 }
 
-async function fetchBitcoin(env: Env, usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
-  // Fonte principal: Binance — direto em BRL quando possível.
+async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
   try {
     const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCBRL', {
       headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
@@ -123,7 +116,6 @@ async function fetchBitcoin(env: Env, usdBrl: CambioEntry | null, debug: string[
     debug.push(`Binance BTCBRL: ${e?.message || String(e)}`);
   }
 
-  // Reserva 1: Binance em USDT, convertido pelo nosso câmbio (BCB).
   if (usdBrl) {
     try {
       const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', {
@@ -140,15 +132,12 @@ async function fetchBitcoin(env: Env, usdBrl: CambioEntry | null, debug: string[
             atualizadoEm: new Date().toISOString(),
           };
         }
-      } else {
-        debug.push(`Binance BTCUSDT: HTTP ${res.status}`);
       }
     } catch (e: any) {
       debug.push(`Binance BTCUSDT: ${e?.message || String(e)}`);
     }
   }
 
-  // Reserva 2: CoinGecko.
   try {
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true',
@@ -165,100 +154,72 @@ async function fetchBitcoin(env: Env, usdBrl: CambioEntry | null, debug: string[
           atualizadoEm: new Date().toISOString(),
         };
       }
-    } else {
-      debug.push(`CoinGecko BTC: HTTP ${res.status}`);
     }
   } catch (e: any) {
     debug.push(`CoinGecko BTC: ${e?.message || String(e)}`);
   }
 
-  // Reserva 3: AwesomeAPI.
-  const awesome = await fetchAwesomeApi(env, 'BTC-BRL');
-  if ('__error' in awesome) {
-    debug.push(`Reserva AwesomeAPI para BTC: ${awesome.__error}`);
-    return null;
-  }
-  return formatAwesome(awesome.BTCBRL);
+  return null;
 }
 
-async function fetchGold(env: Env, usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
+async function fetchGold(usdBrl: CambioEntry | null, debug: string[]): Promise<CambioEntry | null> {
   const GRAMS_PER_TROY_OUNCE = 31.1035;
 
-  // Fonte principal: Binance PAXG (token com lastro 1:1 em ouro físico,
-  // 1 PAXG = 1 onça troy), convertido pelo nosso câmbio (BCB).
-  if (usdBrl) {
-    try {
-      const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT', {
-        headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
-      });
-      if (res.ok) {
-        const data = (await res.json()) as any;
-        if (data.lastPrice) {
-          const usdPerGram = Number(data.lastPrice) / GRAMS_PER_TROY_OUNCE;
-          const brlPerGram = usdPerGram * usdBrl.venda;
-          return {
-            compra: Number((brlPerGram * 0.98).toFixed(2)),
-            venda: Number(brlPerGram.toFixed(2)),
-            variacaoPct: Number(Number(data.priceChangePercent).toFixed(2)),
-            atualizadoEm: new Date().toISOString(),
-          };
-        }
-      } else {
-        debug.push(`Binance PAXGUSDT: HTTP ${res.status}`);
-      }
-    } catch (e: any) {
-      debug.push(`Binance PAXGUSDT: ${e?.message || String(e)}`);
-    }
-  } else {
-    debug.push('Ouro: pulou Binance/Stooq porque o dólar não foi obtido.');
-  }
-
-  // Reserva 1: Stooq (cotação internacional em dólar).
-  if (usdBrl) {
-    try {
-      const res = await fetch('https://stooq.com/q/l/?s=xauusd&f=sd2t2c&h&e=csv', {
-        headers: { 'User-Agent': BROWSER_UA },
-      });
-      if (res.ok) {
-        const csv = await res.text();
-        const lines = csv.trim().split('\n');
-        const cols = lines[1]?.split(',') || [];
-        const closeUsdPerOz = Number(cols[3]);
-        if (closeUsdPerOz > 0) {
-          const usdPerGram = closeUsdPerOz / GRAMS_PER_TROY_OUNCE;
-          const brlPerGram = usdPerGram * usdBrl.venda;
-          return {
-            compra: Number((brlPerGram * 0.98).toFixed(2)),
-            venda: Number(brlPerGram.toFixed(2)),
-            variacaoPct: 0,
-            atualizadoEm: new Date().toISOString(),
-          };
-        }
-      } else {
-        debug.push(`Stooq XAUUSD: HTTP ${res.status}`);
-      }
-    } catch (e: any) {
-      debug.push(`Stooq XAUUSD: ${e?.message || String(e)}`);
-    }
-  }
-
-  // Reserva 2: AwesomeAPI.
-  const awesome = await fetchAwesomeApi(env, 'XAU-BRL');
-  if ('__error' in awesome) {
-    debug.push(`Reserva AwesomeAPI para XAU: ${awesome.__error}`);
+  if (!usdBrl) {
+    debug.push('Ouro: não foi possível calcular porque nenhuma cotação de dólar ficou disponível.');
     return null;
   }
-  const entry = awesome.XAUBRL;
-  if (!entry) {
-    debug.push('Reserva AwesomeAPI para XAU: resposta sem dados utilizáveis.');
-    return null;
+
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT', {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as any;
+      if (data.lastPrice) {
+        const usdPerGram = Number(data.lastPrice) / GRAMS_PER_TROY_OUNCE;
+        const brlPerGram = usdPerGram * usdBrl.venda;
+        return {
+          compra: Number((brlPerGram * 0.98).toFixed(2)),
+          venda: Number(brlPerGram.toFixed(2)),
+          variacaoPct: Number(Number(data.priceChangePercent).toFixed(2)),
+          atualizadoEm: new Date().toISOString(),
+        };
+      }
+    } else {
+      debug.push(`Binance PAXGUSDT: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`Binance PAXGUSDT: ${e?.message || String(e)}`);
   }
-  return {
-    compra: Number((Number(entry.bid) / GRAMS_PER_TROY_OUNCE).toFixed(2)),
-    venda: Number((Number(entry.ask) / GRAMS_PER_TROY_OUNCE).toFixed(2)),
-    variacaoPct: Number(entry.pctChange),
-    atualizadoEm: entry.create_date,
-  };
+
+  try {
+    const res = await fetch('https://stooq.com/q/l/?s=xauusd&f=sd2t2c&h&e=csv', {
+      headers: { 'User-Agent': BROWSER_UA },
+    });
+    if (res.ok) {
+      const csv = await res.text();
+      const lines = csv.trim().split('\n');
+      const cols = lines[1]?.split(',') || [];
+      const closeUsdPerOz = Number(cols[3]);
+      if (closeUsdPerOz > 0) {
+        const usdPerGram = closeUsdPerOz / GRAMS_PER_TROY_OUNCE;
+        const brlPerGram = usdPerGram * usdBrl.venda;
+        return {
+          compra: Number((brlPerGram * 0.98).toFixed(2)),
+          venda: Number(brlPerGram.toFixed(2)),
+          variacaoPct: 0,
+          atualizadoEm: new Date().toISOString(),
+        };
+      }
+    } else {
+      debug.push(`Stooq XAUUSD: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`Stooq XAUUSD: ${e?.message || String(e)}`);
+  }
+
+  return null;
 }
 
 async function fetchDolarFuturoB3(): Promise<{ valor: string; vencimento: string } | null> {
@@ -278,7 +239,7 @@ async function fetchDolarFuturoB3(): Promise<{ valor: string; vencimento: string
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const cache = (caches as any).default;
-  const cacheKey = new Request('https://cache.internal/cambio-v3', context.request);
+  const cacheKey = new Request('https://cache.internal/cambio-v4', context.request);
   const forceRefresh = new URL(context.request.url).searchParams.has('debug');
 
   if (!forceRefresh) {
@@ -290,21 +251,21 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   try {
     const [usd, eur, jpy, dolarFuturo] = await Promise.all([
-      fetchMoeda(context.env, 'USD', debug),
-      fetchMoeda(context.env, 'EUR', debug),
-      fetchMoeda(context.env, 'JPY', debug),
+      fetchMoeda('USD', debug),
+      fetchMoeda('EUR', debug),
+      fetchMoeda('JPY', debug),
       fetchDolarFuturoB3(),
     ]);
 
     const [btc, xau] = await Promise.all([
-      fetchBitcoin(context.env, usd, debug),
-      fetchGold(context.env, usd, debug),
+      fetchBitcoin(usd, debug),
+      fetchGold(usd, debug),
     ]);
 
     const response = new Response(JSON.stringify({
       usd, eur, jpy, xau, btc,
       dolarFuturoB3: dolarFuturo,
-      fonte: 'Banco Central (PTAX) + AwesomeAPI de reserva — Bitcoin via CoinGecko, Ouro via Stooq+câmbio BCB',
+      fonte: 'Banco Central do Brasil (PTAX oficial) — Bitcoin/Ouro via Binance, Dólar Futuro via B3/Notícias Agrícolas',
       debug: debug.length > 0 ? debug : undefined,
     }), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': forceRefresh ? 'no-store' : 'public, max-age=180' },
