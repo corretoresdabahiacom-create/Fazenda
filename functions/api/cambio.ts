@@ -27,6 +27,37 @@ function toMMDDYYYY(d: Date): string {
 }
 
 async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY' | 'RUB', debug: string[]): Promise<CambioEntry | null> {
+  // Fonte principal: Frankfurter — API gratuita, sem chave, que rastreia
+  // as taxas de referência do Banco Central Europeu. Escolhida como
+  // principal para TODAS as moedas por ser uma chamada única e simples
+  // (sem a complexidade de tentar várias datas), reduzindo o risco de
+  // bugs que já afetaram a integração direta com o Banco Central do
+  // Brasil — e cobre Yuan e Rublo, que o BCB pode não ter.
+  try {
+    const res = await fetch(`https://api.frankfurter.app/latest?from=${moeda}&to=BRL`, {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as any;
+      const rate = data?.rates?.BRL;
+      if (rate) {
+        return {
+          compra: Number((rate * 0.998).toFixed(4)),
+          venda: Number(rate.toFixed(4)),
+          variacaoPct: 0,
+          atualizadoEm: data.date || new Date().toISOString(),
+        };
+      }
+      debug.push(`Frankfurter ${moeda}: resposta sem taxa BRL utilizável.`);
+    } else {
+      debug.push(`Frankfurter ${moeda}: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`Frankfurter ${moeda}: ${e?.message || String(e)}`);
+  }
+
+  // Reserva 1: Banco Central do Brasil (PTAX) — tenta os últimos 7 dias.
+  debug.push(`Frankfurter falhou para ${moeda} — tentando reserva Banco Central (PTAX).`);
   function buildUrl(dateStr: string): string {
     const encodedDate = `%27${dateStr}%27`;
     if (moeda === 'USD') {
@@ -55,9 +86,6 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY' | 'RUB', debug: s
         continue;
       }
 
-      // Sem o campo tipoBoletim (não existe no tipo retornado pelo BCB
-      // para o Dólar), usamos o último valor do dia — a API já devolve
-      // em ordem cronológica, então é o mais recente/final.
       const fechamento = values[values.length - 1];
       const compra = Number(fechamento.cotacaoCompra);
       const venda = Number(fechamento.cotacaoVenda);
@@ -70,8 +98,9 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY' | 'RUB', debug: s
     }
   }
 
+  // Reserva 2 (só USD): Binance USDT/BRL.
   if (moeda === 'USD') {
-    debug.push('BCB falhou para USD em todas as tentativas — usando reserva Binance (USDT/BRL).');
+    debug.push('BCB também falhou para USD — usando reserva Binance (USDT/BRL).');
     try {
       const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=USDTBRL', {
         headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
@@ -92,34 +121,6 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY' | 'RUB', debug: s
     } catch (e: any) {
       debug.push(`Binance USDTBRL: ${e?.message || String(e)}`);
     }
-  }
-
-  // Reserva final (todas as moedas, especialmente útil para CNY e RUB
-  // que o Banco Central pode não cobrir): Frankfurter — API gratuita e
-  // sem chave que rastreia as taxas de referência do Banco Central
-  // Europeu (inclui Yuan e Rublo).
-  debug.push(`BCB falhou para ${moeda} — usando reserva Frankfurter (taxas do Banco Central Europeu).`);
-  try {
-    const res = await fetch(`https://api.frankfurter.app/latest?from=${moeda}&to=BRL`, {
-      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
-    });
-    if (res.ok) {
-      const data = (await res.json()) as any;
-      const rate = data?.rates?.BRL;
-      if (rate) {
-        return {
-          compra: Number((rate * 0.998).toFixed(4)),
-          venda: Number(rate.toFixed(4)),
-          variacaoPct: 0,
-          atualizadoEm: data.date || new Date().toISOString(),
-        };
-      }
-      debug.push(`Frankfurter ${moeda}: resposta sem taxa BRL utilizável.`);
-    } else {
-      debug.push(`Frankfurter ${moeda}: HTTP ${res.status}`);
-    }
-  } catch (e: any) {
-    debug.push(`Frankfurter ${moeda}: ${e?.message || String(e)}`);
   }
 
   return null;

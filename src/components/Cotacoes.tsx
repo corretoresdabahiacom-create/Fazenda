@@ -78,7 +78,6 @@ interface CotacoesResponse {
   fetchedAt: string; error?: string;
 }
 
-interface AgrolinkData { rows: { produto: string; preco: string; data: string }[]; sourceUrl: string; totalProdutosListados: number }
 
 function classifyTable(table: ParsedTable): 'futuro' | 'atual' {
   const heading = table.heading.toLowerCase();
@@ -198,9 +197,6 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [agrolinkData, setAgrolinkData] = useState<AgrolinkData | null>(null);
-  const [agrolinkLoading, setAgrolinkLoading] = useState(false);
-  const [agrolinkError, setAgrolinkError] = useState<string | null>(null);
 
   const produtoDef = PRODUCTS.find(p => p.id === produto)!;
 
@@ -225,17 +221,6 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     loadCotacoes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produto]);
-
-  useEffect(() => {
-    if (!cidade || !estado) { setAgrolinkData(null); setAgrolinkError(null); return; }
-    setAgrolinkLoading(true);
-    setAgrolinkError(null);
-    fetch(`/api/agrolink-regional?cidade=${encodeURIComponent(cidade)}&estado=${encodeURIComponent(estado)}`)
-      .then(res => res.json())
-      .then(json => { if (json.error) setAgrolinkError(json.error); else setAgrolinkData(json); })
-      .catch(() => setAgrolinkError('Não foi possível buscar cotações do Agrolink para essa cidade agora.'))
-      .finally(() => setAgrolinkLoading(false));
-  }, [cidade, estado]);
 
   function handleDetectLocal() {
     if (!navigator.geolocation) return;
@@ -263,7 +248,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const uf = estado ? UF_POR_ESTADO[estado] : undefined;
   const localBusca = cidade || estado;
 
-  const availableCities = data ? (() => {
+  const realCities = data ? (() => {
     const found = new Set<string>();
     for (const t of filteredTables) {
       for (const row of t.rows.slice(1)) {
@@ -276,11 +261,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         found.add(cell);
       }
     }
-    if (estado && CIDADES_SUGERIDAS[estado]) {
-      for (const c of CIDADES_SUGERIDAS[estado]) found.add(c);
-    }
     return Array.from(found).sort();
-  })() : (estado && CIDADES_SUGERIDAS[estado] ? CIDADES_SUGERIDAS[estado] : []);
+  })() : [];
+
+  // Cidades importantes pra sugerir como próximo passo de busca — só
+  // sugestão de digitação, não é garantia de que a fonte principal tem
+  // dado pra elas (o app avisa "local mais próximo"/"não encontrado" se
+  // não tiver, nunca inventa valor).
+  const suggestedCities = estado && CIDADES_SUGERIDAS[estado] ? CIDADES_SUGERIDAS[estado].filter(c => !realCities.includes(c)) : [];
 
   return (
     <div className="space-y-4">
@@ -357,10 +345,27 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm disabled:opacity-60"
             />
             <datalist id="cidades-disponiveis">
-              {availableCities.map(c => <option key={c} value={c} />)}
+              {realCities.map(c => <option key={c} value={c} />)}
             </datalist>
           </div>
         </div>
+        {realCities.length > 0 && (
+          <p className="text-[10px] text-theme-secondary">
+            {realCities.length} cidade(s)/região(ões) com dado real disponível para {produtoDef.label} — comece a digitar no campo acima para ver a lista.
+          </p>
+        )}
+        {suggestedCities.length > 0 && (
+          <div>
+            <p className="text-[10px] text-theme-secondary mb-1">Cidades importantes da região para tentar (sem garantia de dado disponível):</p>
+            <div className="flex flex-wrap gap-1.5">
+              {suggestedCities.map(c => (
+                <button key={c} onClick={() => setCidade(c)} className="text-[10px] font-semibold px-2 py-1 rounded-full border border-theme text-theme-secondary">
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <button
           onClick={handleDetectLocal}
           disabled={detectingLocal}
@@ -369,7 +374,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           <Navigation size={14} /> {detectingLocal ? 'Detectando...' : 'Usar minha localização'}
         </button>
         <p className="text-[10px] text-theme-secondary">
-          Outros países além do Brasil ainda não têm fonte de dados integrada — em breve.
+          Outros países além do Brasil ainda não têm fonte de dados integrada — em breve. A cobertura de cidades varia por produto: quando a cidade exata não tem dado, mostramos o local mais próximo do mesmo estado.
         </p>
       </div>
 
@@ -440,23 +445,6 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                   </div>
                 </div>
               )}
-              {agrolinkLoading && <p className="text-xs text-theme-secondary text-center py-2">Buscando cotação específica da cidade...</p>}
-              {agrolinkData && agrolinkData.rows.length > 0 && (
-                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden">
-                  <div className="p-3 pb-1"><p className="text-xs font-bold text-theme-primary">📍 Detalhado por cidade — {cidade}</p></div>
-                  <table className="w-full text-sm">
-                    <tbody className="divide-y divide-theme">
-                      {agrolinkData.rows.slice(0, 10).map((r, i) => (
-                        <tr key={i}>
-                          <td className="p-2 text-xs text-theme-secondary">{r.produto}</td>
-                          <td className="p-2 text-xs font-bold text-theme-primary">R$ {r.preco}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              {agrolinkError && <p className="text-[10px] text-theme-secondary">{agrolinkError}</p>}
             </div>
 
             <div className="space-y-2">
