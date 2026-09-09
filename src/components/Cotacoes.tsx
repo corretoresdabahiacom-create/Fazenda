@@ -226,6 +226,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
   const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string } | null>(null);
+  const [boiMundoData, setBoiMundoData] = useState<{ paises: { pais: string; atual: string; haUmAno: string }[]; unidade: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -286,6 +287,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       .then(res => res.json())
       .then(json => { if (!json.error) setTeData(json); else setTeData(null); })
       .catch(() => setTeData(null));
+  }, [produto]);
+
+  useEffect(() => {
+    if (!['boi_gordo', 'vaca', 'novilho', 'novilha'].includes(produto)) { setBoiMundoData(null); return; }
+    fetch('/api/scot-boi-mundo')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setBoiMundoData(json); else setBoiMundoData(null); })
+      .catch(() => setBoiMundoData(null));
   }, [produto]);
 
   function handleDetectLocal() {
@@ -609,39 +618,66 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
             <div className="space-y-2">
               <h2 className="text-sm font-bold text-theme-primary">🌍 Mercado Internacional</h2>
-              <div className="bg-theme-card rounded-2xl border border-theme p-4">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <div className="bg-theme-secondary rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇺🇸 Estados Unidos</p>
-                    {data.mercadoInternacional ? (
-                      <>
-                        <p className="text-sm font-bold text-theme-primary mt-1">{data.mercadoInternacional.valor.toFixed(4)}</p>
-                        <p className="text-[9px] text-theme-secondary">{data.mercadoInternacional.unidade}</p>
-                      </>
-                    ) : <p className="text-xs text-theme-secondary mt-1">Sem contrato de referência para este produto</p>}
+              {boiMundoData ? (
+                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+                  <div className="p-3 pb-1">
+                    <p className="text-xs font-bold text-theme-primary">Comparativo internacional — Boi Gordo</p>
+                    <p className="text-[9px] text-theme-secondary">{boiMundoData.unidade}</p>
                   </div>
-                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇪🇺 Europa</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
-                  </div>
-                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇨🇳 China</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
-                  </div>
-                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇷🇺 Rússia</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
-                  </div>
-                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🇯🇵 Japão</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
-                  </div>
-                  <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
-                    <p className="text-[10px] font-bold text-theme-secondary uppercase">🕌 Oriente Médio</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-theme-secondary">
+                        <th className="text-left p-2.5 text-xs font-bold text-theme-primary">País</th>
+                        <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Atual</th>
+                        <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Há 1 ano</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-theme">
+                      {boiMundoData.paises.map((p, i) => (
+                        <tr key={i} className={/brasil/i.test(p.pais) ? 'bg-[var(--primary-soft)]' : ''}>
+                          <td className="p-2.5 text-xs font-semibold text-theme-primary">{p.pais}</td>
+                          <td className="p-2.5 text-xs text-theme-secondary">{p.atual}</td>
+                          <td className="p-2.5 text-xs text-theme-secondary">{p.haUmAno}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="bg-theme-card rounded-2xl border border-theme p-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div className="bg-theme-secondary rounded-xl p-3">
+                      <p className="text-[10px] font-bold text-theme-secondary uppercase">🇺🇸 Estados Unidos</p>
+                      {data.mercadoInternacional ? (
+                        <>
+                          <p className="text-sm font-bold text-theme-primary mt-1">{data.mercadoInternacional.valor.toFixed(4)}</p>
+                          <p className="text-[9px] text-theme-secondary">{data.mercadoInternacional.unidade}</p>
+                        </>
+                      ) : <p className="text-xs text-theme-secondary mt-1">Sem contrato de referência para este produto</p>}
+                    </div>
+                    <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                      <p className="text-[10px] font-bold text-theme-secondary uppercase">🇪🇺 Europa</p>
+                      <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
+                    </div>
+                    <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                      <p className="text-[10px] font-bold text-theme-secondary uppercase">🇨🇳 China</p>
+                      <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
+                    </div>
+                    <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                      <p className="text-[10px] font-bold text-theme-secondary uppercase">🇷🇺 Rússia</p>
+                      <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
+                    </div>
+                    <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                      <p className="text-[10px] font-bold text-theme-secondary uppercase">🇯🇵 Japão</p>
+                      <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
+                    </div>
+                    <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
+                      <p className="text-[10px] font-bold text-theme-secondary uppercase">🕌 Oriente Médio</p>
+                      <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 text-xs font-semibold text-theme-secondary py-2">
