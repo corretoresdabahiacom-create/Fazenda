@@ -31,6 +31,11 @@ const IEA_KEYWORDS: Record<string, RegExp> = {
   suinos: /su[ií]no/i,
 };
 
+const INCAPER_KEYWORDS: Record<string, RegExp> = {
+  boi_gordo: /boi gordo/i,
+  vaca: /vaca gorda/i,
+};
+
 const PRODUCTS: ProductDef[] = [
   { id: 'boi_gordo', label: 'Boi Gordo', backendKey: 'boi_gordo', filter: /indicador do boi\b|\bboi gordo\b/i },
   { id: 'vaca', label: 'Vaca', backendKey: 'boi_gordo', filter: /indicador da vaca\b|vaca gorda/i },
@@ -249,6 +254,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string } | null>(null);
   const [boiMundoData, setBoiMundoData] = useState<{ paises: { pais: string; atual: string; haUmAno: string }[]; unidade: string } | null>(null);
   const [ieaData, setIeaData] = useState<{ recebidosPelosProdutores: { produto: string; unidade: string; preco: string }[]; mercadoInternoInternacional: { produto: string; mercado: string; unidade: string; preco: string }[] } | null>(null);
+  const [incaperData, setIncaperData] = useState<{ precos: { produto: string; minimo: string; medio: string; maximo: string }[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -315,6 +321,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     fetch('/api/iea-sp')
       .then(res => res.json())
       .then(json => { if (!json.error) setIeaData(json); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/incaper-es')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setIncaperData(json); })
       .catch(() => {});
   }, []);
 
@@ -501,7 +514,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           Outros países além do Brasil ainda não têm fonte de dados integrada — em breve. A cobertura de cidades varia por produto: quando a cidade exata não tem dado, mostramos o local mais próximo do mesmo estado.
         </p>
         <p className="text-[10px] text-theme-secondary">
-          Fontes oficiais estaduais em implementação gradual — hoje cobrimos oficialmente <strong>São Paulo</strong> (IEA-SP). Outros estados usam as fontes de mercado (Notícias Agrícolas/Scot Consultoria/Datagro).
+          Fontes oficiais estaduais em implementação gradual — hoje cobrimos oficialmente <strong>São Paulo</strong> (IEA-SP) e <strong>Espírito Santo</strong> (Incaper). Outros estados usam as fontes de mercado (Notícias Agrícolas/Scot Consultoria/Datagro).
         </p>
       </div>
 
@@ -627,6 +640,25 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                       <p className="text-[9px] text-blue-700">Boi Gordo com padrão de exportação para a China, em São Paulo</p>
                     </div>
                     <p className="text-sm font-bold text-blue-800">R$ {chinaRow.preco} <span className="text-[10px] font-normal">/{chinaRow.unidade}</span></p>
+                  </div>
+                );
+              })()}
+              {(() => {
+                // Incaper só cobre o Espírito Santo — mesma regra de
+                // escopo: só mostra se nenhum estado ou "Espírito Santo"
+                // estiver selecionado.
+                const keyword = INCAPER_KEYWORDS[produto];
+                const estadoCompativel = !estado || estado === 'Espírito Santo';
+                if (!keyword || !incaperData || !estadoCompativel) return null;
+                const row = incaperData.precos.find(r => keyword.test(r.produto));
+                if (!row) return null;
+                return (
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-blue-800">🏛️ Incaper (Oficial — só Espírito Santo)</p>
+                      <p className="text-[9px] text-blue-700">{row.produto} — mín. {row.minimo} / máx. {row.maximo}</p>
+                    </div>
+                    <p className="text-sm font-bold text-blue-800">R$ {row.medio} <span className="text-[10px] font-normal">médio/@</span></p>
                   </div>
                 );
               })()}
