@@ -222,6 +222,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [estado, setEstado] = useState('');
   const [cidade, setCidade] = useState(defaultRegion || '');
   const [detectingLocal, setDetectingLocal] = useState(false);
+  const [showAllCities, setShowAllCities] = useState(false);
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
   const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string } | null>(null);
@@ -410,7 +411,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
             <select
               value={estado}
-              onChange={e => { setEstado(e.target.value); setCidade(''); }}
+              onChange={e => { setEstado(e.target.value); setCidade(''); setShowAllCities(false); }}
               className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none"
             >
               <option value="">Todos os Estados</option>
@@ -438,11 +439,16 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               Cidades com cotação disponível para {produtoDef.label}{estado ? ` em ${estado}` : ''} — capital e praças importantes primeiro:
             </p>
             <div className="flex flex-wrap gap-1.5">
-              {realCities.slice(0, 8).map(c => (
+              {(showAllCities ? realCities : realCities.slice(0, 8)).map(c => (
                 <button key={c} onClick={() => setCidade(c)} className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${cidade === c ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}>
                   {c}
                 </button>
               ))}
+              {realCities.length > 8 && (
+                <button onClick={() => setShowAllCities(!showAllCities)} className="text-[10px] font-bold px-2 py-1 rounded-full border border-dashed border-theme text-[var(--primary)]">
+                  {showAllCities ? 'Ver menos' : `Ver todas (${realCities.length})`}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -500,6 +506,16 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         const regionMatch = primaryAtual ? findRegionRow(primaryAtual, localBusca, uf, estado) : null;
         const displayRow = regionMatch?.row || primaryAtual?.rows[1];
 
+        // Se a cidade digitada não bateu exato, busca especificamente o
+        // preço da CAPITAL do estado escolhido — referência mais útil e
+        // concreta do que só dizer "mostrando geral".
+        const capitalNome = estado ? CIDADES_PRIORITARIAS[estado]?.[0] : undefined;
+        const buscouCidadeEspecifica = !!cidade && estado;
+        const capitalMatch = (primaryAtual && capitalNome && buscouCidadeEspecifica && !regionMatch)
+          ? findRegionRow(primaryAtual, capitalNome)
+          : null;
+        const capitalPreco = capitalMatch?.row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c));
+
         const primaryFuturo = futuroTables[0];
         const estadosTable = buildEstadosTable(filteredTables);
 
@@ -508,6 +524,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <div className="space-y-2">
               <h2 className="text-sm font-bold text-theme-primary">🇧🇷 Preço no Mercado Selecionado{localBusca ? ` — ${localBusca}` : ' — Geral (Brasil)'}</h2>
               {!primaryAtual && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4">Nenhum dado de mercado atual encontrado para {produtoDef.label} no momento.</p>}
+              {buscouCidadeEspecifica && !regionMatch && (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
+                  <p className="text-xs font-semibold text-amber-800">
+                    Não temos cotação específica para <strong>{cidade}</strong> no momento.
+                    {capitalPreco ? <> Como referência mais próxima, a capital <strong>{capitalNome}</strong> está cotada em <strong>R$ {capitalPreco}</strong>.</> : ' Veja o preço geral do estado/Brasil abaixo.'}
+                  </p>
+                </div>
+              )}
               {primaryAtual && displayRow && (
                 <div className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/20 p-4">
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
