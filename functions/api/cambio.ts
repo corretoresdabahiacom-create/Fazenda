@@ -94,6 +94,34 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY' | 'RUB', debug: s
     }
   }
 
+  // Reserva final (todas as moedas, especialmente útil para CNY e RUB
+  // que o Banco Central pode não cobrir): Frankfurter — API gratuita e
+  // sem chave que rastreia as taxas de referência do Banco Central
+  // Europeu (inclui Yuan e Rublo).
+  debug.push(`BCB falhou para ${moeda} — usando reserva Frankfurter (taxas do Banco Central Europeu).`);
+  try {
+    const res = await fetch(`https://api.frankfurter.app/latest?from=${moeda}&to=BRL`, {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as any;
+      const rate = data?.rates?.BRL;
+      if (rate) {
+        return {
+          compra: Number((rate * 0.998).toFixed(4)),
+          venda: Number(rate.toFixed(4)),
+          variacaoPct: 0,
+          atualizadoEm: data.date || new Date().toISOString(),
+        };
+      }
+      debug.push(`Frankfurter ${moeda}: resposta sem taxa BRL utilizável.`);
+    } else {
+      debug.push(`Frankfurter ${moeda}: HTTP ${res.status}`);
+    }
+  } catch (e: any) {
+    debug.push(`Frankfurter ${moeda}: ${e?.message || String(e)}`);
+  }
+
   return null;
 }
 

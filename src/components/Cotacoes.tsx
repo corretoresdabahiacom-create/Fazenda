@@ -135,31 +135,36 @@ function buildEstadosTable(tables: ParsedTable[]): { estado: string; valor: stri
 function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry: CambioEntry | null; flag: string; decimals?: number }) {
   if (!entry) {
     return (
-      <div className="bg-theme-card rounded-2xl border border-theme p-3">
-        <p className="text-[11px] text-theme-secondary">{flag} {label}</p>
+      <div className="bg-theme-card rounded-2xl border border-theme p-3 min-w-0">
+        <p className="text-[11px] text-theme-secondary truncate">{flag} {label}</p>
         <p className="text-xs text-theme-secondary mt-1">Indisponível</p>
       </div>
     );
   }
   const isUp = entry.variacaoPct >= 0;
+  // Números grandes (Bitcoin, Ouro em contextos de alta) quebram o
+  // layout de 2 colunas — nesse caso empilha Compra/Venda um embaixo do
+  // outro em vez de lado a lado, e reduz a fonte.
+  const formatted = entry.venda.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  const isLongValue = formatted.length > 9;
   return (
-    <div className="bg-theme-card rounded-2xl border border-theme p-3">
-      <div className="flex items-center justify-between mb-1.5">
-        <p className="text-[11px] font-bold text-theme-secondary">{flag} {label}</p>
+    <div className="bg-theme-card rounded-2xl border border-theme p-3 min-w-0 overflow-hidden">
+      <div className="flex items-center justify-between mb-1.5 gap-1">
+        <p className="text-[11px] font-bold text-theme-secondary truncate">{flag} {label}</p>
         {entry.variacaoPct !== 0 && (
-          <span className={`text-[9px] font-bold flex items-center gap-0.5 ${isUp ? 'text-green-600' : 'text-red-500'}`}>
+          <span className={`text-[9px] font-bold flex items-center gap-0.5 shrink-0 ${isUp ? 'text-green-600' : 'text-red-500'}`}>
             {isUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />} {entry.variacaoPct}%
           </span>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-1.5">
-        <div>
+      <div className={isLongValue ? 'space-y-1' : 'grid grid-cols-2 gap-1.5'}>
+        <div className="min-w-0">
           <p className="text-[9px] uppercase text-theme-secondary">Compra</p>
-          <p className="text-xs font-bold text-theme-primary">R$ {entry.compra.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</p>
+          <p className="text-xs font-bold text-theme-primary truncate">R$ {entry.compra.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</p>
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-[9px] uppercase text-theme-secondary">Venda</p>
-          <p className="text-xs font-bold text-theme-primary">R$ {entry.venda.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</p>
+          <p className="text-xs font-bold text-theme-primary truncate">R$ {formatted}</p>
         </div>
       </div>
     </div>
@@ -288,14 +293,18 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
       <div>
         {cambioError && <p className="text-xs text-red-500 bg-red-50 rounded-xl p-2 mb-2">{cambioError}</p>}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+        <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Moedas</p>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-2">
           <CambioCard label="Dólar (USD)" entry={cambio?.usd ?? null} flag="🇺🇸" decimals={4} />
           <CambioCard label="Euro (EUR)" entry={cambio?.eur ?? null} flag="🇪🇺" decimals={4} />
           <CambioCard label="Iene (JPY)" entry={cambio?.jpy ?? null} flag="🇯🇵" decimals={4} />
           <CambioCard label="Yuan (CNY)" entry={cambio?.cny ?? null} flag="🇨🇳" decimals={4} />
           <CambioCard label="Rublo (RUB)" entry={cambio?.rub ?? null} flag="🇷🇺" decimals={4} />
+        </div>
+        <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Outros ativos</p>
+        <div className="grid grid-cols-2 gap-2">
           <CambioCard label="Ouro (grama)" entry={cambio?.xau ?? null} flag="🥇" decimals={2} />
-          <CambioCard label="Bitcoin (BTC)" entry={cambio?.btc ?? null} flag="₿" decimals={2} />
+          <CambioCard label="Bitcoin (BTC)" entry={cambio?.btc ?? null} flag="₿" decimals={0} />
         </div>
         {cambio?.dolarFuturoB3 && (
           <div className="mt-2 bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-between">
@@ -416,14 +425,18 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               {!primaryAtual && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4">Nenhum dado de mercado atual encontrado para {produtoDef.label} no momento.</p>}
               {primaryAtual && displayRow && (
                 <div className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/20 p-4">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <Badge kind="atual" />
-                    <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">{detectCurrency(primaryAtual.rows[0])}</span>
                     {localBusca && !regionMatch && <span className="text-[9px] text-theme-secondary">(local não encontrado, mostrando geral)</span>}
                     {localBusca && regionMatch && !regionMatch.exact && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1">
-                    {displayRow.map((cell, i) => <span key={i} className="text-sm text-theme-primary font-semibold">{cell}</span>)}
+                  <div className="flex flex-wrap gap-x-6 gap-y-2">
+                    {displayRow.map((cell, i) => (
+                      <div key={i}>
+                        <p className="text-[9px] uppercase font-bold text-theme-secondary">{primaryAtual.rows[0]?.[i] || ''}</p>
+                        <span className="text-sm text-theme-primary font-semibold">{cell}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -508,23 +521,23 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                   </div>
                   <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
                     <p className="text-[10px] font-bold text-theme-secondary uppercase">🇪🇺 Europa</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável</p>
+                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
                   </div>
                   <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
                     <p className="text-[10px] font-bold text-theme-secondary uppercase">🇨🇳 China</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável</p>
+                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
                   </div>
                   <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
                     <p className="text-[10px] font-bold text-theme-secondary uppercase">🇷🇺 Rússia</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável</p>
+                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
                   </div>
                   <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
                     <p className="text-[10px] font-bold text-theme-secondary uppercase">🇯🇵 Japão</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável</p>
+                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
                   </div>
                   <div className="bg-theme-secondary rounded-xl p-3 opacity-60">
                     <p className="text-[10px] font-bold text-theme-secondary uppercase">🕌 Oriente Médio</p>
-                    <p className="text-xs text-theme-secondary mt-1">Sem fonte gratuita confiável</p>
+                    <p className="text-xs text-theme-secondary mt-1">Sem cotação no momento</p>
                   </div>
                 </div>
               </div>
