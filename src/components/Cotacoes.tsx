@@ -10,6 +10,27 @@ import {
 
 interface ProductDef { id: string; label: string; backendKey: string; filter?: RegExp }
 
+// Palavras-chave para achar a linha certa na tabela oficial do IEA-SP
+// (Governo de São Paulo) pra cada produto — usado pra mostrar o dado
+// oficial ao lado do dado de mercado, quando os dois existirem.
+const IEA_KEYWORDS: Record<string, RegExp> = {
+  boi_gordo: /^boi gordo$/i,
+  vaca: /vaca gorda/i,
+  novilho: /garrote/i,
+  novilha: /novilha/i,
+  milho: /^milho$/i,
+  soja: /^soja$/i,
+  cafe_arabica: /café ar[aá]bico|café benef/i,
+  cafe_conilon: /café robusta/i,
+  arroz: /arroz/i,
+  feijao: /feij[aã]o/i,
+  laranja: /laranja/i,
+  mandioca: /mandioca/i,
+  amendoim: /amendoim/i,
+  ovos: /ovo/i,
+  suinos: /su[ií]no/i,
+};
+
 const PRODUCTS: ProductDef[] = [
   { id: 'boi_gordo', label: 'Boi Gordo', backendKey: 'boi_gordo', filter: /indicador do boi\b|\bboi gordo\b/i },
   { id: 'vaca', label: 'Vaca', backendKey: 'boi_gordo', filter: /indicador da vaca\b|vaca gorda/i },
@@ -227,6 +248,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [data, setData] = useState<CotacoesResponse | null>(null);
   const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string } | null>(null);
   const [boiMundoData, setBoiMundoData] = useState<{ paises: { pais: string; atual: string; haUmAno: string }[]; unidade: string } | null>(null);
+  const [ieaData, setIeaData] = useState<{ recebidosPelosProdutores: { produto: string; unidade: string; preco: string }[]; mercadoInternoInternacional: { produto: string; mercado: string; unidade: string; preco: string }[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -288,6 +310,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       .then(json => { if (!json.error) setTeData(json); else setTeData(null); })
       .catch(() => setTeData(null));
   }, [produto]);
+
+  useEffect(() => {
+    fetch('/api/iea-sp')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setIeaData(json); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!['boi_gordo', 'vaca', 'novilho', 'novilha'].includes(produto)) { setBoiMundoData(null); return; }
@@ -471,6 +500,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         <p className="text-[10px] text-theme-secondary">
           Outros países além do Brasil ainda não têm fonte de dados integrada — em breve. A cobertura de cidades varia por produto: quando a cidade exata não tem dado, mostramos o local mais próximo do mesmo estado.
         </p>
+        <p className="text-[10px] text-theme-secondary">
+          Fontes oficiais estaduais em implementação gradual — hoje cobrimos oficialmente <strong>São Paulo</strong> (IEA-SP). Outros estados usam as fontes de mercado (Notícias Agrícolas/Scot Consultoria/Datagro).
+        </p>
       </div>
 
       {isProdutoModalOpen && (
@@ -567,6 +599,37 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                   <p className="text-sm font-bold text-theme-primary">{teData.preco.toFixed(2)} <span className="text-[10px] font-normal">{teData.unidade}</span></p>
                 </div>
               )}
+              {(() => {
+                const keyword = IEA_KEYWORDS[produto];
+                // O IEA-SP só cobre o Estado de São Paulo — nunca mostra
+                // esse dado se o usuário estiver filtrando por outro
+                // estado, pra não parecer que é da região pesquisada.
+                const estadoCompativel = !estado || estado === 'São Paulo';
+                if (!keyword || !ieaData || !estadoCompativel) return null;
+                const ieaRow = ieaData.recebidosPelosProdutores.find(r => keyword.test(r.produto));
+                if (!ieaRow) return null;
+                return (
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-blue-800">🏛️ IEA-SP (Oficial — só Estado de São Paulo)</p>
+                      <p className="text-[9px] text-blue-700">{ieaRow.produto} — preço recebido pelo produtor, exclusivo de SP</p>
+                    </div>
+                    <p className="text-sm font-bold text-blue-800">R$ {ieaRow.preco} <span className="text-[10px] font-normal">/{ieaRow.unidade}</span></p>
+                  </div>
+                );
+              })()}
+              {produto === 'boi_gordo' && (!estado || estado === 'São Paulo') && ieaData?.recebidosPelosProdutores.find(r => /boi gordo \(china\)/i.test(r.produto)) && (() => {
+                const chinaRow = ieaData.recebidosPelosProdutores.find(r => /boi gordo \(china\)/i.test(r.produto))!;
+                return (
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-blue-800">🏛️ IEA-SP (Oficial, só SP) — Padrão China</p>
+                      <p className="text-[9px] text-blue-700">Boi Gordo com padrão de exportação para a China, em São Paulo</p>
+                    </div>
+                    <p className="text-sm font-bold text-blue-800">R$ {chinaRow.preco} <span className="text-[10px] font-normal">/{chinaRow.unidade}</span></p>
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="space-y-2">
