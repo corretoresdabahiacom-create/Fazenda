@@ -26,7 +26,7 @@ function toMMDDYYYY(d: Date): string {
   return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
 }
 
-async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY', debug: string[]): Promise<CambioEntry | null> {
+async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY' | 'RUB', debug: string[]): Promise<CambioEntry | null> {
   function buildUrl(dateStr: string): string {
     const encodedDate = `%27${dateStr}%27`;
     if (moeda === 'USD') {
@@ -360,10 +360,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const debug: string[] = [];
 
   try {
-    const [usd, eur, jpy, b3Extras] = await Promise.all([
+    const [usd, eur, jpy, cny, rub, b3Extras] = await Promise.all([
       fetchMoeda('USD', debug),
       fetchMoeda('EUR', debug),
       fetchMoeda('JPY', debug),
+      fetchMoeda('CNY', debug),
+      fetchMoeda('RUB', debug),
       fetchB3Extras(),
     ]);
 
@@ -373,7 +375,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     ]);
 
     const response = new Response(JSON.stringify({
-      usd, eur, jpy, xau, btc,
+      usd, eur, jpy, cny, rub, xau, btc,
       dolarFuturoB3: b3Extras.dolarFuturo,
       fonte: 'Banco Central do Brasil (PTAX oficial) — Bitcoin via Mercado Bitcoin, Ouro via B3/Stooq, Dólar Futuro via B3/Notícias Agrícolas',
       debug: debug.length > 0 ? debug : undefined,
