@@ -54,8 +54,38 @@ const UF_POR_ESTADO: Record<string, string> = {
   'Santa Catarina': 'SC', 'São Paulo': 'SP', 'Sergipe': 'SE', 'Tocantins': 'TO',
 };
 
-const CIDADES_SUGERIDAS: Record<string, string[]> = {
-  'Bahia': ['Feira de Santana', 'Alagoinhas', 'Itabuna', 'Santo Antônio de Jesus', 'Serrinha', 'Salvador', 'Ilhéus', 'Itaberaba', 'Barreiras', 'Inhambupe'],
+// Capital + cidades de maior peso econômico/produtivo de cada estado —
+// usado só para ORDENAR as cidades que já têm dado real confirmado
+// (capital e praças importantes aparecem primeiro na lista), nunca para
+// inventar uma cidade sem cotação de verdade.
+const CIDADES_PRIORITARIAS: Record<string, string[]> = {
+  'Acre': ['Rio Branco', 'Cruzeiro do Sul'],
+  'Alagoas': ['Maceió', 'Arapiraca'],
+  'Amapá': ['Macapá'],
+  'Amazonas': ['Manaus', 'Parintins'],
+  'Bahia': ['Salvador', 'Feira de Santana', 'Barreiras', 'Itaberaba', 'Ilhéus', 'Alagoinhas', 'Itabuna', 'Vitória da Conquista'],
+  'Ceará': ['Fortaleza', 'Juazeiro do Norte'],
+  'Distrito Federal': ['Brasília'],
+  'Espírito Santo': ['Vitória', 'Cachoeiro de Itapemirim'],
+  'Goiás': ['Goiânia', 'Rio Verde', 'Anápolis'],
+  'Maranhão': ['São Luís', 'Imperatriz', 'Balsas'],
+  'Mato Grosso': ['Cuiabá', 'Rondonópolis', 'Sorriso', 'Sinop'],
+  'Mato Grosso do Sul': ['Campo Grande', 'Dourados'],
+  'Minas Gerais': ['Belo Horizonte', 'Uberlândia', 'Uberaba', 'Triângulo Mineiro'],
+  'Pará': ['Belém', 'Marabá', 'Santarém'],
+  'Paraíba': ['João Pessoa', 'Campina Grande'],
+  'Paraná': ['Curitiba', 'Londrina', 'Maringá', 'Cascavel'],
+  'Pernambuco': ['Recife', 'Petrolina'],
+  'Piauí': ['Teresina', 'Bom Jesus'],
+  'Rio de Janeiro': ['Rio de Janeiro', 'Campos dos Goytacazes'],
+  'Rio Grande do Norte': ['Natal', 'Mossoró'],
+  'Rio Grande do Sul': ['Porto Alegre', 'Passo Fundo', 'Santa Maria'],
+  'Rondônia': ['Porto Velho', 'Ji-Paraná'],
+  'Roraima': ['Boa Vista'],
+  'Santa Catarina': ['Florianópolis', 'Chapecó', 'Joaçaba'],
+  'São Paulo': ['São Paulo', 'Ribeirão Preto', 'Bauru', 'Araçatuba', 'Barretos'],
+  'Sergipe': ['Aracaju'],
+  'Tocantins': ['Palmas', 'Araguaína'],
 };
 
 const FUTURES_PATTERN = /pregão|futuro|vencimento/i;
@@ -213,7 +243,33 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     setError(null);
     fetch(`/api/cotacoes?produto=${produtoDef.backendKey}`)
       .then(res => res.json())
-      .then(json => { if (json.error) setError(json.error); else setData(json); })
+      .then(json => {
+        if (json.error) {
+          // Fonte principal falhou — tenta uma reserva real antes de
+          // desistir. Por enquanto só temos uma segunda fonte confirmada
+          // (TradingEconomics) para Boi Gordo; outros produtos ainda não
+          // têm reserva verificada, então mostramos o erro sem fingir.
+          if (produtoDef.backendKey === 'boi_gordo') {
+            fetch('/api/tradingeconomics?produto=boi_gordo')
+              .then(r => r.json())
+              .then(te => {
+                if (te.error) { setError(json.error); return; }
+                setError(null);
+                setData({
+                  produto: produtoDef.backendKey,
+                  sourceUrl: te.sourceUrl,
+                  tables: [{ heading: te.nomeExibido, source: 'TradingEconomics (reserva)', rows: [['Local', 'Preço'], ['Brasil (indicador B3)', `${te.preco.toFixed(2)} ${te.unidade}`]] }],
+                  fetchedAt: te.fetchedAt,
+                });
+              })
+              .catch(() => setError(json.error));
+          } else {
+            setError(json.error);
+          }
+        } else {
+          setData(json);
+        }
+      })
       .catch(() => setError('Não foi possível carregar as cotações agora. Tente novamente em instantes.'))
       .finally(() => setLoading(false));
   }
@@ -250,7 +306,19 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     );
   }
 
-  const filteredTables = data ? (produtoDef.filter ? data.tables.filter(t => produtoDef.filter!.test(t.heading)) : data.tables) : [];
+  const filteredTables = data ? (() => {
+    const matched = produtoDef.filter ? data.tables.filter(t => produtoDef.filter!.test(t.heading)) : data.tables;
+    // Quando várias tabelas batem no mesmo filtro (ex: "Indicador do Boi
+    // Gordo Esalq/B3" e "Boi Gordo - Média SP a prazo" são coisas
+    // diferentes, mas ambas contêm "Boi Gordo"), prioriza a que tem
+    // "Indicador" no título — é a referência oficial CEPEA/ESALQ, mais
+    // confiável que variantes regionais/a prazo.
+    return [...matched].sort((a, b) => {
+      const aIndicador = /indicador/i.test(a.heading) ? 0 : 1;
+      const bIndicador = /indicador/i.test(b.heading) ? 0 : 1;
+      return aIndicador - bIndicador;
+    });
+  })() : [];
   const atualTables = filteredTables.filter(t => classifyTable(t) === 'atual');
   const futuroTables = filteredTables.filter(t => classifyTable(t) === 'futuro');
 
@@ -270,14 +338,20 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         found.add(cell);
       }
     }
-    return Array.from(found).sort();
+    const all = Array.from(found);
+    const prioridade = estado ? CIDADES_PRIORITARIAS[estado] || [] : [];
+    // Ordena colocando primeiro as cidades prioritárias (capital e polos
+    // importantes) que realmente têm dado, depois o restante em ordem
+    // alfabética — nunca mostra cidade sem dado real por trás.
+    return all.sort((a, b) => {
+      const pa = prioridade.findIndex(p => a.toLowerCase().includes(p.toLowerCase()));
+      const pb = prioridade.findIndex(p => b.toLowerCase().includes(p.toLowerCase()));
+      if (pa !== -1 && pb === -1) return -1;
+      if (pa === -1 && pb !== -1) return 1;
+      if (pa !== -1 && pb !== -1) return pa - pb;
+      return a.localeCompare(b);
+    });
   })() : [];
-
-  // Cidades importantes pra sugerir como próximo passo de busca — só
-  // sugestão de digitação, não é garantia de que a fonte principal tem
-  // dado pra elas (o app avisa "local mais próximo"/"não encontrado" se
-  // não tiver, nunca inventa valor).
-  const suggestedCities = estado && CIDADES_SUGERIDAS[estado] ? CIDADES_SUGERIDAS[estado].filter(c => !realCities.includes(c)) : [];
 
   return (
     <div className="space-y-4">
@@ -359,16 +433,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           </div>
         </div>
         {realCities.length > 0 && (
-          <p className="text-[10px] text-theme-secondary">
-            {realCities.length} cidade(s)/região(ões) com dado real disponível para {produtoDef.label} — comece a digitar no campo acima para ver a lista.
-          </p>
-        )}
-        {suggestedCities.length > 0 && (
           <div>
-            <p className="text-[10px] text-theme-secondary mb-1">Cidades importantes da região para tentar (sem garantia de dado disponível):</p>
+            <p className="text-[10px] text-theme-secondary mb-1">
+              Cidades com cotação disponível para {produtoDef.label}{estado ? ` em ${estado}` : ''} — capital e praças importantes primeiro:
+            </p>
             <div className="flex flex-wrap gap-1.5">
-              {suggestedCities.map(c => (
-                <button key={c} onClick={() => setCidade(c)} className="text-[10px] font-semibold px-2 py-1 rounded-full border border-theme text-theme-secondary">
+              {realCities.slice(0, 8).map(c => (
+                <button key={c} onClick={() => setCidade(c)} className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${cidade === c ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}>
                   {c}
                 </button>
               ))}
