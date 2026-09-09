@@ -194,6 +194,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [detectingLocal, setDetectingLocal] = useState(false);
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
+  const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -220,6 +221,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   useEffect(() => {
     loadCotacoes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [produto]);
+
+  useEffect(() => {
+    if (produto !== 'boi_gordo') { setTeData(null); return; }
+    fetch(`/api/tradingeconomics?produto=boi_gordo`)
+      .then(res => res.json())
+      .then(json => { if (!json.error) setTeData(json); else setTeData(null); })
+      .catch(() => setTeData(null));
   }, [produto]);
 
   function handleDetectLocal() {
@@ -443,6 +452,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+              {teData && (
+                <div className="bg-theme-secondary rounded-2xl p-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold text-theme-secondary">🌐 {teData.nomeExibido}</p>
+                    <p className="text-[9px] text-theme-secondary">Fonte independente, para conferência</p>
+                  </div>
+                  <p className="text-sm font-bold text-theme-primary">{teData.preco.toFixed(2)} <span className="text-[10px] font-normal">{teData.unidade}</span></p>
                 </div>
               )}
             </div>
