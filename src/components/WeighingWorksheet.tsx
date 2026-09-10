@@ -50,6 +50,7 @@ export default function WeighingWorksheet() {
   // Modals/Ui state
   const [isEditingName, setIsEditingName] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [analiseResultado, setAnaliseResultado] = useState<{ totalExato: number; totalArredondado: number; margemPct: number; direcao: 'igual' | 'maior' | 'menor' } | null>(null);
   const [activeTab, setActiveTab] = useState<'sheets' | 'editor'>('sheets');
 
   // Load selected sheet
@@ -138,6 +139,37 @@ export default function WeighingWorksheet() {
     setSheetRows(sheetRows.filter(r => r.id !== rowId));
   };
 
+  // Compara o Total Geral calculado com precisão total (o que o app
+  // realmente usa internamente) contra o que se chegaria arredondando
+  // cada etapa (peso/animal, arrobas, valor parcial) pras casas
+  // decimais que aparecem na tela antes de seguir pra próxima conta —
+  // como alguém faria copiando os números mostrados numa calculadora.
+  // A diferença entre os dois é a margem de erro real e honesta: dá
+  // mais confiança mostrando que o total automático é o mais preciso
+  // possível, e por quanto ele poderia divergir se recalculado à mão.
+  function analisarPlanilha(rows: WeighingRow[]) {
+    let totalExato = 0;
+    let totalArredondado = 0;
+    for (const row of rows) {
+      const { parcialTotal } = calculateRowValues(row);
+      totalExato += parcialTotal;
+
+      // Simula arredondamento manual: Divisão por 15 e Média @/Animal a
+      // 2 casas (como alguém leria numa calculadora simples), Valor
+      // Parcial a 2 casas, depois multiplica pela quantidade.
+      const divRound = Number(((row.weight / 15) / 2).toFixed(2));
+      const mediaRound = row.quantity > 0 ? Number((divRound / row.quantity).toFixed(2)) : 0;
+      const valorRound = Number((mediaRound * row.arrobaValue).toFixed(2));
+      totalArredondado += valorRound * row.quantity;
+    }
+
+    if (totalExato === 0) return null;
+    const diferenca = totalArredondado - totalExato;
+    const margemPct = Math.abs(diferenca / totalExato) * 100;
+    const direcao: 'igual' | 'maior' | 'menor' = Math.abs(diferenca) < 0.005 ? 'igual' : diferenca > 0 ? 'maior' : 'menor';
+    return { totalExato, totalArredondado, margemPct, direcao };
+  }
+
   const handleSaveSheet = async () => {
     setSaveStatus('saving');
     const id = activeSheetId || `sheet_${Date.now()}`;
@@ -155,6 +187,7 @@ export default function WeighingWorksheet() {
         setActiveSheetId(id);
       }
       setSaveStatus('saved');
+      setAnaliseResultado(analisarPlanilha(sheetRows));
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (err) {
       console.error("Erro ao salvar planilha:", err);
@@ -554,6 +587,22 @@ export default function WeighingWorksheet() {
               </button>
             </div>
           </div>
+
+          {analiseResultado && (
+            <div className={`rounded-2xl border p-3 mb-4 ${analiseResultado.direcao === 'igual' ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+              <p className={`text-xs font-bold mb-1 ${analiseResultado.direcao === 'igual' ? 'text-green-800' : 'text-amber-800'}`}>
+                📊 Análise da planilha
+              </p>
+              <p className={`text-xs ${analiseResultado.direcao === 'igual' ? 'text-green-700' : 'text-amber-700'}`}>
+                Total Geral calculado com precisão total: <strong>R$ {analiseResultado.totalExato.toFixed(2)}</strong>.{' '}
+                {analiseResultado.direcao === 'igual' ? (
+                  <>Esse valor não muda mesmo se cada etapa fosse arredondada à mão — pode confiar nele com segurança (margem de erro: 0%).</>
+                ) : (
+                  <>Se alguém recalculasse arredondando cada etapa numa calculadora (em vez de usar o total automático), chegaria em R$ {analiseResultado.totalArredondado.toFixed(2)} — uma diferença de <strong>{analiseResultado.margemPct.toFixed(3)}% para {analiseResultado.direcao === 'maior' ? 'mais' : 'menos'}</strong>. O valor automático acima é o mais preciso; use-o como referência.</>
+                )}
+              </p>
+            </div>
+          )}
 
           {/* Excel Spreadsheet Table Interface */}
           <div className="bg-white rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">

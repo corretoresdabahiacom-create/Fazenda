@@ -463,10 +463,22 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
   const realCities = data ? (() => {
     const found = new Set<string>();
+    const MESES_RE = /^(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\/\d{2,4}$/i;
+    // Só busca em tabelas "atuais" — tabelas de futuro têm mês/contrato
+    // na primeira coluna (ex: "Dezembro/2026"), não cidade, e por isso
+    // não devem entrar na lista de sugestão de local. Também exclui
+    // siglas soltas de 2 letras (ex: "SP" sozinho, de uma tabela "por
+    // estado") — não representam uma cidade específica pra essa busca,
+    // e clicar nelas não batia com a tabela principal (bug real
+    // encontrado: os botões apareciam mas não mudavam o preço mostrado).
     for (const t of filteredTables) {
+      if (classifyTable(t) !== 'atual') continue;
       for (const row of t.rows.slice(1)) {
         const cell = row[0]?.trim();
-        if (!cell || cell.length < 2 || cell.length > 40 || /^\d/.test(cell) || /r\$|us\$/i.test(cell)) continue;
+        if (!cell || cell.length < 2 || cell.length > 40) continue;
+        if (/^\d/.test(cell) || /r\$|us\$/i.test(cell)) continue;
+        if (MESES_RE.test(cell)) continue;
+        if (/^[a-z]{2}$/i.test(cell)) continue; // sigla de UF sozinha
         if (estado) {
           const matches = cell.toLowerCase().includes(estado.toLowerCase()) || (uf && new RegExp(`\\b${uf}\\b`, 'i').test(cell));
           if (!matches) continue;
@@ -663,6 +675,34 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         const displayRow = regionMatch?.row || primaryAtual?.rows[1];
         const priceCheck = checkPriceAnomaly(produto, displayRow);
 
+        // Quando o estado escolhido tem uma fonte OFICIAL real (SP, ES,
+        // SC, Bahia), ela deve ser o valor PRINCIPAL mostrado — não a
+        // referência nacional genérica (Cepea/Esalq), que é a mesma
+        // pra qualquer estado e por isso "não muda" quando o usuário
+        // troca de local (bug real reportado: o preço parecia travado).
+        const officialOverride = (() => {
+          if (estado === 'São Paulo' && ieaData) {
+            const keyword = IEA_KEYWORDS[produto];
+            const row = keyword ? ieaData.recebidosPelosProdutores.find(r => keyword.test(r.produto)) : null;
+            if (row) return { fonte: 'IEA-SP', preco: row.preco, unidade: row.unidade, sourceUrl: ieaData.sourceUrl, fetchedAt: ieaData.fetchedAt };
+          }
+          if (estado === 'Espírito Santo' && incaperData) {
+            const keyword = INCAPER_KEYWORDS[produto];
+            const row = keyword ? incaperData.precos.find(r => keyword.test(r.produto)) : null;
+            if (row) return { fonte: 'Incaper', preco: row.medio, unidade: '@', sourceUrl: incaperData.sourceUrl, fetchedAt: incaperData.fetchedAt };
+          }
+          if (estado === 'Santa Catarina' && epagriData) {
+            const row = produto === 'boi_gordo' ? epagriData.boiGordo : produto === 'vaca' ? epagriData.vacaGorda : null;
+            if (row) return { fonte: 'Epagri/Cepa', preco: row.preco.toFixed(2), unidade: '@', sourceUrl: epagriData.sourceUrl, fetchedAt: epagriData.fetchedAt };
+          }
+          if (estado === 'Bahia' && aibaData) {
+            const keyword = AIBA_KEYWORDS[produto];
+            const row = keyword ? aibaData.rows.find(r => keyword.test(r.produto)) : null;
+            if (row) return { fonte: 'AIBA (Oeste da Bahia)', preco: row.preco, unidade: row.unidade, sourceUrl: aibaData.sourceUrl, fetchedAt: aibaData.fetchedAt };
+          }
+          return null;
+        })();
+
         // Se a cidade digitada não bateu exato, busca especificamente o
         // preço da CAPITAL do estado escolhido — referência mais útil e
         // concreta do que só dizer "mostrando geral".
@@ -681,6 +721,16 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <div className="space-y-2">
               <h2 className="text-sm font-bold text-theme-primary">🇧🇷 Preço no Mercado Selecionado{localBusca ? ` — ${localBusca}` : ' — Geral (Brasil)'}</h2>
               <AlertasCotacoes produto={produto} produtoLabel={produtoDef.label} quotesResponse={quotesResponse} />
+              {officialOverride && (
+                <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-green-800 bg-green-100 px-2 py-0.5 rounded-full">🏛️ Fonte Oficial — {officialOverride.fonte}</span>
+                  </div>
+                  <p className="text-2xl font-bold text-green-900">R$ {officialOverride.preco} <span className="text-sm font-normal">/{officialOverride.unidade}</span></p>
+                  <p className="text-[10px] text-green-700 mt-1">Preço oficial específico de {estado} — mais preciso que a referência nacional abaixo.</p>
+                  <VerFonte fonte={officialOverride.fonte} dataHora={officialOverride.fetchedAt ? new Date(officialOverride.fetchedAt).toLocaleString('pt-BR') : undefined} url={officialOverride.sourceUrl || ''} />
+                </div>
+              )}
               {!primaryAtual && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4">Nenhum dado de mercado atual encontrado para {produtoDef.label} no momento.</p>}
               {buscouCidadeEspecifica && !regionMatch && (
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
@@ -694,7 +744,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 <div className={`bg-theme-card rounded-2xl border-2 p-4 ${priceCheck.isAnomaly ? 'border-red-300' : 'border-[var(--primary)]/20'}`}>
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <Badge kind="atual" />
-                    {localBusca && !regionMatch && <span className="text-[9px] text-theme-secondary">(local não encontrado, mostrando geral)</span>}
+                    {officialOverride && <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">Referência Nacional (não muda por estado)</span>}
+                    {localBusca && !regionMatch && !officialOverride && <span className="text-[9px] text-theme-secondary">(local não encontrado, mostrando geral)</span>}
                     {localBusca && regionMatch && !regionMatch.exact && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
                   </div>
                   {priceCheck.isAnomaly && (
