@@ -796,12 +796,27 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                   </p>
                 </div>
               )}
-              {primaryAtual && displayRow && (
+              {primaryAtual && displayRow && officialOverride && (
+                <details className="bg-theme-secondary rounded-2xl p-3">
+                  <summary className="cursor-pointer text-xs font-semibold text-theme-secondary select-none">
+                    Ver também: Referência Nacional (Cepea/Esalq) — mesmo valor pra qualquer estado
+                  </summary>
+                  <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                    {displayRow.map((cell, i) => (
+                      <div key={i}>
+                        <p className="text-[9px] uppercase font-bold text-theme-secondary">{primaryAtual.rows[0]?.[i] || ''}</p>
+                        <span className="text-sm text-theme-primary font-semibold">{cell}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <VerFonte fonte={primaryAtual.source || 'Notícias Agrícolas'} dataHora={new Date(data.fetchedAt).toLocaleString('pt-BR')} url={data.sourceUrl} />
+                </details>
+              )}
+              {primaryAtual && displayRow && !officialOverride && (
                 <div className={`bg-theme-card rounded-2xl border-2 p-4 ${priceCheck.isAnomaly ? 'border-red-300' : 'border-[var(--primary)]/20'}`}>
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <Badge kind="atual" />
-                    {officialOverride && <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">Referência Nacional (não muda por estado)</span>}
-                    {localBusca && !regionMatch && !officialOverride && <span className="text-[9px] text-theme-secondary">(local não encontrado, mostrando geral)</span>}
+                    {localBusca && !regionMatch && <span className="text-[9px] text-theme-secondary">(local não encontrado, mostrando geral)</span>}
                     {localBusca && regionMatch && !regionMatch.exact && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
                   </div>
                   {priceCheck.isAnomaly && (

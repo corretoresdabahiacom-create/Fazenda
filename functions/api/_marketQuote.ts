@@ -20,8 +20,28 @@ export type SourceKind = 'oficial' | 'mercado' | 'internacional';
 // deve ser tratado como um dado disponível — geralmente significa erro
 // de leitura ou campo vazio disfarçado de número. Centralizado aqui e
 // usado em TODOS os normalizadores, coberto por teste automatizado.
-export function isValidPrice(price: unknown): price is number {
-  return typeof price === 'number' && !isNaN(price) && isFinite(price) && price > 0;
+//
+// Faixas de sanidade por produto — bug real encontrado em produção:
+// sem isso, um valor claramente errado de leitura (ex: 18.211.009,00 ou
+// 0,60 pra Boi Gordo, que deveria estar entre 150 e 600) passava como
+// "válido" e aparecia como se fosse uma fonte divergente de verdade,
+// gerando alertas de "divergência entre fontes" com a mesma fonte
+// comparada contra ela mesma. Mesma ideia de src/lib/priceSanity.ts,
+// duplicada aqui de propósito (não importada) porque functions/ e src/
+// podem ter resolução de caminho diferente na build da Cloudflare
+// Function — mais seguro manter uma cópia pequena e local.
+const FAIXAS_SANIDADE: Record<string, [number, number]> = {
+  boi_gordo: [150, 600], vaca: [130, 550], novilho: [130, 550], novilha: [130, 550],
+  soja: [60, 250], milho: [20, 130], cafe: [400, 3500], cafe_arabica: [400, 3500], cafe_conilon: [300, 2500],
+  algodao: [60, 280], trigo: [30, 150], arroz: [40, 170], feijao: [100, 600], acucar: [50, 200],
+  suinos: [2, 18], frango: [2, 15], leite: [0.8, 6], sorgo: [20, 100],
+};
+
+export function isValidPrice(price: unknown, produto?: string): price is number {
+  if (typeof price !== 'number' || isNaN(price) || !isFinite(price) || price <= 0) return false;
+  const faixa = produto ? FAIXAS_SANIDADE[produto] : undefined;
+  if (faixa && (price < faixa[0] || price > faixa[1])) return false;
+  return true;
 }
 
 // Campos do documento de spec original que NÃO incluímos aqui, e por
@@ -79,7 +99,7 @@ export function normalizeNoticiasAgricolas(data: any, productId: string, product
       quotes.push({
         productId, productLabel,
         state: null, stateCode: null, region: null, municipality: row[0] || null, marketPlace: row[0] || null,
-        price: isValidPrice(price) ? price : null,
+        price: isValidPrice(price, productId) ? price : null,
         currency: 'BRL',
         unit: (table.rows?.[0] || []).find((h: string) => /r\$|us\$/i.test(h)) || 'R$',
         priceType: isFuturo ? 'futuro' : 'indicador',
@@ -90,7 +110,7 @@ export function normalizeNoticiasAgricolas(data: any, productId: string, product
         sourceKind: 'mercado',
         isOfficial: false,
         isEstimated: false,
-        isAvailable: isValidPrice(price),
+        isAvailable: isValidPrice(price, productId),
       });
     }
   }
@@ -104,12 +124,12 @@ export function normalizeIeaSp(data: any, productId: string, productLabel: strin
     return {
       productId, productLabel,
       state: 'São Paulo', stateCode: 'SP', region: null, municipality: null, marketPlace: null,
-      price: isValidPrice(price) ? price : null,
+      price: isValidPrice(price, productId) ? price : null,
       currency: 'BRL', unit: row.unidade || '@',
       priceType: 'a_vista' as PriceType,
       date: null, fetchedAt: data.fetchedAt || new Date().toISOString(),
       source: 'IEA-SP', sourceUrl: data.sourceUrl, sourceKind: 'oficial' as SourceKind,
-      isOfficial: true, isEstimated: false, isAvailable: isValidPrice(price),
+      isOfficial: true, isEstimated: false, isAvailable: isValidPrice(price, productId),
     };
   });
 }
@@ -121,12 +141,12 @@ export function normalizeIncaperEs(data: any, productId: string, productLabel: s
     return {
       productId, productLabel,
       state: 'Espírito Santo', stateCode: 'ES', region: null, municipality: null, marketPlace: row.produto || null,
-      price: isValidPrice(price) ? price : null,
+      price: isValidPrice(price, productId) ? price : null,
       currency: 'BRL', unit: '@',
       priceType: 'a_vista' as PriceType,
       date: null, fetchedAt: data.fetchedAt || new Date().toISOString(),
       source: 'Incaper', sourceUrl: data.sourceUrl, sourceKind: 'oficial' as SourceKind,
-      isOfficial: true, isEstimated: false, isAvailable: isValidPrice(price),
+      isOfficial: true, isEstimated: false, isAvailable: isValidPrice(price, productId),
     };
   });
 }
@@ -139,11 +159,11 @@ export function normalizeEpagriSc(data: any, productId: string, productLabel: st
     quotes.push({
       productId, productLabel,
       state: 'Santa Catarina', stateCode: 'SC', region: null, municipality: null, marketPlace: row.praca || null,
-      price: isValidPrice(row.preco) ? row.preco : null,
+      price: isValidPrice(row.preco, productId) ? row.preco : null,
       currency: 'BRL', unit: '@',
       priceType: 'a_vista', date: row.data || null, fetchedAt: data.fetchedAt || new Date().toISOString(),
       source: 'Epagri/Cepa', sourceUrl: data.sourceUrl, sourceKind: 'oficial',
-      isOfficial: true, isEstimated: false, isAvailable: isValidPrice(row.preco),
+      isOfficial: true, isEstimated: false, isAvailable: isValidPrice(row.preco, productId),
     });
   }
   return quotes;
@@ -156,18 +176,18 @@ export function normalizeAiba(data: any, productId: string, productLabel: string
     return {
       productId, productLabel,
       state: 'Bahia', stateCode: 'BA', region: 'Oeste da Bahia', municipality: null, marketPlace: null,
-      price: isValidPrice(price) ? price : null,
+      price: isValidPrice(price, productId) ? price : null,
       currency: 'BRL', unit: row.unidade || 'Saca 60kg',
       priceType: 'a_vista' as PriceType,
       date: row.data || null, fetchedAt: data.fetchedAt || new Date().toISOString(),
       source: 'AIBA', sourceUrl: data.sourceUrl, sourceKind: 'mercado' as SourceKind,
-      isOfficial: false, isEstimated: false, isAvailable: isValidPrice(price),
+      isOfficial: false, isEstimated: false, isAvailable: isValidPrice(price, productId),
     };
   });
 }
 
 export function normalizeTradingEconomics(data: any, productId: string, productLabel: string): MarketQuote[] {
-  if (!isValidPrice(data?.preco)) return [];
+  if (!isValidPrice(data?.preco, productId)) return [];
   return [{
     productId, productLabel,
     state: null, stateCode: null, region: null, municipality: null, marketPlace: 'Estados Unidos',
@@ -192,12 +212,12 @@ export function normalizeBoiMundo(data: any, productId: string, productLabel: st
     return {
       productId, productLabel,
       state: null, stateCode: null, region: null, municipality: null, marketPlace: p.pais,
-      price: isValidPrice(price) ? price : null,
+      price: isValidPrice(price, productId) ? price : null,
       currency: 'USD', unit: data.unidade || 'US$/@',
       priceType: 'indicador',
       date: null, fetchedAt: data.fetchedAt || new Date().toISOString(),
       source: 'Scot Consultoria (Boi no Mundo)', sourceUrl: data.sourceUrl, sourceKind: 'internacional',
-      isOfficial: false, isEstimated: false, isAvailable: isValidPrice(price),
+      isOfficial: false, isEstimated: false, isAvailable: isValidPrice(price, productId),
     };
   });
 }
