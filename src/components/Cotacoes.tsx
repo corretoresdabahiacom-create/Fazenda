@@ -237,6 +237,24 @@ function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry
   );
 }
 
+// Botão "Ver fonte" — mostra de onde veio o dado (nome, data/hora
+// exatas, e link pra fonte original) em qualquer cotação exibida.
+// Implementado como <details> nativo, sem estado extra em React.
+function VerFonte({ fonte, dataHora, url }: { fonte: string; dataHora?: string; url: string }) {
+  return (
+    <details className="mt-1.5 text-[10px]">
+      <summary className="cursor-pointer font-semibold text-theme-secondary underline decoration-dotted select-none">Ver fonte</summary>
+      <div className="mt-1 pl-2 border-l-2 border-theme space-y-0.5">
+        <p className="text-theme-secondary"><span className="font-bold">Fonte:</span> {fonte}</p>
+        {dataHora && <p className="text-theme-secondary"><span className="font-bold">Data/hora:</span> {dataHora}</p>}
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-[var(--primary)] font-semibold underline break-all">
+          {url}
+        </a>
+      </div>
+    </details>
+  );
+}
+
 function Badge({ kind }: { kind: 'atual' | 'futuro' }) {
   return (
     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap ${
@@ -262,12 +280,12 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [showAllCities, setShowAllCities] = useState(false);
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
-  const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string } | null>(null);
-  const [boiMundoData, setBoiMundoData] = useState<{ paises: { pais: string; atual: string; haUmAno: string }[]; unidade: string } | null>(null);
-  const [ieaData, setIeaData] = useState<{ recebidosPelosProdutores: { produto: string; unidade: string; preco: string }[]; mercadoInternoInternacional: { produto: string; mercado: string; unidade: string; preco: string }[] } | null>(null);
-  const [incaperData, setIncaperData] = useState<{ precos: { produto: string; minimo: string; medio: string; maximo: string }[] } | null>(null);
-  const [epagriData, setEpagriData] = useState<{ boiGordo: { data: string; preco: number; praca?: string } | null; vacaGorda: { data: string; preco: number; praca?: string } | null } | null>(null);
-  const [aibaData, setAibaData] = useState<{ rows: { produto: string; unidade: string; preco: string; variacaoPct: string; data: string }[] } | null>(null);
+  const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string; sourceUrl?: string; fetchedAt?: string } | null>(null);
+  const [boiMundoData, setBoiMundoData] = useState<{ paises: { pais: string; atual: string; haUmAno: string }[]; unidade: string; sourceUrl?: string; fetchedAt?: string } | null>(null);
+  const [ieaData, setIeaData] = useState<{ recebidosPelosProdutores: { produto: string; unidade: string; preco: string }[]; mercadoInternoInternacional: { produto: string; mercado: string; unidade: string; preco: string }[]; sourceUrl?: string; fetchedAt?: string } | null>(null);
+  const [incaperData, setIncaperData] = useState<{ precos: { produto: string; minimo: string; medio: string; maximo: string }[]; sourceUrl?: string; fetchedAt?: string } | null>(null);
+  const [epagriData, setEpagriData] = useState<{ boiGordo: { data: string; preco: number; praca?: string } | null; vacaGorda: { data: string; preco: number; praca?: string } | null; sourceUrl?: string; fetchedAt?: string } | null>(null);
+  const [aibaData, setAibaData] = useState<{ rows: { produto: string; unidade: string; preco: string; variacaoPct: string; data: string }[]; sourceUrl?: string; fetchedAt?: string } | null>(null);
   const [pecuariaData, setPecuariaData] = useState<{ rows: { data: string; SP: string; MS: string; MG: string; GO: string; MT: string; RJ: string }[]; unidade: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -637,15 +655,19 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                       </div>
                     ))}
                   </div>
+                  <VerFonte fonte={primaryAtual.source || 'Notícias Agrícolas'} dataHora={new Date(data.fetchedAt).toLocaleString('pt-BR')} url={data.sourceUrl} />
                 </div>
               )}
               {teData && (
-                <div className="bg-theme-secondary rounded-2xl p-3 flex items-center justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold text-theme-secondary">🌐 {teData.nomeExibido}</p>
-                    <p className="text-[9px] text-theme-secondary">Fonte independente, para conferência</p>
+                <div className="bg-theme-secondary rounded-2xl p-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-theme-secondary">🌐 {teData.nomeExibido}</p>
+                      <p className="text-[9px] text-theme-secondary">Fonte independente, para conferência</p>
+                    </div>
+                    <p className="text-sm font-bold text-theme-primary">{teData.preco.toFixed(2)} <span className="text-[10px] font-normal">{teData.unidade}</span></p>
                   </div>
-                  <p className="text-sm font-bold text-theme-primary">{teData.preco.toFixed(2)} <span className="text-[10px] font-normal">{teData.unidade}</span></p>
+                  {teData.sourceUrl && <VerFonte fonte="TradingEconomics" dataHora={teData.fetchedAt ? new Date(teData.fetchedAt).toLocaleString('pt-BR') : undefined} url={teData.sourceUrl} />}
                 </div>
               )}
               {(() => {
@@ -658,12 +680,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 const ieaRow = ieaData.recebidosPelosProdutores.find(r => keyword.test(r.produto));
                 if (!ieaRow) return null;
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold text-blue-800">🏛️ IEA-SP (Oficial — só Estado de São Paulo)</p>
-                      <p className="text-[9px] text-blue-700">{ieaRow.produto} — preço recebido pelo produtor, exclusivo de SP</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold text-blue-800">🏛️ IEA-SP (Oficial — só Estado de São Paulo)</p>
+                        <p className="text-[9px] text-blue-700">{ieaRow.produto} — preço recebido pelo produtor, exclusivo de SP</p>
+                      </div>
+                      <p className="text-sm font-bold text-blue-800">R$ {ieaRow.preco} <span className="text-[10px] font-normal">/{ieaRow.unidade}</span></p>
                     </div>
-                    <p className="text-sm font-bold text-blue-800">R$ {ieaRow.preco} <span className="text-[10px] font-normal">/{ieaRow.unidade}</span></p>
+                    {ieaData.sourceUrl && <VerFonte fonte="IEA-SP (Governo de São Paulo)" dataHora={ieaData.fetchedAt ? new Date(ieaData.fetchedAt).toLocaleString('pt-BR') : undefined} url={ieaData.sourceUrl} />}
                   </div>
                 );
               })()}
@@ -689,12 +714,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 const row = incaperData.precos.find(r => keyword.test(r.produto));
                 if (!row) return null;
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold text-blue-800">🏛️ Incaper (Oficial — só Espírito Santo)</p>
-                      <p className="text-[9px] text-blue-700">{row.produto} — mín. {row.minimo} / máx. {row.maximo}</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold text-blue-800">🏛️ Incaper (Oficial — só Espírito Santo)</p>
+                        <p className="text-[9px] text-blue-700">{row.produto} — mín. {row.minimo} / máx. {row.maximo}</p>
+                      </div>
+                      <p className="text-sm font-bold text-blue-800">R$ {row.medio} <span className="text-[10px] font-normal">médio/@</span></p>
                     </div>
-                    <p className="text-sm font-bold text-blue-800">R$ {row.medio} <span className="text-[10px] font-normal">médio/@</span></p>
+                    {incaperData.sourceUrl && <VerFonte fonte="Incaper (Governo do Espírito Santo)" dataHora={incaperData.fetchedAt ? new Date(incaperData.fetchedAt).toLocaleString('pt-BR') : undefined} url={incaperData.sourceUrl} />}
                   </div>
                 );
               })()}
@@ -705,12 +733,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 const row = produto === 'boi_gordo' ? epagriData.boiGordo : produto === 'vaca' ? epagriData.vacaGorda : null;
                 if (!row) return null;
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold text-blue-800">🏛️ Epagri/Cepa (Oficial — só Santa Catarina)</p>
-                      <p className="text-[9px] text-blue-700">{row.praca ? `${row.praca} — ` : ''}{row.data}</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold text-blue-800">🏛️ Epagri/Cepa (Oficial — só Santa Catarina)</p>
+                        <p className="text-[9px] text-blue-700">{row.praca ? `${row.praca} — ` : ''}{row.data}</p>
+                      </div>
+                      <p className="text-sm font-bold text-blue-800">R$ {row.preco.toFixed(2)} <span className="text-[10px] font-normal">/@</span></p>
                     </div>
-                    <p className="text-sm font-bold text-blue-800">R$ {row.preco.toFixed(2)} <span className="text-[10px] font-normal">/@</span></p>
+                    {epagriData.sourceUrl && <VerFonte fonte="Epagri/Cepa (Governo de Santa Catarina)" dataHora={epagriData.fetchedAt ? new Date(epagriData.fetchedAt).toLocaleString('pt-BR') : undefined} url={epagriData.sourceUrl} />}
                   </div>
                 );
               })()}
@@ -722,12 +753,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 const row = aibaData.rows.find(r => keyword.test(r.produto));
                 if (!row) return null;
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold text-blue-800">🏛️ AIBA (Oeste da Bahia) — {row.produto}</p>
-                      <p className="text-[9px] text-blue-700">{row.data} · {row.variacaoPct}%</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold text-blue-800">🏛️ AIBA (Oeste da Bahia) — {row.produto}</p>
+                        <p className="text-[9px] text-blue-700">{row.data} · {row.variacaoPct}%</p>
+                      </div>
+                      <p className="text-sm font-bold text-blue-800">R$ {row.preco} <span className="text-[10px] font-normal">/{row.unidade}</span></p>
                     </div>
-                    <p className="text-sm font-bold text-blue-800">R$ {row.preco} <span className="text-[10px] font-normal">/{row.unidade}</span></p>
+                    {aibaData.sourceUrl && <VerFonte fonte="AIBA (Associação de Agricultores e Irrigantes da Bahia)" dataHora={aibaData.fetchedAt ? new Date(aibaData.fetchedAt).toLocaleString('pt-BR') : undefined} url={aibaData.sourceUrl} />}
                   </div>
                 );
               })()}
@@ -751,6 +785,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                       ))}
                     </tbody>
                   </table>
+                  <div className="px-3 pb-3">
+                    <VerFonte fonte={primaryFuturo.source || 'B3 / Notícias Agrícolas'} dataHora={new Date(data.fetchedAt).toLocaleString('pt-BR')} url={data.sourceUrl} />
+                  </div>
                 </div>
               )}
             </div>
@@ -830,6 +867,11 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                       ))}
                     </tbody>
                   </table>
+                  {boiMundoData.sourceUrl && (
+                    <div className="px-3 pb-3">
+                      <VerFonte fonte="Scot Consultoria" dataHora={boiMundoData.fetchedAt ? new Date(boiMundoData.fetchedAt).toLocaleString('pt-BR') : undefined} url={boiMundoData.sourceUrl} />
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="bg-theme-card rounded-2xl border border-theme p-4">

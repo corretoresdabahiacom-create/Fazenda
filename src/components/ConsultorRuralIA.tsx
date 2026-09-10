@@ -35,6 +35,7 @@ interface Props {
 
 const SUGGESTIONS = [
   'Posso pulverizar hoje?',
+  'Qual o preço do boi gordo hoje?',
   'Qual meu saldo financeiro?',
   'Alguma vaca próxima do parto?',
   'Tem alguma vacina pendente?',
@@ -68,7 +69,7 @@ export default function ConsultorRuralIA({
         }
       }
 
-      const result = answerRuralQuestion(q, {
+      const result = await answerRuralQuestion(q, {
         weather,
         accountsPayable,
         accountsReceivable,

@@ -43,8 +43,102 @@ function normalize(s: string): string {
     .replace(/[\u0300-\u036f]/g, ''); // remove acentos, pra "não" e "nao" darem match igual
 }
 
-export function answerRuralQuestion(question: string, ctx: AdvisorContext): AdvisorAnswer {
+// Produtos reconhecidos em perguntas de preço/cotação, e o produto
+// correspondente na tela de Cotações (mesma chave usada em
+// functions/api/cotacoes.ts) — usado pra buscar o dado REAL antes de
+// responder, nunca inventando um número.
+const PRICE_PRODUCT_KEYWORDS: { pattern: RegExp; backendKey: string; label: string }[] = [
+  { pattern: /\bboi\s*gordo\b|\bboi\b(?!\s*no\s*mundo)/i, backendKey: 'boi_gordo', label: 'Boi Gordo' },
+  { pattern: /\bvaca\s*gorda\b|\bvaca\b/i, backendKey: 'boi_gordo', label: 'Vaca' },
+  { pattern: /\bnovilh[ao]\b/i, backendKey: 'boi_gordo', label: 'Novilha' },
+  { pattern: /\bgarrote\b|\bnovilho\b/i, backendKey: 'boi_gordo', label: 'Novilho/Garrote' },
+  { pattern: /\bsoja\b/i, backendKey: 'soja', label: 'Soja' },
+  { pattern: /\bmilho\b/i, backendKey: 'milho', label: 'Milho' },
+  { pattern: /\bcaf[eé]\b/i, backendKey: 'cafe', label: 'Café' },
+  { pattern: /\balgod[aã]o\b/i, backendKey: 'algodao', label: 'Algodão' },
+  { pattern: /\btrigo\b/i, backendKey: 'trigo', label: 'Trigo' },
+  { pattern: /\barroz\b/i, backendKey: 'arroz', label: 'Arroz' },
+  { pattern: /\bfeij[aã]o\b/i, backendKey: 'feijao', label: 'Feijão' },
+  { pattern: /\bsu[ií]no\b|\bporco\b/i, backendKey: 'suinos', label: 'Suínos' },
+  { pattern: /\bfrango\b/i, backendKey: 'frango', label: 'Frango' },
+  { pattern: /\bleite\b/i, backendKey: 'leite', label: 'Leite' },
+  { pattern: /\bsorgo\b/i, backendKey: 'sorgo', label: 'Sorgo' },
+  { pattern: /\baçucar\b|\bacucar\b/i, backendKey: 'acucar', label: 'Açúcar' },
+  { pattern: /\blaranja\b/i, backendKey: 'laranja', label: 'Laranja' },
+];
+
+function isPriceQuestion(q: string): boolean {
+  return /\bpreco\b|\bcotacao\b|\bcotacoes\b|\bquanto\s*(esta|custa|vale|tao)\b|\bvalor\s*d[aeo]\b|\barroba\b/i.test(q);
+}
+
+// Extrai um nome de local (cidade/estado) simples da pergunta, se
+// houver algo como "em barretos" ou "na bahia" — usado só pra tentar
+// achar a linha regional certa nos dados já buscados, sem garantir que
+// vai existir (o app já avisa quando não encontra).
+function extractLocation(q: string): string | null {
+  const match = q.match(/\b(?:em|na|no)\s+([a-zà-ú çãõéê\s]{3,30})$/i) || q.match(/\b(?:em|na|no)\s+([a-zà-ú çãõéê]{3,25})\b/i);
+  return match ? match[1].trim() : null;
+}
+
+async function tryAnswerPriceQuestion(q: string, originalQuestion: string): Promise<AdvisorAnswer | null> {
+  if (!isPriceQuestion(q)) return null;
+  const productMatch = PRICE_PRODUCT_KEYWORDS.find(p => p.pattern.test(q));
+  if (!productMatch) return null;
+
+  try {
+    const res = await fetch(`/api/cotacoes?produto=${productMatch.backendKey}`);
+    const data = await res.json();
+    if (data.error || !data.tables?.length) {
+      return {
+        answer: `Não consegui buscar a cotação de ${productMatch.label} agora — a fonte de dados pode estar temporariamente indisponível. Você pode conferir direto na tela de Cotações.`,
+        basedOnRealData: false,
+      };
+    }
+
+    const atualTable = data.tables.find((t: any) => !/pregão|futuro|vencimento/i.test(t.heading));
+    if (!atualTable) {
+      return {
+        answer: `Encontrei dados de ${productMatch.label}, mas não um preço de mercado atual específico agora. Veja a tela de Cotações para o detalhe completo.`,
+        basedOnRealData: false,
+      };
+    }
+
+    const location = extractLocation(q);
+    let displayRow = atualTable.rows[1];
+    let foundLocation = false;
+    if (location) {
+      const term = normalize(location);
+      const match = atualTable.rows.slice(1).find((r: string[]) => r.some(c => normalize(c).includes(term)));
+      if (match) { displayRow = match; foundLocation = true; }
+    }
+
+    if (!displayRow) return null;
+    const headers = atualTable.rows[0] || [];
+    const parts = displayRow.map((cell: string, i: number) => `${headers[i] || ''}: ${cell}`).join(', ');
+
+    const localeText = location
+      ? (foundLocation ? ` em ${location}` : ` (não achei dado específico de "${location}", mostrando o geral)`)
+      : '';
+
+    return {
+      answer: `${productMatch.label}${localeText}: ${parts}. Fonte: ${atualTable.source || 'Notícias Agrícolas'}, dado buscado agora. Veja mais detalhes e o comparativo por estado na tela de Cotações.`,
+      basedOnRealData: true,
+    };
+  } catch {
+    return {
+      answer: `Não consegui buscar a cotação de ${productMatch.label} agora por uma falha de conexão. Tente de novo em instantes, ou confira direto na tela de Cotações.`,
+      basedOnRealData: false,
+    };
+  }
+}
+
+export async function answerRuralQuestion(question: string, ctx: AdvisorContext): Promise<AdvisorAnswer> {
   const q = normalize(question);
+
+  // ---- Preço / cotação de mercado — busca dado real na tela de
+  // Cotações antes de responder, nunca inventando número. ----
+  const priceAnswer = await tryAnswerPriceQuestion(q, question);
+  if (priceAnswer) return priceAnswer;
 
   // ---- Pulverização / vento / clima operacional ----
   if (
