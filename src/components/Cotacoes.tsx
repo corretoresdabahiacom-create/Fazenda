@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { isPriceAnomalous, extractNumber, findPriceCell } from '../lib/priceSanity';
 import DashboardBahia from './DashboardBahia';
+import AlertasCotacoes from './AlertasCotacoes';
 import {
   DollarSign, TrendingUp, TrendingDown, Search, RefreshCw, ExternalLink, AlertTriangle, MapPin, Navigation, Globe,
 } from 'lucide-react';
@@ -292,6 +293,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [detectingLocal, setDetectingLocal] = useState(false);
   const [showAllCities, setShowAllCities] = useState(false);
   const [showBahiaDashboard, setShowBahiaDashboard] = useState(false);
+  const [quotesResponse, setQuotesResponse] = useState<{ quotes: any[]; semCotacaoDisponivel: number } | null>(null);
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
   const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string; sourceUrl?: string; fetchedAt?: string } | null>(null);
@@ -354,6 +356,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     loadCotacoes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produto]);
+
+  useEffect(() => {
+    const params = new URLSearchParams({ product: produto });
+    if (estado) params.set('state', estado);
+    fetch(`/api/quotes?${params}`)
+      .then(res => res.json())
+      .then(json => { if (!json.error) setQuotesResponse(json); else setQuotesResponse(null); })
+      .catch(() => setQuotesResponse(null));
+  }, [produto, estado]);
 
   useEffect(() => {
     if (produto !== 'boi_gordo') { setTeData(null); return; }
@@ -655,6 +666,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           <div className="space-y-4">
             <div className="space-y-2">
               <h2 className="text-sm font-bold text-theme-primary">🇧🇷 Preço no Mercado Selecionado{localBusca ? ` — ${localBusca}` : ' — Geral (Brasil)'}</h2>
+              <AlertasCotacoes produto={produto} produtoLabel={produtoDef.label} quotesResponse={quotesResponse} />
               {!primaryAtual && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4">Nenhum dado de mercado atual encontrado para {produtoDef.label} no momento.</p>}
               {buscouCidadeEspecifica && !regionMatch && (
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
