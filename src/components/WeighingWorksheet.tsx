@@ -121,7 +121,7 @@ export default function WeighingWorksheet() {
         if (row.id === rowId) {
           const updated = { ...row, [field]: value };
           if (field === 'weight') {
-            updated.divisionBy15 = value / 15;
+            updated.divisionBy15 = (value / 15) / 2; // com rendimento de carcaça — mantido só por consistência, não é mais lido em nenhum cálculo
           }
           return updated;
         }
@@ -212,12 +212,13 @@ export default function WeighingWorksheet() {
   // Formulas for calculations per row
   const calculateRowValues = (row: WeighingRow) => {
     // divisionBy15 é campo só de exibição (não editável) — sempre
-    // recalcula do peso atual, nunca confia num valor antigo que possa
-    // ter sido salvo no servidor com uma fórmula anterior (bug real
-    // encontrado: planilhas salvas antes de uma correção anterior
-    // ficavam com esse valor errado "preso" mesmo depois do código ser
-    // corrigido, porque o app preferia o valor salvo ao recalculado).
-    const divisionBy15 = row.weight / 15;
+    // recalcula do peso atual, nunca confia num valor antigo salvo.
+    // Inclui o rendimento de carcaça (~50%): a arroba de comércio é
+    // calculada sobre o peso de CARCAÇA, não o peso vivo direto — por
+    // isso divide por 15 e depois por 2 (rendimento médio de ~50%),
+    // e não só por 15. Esse ajuste entra aqui, na origem, pra propagar
+    // certo pra Média @/Animal, Valor Parcial e Total Geral também.
+    const divisionBy15 = (row.weight / 15) / 2;
     // parcialArrobaAnimal is "Média @/Animal" = divisionBy15 / quantity
     const parcialArrobaAnimal = row.quantity > 0 ? (divisionBy15 / row.quantity) : 0;
     // valorParcialAnimal is "Valor parcial/ animal" = Média @/Animal × Valor da Arroba
@@ -390,11 +391,10 @@ export default function WeighingWorksheet() {
               const rowCount = sheet.rows?.length || 0;
               const heads = sheet.rows?.reduce((acc, current) => acc + (current.quantity || 0), 0) || 0;
               const totalKg = sheet.rows?.reduce((acc, current) => acc + (current.weight || 0), 0) || 0;
-              // Sempre recalcula do peso atual (mesmo motivo do
-              // calculateRowValues) — nunca confia num divisionBy15
-              // salvo antigo, que pode estar errado de uma versão
-              // anterior da fórmula.
-              const totalAt = sheet.rows?.reduce((acc, current) => acc + ((current.weight || 0) / 15), 0) || 0;
+              // Mesma fórmula de calculateRowValues: peso/15/2 (com
+              // rendimento de carcaça ~50%) — nunca confia num valor
+              // salvo antigo.
+              const totalAt = sheet.rows?.reduce((acc, current) => acc + (((current.weight || 0) / 15) / 2), 0) || 0;
 
               return (
                 <motion.div
