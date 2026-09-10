@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { isPriceAnomalous, extractNumber } from '../lib/priceSanity';
 import {
   DollarSign, TrendingUp, TrendingDown, Search, RefreshCw, ExternalLink, AlertTriangle, MapPin, Navigation, Globe,
 } from 'lucide-react';
@@ -126,6 +127,17 @@ const CIDADES_PRIORITARIAS: Record<string, string[]> = {
 };
 
 const FUTURES_PATTERN = /pregão|futuro|vencimento/i;
+
+function checkPriceAnomaly(produto: string, row: string[] | undefined): { isAnomaly: boolean; value: number | null } {
+  if (!row) return { isAnomaly: false, value: null };
+  const priceCell = row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c));
+  if (!priceCell) return { isAnomaly: false, value: null };
+  return { isAnomaly: isPriceAnomalous(produto, priceCell), value: extractNumber(priceCell) };
+}
+
+function checkSimplePriceAnomaly(produto: string, priceStr: string | undefined): boolean {
+  return isPriceAnomalous(produto, priceStr);
+}
 
 interface CambioEntry { compra: number; venda: number; variacaoPct: number; atualizadoEm: string }
 
@@ -613,6 +625,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         const primaryAtual = atualTables[0];
         const regionMatch = primaryAtual ? findRegionRow(primaryAtual, localBusca, uf, estado) : null;
         const displayRow = regionMatch?.row || primaryAtual?.rows[1];
+        const priceCheck = checkPriceAnomaly(produto, displayRow);
 
         // Se a cidade digitada não bateu exato, busca especificamente o
         // preço da CAPITAL do estado escolhido — referência mais útil e
@@ -641,12 +654,20 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 </div>
               )}
               {primaryAtual && displayRow && (
-                <div className="bg-theme-card rounded-2xl border-2 border-[var(--primary)]/20 p-4">
+                <div className={`bg-theme-card rounded-2xl border-2 p-4 ${priceCheck.isAnomaly ? 'border-red-300' : 'border-[var(--primary)]/20'}`}>
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <Badge kind="atual" />
                     {localBusca && !regionMatch && <span className="text-[9px] text-theme-secondary">(local não encontrado, mostrando geral)</span>}
                     {localBusca && regionMatch && !regionMatch.exact && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
                   </div>
+                  {priceCheck.isAnomaly && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-2.5 mb-3 flex items-start gap-2">
+                      <AlertTriangle size={14} className="text-red-500 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-red-700">
+                        <strong>Atenção:</strong> este valor está fora da faixa normal esperada pra {produtoDef.label} — pode ser oscilação real de mercado, ou um erro de leitura da fonte. Confira em "Ver fonte" antes de usar pra negociar.
+                      </p>
+                    </div>
+                  )}
                   <div className="flex flex-wrap gap-x-6 gap-y-2">
                     {displayRow.map((cell, i) => (
                       <div key={i}>
@@ -679,8 +700,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 if (!keyword || !ieaData || !estadoCompativel) return null;
                 const ieaRow = ieaData.recebidosPelosProdutores.find(r => keyword.test(r.produto));
                 if (!ieaRow) return null;
+                const ieaAnomaly = checkSimplePriceAnomaly(produto, ieaRow.preco);
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+                  <div className={`bg-blue-50 border rounded-2xl p-3 ${ieaAnomaly ? 'border-red-300' : 'border-blue-200'}`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-bold text-blue-800">🏛️ IEA-SP (Oficial — só Estado de São Paulo)</p>
@@ -688,6 +710,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                       </div>
                       <p className="text-sm font-bold text-blue-800">R$ {ieaRow.preco} <span className="text-[10px] font-normal">/{ieaRow.unidade}</span></p>
                     </div>
+                    {ieaAnomaly && <p className="text-[10px] text-red-600 font-semibold mt-1">⚠️ Valor fora da faixa esperada — confira a fonte.</p>}
                     {ieaData.sourceUrl && <VerFonte fonte="IEA-SP (Governo de São Paulo)" dataHora={ieaData.fetchedAt ? new Date(ieaData.fetchedAt).toLocaleString('pt-BR') : undefined} url={ieaData.sourceUrl} />}
                   </div>
                 );
@@ -752,8 +775,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 if (!keyword || !aibaData || !estadoCompativel) return null;
                 const row = aibaData.rows.find(r => keyword.test(r.produto));
                 if (!row) return null;
+                const aibaAnomaly = checkSimplePriceAnomaly(produto, row.preco);
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+                  <div className={`bg-blue-50 border rounded-2xl p-3 ${aibaAnomaly ? 'border-red-300' : 'border-blue-200'}`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-bold text-blue-800">🏛️ AIBA (Oeste da Bahia) — {row.produto}</p>
@@ -761,6 +785,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                       </div>
                       <p className="text-sm font-bold text-blue-800">R$ {row.preco} <span className="text-[10px] font-normal">/{row.unidade}</span></p>
                     </div>
+                    {aibaAnomaly && <p className="text-[10px] text-red-600 font-semibold mt-1">⚠️ Valor fora da faixa esperada — confira a fonte.</p>}
                     {aibaData.sourceUrl && <VerFonte fonte="AIBA (Associação de Agricultores e Irrigantes da Bahia)" dataHora={aibaData.fetchedAt ? new Date(aibaData.fetchedAt).toLocaleString('pt-BR') : undefined} url={aibaData.sourceUrl} />}
                   </div>
                 );

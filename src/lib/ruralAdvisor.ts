@@ -15,6 +15,7 @@ import {
   InventoryItem,
 } from '../types';
 import { differenceInCalendarDays, format } from 'date-fns';
+import { isPriceAnomalous } from './priceSanity';
 
 export interface AdvisorContext {
   weather: WeatherSnapshot | null;
@@ -120,8 +121,13 @@ async function tryAnswerPriceQuestion(q: string, originalQuestion: string): Prom
       ? (foundLocation ? ` em ${location}` : ` (não achei dado específico de "${location}", mostrando o geral)`)
       : '';
 
+    const priceCell = displayRow.find((c: string) => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c));
+    const anomalyWarning = isPriceAnomalous(productMatch.backendKey, priceCell)
+      ? ' ⚠️ Atenção: esse valor está fora da faixa normal esperada — pode ser uma oscilação real forte, ou um erro de leitura da fonte. Confira na tela de Cotações antes de usar pra negociar.'
+      : '';
+
     return {
-      answer: `${productMatch.label}${localeText}: ${parts}. Fonte: ${atualTable.source || 'Notícias Agrícolas'}, dado buscado agora. Veja mais detalhes e o comparativo por estado na tela de Cotações.`,
+      answer: `${productMatch.label}${localeText}: ${parts}. Fonte: ${atualTable.source || 'Notícias Agrícolas'}, dado buscado agora.${anomalyWarning} Veja mais detalhes e o comparativo por estado na tela de Cotações.`,
       basedOnRealData: true,
     };
   } catch {
