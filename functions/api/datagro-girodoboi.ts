@@ -20,17 +20,29 @@
 
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
 
+// \b do JavaScript trata letra acentuada como "não-palavra" por padrão,
+// o que causa bugs reais: "Paraíba" batia com "Pará" (falso positivo),
+// e "Pará" seguido de vírgula não batia (falso negativo) — encontrado
+// testando contra frases com nomes de estado parecidos antes de usar em
+// produção. Corrigido usando classe de caracteres explícita em vez de
+// \b pra definir o que conta como "fim de palavra".
+const NAO_LETRA = '(?:^|[^a-zà-üA-ZÀ-Ü])';
+const NAO_LETRA_FIM = '(?:[^a-zà-üA-ZÀ-Ü]|$)';
+function limitePalavra(termo: string): RegExp {
+  return new RegExp(NAO_LETRA + termo + NAO_LETRA_FIM, 'i');
+}
+
 const ESTADOS_REGEX: Record<string, RegExp> = {
   'São Paulo': /s[ãa]o paulo/i,
-  'Bahia': /\bbahia\b/i,
+  'Bahia': limitePalavra('bahia'),
   'Goiás': /goi[áa]s/i,
   'Minas Gerais': /minas gerais/i,
   'Mato Grosso do Sul': /mato grosso do sul/i,
-  'Mato Grosso': /\bmato grosso\b(?! do sul)/i,
-  'Pará': /\bpar[áa]\b(?! de|iso)/i,
+  'Mato Grosso': /mato grosso(?! do sul)/i,
+  'Pará': limitePalavra('par[áa]'),
   'Rondônia': /rond[ôo]nia/i,
   'Tocantins': /tocantins/i,
-  'Rio Grande do Sul': /rio grande do sul/i,
+  'Rio Grande do Sul': limitePalavra('rio grande do sul'),
 };
 
 function stripTags(html: string): string {
