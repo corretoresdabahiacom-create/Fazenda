@@ -58,3 +58,18 @@ export function isPriceAnomalous(produto: string, priceStr: string | undefined |
   if (value === null) return false;
   return value < range[0] || value > range[1];
 }
+
+// Acha a célula de preço numa linha de tabela — prioriza formato
+// "123,45" (preço de verdade), só cai pro critério largo (qualquer
+// célula com dígito) se não achar nenhuma assim, e explicitamente
+// ignora células que parecem mês/ano de contrato (ex: "Out/2026"),
+// que têm dígito mas não são preço — bug real encontrado testando
+// contra dado sintético de tabela de Futuro B3 antes de usar em
+// produção (o rótulo do contrato estava sendo lido como se fosse o
+// valor).
+export function findPriceCell(row: string[] | undefined): string | undefined {
+  if (!row) return undefined;
+  const decimalPrice = row.find(c => /\d+,\d{2}\b/.test(c));
+  if (decimalPrice) return decimalPrice;
+  return row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c) && !/^\d{1,2}\/\d{2,4}$/.test(c.trim()));
+}

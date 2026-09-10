@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { isPriceAnomalous, extractNumber } from '../lib/priceSanity';
+import { isPriceAnomalous, extractNumber, findPriceCell } from '../lib/priceSanity';
 import {
   DollarSign, TrendingUp, TrendingDown, Search, RefreshCw, ExternalLink, AlertTriangle, MapPin, Navigation, Globe,
 } from 'lucide-react';
@@ -130,7 +130,7 @@ const FUTURES_PATTERN = /pregão|futuro|vencimento/i;
 
 function checkPriceAnomaly(produto: string, row: string[] | undefined): { isAnomaly: boolean; value: number | null } {
   if (!row) return { isAnomaly: false, value: null };
-  const priceCell = row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c));
+  const priceCell = findPriceCell(row);
   if (!priceCell) return { isAnomaly: false, value: null };
   return { isAnomaly: isPriceAnomalous(produto, priceCell), value: extractNumber(priceCell) };
 }
@@ -201,7 +201,7 @@ function buildEstadosTable(tables: ParsedTable[]): { estado: string; valor: stri
         const uf = UF_POR_ESTADO[estado];
         const matches = row.some(cell => cell.toLowerCase().includes(estado.toLowerCase()) || new RegExp(`\\b${uf}\\b`).test(cell));
         if (matches) {
-          const priceCell = row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c));
+          const priceCell = findPriceCell(row);
           if (priceCell) found.set(estado, priceCell);
         }
       }
@@ -635,7 +635,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         const capitalMatch = (primaryAtual && capitalNome && buscouCidadeEspecifica && !regionMatch)
           ? findRegionRow(primaryAtual, capitalNome)
           : null;
-        const capitalPreco = capitalMatch?.row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c));
+        const capitalPreco = findPriceCell(capitalMatch?.row);
 
         const primaryFuturo = futuroTables[0];
         const estadosTable = buildEstadosTable(filteredTables);
