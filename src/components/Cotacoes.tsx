@@ -304,6 +304,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [incaperData, setIncaperData] = useState<{ precos: { produto: string; minimo: string; medio: string; maximo: string }[]; sourceUrl?: string; fetchedAt?: string } | null>(null);
   const [epagriData, setEpagriData] = useState<{ boiGordo: { data: string; preco: number; praca?: string } | null; vacaGorda: { data: string; preco: number; praca?: string } | null; sourceUrl?: string; fetchedAt?: string } | null>(null);
   const [aibaData, setAibaData] = useState<{ rows: { produto: string; unidade: string; preco: string; variacaoPct: string; data: string }[]; sourceUrl?: string; fetchedAt?: string } | null>(null);
+  const [datagroData, setDatagroData] = useState<{ precos: Record<string, string>; titulo: string | null; sourceUrl: string; fetchedAt: string } | null>(null);
   const [pecuariaData, setPecuariaData] = useState<{ rows: { data: string; SP: string; MS: string; MG: string; GO: string; MT: string; RJ: string }[]; unidade: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -406,6 +407,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       .then(json => { if (!json.error) setAibaData(json); })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (produto !== 'boi_gordo') { setDatagroData(null); return; }
+    fetch('/api/datagro-girodoboi')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setDatagroData(json); else setDatagroData(null); })
+      .catch(() => setDatagroData(null));
+  }, [produto]);
 
   useEffect(() => {
     if (produto !== 'boi_gordo') { setPecuariaData(null); return; }
@@ -605,7 +614,20 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             </p>
             <div className="flex flex-wrap gap-1.5">
               {(showAllCities ? realCities : realCities.slice(0, 8)).map(c => (
-                <button key={c} onClick={() => setCidade(c)} className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${cidade === c ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}>
+                <button
+                  key={c}
+                  onClick={() => {
+                    // Se o valor clicado for na verdade um nome de
+                    // estado (ex: vindo da tabela "Estados da
+                    // Federação"), seleciona o estado certo também —
+                    // sem isso, cliques como esse nunca ativavam a
+                    // fonte oficial correspondente (bug real corrigido).
+                    const estadoCorrespondente = ESTADOS.find(e => e.toLowerCase() === c.toLowerCase());
+                    if (estadoCorrespondente) { setEstado(estadoCorrespondente); setCidade(''); }
+                    else setCidade(c);
+                  }}
+                  className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${cidade === c ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}
+                >
                   {c}
                 </button>
               ))}
@@ -679,26 +701,60 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         // SC, Bahia), ela deve ser o valor PRINCIPAL mostrado — não a
         // referência nacional genérica (Cepea/Esalq), que é a mesma
         // pra qualquer estado e por isso "não muda" quando o usuário
-        // troca de local (bug real reportado: o preço parecia travado).
+        // troca de local.
+        //
+        // BUG REAL ENCONTRADO E CORRIGIDO: os botões de sugestão de
+        // cidade só atualizavam "cidade", nunca o dropdown "estado" —
+        // então clicar num botão como "Bahia" ou "SP" nunca ativava essa
+        // verificação (que checava só o dropdown). Agora deriva o
+        // estado efetivo tanto do dropdown quanto do texto livre digitado
+        // ou clicado no campo de cidade, cobrindo os dois casos.
+        const estadoEfetivo = estado || (() => {
+          const termo = cidade.toLowerCase();
+          if (/^sp$|são paulo/i.test(termo)) return 'São Paulo';
+          if (/^es$|esp[ií]rito santo/i.test(termo)) return 'Espírito Santo';
+          if (/^sc$|santa catarina/i.test(termo)) return 'Santa Catarina';
+          if (/^ba$|bahia/i.test(termo)) return 'Bahia';
+          if (/^go$|goi[áa]s/i.test(termo)) return 'Goiás';
+          if (/^mg$|minas gerais/i.test(termo)) return 'Minas Gerais';
+          if (/^ms$|mato grosso do sul/i.test(termo)) return 'Mato Grosso do Sul';
+          if (/^mt$|^mato grosso$/i.test(termo)) return 'Mato Grosso';
+          if (/^pa$|^par[áa]$/i.test(termo)) return 'Pará';
+          if (/^ro$|rond[ôo]nia/i.test(termo)) return 'Rondônia';
+          if (/^to$|tocantins/i.test(termo)) return 'Tocantins';
+          if (/^rs$|rio grande do sul/i.test(termo)) return 'Rio Grande do Sul';
+          return '';
+        })();
+
         const officialOverride = (() => {
-          if (estado === 'São Paulo' && ieaData) {
+          if (estadoEfetivo === 'São Paulo' && ieaData) {
             const keyword = IEA_KEYWORDS[produto];
             const row = keyword ? ieaData.recebidosPelosProdutores.find(r => keyword.test(r.produto)) : null;
             if (row) return { fonte: 'IEA-SP', preco: row.preco, unidade: row.unidade, sourceUrl: ieaData.sourceUrl, fetchedAt: ieaData.fetchedAt };
           }
-          if (estado === 'Espírito Santo' && incaperData) {
+          if (estadoEfetivo === 'Espírito Santo' && incaperData) {
             const keyword = INCAPER_KEYWORDS[produto];
             const row = keyword ? incaperData.precos.find(r => keyword.test(r.produto)) : null;
             if (row) return { fonte: 'Incaper', preco: row.medio, unidade: '@', sourceUrl: incaperData.sourceUrl, fetchedAt: incaperData.fetchedAt };
           }
-          if (estado === 'Santa Catarina' && epagriData) {
+          if (estadoEfetivo === 'Santa Catarina' && epagriData) {
             const row = produto === 'boi_gordo' ? epagriData.boiGordo : produto === 'vaca' ? epagriData.vacaGorda : null;
             if (row) return { fonte: 'Epagri/Cepa', preco: row.preco.toFixed(2), unidade: '@', sourceUrl: epagriData.sourceUrl, fetchedAt: epagriData.fetchedAt };
           }
-          if (estado === 'Bahia' && aibaData) {
+          if (estadoEfetivo === 'Bahia' && produto !== 'boi_gordo' && aibaData) {
             const keyword = AIBA_KEYWORDS[produto];
             const row = keyword ? aibaData.rows.find(r => keyword.test(r.produto)) : null;
             if (row) return { fonte: 'AIBA (Oeste da Bahia)', preco: row.preco, unidade: row.unidade, sourceUrl: aibaData.sourceUrl, fetchedAt: aibaData.fetchedAt };
+          }
+          // Datagro (redistribuído de graça pelo Giro do Boi/Canal
+          // Rural) cobre 10 estados pra Boi Gordo especificamente —
+          // preenche o buraco que as fontes acima não cobrem (Bahia
+          // pra boi, Goiás, Minas Gerais, MT, MS, Pará, Rondônia,
+          // Tocantins, RS). Só usa como reserva onde não há fonte
+          // acima já respondida, pra não substituir um dado de governo
+          // por um de fonte comercial redistribuída.
+          if (produto === 'boi_gordo' && datagroData?.precos[estadoEfetivo]) {
+            return { fonte: 'Datagro (via Giro do Boi/Canal Rural)', preco: datagroData.precos[estadoEfetivo], unidade: '@', sourceUrl: datagroData.sourceUrl, fetchedAt: datagroData.fetchedAt };
           }
           return null;
         })();
