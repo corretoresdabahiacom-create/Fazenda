@@ -20,12 +20,15 @@ import {
 import { firestoreGetDoc, firestoreMergeDoc, GoogleServiceAccountEnv } from './_googleAuth';
 
 // SEÇÃO 23 do documento original: histórico. Decisão de custo tomada
-// aqui: em vez de gravar a CADA consulta de usuário (o que faria o
-// custo de escrita crescer junto com o tráfego, sem controle), grava no
-// máximo 1 vez por hora por combinação produto+estado — o custo fica
-// previsível e baixo (no máximo 24 escritas/dia por combinação),
-// independente de quantas pessoas consultem nesse meio tempo.
-const HISTORY_THROTTLE_MS = 60 * 60 * 1000; // 1 hora
+// aqui: em vez de gravar a CADA consulta de usuário, grava no máximo 1
+// vez por DIA por combinação produto+estado (não por hora — o gráfico
+// de preço x clima por mês/dia que vamos construir não precisa de mais
+// granularidade que isso, e economiza ainda mais escrita). Guarda até
+// 730 pontos (2 anos de pontos diários) por combinação, depois descarta
+// os mais antigos — 2 anos é mais que suficiente pro gráfico pedido
+// (ano atual + comparação com o ano anterior).
+const HISTORY_THROTTLE_MS = 24 * 60 * 60 * 1000; // 1 dia
+const HISTORY_MAX_POINTS = 730; // 2 anos de pontos diários
 
 async function talvezGravarHistorico(env: GoogleServiceAccountEnv, produto: string, estado: string, quotes: MarketQuote[]) {
   if (!env.FIREBASE_PROJECT_ID || !env.FIREBASE_CLIENT_EMAIL || !env.FIREBASE_PRIVATE_KEY) return; // não configurado — não quebra, só não grava
@@ -36,12 +39,12 @@ async function talvezGravarHistorico(env: GoogleServiceAccountEnv, produto: stri
   try {
     const existente = await firestoreGetDoc(env, 'priceHistory', docId);
     const ultimaGravacao = existente?.ultimaGravacao ? new Date(existente.ultimaGravacao).getTime() : 0;
-    if (Date.now() - ultimaGravacao < HISTORY_THROTTLE_MS) return; // ainda dentro da última hora, não grava de novo
+    if (Date.now() - ultimaGravacao < HISTORY_THROTTLE_MS) return; // já gravou hoje, não grava de novo
 
     const pontos: any[] = Array.isArray(existente?.pontos) ? existente.pontos : [];
     pontos.push({ preco: principal.price, fonte: principal.source, data: new Date().toISOString() });
-    // Mantém só os últimos 200 pontos (evita o documento crescer sem limite).
-    const pontosLimitados = pontos.slice(-200);
+    // Mantém só os últimos 2 anos de pontos (evita o documento crescer sem limite).
+    const pontosLimitados = pontos.slice(-HISTORY_MAX_POINTS);
 
     await firestoreMergeDoc(env, 'priceHistory', docId, {
       produto, estado: estado || null,

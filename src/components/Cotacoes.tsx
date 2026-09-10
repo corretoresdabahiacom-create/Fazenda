@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { isPriceAnomalous, extractNumber, findPriceCell } from '../lib/priceSanity';
 import DashboardBahia from './DashboardBahia';
 import AlertasCotacoes from './AlertasCotacoes';
+import GraficoPrecoClima from './GraficoPrecoClima';
 import {
   DollarSign, TrendingUp, TrendingDown, Search, RefreshCw, ExternalLink, AlertTriangle, MapPin, Navigation, Globe,
 } from 'lucide-react';
@@ -293,6 +294,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [detectingLocal, setDetectingLocal] = useState(false);
   const [showAllCities, setShowAllCities] = useState(false);
   const [showBahiaDashboard, setShowBahiaDashboard] = useState(false);
+  const [showGrafico, setShowGrafico] = useState(false);
   const [quotesResponse, setQuotesResponse] = useState<{ quotes: any[]; semCotacaoDisponivel: number } | null>(null);
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
@@ -496,15 +498,24 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           </h1>
           <p className="text-xs text-theme-secondary">Preços de mercado agropecuário e câmbio, buscados em tempo real.</p>
         </div>
-        <button
-          onClick={() => setShowBahiaDashboard(!showBahiaDashboard)}
-          className={`text-xs font-bold px-3 py-2 rounded-xl border ${showBahiaDashboard ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}
-        >
-          🗺️ {showBahiaDashboard ? 'Esconder Dashboard Bahia' : 'Ver Dashboard Bahia'}
-        </button>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setShowBahiaDashboard(!showBahiaDashboard)}
+            className={`text-xs font-bold px-3 py-2 rounded-xl border ${showBahiaDashboard ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}
+          >
+            🗺️ {showBahiaDashboard ? 'Esconder Dashboard Bahia' : 'Ver Dashboard Bahia'}
+          </button>
+          <button
+            onClick={() => setShowGrafico(!showGrafico)}
+            className={`text-xs font-bold px-3 py-2 rounded-xl border ${showGrafico ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}
+          >
+            📊 {showGrafico ? 'Esconder Gráfico Preço × Clima' : 'Ver Gráfico Preço × Clima'}
+          </button>
+        </div>
       </div>
 
       {showBahiaDashboard && <DashboardBahia />}
+      {showGrafico && <GraficoPrecoClima produto={produto} produtoLabel={produtoDef.label} estado={estado} cidade={cidade} />}
       <div>
         {cambioError && <p className="text-xs text-red-500 bg-red-50 rounded-xl p-2 mb-2">{cambioError}</p>}
         <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Moedas</p>
