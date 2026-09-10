@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { isPriceAnomalous, extractNumber, findPriceCell } from '../lib/priceSanity';
+import DashboardBahia from './DashboardBahia';
 import {
   DollarSign, TrendingUp, TrendingDown, Search, RefreshCw, ExternalLink, AlertTriangle, MapPin, Navigation, Globe,
 } from 'lucide-react';
@@ -290,6 +291,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [cidade, setCidade] = useState(defaultRegion || '');
   const [detectingLocal, setDetectingLocal] = useState(false);
   const [showAllCities, setShowAllCities] = useState(false);
+  const [showBahiaDashboard, setShowBahiaDashboard] = useState(false);
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
   const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string; sourceUrl?: string; fetchedAt?: string } | null>(null);
@@ -473,13 +475,22 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-xl font-bold text-theme-primary flex items-center gap-2">
-          <DollarSign className="text-primary" size={20} /> Cotações
-        </h1>
-        <p className="text-xs text-theme-secondary">Preços de mercado agropecuário e câmbio, buscados em tempo real.</p>
+      <div className="flex items-start justify-between gap-2 flex-wrap">
+        <div>
+          <h1 className="text-xl font-bold text-theme-primary flex items-center gap-2">
+            <DollarSign className="text-primary" size={20} /> Cotações
+          </h1>
+          <p className="text-xs text-theme-secondary">Preços de mercado agropecuário e câmbio, buscados em tempo real.</p>
+        </div>
+        <button
+          onClick={() => setShowBahiaDashboard(!showBahiaDashboard)}
+          className={`text-xs font-bold px-3 py-2 rounded-xl border ${showBahiaDashboard ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}
+        >
+          🗺️ {showBahiaDashboard ? 'Esconder Dashboard Bahia' : 'Ver Dashboard Bahia'}
+        </button>
       </div>
 
+      {showBahiaDashboard && <DashboardBahia />}
       <div>
         {cambioError && <p className="text-xs text-red-500 bg-red-50 rounded-xl p-2 mb-2">{cambioError}</p>}
         <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Moedas</p>
