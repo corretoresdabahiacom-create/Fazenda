@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle, Bell, X } from 'lucide-react';
 import { doc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
+import { detectDivergence, isStale, checkTargetReached } from '../lib/alertLogic';
 
 interface Alert {
   tipo: 'subiu' | 'caiu' | 'alvo_atingido' | 'divergencia_fontes' | 'desatualizada' | 'fonte_indisponivel';
@@ -65,34 +66,24 @@ export default function AlertasCotacoes({ produto, produtoLabel, quotesResponse 
     }
 
     for (const q of quotes) {
-      if (!q.fetchedAt) continue;
-      const horasAtras = (Date.now() - new Date(q.fetchedAt).getTime()) / (1000 * 60 * 60);
-      if (horasAtras > 48) {
-        novosAlertas.push({ tipo: 'desatualizada', mensagem: `${q.source}: última busca há ${Math.round(horasAtras)}h — pode estar desatualizado.`, severidade: 'atencao' });
+      if (isStale(q.fetchedAt)) {
+        novosAlertas.push({ tipo: 'desatualizada', mensagem: `${q.source}: última busca há mais de 48h — pode estar desatualizado.`, severidade: 'atencao' });
         break;
       }
     }
 
-    const precosBRL = quotes.filter((q: any) => q.currency === 'BRL' && q.price != null).map((q: any) => ({ source: q.source, price: q.price }));
-    if (precosBRL.length >= 2) {
-      const valores = precosBRL.map((p: any) => p.price);
-      const min = Math.min(...valores), max = Math.max(...valores);
-      if (min > 0 && (max - min) / min > 0.1) {
-        const maisAlta = precosBRL.find((p: any) => p.price === max)!;
-        const maisBaixa = precosBRL.find((p: any) => p.price === min)!;
-        novosAlertas.push({
-          tipo: 'divergencia_fontes',
-          mensagem: `Divergência entre fontes: ${maisAlta.source} (R$ ${max.toFixed(2)}) vs. ${maisBaixa.source} (R$ ${min.toFixed(2)}) — mais de 10% de diferença.`,
-          severidade: 'atencao',
-        });
-      }
+    const divergencia = detectDivergence(quotes);
+    if (divergencia.hasDivergence) {
+      novosAlertas.push({
+        tipo: 'divergencia_fontes',
+        mensagem: `Divergência entre fontes: ${divergencia.maisAlta!.source} (R$ ${divergencia.maisAlta!.price.toFixed(2)}) vs. ${divergencia.maisBaixa!.source} (R$ ${divergencia.maisBaixa!.price.toFixed(2)}) — mais de 10% de diferença.`,
+        severidade: 'atencao',
+      });
     }
 
-    if (alvoSalvo != null && precosBRL.length > 0) {
-      const precoAtual = precosBRL[0].price;
-      if (precoAtual >= alvoSalvo) {
-        novosAlertas.push({ tipo: 'alvo_atingido', mensagem: `${produtoLabel} atingiu seu alvo de R$ ${alvoSalvo.toFixed(2)} — está em R$ ${precoAtual.toFixed(2)}.`, severidade: 'info' });
-      }
+    const precosBRL = quotes.filter((q: any) => q.currency === 'BRL' && q.price != null);
+    if (checkTargetReached(precosBRL[0]?.price ?? null, alvoSalvo)) {
+      novosAlertas.push({ tipo: 'alvo_atingido', mensagem: `${produtoLabel} atingiu seu alvo de R$ ${alvoSalvo!.toFixed(2)} — está em R$ ${precosBRL[0].price.toFixed(2)}.`, severidade: 'info' });
     }
 
     setAlertas(novosAlertas);
