@@ -323,27 +323,30 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       .then(res => res.json())
       .then(json => {
         if (json.error) {
-          // Fonte principal falhou — tenta uma reserva real antes de
-          // desistir. Por enquanto só temos uma segunda fonte confirmada
-          // (TradingEconomics) para Boi Gordo; outros produtos ainda não
-          // têm reserva verificada, então mostramos o erro sem fingir.
-          if (produtoDef.backendKey === 'boi_gordo') {
-            fetch('/api/tradingeconomics?produto=boi_gordo')
-              .then(r => r.json())
-              .then(te => {
-                if (te.error) { setError(json.error); return; }
-                setError(null);
-                setData({
-                  produto: produtoDef.backendKey,
-                  sourceUrl: te.sourceUrl,
-                  tables: [{ heading: te.nomeExibido, source: 'TradingEconomics (reserva)', rows: [['Local', 'Preço'], ['Brasil (indicador B3)', `${te.preco.toFixed(2)} ${te.unidade}`]] }],
-                  fetchedAt: te.fetchedAt,
-                });
-              })
-              .catch(() => setError(json.error));
-          } else {
-            setError(json.error);
-          }
+          // Fonte principal (Notícias Agrícolas) falhou — tenta o
+          // endpoint unificado /api/quotes como reserva geral, já que
+          // ele mesmo tenta várias fontes secundárias (IEA-SP, Incaper,
+          // Epagri, AIBA, TradingEconomics, Boi no Mundo) dependendo do
+          // produto e estado. Generaliza o failover pra todos os
+          // produtos, não só Boi Gordo.
+          fetch(`/api/quotes?product=${produto}${estado ? `&state=${encodeURIComponent(estado)}` : ''}`)
+            .then(r => r.json())
+            .then(quotesData => {
+              const melhor = quotesData?.quotes?.[0];
+              if (!melhor) { setError(json.error); return; }
+              setError(null);
+              setData({
+                produto: produtoDef.backendKey,
+                sourceUrl: melhor.sourceUrl,
+                tables: [{
+                  heading: `${melhor.productLabel} (fonte de reserva)`,
+                  source: `${melhor.source} (reserva — fonte principal indisponível)`,
+                  rows: [['Local', 'Preço'], [melhor.marketPlace || melhor.state || melhor.region || 'Referência', `${melhor.price.toFixed(2)} ${melhor.unit}`]],
+                }],
+                fetchedAt: melhor.fetchedAt,
+              });
+            })
+            .catch(() => setError(json.error));
         } else {
           setData(json);
         }

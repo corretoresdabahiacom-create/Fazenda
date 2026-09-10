@@ -15,8 +15,45 @@
 import {
   MarketQuote,
   normalizeNoticiasAgricolas, normalizeIeaSp, normalizeIncaperEs,
-  normalizeEpagriSc, normalizeAiba, normalizeTradingEconomics,
+  normalizeEpagriSc, normalizeAiba, normalizeTradingEconomics, normalizeBoiMundo,
 } from './_marketQuote';
+import { firestoreGetDoc, firestoreMergeDoc, GoogleServiceAccountEnv } from './_googleAuth';
+
+// SEÇÃO 23 do documento original: histórico. Decisão de custo tomada
+// aqui: em vez de gravar a CADA consulta de usuário (o que faria o
+// custo de escrita crescer junto com o tráfego, sem controle), grava no
+// máximo 1 vez por hora por combinação produto+estado — o custo fica
+// previsível e baixo (no máximo 24 escritas/dia por combinação),
+// independente de quantas pessoas consultem nesse meio tempo.
+const HISTORY_THROTTLE_MS = 60 * 60 * 1000; // 1 hora
+
+async function talvezGravarHistorico(env: GoogleServiceAccountEnv, produto: string, estado: string, quotes: MarketQuote[]) {
+  if (!env.FIREBASE_PROJECT_ID || !env.FIREBASE_CLIENT_EMAIL || !env.FIREBASE_PRIVATE_KEY) return; // não configurado — não quebra, só não grava
+  const principal = quotes.find(q => q.isAvailable);
+  if (!principal) return;
+
+  const docId = `${produto}_${estado || 'geral'}`;
+  try {
+    const existente = await firestoreGetDoc(env, 'priceHistory', docId);
+    const ultimaGravacao = existente?.ultimaGravacao ? new Date(existente.ultimaGravacao).getTime() : 0;
+    if (Date.now() - ultimaGravacao < HISTORY_THROTTLE_MS) return; // ainda dentro da última hora, não grava de novo
+
+    const pontos: any[] = Array.isArray(existente?.pontos) ? existente.pontos : [];
+    pontos.push({ preco: principal.price, fonte: principal.source, data: new Date().toISOString() });
+    // Mantém só os últimos 200 pontos (evita o documento crescer sem limite).
+    const pontosLimitados = pontos.slice(-200);
+
+    await firestoreMergeDoc(env, 'priceHistory', docId, {
+      produto, estado: estado || null,
+      ultimaGravacao: new Date().toISOString(),
+      pontos: pontosLimitados,
+    });
+  } catch (e) {
+    // Falha ao gravar histórico nunca deve quebrar a resposta principal
+    // de cotações — só loga.
+    console.error('Falha ao gravar histórico:', e);
+  }
+}
 
 const PRODUCT_LABELS: Record<string, string> = {
   boi_gordo: 'Boi Gordo', vaca: 'Vaca', novilho: 'Novilho/Garrote', novilha: 'Novilha',
@@ -44,7 +81,9 @@ async function fetchJson(origin: string, path: string): Promise<any | null> {
   }
 }
 
-export const onRequestGet: PagesFunction = async (context) => {
+interface Env extends GoogleServiceAccountEnv {}
+
+export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
     const url = new URL(context.request.url);
     const origin = url.origin;
@@ -68,6 +107,7 @@ export const onRequestGet: PagesFunction = async (context) => {
     }
     if (backendKey === 'boi_gordo') {
       fetches.push(fetchJson(origin, '/api/tradingeconomics?produto=boi_gordo'));
+      fetches.push(fetchJson(origin, '/api/scot-boi-mundo'));
     }
 
     const [naData, ...rest] = await Promise.all(fetches);
@@ -87,6 +127,8 @@ export const onRequestGet: PagesFunction = async (context) => {
     if (backendKey === 'boi_gordo') {
       const teData = rest[restIdx++];
       if (teData) quotes = quotes.concat(normalizeTradingEconomics(teData, produto, productLabel));
+      const boiMundoData = rest[restIdx++];
+      if (boiMundoData) quotes = quotes.concat(normalizeBoiMundo(boiMundoData, produto, productLabel));
     }
 
     // Filtra por estado, se pedido (mantém as internacionais/nacionais
@@ -101,6 +143,11 @@ export const onRequestGet: PagesFunction = async (context) => {
     // quantas foram descartadas por esse motivo (transparência).
     const semPreco = quotes.filter(q => !q.isAvailable).length;
     quotes = quotes.filter(q => q.isAvailable);
+
+    // Gravação de histórico em segundo plano (não atrasa a resposta pro
+    // usuário) — limitada a 1x/hora por produto+estado, ver comentário
+    // no topo do arquivo.
+    context.waitUntil(talvezGravarHistorico(context.env, produto, state, quotes));
 
     return new Response(JSON.stringify({
       product: produto,
