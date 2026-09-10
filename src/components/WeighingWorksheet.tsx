@@ -108,9 +108,9 @@ export default function WeighingWorksheet() {
   const handleAddRow = () => {
     const newRow: WeighingRow = {
       id: `row_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-      quantity: 1,
-      weight: 300,
-      arrobaValue: sheetRows.length > 0 ? sheetRows[sheetRows.length - 1].arrobaValue : 310
+      quantity: 0,
+      weight: 0,
+      arrobaValue: 0
     };
     setSheetRows([...sheetRows, newRow]);
   };
