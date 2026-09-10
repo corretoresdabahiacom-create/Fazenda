@@ -36,6 +36,17 @@ const INCAPER_KEYWORDS: Record<string, RegExp> = {
   vaca: /vaca gorda/i,
 };
 
+const AIBA_KEYWORDS: Record<string, RegExp> = {
+  soja: /soja dispon[ií]vel/i,
+  milho: /^milho$/i,
+  sorgo: /sorgo/i,
+  algodao: /algod[ãa]o pluma/i,
+  cafe_arabica: /^café$/i,
+  cafe_conilon: /^café$/i,
+  feijao: /feij[ãa]o/i,
+  arroz: /arroz/i,
+};
+
 const PRODUCTS: ProductDef[] = [
   { id: 'boi_gordo', label: 'Boi Gordo', backendKey: 'boi_gordo', filter: /indicador do boi\b|\bboi gordo\b/i },
   { id: 'vaca', label: 'Vaca', backendKey: 'boi_gordo', filter: /indicador da vaca\b|vaca gorda/i },
@@ -255,6 +266,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [boiMundoData, setBoiMundoData] = useState<{ paises: { pais: string; atual: string; haUmAno: string }[]; unidade: string } | null>(null);
   const [ieaData, setIeaData] = useState<{ recebidosPelosProdutores: { produto: string; unidade: string; preco: string }[]; mercadoInternoInternacional: { produto: string; mercado: string; unidade: string; preco: string }[] } | null>(null);
   const [incaperData, setIncaperData] = useState<{ precos: { produto: string; minimo: string; medio: string; maximo: string }[] } | null>(null);
+  const [epagriData, setEpagriData] = useState<{ boiGordo: { data: string; preco: number; praca?: string } | null; vacaGorda: { data: string; preco: number; praca?: string } | null } | null>(null);
+  const [aibaData, setAibaData] = useState<{ rows: { produto: string; unidade: string; preco: string; variacaoPct: string; data: string }[] } | null>(null);
+  const [pecuariaData, setPecuariaData] = useState<{ rows: { data: string; SP: string; MS: string; MG: string; GO: string; MT: string; RJ: string }[]; unidade: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -330,6 +344,28 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       .then(json => { if (!json.error) setIncaperData(json); })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    fetch('/api/epagri-sc')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setEpagriData(json); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/aiba-ba')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setAibaData(json); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (produto !== 'boi_gordo') { setPecuariaData(null); return; }
+    fetch('/api/pecuaria-com-br')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setPecuariaData(json); else setPecuariaData(null); })
+      .catch(() => setPecuariaData(null));
+  }, [produto]);
 
   useEffect(() => {
     if (!['boi_gordo', 'vaca', 'novilho', 'novilha'].includes(produto)) { setBoiMundoData(null); return; }
@@ -514,7 +550,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           Outros países além do Brasil ainda não têm fonte de dados integrada — em breve. A cobertura de cidades varia por produto: quando a cidade exata não tem dado, mostramos o local mais próximo do mesmo estado.
         </p>
         <p className="text-[10px] text-theme-secondary">
-          Fontes oficiais estaduais em implementação gradual — hoje cobrimos oficialmente <strong>São Paulo</strong> (IEA-SP) e <strong>Espírito Santo</strong> (Incaper). Outros estados usam as fontes de mercado (Notícias Agrícolas/Scot Consultoria/Datagro).
+          Fontes oficiais/regionais em implementação gradual — hoje cobrimos <strong>São Paulo</strong> (IEA-SP), <strong>Espírito Santo</strong> (Incaper), <strong>Santa Catarina</strong> (Epagri/Cepa) e <strong>Bahia — grãos do Oeste</strong> (AIBA). Outros estados usam as fontes de mercado (Notícias Agrícolas/Scot Consultoria/Datagro).
         </p>
       </div>
 
@@ -662,6 +698,39 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                   </div>
                 );
               })()}
+              {(() => {
+                // Epagri/Cepa só cobre Santa Catarina.
+                const estadoCompativel = !estado || estado === 'Santa Catarina';
+                if (!epagriData || !estadoCompativel) return null;
+                const row = produto === 'boi_gordo' ? epagriData.boiGordo : produto === 'vaca' ? epagriData.vacaGorda : null;
+                if (!row) return null;
+                return (
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-blue-800">🏛️ Epagri/Cepa (Oficial — só Santa Catarina)</p>
+                      <p className="text-[9px] text-blue-700">{row.praca ? `${row.praca} — ` : ''}{row.data}</p>
+                    </div>
+                    <p className="text-sm font-bold text-blue-800">R$ {row.preco.toFixed(2)} <span className="text-[10px] font-normal">/@</span></p>
+                  </div>
+                );
+              })()}
+              {(() => {
+                // AIBA só cobre o Oeste da Bahia — não é indicador nacional.
+                const keyword = AIBA_KEYWORDS[produto];
+                const estadoCompativel = !estado || estado === 'Bahia';
+                if (!keyword || !aibaData || !estadoCompativel) return null;
+                const row = aibaData.rows.find(r => keyword.test(r.produto));
+                if (!row) return null;
+                return (
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-blue-800">🏛️ AIBA (Oeste da Bahia) — {row.produto}</p>
+                      <p className="text-[9px] text-blue-700">{row.data} · {row.variacaoPct}%</p>
+                    </div>
+                    <p className="text-sm font-bold text-blue-800">R$ {row.preco} <span className="text-[10px] font-normal">/{row.unidade}</span></p>
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="space-y-2">
@@ -705,6 +774,30 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                           <td className="p-2.5 text-xs text-theme-secondary">{r.valor}</td>
                         </tr>
                       ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {pecuariaData && pecuariaData.rows[0] && (
+                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+                  <div className="p-3 pb-1">
+                    <p className="text-xs font-bold text-theme-primary">Pecuária.com.br — fonte de mercado (conferência)</p>
+                    <p className="text-[9px] text-theme-secondary">{pecuariaData.unidade}</p>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-theme-secondary">
+                        {(['SP', 'MS', 'MG', 'GO', 'MT', 'RJ'] as const).map(uf => (
+                          <th key={uf} className="text-left p-2 text-xs font-bold text-theme-primary">{uf}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        {(['SP', 'MS', 'MG', 'GO', 'MT', 'RJ'] as const).map(uf => (
+                          <td key={uf} className="p-2 text-xs text-theme-secondary">R$ {pecuariaData.rows[0][uf]}</td>
+                        ))}
+                      </tr>
                     </tbody>
                   </table>
                 </div>
