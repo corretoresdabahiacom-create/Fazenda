@@ -215,8 +215,11 @@ export default function WeighingWorksheet() {
     const divisionBy15 = row.divisionBy15 !== undefined ? row.divisionBy15 : (row.weight / 15);
     // parcialArrobaAnimal is "Média @/Animal" = divisionBy15 / quantity
     const parcialArrobaAnimal = row.quantity > 0 ? (divisionBy15 / row.quantity) : 0;
-    // valorParcialAnimal is "Valor parcial/ animal" = ( (divisionBy15 * row.arrobaValue) / quantity ) / 2
-    const valorParcialAnimal = row.quantity > 0 ? (((divisionBy15 * row.arrobaValue) / row.quantity) / 2) : 0;
+    // valorParcialAnimal is "Valor parcial/ animal" = Média @/Animal × Valor da Arroba
+    // (havia uma divisão por 2 aqui antes, sem motivo — corrigido: o valor
+    // parcial deve bater exatamente com Média@/Animal × Valor da Arroba,
+    // sem cortar pela metade)
+    const valorParcialAnimal = parcialArrobaAnimal * row.arrobaValue;
     // parcialTotal is "Total Geral" of the row = valorParcialAnimal * row.quantity
     const parcialTotal = valorParcialAnimal * row.quantity;
     const averageWeight = row.quantity > 0 ? (row.weight / row.quantity) : 0;
