@@ -10,7 +10,7 @@ import {
 import { db, auth } from '../lib/firebase';
 import {
   Users, DollarSign, TrendingDown, Bell, Image as ImageIcon, Receipt,
-  Trash2, Plus, X, ShieldOff, ShieldAlert, Ban, CheckCircle2, Search,
+  Trash2, Plus, X, ShieldOff, ShieldAlert, Ban, CheckCircle2, Search, Database,
 } from 'lucide-react';
 import {
   UserDirectoryEntry, Subscription, SubscriptionStatus, PlanTier, PLAN_PRICES,
@@ -19,7 +19,7 @@ import {
 import { format } from 'date-fns';
 import { compressImageIfNeeded, fileToDataUrl } from '../lib/imageCompression';
 
-type Tab = 'visao_geral' | 'usuarios' | 'notificacoes' | 'anuncios' | 'despesas';
+type Tab = 'visao_geral' | 'usuarios' | 'notificacoes' | 'anuncios' | 'despesas' | 'fontes_cotacoes';
 
 // Remove campos com valor undefined antes de gravar no Firestore — ele
 // recusa a gravação inteira se qualquer campo vier como undefined.
@@ -40,6 +40,7 @@ const TABS: { id: Tab; label: string; icon: typeof Users }[] = [
   { id: 'notificacoes', label: 'Notificações', icon: Bell },
   { id: 'anuncios', label: 'Publicidade', icon: ImageIcon },
   { id: 'despesas', label: 'Despesas do App', icon: Receipt },
+  { id: 'fontes_cotacoes', label: 'Fontes de Cotações', icon: Database },
 ];
 
 export default function AdminPanel({ adminEmail }: { adminEmail: string }) {
@@ -110,6 +111,7 @@ export default function AdminPanel({ adminEmail }: { adminEmail: string }) {
       {tab === 'notificacoes' && <NotificacoesTab notifications={notifications} users={users} adminEmail={adminEmail} />}
       {tab === 'anuncios' && <AnunciosTab ads={ads} adminEmail={adminEmail} />}
       {tab === 'despesas' && <DespesasTab expenses={appExpenses} />}
+      {tab === 'fontes_cotacoes' && <FontesCotacoesTab />}
     </div>
   );
 }
@@ -722,6 +724,85 @@ function AnunciosTab({ ads, adminEmail }: { ads: Advertisement[]; adminEmail: st
 }
 
 // ---------- Despesas do App ----------
+
+// Fontes ativas — testadas e confirmadas trazendo dado real (não vem de
+// nenhuma API, é uma lista fixa documentando o que já foi verificado
+// manualmente nas conversas de desenvolvimento).
+const FONTES_ATIVAS = [
+  { nome: 'Notícias Agrícolas', cobertura: 'Nacional — todos os produtos', tipo: 'Mercado (agregador)' },
+  { nome: 'IEA-SP', cobertura: 'Só Estado de São Paulo', tipo: 'Oficial (Governo de SP)' },
+  { nome: 'Incaper', cobertura: 'Só Espírito Santo', tipo: 'Oficial (Governo do ES)' },
+  { nome: 'Epagri/Cepa', cobertura: 'Só Santa Catarina', tipo: 'Oficial (Governo de SC)' },
+  { nome: 'AIBA', cobertura: 'Oeste da Bahia — grãos', tipo: 'Associação de produtores' },
+  { nome: 'Scot Consultoria (Boi no Mundo)', cobertura: 'Comparativo internacional', tipo: 'Mercado' },
+  { nome: 'TradingEconomics', cobertura: 'Boi Gordo — referência EUA', tipo: 'Mercado (internacional)' },
+  { nome: 'Yahoo Finance', cobertura: 'Futuros dos EUA (CBOT/ICE/CME)', tipo: 'Mercado (internacional)' },
+  { nome: 'Frankfurter (BCE)', cobertura: 'Câmbio — todas as moedas', tipo: 'Oficial (Banco Central Europeu)' },
+  { nome: 'Banco Central do Brasil (PTAX)', cobertura: 'Câmbio — reserva', tipo: 'Oficial (BCB)' },
+];
+
+function FontesCotacoesTab() {
+  const [preparedAdapters, setPreparedAdapters] = useState<{ nome: string; status: string; motivo: string; urlInvestigada: string; proximoPasso: string }[]>([]);
+  const [loadingAdapters, setLoadingAdapters] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/adapters-status')
+      .then(res => res.json())
+      .then(json => setPreparedAdapters(json.adapters || []))
+      .finally(() => setLoadingAdapters(false));
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-bold text-theme-primary mb-1">Fontes de Cotações — Ativas</h2>
+        <p className="text-xs text-theme-secondary mb-3">Testadas e confirmadas trazendo dado real. Nenhuma delas exige chave de API paga.</p>
+        <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-theme-secondary">
+                <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Fonte</th>
+                <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Cobertura</th>
+                <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Tipo</th>
+                <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-theme">
+              {FONTES_ATIVAS.map((f, i) => (
+                <tr key={i}>
+                  <td className="p-2.5 text-xs font-semibold text-theme-primary">{f.nome}</td>
+                  <td className="p-2.5 text-xs text-theme-secondary">{f.cobertura}</td>
+                  <td className="p-2.5 text-xs text-theme-secondary">{f.tipo}</td>
+                  <td className="p-2.5 text-xs"><span className="bg-green-50 text-green-700 font-bold px-2 py-0.5 rounded-full">Ativa</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-bold text-theme-primary mb-1">Adapters Preparados — Não Ativos</h2>
+        <p className="text-xs text-theme-secondary mb-3">Fontes reais, investigadas de verdade, mas que exigem algo que ainda não temos (JavaScript que não conseguimos executar, ou contrato pago). Nenhuma delas retorna preço até ser ativada.</p>
+        {loadingAdapters && <p className="text-xs text-theme-secondary">Carregando...</p>}
+        <div className="space-y-2">
+          {preparedAdapters.map((a, i) => (
+            <div key={i} className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-sm font-bold text-amber-900">{a.nome}</p>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                  {a.status === 'requer_javascript' ? 'Precisa de JS' : 'Precisa de contrato pago'}
+                </span>
+              </div>
+              <p className="text-xs text-amber-800 mb-1">{a.motivo}</p>
+              <p className="text-[11px] text-amber-700"><strong>Próximo passo:</strong> {a.proximoPasso}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function DespesasTab({ expenses }: { expenses: AppExpense[] }) {
   const [isOpen, setIsOpen] = useState(false);
