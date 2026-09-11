@@ -296,6 +296,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [showBahiaDashboard, setShowBahiaDashboard] = useState(false);
   const [showGrafico, setShowGrafico] = useState(false);
   const [quotesResponse, setQuotesResponse] = useState<{ quotes: any[]; semCotacaoDisponivel: number } | null>(null);
+  const [locaisDisponiveis, setLocaisDisponiveis] = useState<any[]>([]);
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
   const [teData, setTeData] = useState<{ nomeExibido: string; preco: number; unidade: string; sourceUrl?: string; fetchedAt?: string } | null>(null);
@@ -371,6 +372,18 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       .then(json => { if (!json.error) setQuotesResponse(json); else setQuotesResponse(null); })
       .catch(() => setQuotesResponse(null));
   }, [produto, estado]);
+
+  // Busca SEM filtro de estado, pra descobrir de verdade quais estados
+  // e locais têm cotação real pra esse produto — usado pra montar os
+  // seletores de Estado/Cidade dinamicamente, em vez de mostrar os 27
+  // estados sempre (auditoria externa apontou isso corretamente: antes
+  // a lista de estados era fixa, independente de existir dado ou não).
+  useEffect(() => {
+    fetch(`/api/quotes?product=${produto}`)
+      .then(res => res.json())
+      .then(json => { if (!json.error) setLocaisDisponiveis(json.quotes || []); else setLocaisDisponiveis([]); })
+      .catch(() => setLocaisDisponiveis([]));
+  }, [produto]);
 
   useEffect(() => {
     if (produto !== 'boi_gordo') { setTeData(null); return; }
@@ -469,6 +482,26 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
   const uf = estado ? UF_POR_ESTADO[estado] : undefined;
   const localBusca = cidade || estado;
+
+  // Estados com dado REAL pra esse produto — derivado das cotações de
+  // verdade, não de uma lista fixa (antes ESTADOS listava os 27 sempre,
+  // mesmo sem nenhuma fonte pra maioria deles).
+  const estadosComDado: string[] = Array.from(
+    new Set<string>(locaisDisponiveis.filter(q => q.state).map(q => q.state as string))
+  ).sort((a, b) => a.localeCompare(b));
+
+  // Locais (praça/região/município) dentro do estado selecionado que
+  // realmente têm preço — usado no seletor de Cidade/Praça no lugar do
+  // datalist antigo. Prioriza marketPlace > municipality > region,
+  // usando o mais específico que a fonte tiver informado.
+  const locaisNoEstado: string[] = estado
+    ? Array.from(new Set<string>(
+        locaisDisponiveis
+          .filter(q => q.state === estado)
+          .map(q => (q.marketPlace || q.municipality || q.region) as string)
+          .filter(Boolean)
+      )).sort((a, b) => a.localeCompare(b))
+    : [];
 
   const realCities = data ? (() => {
     const found = new Set<string>();
@@ -589,24 +622,25 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none"
             >
               <option value="">Todos os Estados</option>
-              {ESTADOS.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+              {estadosComDado.map(uf => <option key={uf} value={uf}>{uf}</option>)}
             </select>
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
-            <input
+            <select
               value={cidade}
               onChange={e => setCidade(e.target.value)}
-              placeholder={estado ? 'Cidade específica...' : 'Escolha um estado primeiro'}
-              disabled={!estado}
-              list="cidades-disponiveis"
-              className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm disabled:opacity-60"
-            />
-            <datalist id="cidades-disponiveis">
-              {realCities.map(c => <option key={c} value={c} />)}
-            </datalist>
+              disabled={!estado || locaisNoEstado.length === 0}
+              className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60"
+            >
+              <option value="">{!estado ? 'Escolha um estado primeiro' : locaisNoEstado.length === 0 ? 'Sem local específico com dado' : 'Todas as cidades/praças'}</option>
+              {locaisNoEstado.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
         </div>
+        {estado && estadosComDado.length === 0 && (
+          <p className="text-[10px] text-amber-600">Nenhum estado tem cotação específica pra {produtoDef.label} ainda — mostrando referência geral do Brasil.</p>
+        )}
         {realCities.length > 0 && (
           <div>
             <p className="text-[10px] text-theme-secondary mb-1">
@@ -670,7 +704,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             </div>
             <div className="p-4 border-t border-theme flex gap-2">
               <button onClick={() => setIsProdutoModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-theme text-theme-secondary font-semibold text-sm">Cancelar</button>
-              <button onClick={() => { setProduto(produtoTemp); setIsProdutoModalOpen(false); }} className="flex-1 py-2.5 rounded-xl bg-[var(--primary)] text-white font-bold text-sm">Ok</button>
+              <button onClick={() => { setProduto(produtoTemp); setEstado(''); setCidade(''); setShowAllCities(false); setIsProdutoModalOpen(false); }} className="flex-1 py-2.5 rounded-xl bg-[var(--primary)] text-white font-bold text-sm">Ok</button>
             </div>
           </div>
         </div>

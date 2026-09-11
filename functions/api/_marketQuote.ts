@@ -130,6 +130,41 @@ export function findPriceCell(row: string[]): string | undefined {
   return row.find(c => /\d/.test(c) && !/^[a-zà-ú]+$/i.test(c) && !/^\d{1,2}\/\d{2,4}$/.test(c.trim()));
 }
 
+// Detecta se o texto da primeira célula de uma linha é literalmente um
+// nome de estado ou sigla — usado pra preencher "state" corretamente
+// (antes ficava sempre null, mesmo quando a linha já dizia "Bahia" ou
+// "SP", o que impedia montar um seletor de localização de verdade a
+// partir dessa fonte).
+const ESTADOS_E_UF: Record<string, string> = {
+  'acre': 'Acre', 'ac': 'Acre', 'alagoas': 'Alagoas', 'al': 'Alagoas',
+  'amapá': 'Amapá', 'amapa': 'Amapá', 'ap': 'Amapá',
+  'amazonas': 'Amazonas', 'am': 'Amazonas', 'bahia': 'Bahia', 'ba': 'Bahia',
+  'ceará': 'Ceará', 'ceara': 'Ceará', 'ce': 'Ceará',
+  'distrito federal': 'Distrito Federal', 'df': 'Distrito Federal',
+  'espírito santo': 'Espírito Santo', 'espirito santo': 'Espírito Santo', 'es': 'Espírito Santo',
+  'goiás': 'Goiás', 'goias': 'Goiás', 'go': 'Goiás',
+  'maranhão': 'Maranhão', 'maranhao': 'Maranhão', 'ma': 'Maranhão',
+  'mato grosso do sul': 'Mato Grosso do Sul', 'ms': 'Mato Grosso do Sul',
+  'mato grosso': 'Mato Grosso', 'mt': 'Mato Grosso',
+  'minas gerais': 'Minas Gerais', 'mg': 'Minas Gerais',
+  'pará': 'Pará', 'para': 'Pará', 'pa': 'Pará', 'paraíba': 'Paraíba', 'paraiba': 'Paraíba', 'pb': 'Paraíba',
+  'paraná': 'Paraná', 'parana': 'Paraná', 'pr': 'Paraná',
+  'pernambuco': 'Pernambuco', 'pe': 'Pernambuco', 'piauí': 'Piauí', 'piaui': 'Piauí', 'pi': 'Piauí',
+  'rio de janeiro': 'Rio de Janeiro', 'rj': 'Rio de Janeiro',
+  'rio grande do norte': 'Rio Grande do Norte', 'rn': 'Rio Grande do Norte',
+  'rio grande do sul': 'Rio Grande do Sul', 'rs': 'Rio Grande do Sul',
+  'rondônia': 'Rondônia', 'rondonia': 'Rondônia', 'ro': 'Rondônia',
+  'roraima': 'Roraima', 'rr': 'Roraima',
+  'santa catarina': 'Santa Catarina', 'sc': 'Santa Catarina',
+  'são paulo': 'São Paulo', 'sao paulo': 'São Paulo', 'sp': 'São Paulo',
+  'sergipe': 'Sergipe', 'se': 'Sergipe', 'tocantins': 'Tocantins', 'to': 'Tocantins',
+};
+
+function detectarEstado(texto: string): string | null {
+  const chave = texto.trim().toLowerCase();
+  return ESTADOS_E_UF[chave] || null;
+}
+
 export function normalizeNoticiasAgricolas(data: any, productId: string, productLabel: string): MarketQuote[] {
   if (!data?.tables?.length) return [];
   const quotes: MarketQuote[] = [];
@@ -138,9 +173,16 @@ export function normalizeNoticiasAgricolas(data: any, productId: string, product
     for (const row of (table.rows || []).slice(1)) {
       const priceCell = findPriceCell(row);
       const price = priceCell ? Number(priceCell.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.')) : null;
+      const localTexto = row[0] || '';
+      const estadoDetectado = detectarEstado(localTexto);
       quotes.push({
         productId, productLabel,
-        state: null, stateCode: null, region: null, municipality: row[0] || null, marketPlace: row[0] || null,
+        state: estadoDetectado, stateCode: null, region: null,
+        // Se a célula era literalmente um nome de estado, não faz
+        // sentido repetir o mesmo texto como "município" — só preenche
+        // município/praça quando for de fato um local mais específico.
+        municipality: estadoDetectado ? null : (localTexto || null),
+        marketPlace: estadoDetectado ? null : (localTexto || null),
         price: isValidPrice(price, productId) ? price : null,
         currency: 'BRL',
         unit: (table.rows?.[0] || []).find((h: string) => /r\$|us\$/i.test(h)) || 'R$',

@@ -68,6 +68,23 @@ describe('Cenário 5: API retorna estado inexistente', () => {
     expect(result[0].state).toBe('Bahia');
     expect(result[0].stateCode).toBe('BA');
   });
+
+  it('Notícias Agrícolas agora detecta estado quando a linha é literalmente um nome de estado ou UF (antes sempre ficava null)', () => {
+    const data = {
+      tables: [{ heading: 'Boi Gordo por Estado', source: 'Scot Consultoria', rows: [
+        ['Estado', 'R$/@'],
+        ['Bahia', '312,72'],
+        ['SP', '349,50'],
+        ['Feira de Santana', '308,00'], // cidade real, não deve virar "estado"
+      ]}],
+      sourceUrl: 'x',
+    };
+    const result = normalizeNoticiasAgricolas(data, 'boi_gordo', 'Boi Gordo');
+    expect(result[0].state).toBe('Bahia');
+    expect(result[1].state).toBe('São Paulo');
+    expect(result[2].state).toBeNull(); // cidade continua sem estado detectado, é esperado
+    expect(result[2].municipality).toBe('Feira de Santana');
+  });
 });
 
 describe('Cenário 6: API retorna produto inexistente (sem correspondência)', () => {
