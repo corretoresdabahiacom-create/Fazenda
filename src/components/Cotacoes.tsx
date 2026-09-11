@@ -623,47 +623,59 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           <span className="text-xs font-bold text-[var(--primary)]">Trocar</span>
         </button>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div className="relative">
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
-            <select value={pais} disabled className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none opacity-80">
-              {PAISES.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[9px] font-bold text-theme-secondary uppercase block mb-0.5 ml-1">País</label>
+            <div className="relative">
+              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
+              <select value={pais} disabled className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none opacity-80 truncate">
+                {PAISES.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
           </div>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
-            <select
-              value={estado}
-              onChange={e => { setEstado(e.target.value); setRegiao(''); setCidade(''); setShowAllCities(false); }}
-              className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none"
-            >
-              <option value="">Todos os Estados</option>
-              {estadosComDado.map(uf => <option key={uf} value={uf}>{uf}</option>)}
-            </select>
+          <div>
+            <label className="text-[9px] font-bold text-theme-secondary uppercase block mb-0.5 ml-1">Estado</label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
+              <select
+                value={estado}
+                onChange={e => { setEstado(e.target.value); setRegiao(''); setCidade(''); setShowAllCities(false); }}
+                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none truncate"
+              >
+                <option value="">Todos os estados</option>
+                {estadosComDado.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+              </select>
+            </div>
           </div>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
-            <select
-              value={regiao}
-              onChange={e => { setRegiao(e.target.value); setCidade(''); }}
-              disabled={!estado || regioesNoEstado.length === 0}
-              className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60"
-            >
-              <option value="">{!estado ? 'Escolha um estado' : regioesNoEstado.length === 0 ? 'Sem região específica' : 'Todas as regiões'}</option>
-              {regioesNoEstado.map(r => <option key={r} value={r}>{r}</option>)}
-            </select>
+          <div>
+            <label className="text-[9px] font-bold text-theme-secondary uppercase block mb-0.5 ml-1">Região/Praça</label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
+              <select
+                value={regiao}
+                onChange={e => { setRegiao(e.target.value); setCidade(''); }}
+                disabled={!estado || regioesNoEstado.length === 0}
+                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60 truncate"
+              >
+                <option value="">{!estado ? 'Escolha estado' : regioesNoEstado.length === 0 ? 'Sem região' : 'Todas as regiões'}</option>
+                {regioesNoEstado.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
-            <select
-              value={cidade}
-              onChange={e => setCidade(e.target.value)}
-              disabled={!estado || locaisNoEstado.length === 0}
-              className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60"
-            >
-              <option value="">{!estado ? 'Escolha um estado primeiro' : locaisNoEstado.length === 0 ? 'Sem cidade/praça específica' : 'Todas as cidades/praças'}</option>
-              {locaisNoEstado.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+          <div>
+            <label className="text-[9px] font-bold text-theme-secondary uppercase block mb-0.5 ml-1">Cidade</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
+              <select
+                value={cidade}
+                onChange={e => setCidade(e.target.value)}
+                disabled={!estado || locaisNoEstado.length === 0}
+                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60 truncate"
+              >
+                <option value="">{!estado ? 'Escolha estado' : locaisNoEstado.length === 0 ? 'Sem cidade/praça' : 'Todas as cidades'}</option>
+                {locaisNoEstado.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
           </div>
         </div>
         {estado && estadosComDado.length === 0 && (
@@ -920,7 +932,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 // O IEA-SP só cobre o Estado de São Paulo — nunca mostra
                 // esse dado se o usuário estiver filtrando por outro
                 // estado, pra não parecer que é da região pesquisada.
-                const estadoCompativel = !estado || estado === 'São Paulo';
+                const estadoCompativel = estado === 'São Paulo';
                 if (!keyword || !ieaData || !estadoCompativel) return null;
                 const ieaRow = ieaData.recebidosPelosProdutores.find(r => keyword.test(r.produto));
                 if (!ieaRow) return null;
@@ -956,7 +968,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 // escopo: só mostra se nenhum estado ou "Espírito Santo"
                 // estiver selecionado.
                 const keyword = INCAPER_KEYWORDS[produto];
-                const estadoCompativel = !estado || estado === 'Espírito Santo';
+                const estadoCompativel = estado === 'Espírito Santo';
                 if (!keyword || !incaperData || !estadoCompativel) return null;
                 const row = incaperData.precos.find(r => keyword.test(r.produto));
                 if (!row) return null;
@@ -975,7 +987,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               })()}
               {(() => {
                 // Epagri/Cepa só cobre Santa Catarina.
-                const estadoCompativel = !estado || estado === 'Santa Catarina';
+                const estadoCompativel = estado === 'Santa Catarina';
                 if (!epagriData || !estadoCompativel) return null;
                 const row = produto === 'boi_gordo' ? epagriData.boiGordo : produto === 'vaca' ? epagriData.vacaGorda : null;
                 if (!row) return null;
@@ -995,7 +1007,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               {(() => {
                 // AIBA só cobre o Oeste da Bahia — não é indicador nacional.
                 const keyword = AIBA_KEYWORDS[produto];
-                const estadoCompativel = !estado || estado === 'Bahia';
+                const estadoCompativel = estado === 'Bahia';
                 if (!keyword || !aibaData || !estadoCompativel) return null;
                 const row = aibaData.rows.find(r => keyword.test(r.produto));
                 if (!row) return null;
