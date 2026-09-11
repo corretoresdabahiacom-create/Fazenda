@@ -102,7 +102,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     // Busca a notícia mais recente sobre a cotação da Cooperfeira no
     // Jornal Grande Bahia, que cobre a pauta com regularidade e tem
     // uma busca com URL previsível.
-    const buscaUrl = 'https://jornalgrandebahia.com.br/?s=arroba+boi+gordo+Feira+de+Santana+Cooperfeira';
+    const buscaUrl = 'https://jornalgrandebahia.com.br/?s=arroba+boi+gordo+Feira+de+Santana+Cooperfeira&orderby=date&order=DESC';
     const buscaRes = await fetch(buscaUrl, { headers: { 'User-Agent': BROWSER_UA, Accept: 'text/html' } });
 
     if (!buscaRes.ok) {
@@ -132,9 +132,30 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const artigoHtml = await artigoRes.text();
     const texto = stripTags(artigoHtml);
 
-    // Data de publicação, quando a página informar.
-    const dataMatch = artigoHtml.match(/"datePublished"\s*:\s*"([^"]+)"/i) || artigoUrl.match(/\/(\d{4})\/(\d{2})\//);
-    const dataPublicacao = dataMatch?.[1] || null;
+    // Data de publicação — tenta o metadado estruturado da página
+    // primeiro (mais confiável), senão cai pro padrão /AAAA/MM/ da URL.
+    const metaDateMatch = artigoHtml.match(/"datePublished"\s*:\s*"([^"]+)"/i);
+    const urlDateMatch = artigoUrl.match(/\/(\d{4})\/(\d{2})\//);
+    const dataPublicacao = metaDateMatch?.[1] || (urlDateMatch ? `${urlDateMatch[1]}-${urlDateMatch[2]}-01` : null);
+
+    // BUG REAL EVITADO: a busca por relevância do portal pode trazer uma
+    // notícia ANTIGA que bate bem com os termos, não necessariamente a
+    // mais recente. Em vez de confiar cegamente, rejeitamos
+    // explicitamente qualquer notícia com mais de 25 dias (a divulgação
+    // é semanal, então isso dá uma margem generosa) — melhor avisar que
+    // não achamos nada atual do que mostrar um preço de meses atrás como
+    // se fosse de hoje.
+    if (dataPublicacao) {
+      const dataArtigo = new Date(dataPublicacao);
+      const diasDesdePublicacao = (Date.now() - dataArtigo.getTime()) / (1000 * 60 * 60 * 24);
+      if (!isNaN(diasDesdePublicacao) && diasDesdePublicacao > 25) {
+        return new Response(JSON.stringify({
+          error: `A notícia mais relevante encontrada é de ${dataArtigo.toLocaleDateString('pt-BR')} — velha demais pra mostrar como cotação atual (a Cooperfeira divulga semanalmente). Preferimos avisar isso a mostrar um preço desatualizado.`,
+          sourceUrl: artigoUrl,
+          dataEncontrada: dataPublicacao,
+        }), { status: 404, headers: { 'Content-Type': 'application/json' } });
+      }
+    }
 
     // 1ª tentativa: padrão de texto (rápido, sem custo de IA).
     let resultado = tentarExtracaoSimples(texto);

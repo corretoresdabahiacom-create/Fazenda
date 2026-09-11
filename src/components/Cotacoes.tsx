@@ -5,6 +5,8 @@
 
 import { useEffect, useState } from 'react';
 import { isPriceAnomalous, extractNumber, findPriceCell } from '../lib/priceSanity';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import DashboardBahia from './DashboardBahia';
 import AlertasCotacoes from './AlertasCotacoes';
 import GraficoPrecoClima from './GraficoPrecoClima';
@@ -262,9 +264,13 @@ function VerFonte({ fonte, dataHora, url }: { fonte: string; dataHora?: string; 
       <div className="mt-1 pl-2 border-l-2 border-theme space-y-0.5">
         <p className="text-theme-secondary"><span className="font-bold">Fonte:</span> {fonte}</p>
         {dataHora && <p className="text-theme-secondary"><span className="font-bold">Data/hora:</span> {dataHora}</p>}
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-[var(--primary)] font-semibold underline break-all">
-          {url}
-        </a>
+        {url ? (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-[var(--primary)] font-semibold underline break-all">
+            {url}
+          </a>
+        ) : (
+          <p className="text-theme-secondary italic">Sem link externo — dado cadastrado manualmente.</p>
+        )}
       </div>
     </details>
   );
@@ -308,6 +314,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [datagroData, setDatagroData] = useState<{ precos: Record<string, string>; titulo: string | null; sourceUrl: string; fetchedAt: string } | null>(null);
   const [scotPracasData, setScotPracasData] = useState<{ pracas: any[]; estadosCobertos: string[]; fechamento: string | null; sourceUrl: string; fetchedAt: string } | null>(null);
   const [cooperfeiraData, setCooperfeiraData] = useState<{ praca: string; estado: string; preco: string; unidade: string; sourceUrl: string; fetchedAt: string; aviso: string } | null>(null);
+  const [precosManuais, setPrecosManuais] = useState<any[]>([]);
+  const [produtosManuais, setProdutosManuais] = useState<any[]>([]);
+  const [localizacoesManuais, setLocalizacoesManuais] = useState<any[]>([]);
   const [pecuariaData, setPecuariaData] = useState<{ rows: { data: string; SP: string; MS: string; MG: string; GO: string; MT: string; RJ: string }[]; unidade: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -425,6 +434,17 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       .then(json => { if (!json.error) setCooperfeiraData(json); else setCooperfeiraData(null); })
       .catch(() => setCooperfeiraData(null));
   }, [produto]);
+
+  // Cotações lançadas manualmente no Painel Admin — cada uma sabe seu
+  // produtoId/localizacaoId, resolvidos aqui pros nomes de verdade.
+  useEffect(() => {
+    const unsubs = [
+      onSnapshot(collection(db, 'cotacoesManuais_precos'), snap => setPrecosManuais(snap.docs.map(d => ({ id: d.id, ...d.data() })))),
+      onSnapshot(collection(db, 'cotacoesManuais_produtos'), snap => setProdutosManuais(snap.docs.map(d => ({ id: d.id, ...d.data() })))),
+      onSnapshot(collection(db, 'cotacoesManuais_localizacoes'), snap => setLocalizacoesManuais(snap.docs.map(d => ({ id: d.id, ...d.data() })))),
+    ];
+    return () => unsubs.forEach(u => u());
+  }, []);
 
   useEffect(() => {
     if (!['boi_gordo', 'vaca', 'novilho', 'novilha'].includes(produto)) { setScotPracasData(null); return; }
@@ -833,6 +853,41 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         })();
 
         const officialOverride = (() => {
+          // Cotação manual (cadastrada no Painel Admin) — prioridade
+          // máxima, porque é um dado que você mesmo conferiu e lançou,
+          // pensado justamente pra suprir a falta de fonte automática
+          // num local/produto específico.
+          if (estadoEfetivo) {
+            const produtoManual = produtosManuais.find((p: any) => p.nome?.toLowerCase() === produtoDef.label.toLowerCase().split(' (')[0]);
+            if (produtoManual) {
+              const locaisDoEstado = localizacoesManuais.filter((l: any) => l.estado === estadoEfetivo);
+              const idsLocaisDoEstado = new Set(locaisDoEstado.map((l: any) => l.id));
+              let candidatos = precosManuais.filter((p: any) => p.produtoId === produtoManual.id && idsLocaisDoEstado.has(p.localizacaoId));
+              if (cidade) {
+                const termo = cidade.toLowerCase();
+                const comCidade = candidatos.filter((p: any) => {
+                  const loc = localizacoesManuais.find((l: any) => l.id === p.localizacaoId);
+                  return loc?.local?.toLowerCase().includes(termo);
+                });
+                if (comCidade.length > 0) candidatos = comCidade;
+              }
+              if (candidatos.length > 0) {
+                // Pega o mais recente lançado.
+                const maisRecente = [...candidatos].sort((a, b) => (b.dataCotacao || '').localeCompare(a.dataCotacao || ''))[0];
+                const local = localizacoesManuais.find((l: any) => l.id === maisRecente.localizacaoId);
+                const prazoTexto = maisRecente.prazoDias > 0 ? `, ${maisRecente.prazoDias}d de prazo` : ', à vista';
+                const tipoTexto = maisRecente.tipoNegocio !== 'nao_informado' ? `, ${maisRecente.tipoNegocio}` : '';
+                return {
+                  fonte: `Cadastro Manual — ${local?.local || estadoEfetivo}`,
+                  preco: maisRecente.preco.toFixed(2),
+                  unidade: `${maisRecente.unidade.replace('R$/', '')}${prazoTexto}${tipoTexto}`,
+                  sourceUrl: '',
+                  fetchedAt: maisRecente.atualizadoEm || maisRecente.dataCotacao,
+                };
+              }
+            }
+          }
+
           // Cooperfeira — cotação real da praça de Feira de Santana
           // (BA), baseada em negócios do frigorífico Frifeira. Vem
           // primeiro quando o usuário busca essa praça especificamente,
@@ -941,12 +996,16 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 </div>
               )}
               {officialOverride && (
-                <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-4">
+                <div className={`border-2 rounded-2xl p-4 ${officialOverride.sourceUrl ? 'bg-green-50 border-green-300' : 'bg-blue-50 border-blue-300'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold text-green-800 bg-green-100 px-2 py-0.5 rounded-full">🏛️ Fonte Oficial — {officialOverride.fonte}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${officialOverride.sourceUrl ? 'text-green-800 bg-green-100' : 'text-blue-800 bg-blue-100'}`}>
+                      {officialOverride.sourceUrl ? '🏛️' : '✍️'} {officialOverride.sourceUrl ? 'Fonte Oficial' : 'Cadastro Manual'} — {officialOverride.fonte}
+                    </span>
                   </div>
-                  <p className="text-2xl font-bold text-green-900">R$ {officialOverride.preco} <span className="text-sm font-normal">/{officialOverride.unidade}</span></p>
-                  <p className="text-[10px] text-green-700 mt-1">Preço oficial específico de {estado} — mais preciso que a referência nacional abaixo.</p>
+                  <p className={`text-2xl font-bold ${officialOverride.sourceUrl ? 'text-green-900' : 'text-blue-900'}`}>R$ {officialOverride.preco} <span className="text-sm font-normal">/{officialOverride.unidade}</span></p>
+                  <p className={`text-[10px] mt-1 ${officialOverride.sourceUrl ? 'text-green-700' : 'text-blue-700'}`}>
+                    {officialOverride.sourceUrl ? `Preço oficial específico de ${estado} — mais preciso que a referência nacional abaixo.` : 'Preço lançado manualmente no Painel Admin — confira a data antes de usar pra negociar.'}
+                  </p>
                   <VerFonte fonte={officialOverride.fonte} dataHora={officialOverride.fetchedAt ? new Date(officialOverride.fetchedAt).toLocaleString('pt-BR') : undefined} url={officialOverride.sourceUrl || ''} />
                 </div>
               )}

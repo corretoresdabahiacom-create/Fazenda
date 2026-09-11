@@ -10,7 +10,7 @@ import {
 import { db, auth } from '../lib/firebase';
 import {
   Users, DollarSign, TrendingDown, Bell, Image as ImageIcon, Receipt,
-  Trash2, Plus, X, ShieldOff, ShieldAlert, Ban, CheckCircle2, Search, Database,
+  Trash2, Plus, X, ShieldOff, ShieldAlert, Ban, CheckCircle2, Search, Database, Edit3,
 } from 'lucide-react';
 import {
   UserDirectoryEntry, Subscription, SubscriptionStatus, PlanTier, PLAN_PRICES,
@@ -18,8 +18,9 @@ import {
 } from '../types';
 import { format } from 'date-fns';
 import { compressImageIfNeeded, fileToDataUrl } from '../lib/imageCompression';
+import CotacoesManuais from './CotacoesManuais';
 
-type Tab = 'visao_geral' | 'usuarios' | 'notificacoes' | 'anuncios' | 'despesas' | 'fontes_cotacoes';
+type Tab = 'visao_geral' | 'usuarios' | 'notificacoes' | 'anuncios' | 'despesas' | 'fontes_cotacoes' | 'cotacoes_manuais';
 
 // Remove campos com valor undefined antes de gravar no Firestore — ele
 // recusa a gravação inteira se qualquer campo vier como undefined.
@@ -41,6 +42,7 @@ const TABS: { id: Tab; label: string; icon: typeof Users }[] = [
   { id: 'anuncios', label: 'Publicidade', icon: ImageIcon },
   { id: 'despesas', label: 'Despesas do App', icon: Receipt },
   { id: 'fontes_cotacoes', label: 'Fontes de Cotações', icon: Database },
+  { id: 'cotacoes_manuais', label: 'Cotações Manuais', icon: Edit3 },
 ];
 
 export default function AdminPanel({ adminEmail }: { adminEmail: string }) {
@@ -112,6 +114,7 @@ export default function AdminPanel({ adminEmail }: { adminEmail: string }) {
       {tab === 'anuncios' && <AnunciosTab ads={ads} adminEmail={adminEmail} />}
       {tab === 'despesas' && <DespesasTab expenses={appExpenses} />}
       {tab === 'fontes_cotacoes' && <FontesCotacoesTab />}
+      {tab === 'cotacoes_manuais' && <CotacoesManuais />}
     </div>
   );
 }
