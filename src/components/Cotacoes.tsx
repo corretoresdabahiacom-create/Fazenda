@@ -307,6 +307,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [aibaData, setAibaData] = useState<{ rows: { produto: string; unidade: string; preco: string; variacaoPct: string; data: string }[]; sourceUrl?: string; fetchedAt?: string } | null>(null);
   const [datagroData, setDatagroData] = useState<{ precos: Record<string, string>; titulo: string | null; sourceUrl: string; fetchedAt: string } | null>(null);
   const [scotPracasData, setScotPracasData] = useState<{ pracas: any[]; estadosCobertos: string[]; fechamento: string | null; sourceUrl: string; fetchedAt: string } | null>(null);
+  const [cooperfeiraData, setCooperfeiraData] = useState<{ praca: string; estado: string; preco: string; unidade: string; sourceUrl: string; fetchedAt: string; aviso: string } | null>(null);
   const [pecuariaData, setPecuariaData] = useState<{ rows: { data: string; SP: string; MS: string; MG: string; GO: string; MT: string; RJ: string }[]; unidade: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -416,6 +417,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       .then(json => { if (!json.error) setAibaData(json); })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (produto !== 'boi_gordo') { setCooperfeiraData(null); return; }
+    fetch('/api/cooperfeira-ba')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setCooperfeiraData(json); else setCooperfeiraData(null); })
+      .catch(() => setCooperfeiraData(null));
+  }, [produto]);
 
   useEffect(() => {
     if (!['boi_gordo', 'vaca', 'novilho', 'novilha'].includes(produto)) { setScotPracasData(null); return; }
@@ -536,6 +545,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         ...(scotPracasData?.pracas || [])
           .filter((p: any) => p.estado === estado)
           .map((p: any) => p.praca as string),
+        // Feira de Santana entra como praça real quando a Cooperfeira
+        // respondeu com dado de verdade (nunca aparece "vazia").
+        ...(estado === 'Bahia' && cooperfeiraData ? ['Feira de Santana'] : []),
       ])).sort((a, b) => a.localeCompare(b))
     : [];
 
@@ -821,6 +833,20 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         })();
 
         const officialOverride = (() => {
+          // Cooperfeira — cotação real da praça de Feira de Santana
+          // (BA), baseada em negócios do frigorífico Frifeira. Vem
+          // primeiro quando o usuário busca essa praça especificamente,
+          // porque é o dado mais local que temos pra lá.
+          if (produto === 'boi_gordo' && cooperfeiraData &&
+              (/feira de santana/i.test(cidade) || (estadoEfetivo === 'Bahia' && /feira/i.test(cidade)))) {
+            return {
+              fonte: 'Cooperfeira / Frifeira — Feira de Santana',
+              preco: cooperfeiraData.preco,
+              unidade: cooperfeiraData.unidade,
+              sourceUrl: cooperfeiraData.sourceUrl,
+              fetchedAt: cooperfeiraData.fetchedAt,
+            };
+          }
           // Scot Consultoria por praça — a fonte mais granular que temos
           // pra bovinos (33 praças em 20 estados, com Boi Gordo à vista,
           // a prazo, e Vaca Gorda). Vem PRIMEIRO quando o usuário
@@ -925,7 +951,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 </div>
               )}
               {!primaryAtual && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4">Nenhum dado de mercado atual encontrado para {produtoDef.label} no momento.</p>}
-              {buscouCidadeEspecifica && !regionMatch && (
+              {buscouCidadeEspecifica && !regionMatch && !officialOverride && (
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
                   <p className="text-xs font-semibold text-amber-800">
                     Não temos cotação específica para <strong>{cidade}</strong> no momento.
