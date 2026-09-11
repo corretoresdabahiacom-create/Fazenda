@@ -306,6 +306,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [epagriData, setEpagriData] = useState<{ boiGordo: { data: string; preco: number; praca?: string } | null; vacaGorda: { data: string; preco: number; praca?: string } | null; sourceUrl?: string; fetchedAt?: string } | null>(null);
   const [aibaData, setAibaData] = useState<{ rows: { produto: string; unidade: string; preco: string; variacaoPct: string; data: string }[]; sourceUrl?: string; fetchedAt?: string } | null>(null);
   const [datagroData, setDatagroData] = useState<{ precos: Record<string, string>; titulo: string | null; sourceUrl: string; fetchedAt: string } | null>(null);
+  const [scotPracasData, setScotPracasData] = useState<{ pracas: any[]; estadosCobertos: string[]; fechamento: string | null; sourceUrl: string; fetchedAt: string } | null>(null);
   const [pecuariaData, setPecuariaData] = useState<{ rows: { data: string; SP: string; MS: string; MG: string; GO: string; MT: string; RJ: string }[]; unidade: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -417,6 +418,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   }, []);
 
   useEffect(() => {
+    if (!['boi_gordo', 'vaca', 'novilho', 'novilha'].includes(produto)) { setScotPracasData(null); return; }
+    fetch('/api/scot-pracas')
+      .then(res => res.json())
+      .then(json => { if (!json.error) setScotPracasData(json); else setScotPracasData(null); })
+      .catch(() => setScotPracasData(null));
+  }, [produto]);
+
+  useEffect(() => {
     if (produto !== 'boi_gordo') { setDatagroData(null); return; }
     fetch('/api/datagro-girodoboi')
       .then(res => res.json())
@@ -482,7 +491,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   // verdade, não de uma lista fixa (antes ESTADOS listava os 27 sempre,
   // mesmo sem nenhuma fonte pra maioria deles).
   const estadosComDado: string[] = Array.from(
-    new Set<string>(locaisDisponiveis.filter(q => q.state).map(q => q.state as string))
+    new Set<string>([
+      ...locaisDisponiveis.filter(q => q.state).map(q => q.state as string),
+      // Praças da Scot também contam como cobertura real de estado —
+      // sem isso, o dropdown ficava quase vazio pra bovinos, mesmo
+      // tendo dado de 20 estados disponível.
+      ...(scotPracasData?.estadosCobertos || []),
+    ])
   ).sort((a, b) => a.localeCompare(b));
 
   // Deriva o que os alertas precisam a partir do que JÁ foi buscado —
@@ -511,12 +526,17 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   // região também foi escolhida, filtra só os locais daquela região;
   // senão, mostra todos os locais do estado, com ou sem região.
   const locaisNoEstado: string[] = estado
-    ? Array.from(new Set<string>(
-        locaisDisponiveis
+    ? Array.from(new Set<string>([
+        ...locaisDisponiveis
           .filter(q => q.state === estado && (!regiao || q.region === regiao))
           .map(q => (q.marketPlace || q.municipality) as string)
-          .filter(Boolean)
-      )).sort((a, b) => a.localeCompare(b))
+          .filter(Boolean),
+        // Praças da Scot naquele estado (ex: "SP Barretos", "BA Oeste")
+        // — é o dado mais granular que temos pra bovinos.
+        ...(scotPracasData?.pracas || [])
+          .filter((p: any) => p.estado === estado)
+          .map((p: any) => p.praca as string),
+      ])).sort((a, b) => a.localeCompare(b))
     : [];
 
   const realCities = data ? (() => {
@@ -801,6 +821,39 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         })();
 
         const officialOverride = (() => {
+          // Scot Consultoria por praça — a fonte mais granular que temos
+          // pra bovinos (33 praças em 20 estados, com Boi Gordo à vista,
+          // a prazo, e Vaca Gorda). Vem PRIMEIRO quando o usuário
+          // escolheu uma praça/cidade específica, porque é o dado mais
+          // próximo do local dele. Sem praça escolhida, entra depois das
+          // fontes oficiais de governo.
+          const buscarScotPraca = (exigirPracaExata: boolean) => {
+            if (!scotPracasData || !['boi_gordo', 'vaca'].includes(produto)) return null;
+            const candidatas = scotPracasData.pracas.filter((p: any) => !estadoEfetivo || p.estado === estadoEfetivo);
+            if (candidatas.length === 0) return null;
+            let escolhida = candidatas[0];
+            if (cidade) {
+              const termo = cidade.toLowerCase();
+              const exata = candidatas.find((p: any) =>
+                p.praca?.toLowerCase().includes(termo) || p.regiao?.toLowerCase().includes(termo));
+              if (exata) escolhida = exata;
+              else if (exigirPracaExata) return null;
+            } else if (exigirPracaExata) return null;
+
+            const valor = produto === 'vaca' ? escolhida.vacaGorda : escolhida.boiGordoVista;
+            if (!valor) return null;
+            return {
+              fonte: `Scot Consultoria — ${escolhida.praca}`,
+              preco: valor,
+              unidade: escolhida.unidade.replace('R$/', ''),
+              sourceUrl: scotPracasData.sourceUrl,
+              fetchedAt: scotPracasData.fetchedAt,
+            };
+          };
+
+          const scotExata = buscarScotPraca(true);
+          if (scotExata) return scotExata;
+
           if (estadoEfetivo === 'São Paulo' && ieaData) {
             const keyword = IEA_KEYWORDS[produto];
             const row = keyword ? ieaData.recebidosPelosProdutores.find(r => keyword.test(r.produto)) : null;
@@ -830,7 +883,10 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           if (produto === 'boi_gordo' && datagroData?.precos[estadoEfetivo]) {
             return { fonte: 'Datagro (via Giro do Boi/Canal Rural)', preco: datagroData.precos[estadoEfetivo], unidade: '@', sourceUrl: datagroData.sourceUrl, fetchedAt: datagroData.fetchedAt };
           }
-          return null;
+          // Última tentativa: Scot sem exigir praça exata (usa a primeira
+          // praça do estado escolhido) — cobre Boi Gordo E Vaca em 20
+          // estados, muito além do que as fontes de governo alcançam.
+          return buscarScotPraca(false);
         })();
 
         // Se a cidade digitada não bateu exato, busca especificamente o
@@ -851,6 +907,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <div className="space-y-2">
               <h2 className="text-sm font-bold text-theme-primary">🇧🇷 Preço no Mercado Selecionado{localBusca ? ` — ${localBusca}` : ' — Geral (Brasil)'}</h2>
               <AlertasCotacoes produto={produto} produtoLabel={produtoDef.label} quotesResponse={quotesResponse} />
+              {['novilho', 'novilha'].includes(produto) && !officialOverride && (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
+                  <p className="text-xs text-amber-800">
+                    <strong>Cobertura limitada:</strong> {produtoDef.label} tem bem menos fontes públicas que Boi Gordo e Vaca. Hoje só encontramos dado oficial em São Paulo (IEA-SP). Para as demais praças, use o Boi Gordo e a Vaca como referência de mercado da região.
+                  </p>
+                </div>
+              )}
               {officialOverride && (
                 <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-4">
                   <div className="flex items-center justify-between mb-2">
