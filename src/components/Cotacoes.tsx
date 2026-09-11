@@ -861,7 +861,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               {primaryAtual && displayRow && officialOverride && (
                 <details className="bg-theme-secondary rounded-2xl p-3">
                   <summary className="cursor-pointer text-xs font-semibold text-theme-secondary select-none">
-                    Ver também: Referência Nacional (Cepea/Esalq) — mesmo valor pra qualquer estado
+                    Ver também: Indicador Nacional CEPEA/ESALQ — referência oficial usada na B3, mesmo valor pra qualquer estado
                   </summary>
                   <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
                     {displayRow.map((cell, i) => (
@@ -876,11 +876,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               )}
               {primaryAtual && displayRow && !officialOverride && (
                 <div className={`bg-theme-card rounded-2xl border-2 p-4 ${priceCheck.isAnomaly ? 'border-red-300' : 'border-[var(--primary)]/20'}`}>
-                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <Badge kind="atual" />
                     {localBusca && !regionMatch && <span className="text-[9px] text-theme-secondary">(local não encontrado, mostrando geral)</span>}
                     {localBusca && regionMatch && !regionMatch.exact && <span className="text-[9px] text-amber-600">(local mais próximo, mesma UF)</span>}
                   </div>
+                  <p className="text-[10px] text-theme-secondary mb-3">
+                    Indicador Nacional CEPEA/ESALQ — a referência oficial de preço à vista usada como base pros contratos futuros da B3. Não muda por estado porque é um número único, calculado pra todo o Brasil.
+                  </p>
                   {priceCheck.isAnomaly && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-2.5 mb-3 flex items-start gap-2">
                       <AlertTriangle size={14} className="text-red-500 shrink-0 mt-0.5" />

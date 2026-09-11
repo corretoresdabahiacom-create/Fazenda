@@ -12,6 +12,7 @@ export interface SimpleQuote {
   price: number | null;
   currency: 'BRL' | 'USD';
   fetchedAt?: string;
+  priceType?: string;
 }
 
 export interface DivergenceResult {
@@ -24,9 +25,25 @@ export interface DivergenceResult {
 // Compara preços em BRL de múltiplas fontes pro mesmo produto — alerta
 // quando a diferença entre a maior e a menor passa de 10%. Ignora
 // entradas com moeda diferente (não faz sentido comparar USD com BRL
-// diretamente) e entradas sem preço.
+// diretamente), entradas sem preço, e — importante — só compara
+// cotações do MESMO tipo (ex: só "à vista" com "à vista"). Preço futuro
+// e preço à vista são coisas diferentes por natureza, não uma
+// "divergência" entre fontes; misturar os dois gerava alertas falsos
+// (bug real reportado em produção).
 export function detectDivergence(quotes: SimpleQuote[]): DivergenceResult {
-  const precosBRL = quotes.filter(q => q.currency === 'BRL' && q.price != null && q.price > 0);
+  const candidatos = quotes.filter(q => q.currency === 'BRL' && q.price != null && q.price > 0);
+  // Agrupa por priceType (tratando "sem tipo definido" como um grupo
+  // próprio) e só compara dentro do mesmo grupo.
+  const grupos = new Map<string, SimpleQuote[]>();
+  for (const q of candidatos) {
+    const chave = q.priceType || 'indicador';
+    if (!grupos.has(chave)) grupos.set(chave, []);
+    grupos.get(chave)!.push(q);
+  }
+  // Prioriza o grupo "indicador"/"a_vista" quando existir (é o que o
+  // usuário normalmente quer ver como "preço atual"); senão, usa
+  // qualquer grupo com 2+ itens.
+  const precosBRL = grupos.get('indicador') || grupos.get('a_vista') || Array.from(grupos.values()).find(g => g.length >= 2) || [];
   if (precosBRL.length < 2) return { hasDivergence: false };
 
   const valores = precosBRL.map(p => p.price as number);

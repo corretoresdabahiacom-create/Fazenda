@@ -165,10 +165,56 @@ function detectarEstado(texto: string): string | null {
   return ESTADOS_E_UF[chave] || null;
 }
 
+// Cabeçalhos de tabela relevantes por produto — usado pra filtrar
+// TABELAS inteiras (não só linhas) do Notícias Agrícolas, que organiza
+// a resposta em várias tabelas por chamada (indicador nacional, futuro
+// B3, variante "a prazo" de SP, etc.). Sem isso, o normalizador
+// misturava TODAS as tabelas (até de produtos diferentes, e variantes
+// como "a prazo" que são um número diferente por natureza, não uma
+// fonte "discordando") na mesma lista, causando alertas de divergência
+// completamente falsos — bug real reportado em produção.
+const TABELA_ALIASES: Record<string, RegExp> = {
+  boi_gordo: /\bboi gordo\b|indicador do boi\b/i,
+  vaca: /vaca gorda|indicador da vaca/i,
+  novilho: /\bgarrote\b|\bnovilho\b/i,
+  novilha: /\bnovilha\b/i,
+  soja: /\bsoja\b/i,
+  milho: /\bmilho\b/i,
+  sorgo: /\bsorgo\b/i,
+  algodao: /algod[ãa]o/i,
+  cafe: /\bcaf[ée]\b/i,
+  arroz: /\barroz\b/i,
+  feijao: /feij[ãa]o/i,
+  trigo: /\btrigo\b/i,
+  suinos: /su[íi]no/i,
+  frango: /frango/i,
+  laranja: /laranja/i,
+};
+
 export function normalizeNoticiasAgricolas(data: any, productId: string, productLabel: string): MarketQuote[] {
   if (!data?.tables?.length) return [];
+
+  const aliasTabela = TABELA_ALIASES[productId];
+  const tabelasRelevantes = aliasTabela ? data.tables.filter((t: any) => aliasTabela.test(t.heading || '')) : data.tables;
+
+  // Dentre as tabelas "à vista" (não-futuro), variantes como "a prazo"
+  // ou de uma praça só representam um número FUNDAMENTALMENTE diferente
+  // do indicador nacional — não é a mesma coisa medida por duas fontes.
+  // Pra evitar comparar isso como se fosse "divergência", só a tabela
+  // com "indicador" no título (a referência oficial CEPEA/ESALQ) entra
+  // como cotação "à vista" quando existir mais de uma candidata; as
+  // demais tabelas à vista sem "indicador" só entram se NENHUMA tabela
+  // com "indicador" foi encontrada (evita perder dado quando a fonte
+  // não tiver a tabela principal disponível).
+  const tabelasAtual = tabelasRelevantes.filter((t: any) => !/pregão|futuro|vencimento/i.test(t.heading || ''));
+  const temIndicador = tabelasAtual.some((t: any) => /indicador/i.test(t.heading || ''));
+  const tabelasAtualFiltradas = temIndicador
+    ? tabelasAtual.filter((t: any) => /indicador/i.test(t.heading || ''))
+    : tabelasAtual;
+  const tabelasFuturo = tabelasRelevantes.filter((t: any) => /pregão|futuro|vencimento/i.test(t.heading || ''));
+
   const quotes: MarketQuote[] = [];
-  for (const table of data.tables) {
+  for (const table of [...tabelasAtualFiltradas, ...tabelasFuturo]) {
     const isFuturo = /pregão|futuro|vencimento/i.test(table.heading || '');
     for (const row of (table.rows || []).slice(1)) {
       const priceCell = findPriceCell(row);

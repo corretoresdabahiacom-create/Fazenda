@@ -252,3 +252,45 @@ describe('Cenário 15: Fonte possui somente preço nacional', () => {
     expect(result[0].sourceKind).toBe('internacional');
   });
 });
+
+describe('Bug real reportado em produção: Notícias Agrícolas comparado contra si mesmo', () => {
+  it('não mistura o indicador nacional com a tabela "a prazo" (números diferentes por natureza, não uma divergência)', () => {
+    const data = {
+      tables: [
+        { heading: 'Indicador do Boi Gordo Esalq/B3', source: 'Cepea/Esalq', rows: [['Local', 'R$/@'], ['SP', '349,50']] },
+        { heading: 'Boi Gordo - Média SP a prazo', source: 'Scot Consultoria', rows: [['Local', 'R$/@'], ['SP', '156,00']] },
+      ],
+      sourceUrl: 'x', fetchedAt: '2026-09-10T00:00:00.000Z',
+    };
+    const result = normalizeNoticiasAgricolas(data, 'boi_gordo', 'Boi Gordo');
+    // Só a tabela com "Indicador" no nome deve entrar quando ela existir —
+    // a variante "a prazo" some da comparação, evitando divergência falsa.
+    expect(result).toHaveLength(1);
+    expect(result[0].price).toBe(349.5);
+  });
+
+  it('não mistura tabela de outro produto (ex: Milho) quando o pedido é Boi Gordo', () => {
+    const data = {
+      tables: [
+        { heading: 'Indicador do Boi Gordo Esalq/B3', source: 'Cepea/Esalq', rows: [['Local', 'R$/@'], ['SP', '349,50']] },
+        { heading: 'Milho - Referência CEPEA', source: 'Cepea/Esalq', rows: [['Local', 'R$/sc'], ['SP', '65,00']] },
+      ],
+      sourceUrl: 'x', fetchedAt: '2026-09-10T00:00:00.000Z',
+    };
+    const result = normalizeNoticiasAgricolas(data, 'boi_gordo', 'Boi Gordo');
+    expect(result).toHaveLength(1);
+    expect(result[0].price).toBe(349.5);
+  });
+
+  it('quando NÃO existe tabela "Indicador", usa a(s) tabela(s) à vista disponível(is) em vez de ficar sem nada', () => {
+    const data = {
+      tables: [
+        { heading: 'Boi Gordo - Média SP a prazo', source: 'Scot Consultoria', rows: [['Local', 'R$/@'], ['SP', '156,00']] },
+      ],
+      sourceUrl: 'x', fetchedAt: '2026-09-10T00:00:00.000Z',
+    };
+    const result = normalizeNoticiasAgricolas(data, 'boi_gordo', 'Boi Gordo');
+    expect(result).toHaveLength(1);
+    expect(result[0].price).toBe(156);
+  });
+});

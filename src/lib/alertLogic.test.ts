@@ -99,3 +99,21 @@ describe('checkTargetReached (alvo de preço definido pelo usuário)', () => {
     expect(checkTargetReached(350, -10)).toBe(false);
   });
 });
+
+describe('detectDivergence — não confunde à vista com futuro (bug real reportado)', () => {
+  it('não alerta comparando um preço à vista com um preço futuro da mesma fonte', () => {
+    const result = detectDivergence([
+      { source: 'Notícias Agrícolas', price: 349.50, currency: 'BRL', priceType: 'indicador' },
+      { source: 'Notícias Agrícolas', price: 377.50, currency: 'BRL', priceType: 'futuro' },
+    ]);
+    expect(result.hasDivergence).toBe(false);
+  });
+
+  it('ainda detecta divergência real entre duas fontes À VISTA de verdade', () => {
+    const result = detectDivergence([
+      { source: 'Cepea', price: 349.50, currency: 'BRL', priceType: 'indicador' },
+      { source: 'FonteErrada', price: 156.00, currency: 'BRL', priceType: 'indicador' },
+    ]);
+    expect(result.hasDivergence).toBe(true);
+  });
+});
