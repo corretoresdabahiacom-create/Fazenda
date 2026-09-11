@@ -115,9 +115,9 @@ export default function AlertasCotacoes({ produto, produtoLabel, quotesResponse 
 
       <div className="flex items-center gap-2 flex-wrap">
         {alvoSalvo != null ? (
-          <div className="flex items-center gap-1.5 text-xs bg-theme-secondary px-2.5 py-1 rounded-full">
+          <div className="flex items-center gap-1.5 text-xs bg-[#f5f2ed] px-2.5 py-1 rounded-full">
             <Bell size={11} /> Alvo: R$ {alvoSalvo.toFixed(2)}
-            <button onClick={removerAlvo} className="text-theme-secondary hover:text-red-500"><X size={11} /></button>
+            <button onClick={removerAlvo} className="text-[#6d6a66] hover:text-red-500"><X size={11} /></button>
           </div>
         ) : (
           <button onClick={() => setShowAlvoForm(!showAlvoForm)} className="text-xs font-semibold text-[var(--primary)] flex items-center gap-1">
@@ -130,7 +130,7 @@ export default function AlertasCotacoes({ produto, produtoLabel, quotesResponse 
               value={alvoInput}
               onChange={e => setAlvoInput(e.target.value)}
               placeholder="Ex: 350,00"
-              className="text-xs border border-theme rounded-lg px-2 py-1 w-24"
+              className="text-xs border border-[#e5e0d8] rounded-lg px-2 py-1 w-24"
             />
             <button onClick={salvarAlvo} className="text-xs font-bold bg-[var(--primary)] text-white px-2.5 py-1 rounded-lg">Salvar</button>
           </div>
