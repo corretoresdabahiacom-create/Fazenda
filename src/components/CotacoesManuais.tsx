@@ -120,17 +120,17 @@ function AbaLocalizacao({ localizacoes }: { localizacoes: LocalizacaoManual[] })
             <p className="font-bold text-[#3d5a45]">{editando ? 'Editar localização' : 'Nova localização'}</p>
             <button onClick={() => setMostrarForm(false)}><X size={16} /></button>
           </div>
-          <input value={form.pais} onChange={e => setForm({ ...form, pais: e.target.value })} placeholder="País" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl" />
-          <select value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white">
+          <input value={form.pais} onChange={e => setForm({ ...form, pais: e.target.value })} placeholder="País" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
+          <select value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
             {ESTADOS_BR.map(e => <option key={e}>{e}</option>)}
           </select>
           <div className="flex gap-2">
-            <select value={form.tipoLocal} onChange={e => setForm({ ...form, tipoLocal: e.target.value as any })} className="px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white">
+            <select value={form.tipoLocal} onChange={e => setForm({ ...form, tipoLocal: e.target.value as any })} className="px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
               <option value="cidade">Cidade</option>
               <option value="praca">Praça</option>
               <option value="regiao">Região</option>
             </select>
-            <input value={form.local} onChange={e => setForm({ ...form, local: e.target.value })} placeholder="Nome (ex: Feira de Santana, BA Oeste...)" className="flex-1 px-4 py-2 border border-[#e5e0d8] rounded-xl" />
+            <input value={form.local} onChange={e => setForm({ ...form, local: e.target.value })} placeholder="Nome (ex: Feira de Santana, BA Oeste...)" className="flex-1 px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
           </div>
           <button onClick={salvar} className="btn-primary w-full"><Save size={14} /> Salvar</button>
         </div>
@@ -213,12 +213,12 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
             value={form.nome}
             onChange={e => setForm({ ...form, nome: e.target.value })}
             placeholder="Nome do produto (ex: Garrote)"
-            className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
+            className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c] focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
           />
           <select
             value={form.categoria}
             onChange={e => setForm({ ...form, categoria: e.target.value })}
-            className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white"
+            className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]"
           >
             <option>Pecuária</option>
             <option>Grãos</option>
@@ -321,14 +321,14 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
 
           <div>
             <label className="text-xs font-bold text-[#6d6a66] block mb-1">Produto</label>
-            <select value={form.produtoId} onChange={e => setForm({ ...form, produtoId: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white">
+            <select value={form.produtoId} onChange={e => setForm({ ...form, produtoId: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
               {produtos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
             </select>
           </div>
 
           <div>
             <label className="text-xs font-bold text-[#6d6a66] block mb-1">Localização</label>
-            <select value={form.localizacaoId} onChange={e => setForm({ ...form, localizacaoId: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white">
+            <select value={form.localizacaoId} onChange={e => setForm({ ...form, localizacaoId: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
               {localizacoes.map(l => <option key={l.id} value={l.id}>{l.local} — {l.estado}</option>)}
             </select>
           </div>
@@ -336,11 +336,11 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="text-xs font-bold text-[#6d6a66] block mb-1">Preço (R$)</label>
-              <input type="number" step="0.01" value={form.preco || ''} onChange={e => setForm({ ...form, preco: Number(e.target.value) })} placeholder="0,00" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl" />
+              <input type="number" step="0.01" value={form.preco || ''} onChange={e => setForm({ ...form, preco: Number(e.target.value) })} placeholder="0,00" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
             </div>
             <div>
               <label className="text-xs font-bold text-[#6d6a66] block mb-1">Unidade</label>
-              <select value={form.unidade} onChange={e => setForm({ ...form, unidade: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white">
+              <select value={form.unidade} onChange={e => setForm({ ...form, unidade: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
                 {UNIDADES_COMUNS.map(u => <option key={u}>{u}</option>)}
               </select>
             </div>
@@ -349,11 +349,11 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="text-xs font-bold text-[#6d6a66] block mb-1">Prazo (dias)</label>
-              <input type="number" value={form.prazoDias} onChange={e => setForm({ ...form, prazoDias: Number(e.target.value) })} placeholder="0 = à vista" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl" />
+              <input type="number" value={form.prazoDias} onChange={e => setForm({ ...form, prazoDias: Number(e.target.value) })} placeholder="0 = à vista" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
             </div>
             <div>
               <label className="text-xs font-bold text-[#6d6a66] block mb-1">Tipo de negócio</label>
-              <select value={form.tipoNegocio} onChange={e => setForm({ ...form, tipoNegocio: e.target.value as any })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white">
+              <select value={form.tipoNegocio} onChange={e => setForm({ ...form, tipoNegocio: e.target.value as any })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
                 <option value="nao_informado">Não informa</option>
                 <option value="SIF">SIF</option>
                 <option value="FOB">FOB</option>
@@ -363,12 +363,12 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
 
           <div>
             <label className="text-xs font-bold text-[#6d6a66] block mb-1">Data da cotação</label>
-            <input type="date" value={form.dataCotacao} onChange={e => setForm({ ...form, dataCotacao: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl" />
+            <input type="date" value={form.dataCotacao} onChange={e => setForm({ ...form, dataCotacao: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
           </div>
 
           <div>
             <label className="text-xs font-bold text-[#6d6a66] block mb-1">Observação (opcional)</label>
-            <input value={form.observacao} onChange={e => setForm({ ...form, observacao: e.target.value })} placeholder="Ex: negociado direto com produtor X" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl" />
+            <input value={form.observacao} onChange={e => setForm({ ...form, observacao: e.target.value })} placeholder="Ex: negociado direto com produtor X" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
           </div>
 
           <button onClick={salvar} className="btn-primary w-full"><Save size={14} /> Salvar</button>
