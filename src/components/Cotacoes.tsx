@@ -291,11 +291,11 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [pais] = useState('Brasil');
   const [estado, setEstado] = useState('');
   const [cidade, setCidade] = useState(defaultRegion || '');
+  const [regiao, setRegiao] = useState('');
   const [detectingLocal, setDetectingLocal] = useState(false);
   const [showAllCities, setShowAllCities] = useState(false);
   const [showBahiaDashboard, setShowBahiaDashboard] = useState(false);
   const [showGrafico, setShowGrafico] = useState(false);
-  const [quotesResponse, setQuotesResponse] = useState<{ quotes: any[]; semCotacaoDisponivel: number } | null>(null);
   const [locaisDisponiveis, setLocaisDisponiveis] = useState<any[]>([]);
 
   const [data, setData] = useState<CotacoesResponse | null>(null);
@@ -364,20 +364,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produto]);
 
-  useEffect(() => {
-    const params = new URLSearchParams({ product: produto });
-    if (estado) params.set('state', estado);
-    fetch(`/api/quotes?${params}`)
-      .then(res => res.json())
-      .then(json => { if (!json.error) setQuotesResponse(json); else setQuotesResponse(null); })
-      .catch(() => setQuotesResponse(null));
-  }, [produto, estado]);
-
   // Busca SEM filtro de estado, pra descobrir de verdade quais estados
   // e locais têm cotação real pra esse produto — usado pra montar os
   // seletores de Estado/Cidade dinamicamente, em vez de mostrar os 27
   // estados sempre (auditoria externa apontou isso corretamente: antes
   // a lista de estados era fixa, independente de existir dado ou não).
+  // Essa MESMA busca também alimenta os alertas (antes havia uma
+  // chamada separada e redundante a /api/quotes só com filtro de
+  // estado — removida, já que dá pra filtrar isso aqui mesmo no
+  // navegador a partir do resultado já carregado).
   useEffect(() => {
     fetch(`/api/quotes?product=${produto}`)
       .then(res => res.json())
@@ -481,7 +476,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const futuroTables = filteredTables.filter(t => classifyTable(t) === 'futuro');
 
   const uf = estado ? UF_POR_ESTADO[estado] : undefined;
-  const localBusca = cidade || estado;
+  const localBusca = cidade || regiao || estado;
 
   // Estados com dado REAL pra esse produto — derivado das cotações de
   // verdade, não de uma lista fixa (antes ESTADOS listava os 27 sempre,
@@ -490,15 +485,36 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
     new Set<string>(locaisDisponiveis.filter(q => q.state).map(q => q.state as string))
   ).sort((a, b) => a.localeCompare(b));
 
+  // Deriva o que os alertas precisam a partir do que JÁ foi buscado —
+  // antes havia uma segunda chamada de API só pra isso, redundante com
+  // locaisDisponiveis (que já tem tudo, sem filtro de estado).
+  const quotesResponse = {
+    quotes: estado ? locaisDisponiveis.filter(q => q.state === estado || !q.state) : locaisDisponiveis,
+    semCotacaoDisponivel: 0, // já filtrado no backend antes de chegar aqui — nenhuma linha sem preço passa
+  };
+
   // Locais (praça/região/município) dentro do estado selecionado que
   // realmente têm preço — usado no seletor de Cidade/Praça no lugar do
   // datalist antigo. Prioriza marketPlace > municipality > region,
   // usando o mais específico que a fonte tiver informado.
+  // Regiões (praça ampla, ex: "Oeste da Bahia") dentro do estado
+  // selecionado que realmente têm dado — nível distinto de "cidade",
+  // porque a fonte às vezes só informa região sem detalhar município
+  // (ex: AIBA), e forçar os dois no mesmo campo escondia essa diferença.
+  const regioesNoEstado: string[] = estado
+    ? Array.from(new Set<string>(
+        locaisDisponiveis.filter(q => q.state === estado && q.region).map(q => q.region as string)
+      )).sort((a, b) => a.localeCompare(b))
+    : [];
+
+  // Locais (praça/município) dentro do estado selecionado — se uma
+  // região também foi escolhida, filtra só os locais daquela região;
+  // senão, mostra todos os locais do estado, com ou sem região.
   const locaisNoEstado: string[] = estado
     ? Array.from(new Set<string>(
         locaisDisponiveis
-          .filter(q => q.state === estado)
-          .map(q => (q.marketPlace || q.municipality || q.region) as string)
+          .filter(q => q.state === estado && (!regiao || q.region === regiao))
+          .map(q => (q.marketPlace || q.municipality) as string)
           .filter(Boolean)
       )).sort((a, b) => a.localeCompare(b))
     : [];
@@ -607,7 +623,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           <span className="text-xs font-bold text-[var(--primary)]">Trocar</span>
         </button>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div className="relative">
             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
             <select value={pais} disabled className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none opacity-80">
@@ -618,11 +634,23 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
             <select
               value={estado}
-              onChange={e => { setEstado(e.target.value); setCidade(''); setShowAllCities(false); }}
+              onChange={e => { setEstado(e.target.value); setRegiao(''); setCidade(''); setShowAllCities(false); }}
               className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none"
             >
               <option value="">Todos os Estados</option>
               {estadosComDado.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+            </select>
+          </div>
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
+            <select
+              value={regiao}
+              onChange={e => { setRegiao(e.target.value); setCidade(''); }}
+              disabled={!estado || regioesNoEstado.length === 0}
+              className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60"
+            >
+              <option value="">{!estado ? 'Escolha um estado' : regioesNoEstado.length === 0 ? 'Sem região específica' : 'Todas as regiões'}</option>
+              {regioesNoEstado.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
           <div className="relative">
@@ -633,7 +661,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               disabled={!estado || locaisNoEstado.length === 0}
               className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60"
             >
-              <option value="">{!estado ? 'Escolha um estado primeiro' : locaisNoEstado.length === 0 ? 'Sem local específico com dado' : 'Todas as cidades/praças'}</option>
+              <option value="">{!estado ? 'Escolha um estado primeiro' : locaisNoEstado.length === 0 ? 'Sem cidade/praça específica' : 'Todas as cidades/praças'}</option>
               {locaisNoEstado.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -704,7 +732,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             </div>
             <div className="p-4 border-t border-theme flex gap-2">
               <button onClick={() => setIsProdutoModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-theme text-theme-secondary font-semibold text-sm">Cancelar</button>
-              <button onClick={() => { setProduto(produtoTemp); setEstado(''); setCidade(''); setShowAllCities(false); setIsProdutoModalOpen(false); }} className="flex-1 py-2.5 rounded-xl bg-[var(--primary)] text-white font-bold text-sm">Ok</button>
+              <button onClick={() => { setProduto(produtoTemp); setEstado(''); setRegiao(''); setCidade(''); setShowAllCities(false); setIsProdutoModalOpen(false); }} className="flex-1 py-2.5 rounded-xl bg-[var(--primary)] text-white font-bold text-sm">Ok</button>
             </div>
           </div>
         </div>
