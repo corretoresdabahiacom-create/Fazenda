@@ -9,7 +9,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   isValidPrice, findPriceCell,
-  normalizeNoticiasAgricolas, normalizeIeaSp, normalizeEpagriSc,
+  normalizeNoticiasAgricolas, normalizeIeaSp, normalizeIncaperEs, normalizeEpagriSc,
   normalizeAiba, normalizeTradingEconomics, normalizeBoiMundo,
 } from './_marketQuote';
 
@@ -71,13 +71,70 @@ describe('Cenário 5: API retorna estado inexistente', () => {
 });
 
 describe('Cenário 6: API retorna produto inexistente (sem correspondência)', () => {
-  it('retorna lista vazia quando o produto pedido não existe nas linhas', () => {
-    const data = { rows: [{ produto: 'Milho', unidade: 'Saca 60kg', preco: '65,00', data: '08/09/2026' }], sourceUrl: 'x' };
-    // Simula a busca por um produto que não está na lista — quem faz esse
-    // filtro é o Cotacoes.tsx/AIBA_KEYWORDS, aqui testamos que o
-    // normalizador em si não inventa nada quando não há linhas relevantes.
+  it('retorna lista vazia quando não há nenhuma linha', () => {
     const dataVazia = { rows: [], sourceUrl: 'x' };
     expect(normalizeAiba(dataVazia, 'ovelha', 'Ovelha')).toEqual([]);
+  });
+
+  // BUG REAL ENCONTRADO EM PRODUÇÃO (auditoria externa) e corrigido:
+  // os normalizadores percorriam TODAS as linhas de uma fonte que traz
+  // vários produtos numa resposta só (ex: AIBA devolve Soja, Milho,
+  // Sorgo, Café etc. juntos) e rotulavam CADA linha com o produto
+  // PEDIDO, mesmo quando a linha era de outro produto — pedir "milho"
+  // podia devolver o preço da Soja rotulado como Milho. Esse era
+  // exatamente o ponto cego do teste acima (só testava lista vazia,
+  // nunca lista com produtos MISTURADOS).
+  it('NÃO confunde uma linha de outro produto com o produto pedido — bug real encontrado por auditoria externa', () => {
+    const data = {
+      rows: [
+        { produto: 'Soja Disponível', unidade: 'Saca 60kg', preco: '136,67', data: '09/09/2026' },
+        { produto: 'Milho', unidade: 'Saca 60kg', preco: '65,00', data: '08/09/2026' },
+        { produto: 'Café', unidade: 'Saca 60kg', preco: '1540,00', data: '08/09/2026' },
+      ],
+      sourceUrl: 'x',
+    };
+    // Pedindo "milho", só a linha de Milho deve voltar — nunca Soja ou Café rotulados como Milho.
+    const resultadoMilho = normalizeAiba(data, 'milho', 'Milho');
+    expect(resultadoMilho).toHaveLength(1);
+    expect(resultadoMilho[0].price).toBe(65);
+
+    // Pedindo "soja", só a linha de Soja deve voltar.
+    const resultadoSoja = normalizeAiba(data, 'soja', 'Soja');
+    expect(resultadoSoja).toHaveLength(1);
+    expect(resultadoSoja[0].price).toBe(136.67);
+
+    // Pedindo um produto que não está em nenhuma linha (ex: arroz nessa amostra), nada deve voltar.
+    expect(normalizeAiba(data, 'arroz', 'Arroz')).toEqual([]);
+  });
+
+  it('IEA-SP não confunde Boi Gordo com Boi Gordo (China) — são produtos diferentes', () => {
+    const data = {
+      recebidosPelosProdutores: [
+        { produto: 'Boi gordo', unidade: '@', preco: '342,50' },
+        { produto: 'Boi gordo (China)', unidade: '@', preco: '348,75' },
+      ],
+      sourceUrl: 'x',
+    };
+    const resultado = normalizeIeaSp(data, 'boi_gordo', 'Boi Gordo');
+    expect(resultado).toHaveLength(1);
+    expect(resultado[0].price).toBe(342.5);
+  });
+
+  it('Incaper reconhece variantes "Castrado"/"Inteiro" como Boi Gordo, mas não confunde com Vaca Gorda', () => {
+    const data = {
+      precos: [
+        { produto: 'Boi Gordo Castrado', minimo: 'R$ 340,00', medio: 'R$ 340,00', maximo: 'R$ 340,00' },
+        { produto: 'Vaca Gorda', minimo: 'R$ 310,00', medio: 'R$ 321,86', maximo: 'R$ 330,00' },
+      ],
+      sourceUrl: 'x',
+    };
+    const resultadoBoi = normalizeIncaperEs(data, 'boi_gordo', 'Boi Gordo');
+    expect(resultadoBoi).toHaveLength(1);
+    expect(resultadoBoi[0].price).toBe(340);
+
+    const resultadoVaca = normalizeIncaperEs(data, 'vaca', 'Vaca');
+    expect(resultadoVaca).toHaveLength(1);
+    expect(resultadoVaca[0].price).toBe(321.86);
   });
 });
 

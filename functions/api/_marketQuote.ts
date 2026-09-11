@@ -44,6 +44,48 @@ export function isValidPrice(price: unknown, produto?: string): price is number 
   return true;
 }
 
+// BUG CRÍTICO ENCONTRADO E CORRIGIDO: os normalizadores de AIBA, IEA-SP
+// e Incaper percorriam TODAS as linhas devolvidas pela fonte (que trazem
+// vários produtos por chamada — ex: AIBA devolve Soja, Milho, Sorgo,
+// Café, Feijão, Arroz etc. numa única resposta) e atribuíam o produto
+// PEDIDO pelo usuário a CADA linha, sem checar se a linha realmente
+// representava aquele produto. Resultado: pedir "milho" podia devolver
+// o preço da Soja, do Café etc., todos rotulados como "Milho" — o que
+// também explica alertas de "divergência entre fontes" comparando
+// produtos totalmente diferentes como se fossem o mesmo. Essa função
+// filtra a linha ANTES de virar um MarketQuote; se não achar o nome do
+// produto no texto da linha, descarta (nunca assume).
+const PRODUTO_ALIASES: Record<string, RegExp> = {
+  boi_gordo: /boi gordo(?!\s*\(china\))|indicador do boi\b/i,
+  vaca: /vaca gorda|indicador da vaca/i,
+  novilho: /\bgarrote\b|\bnovilho\b/i,
+  novilha: /\bnovilha\b/i,
+  soja: /\bsoja\b/i,
+  milho: /\bmilho\b/i,
+  sorgo: /\bsorgo\b/i,
+  algodao: /algod[ãa]o/i,
+  cafe: /\bcaf[ée]\b/i,
+  cafe_arabica: /caf[ée].*ar[áa]bic[ao]/i,
+  cafe_conilon: /caf[ée].*(conilon|robusta)/i,
+  arroz: /\barroz\b/i,
+  feijao: /feij[ãa]o/i,
+  amendoim: /amendoim/i,
+  trigo: /\btrigo\b/i,
+  suinos: /su[íi]no/i,
+  frango: /frango/i,
+  leite: /\bleite\b/i,
+  laranja: /laranja/i,
+};
+
+function rowMatchesProduct(textoLinha: string, productId: string): boolean {
+  const alias = PRODUTO_ALIASES[productId];
+  // Se não temos um alias configurado pra esse produto, não bloqueia
+  // (evita quebrar produtos novos que ainda não foram mapeados) — mas
+  // todo produto usado nos normalizadores abaixo já está na lista.
+  if (!alias) return true;
+  return alias.test(textoLinha);
+}
+
 // Campos do documento de spec original que NÃO incluímos aqui, e por
 // quê: preco_bruto/preco_liquido/funrural/senar (nenhuma fonte ativa
 // hoje fornece essa quebra); confidence_score numérico preciso (não
@@ -119,7 +161,9 @@ export function normalizeNoticiasAgricolas(data: any, productId: string, product
 
 export function normalizeIeaSp(data: any, productId: string, productLabel: string): MarketQuote[] {
   if (!data?.recebidosPelosProdutores) return [];
-  return data.recebidosPelosProdutores.map((row: any) => {
+  return data.recebidosPelosProdutores
+    .filter((row: any) => rowMatchesProduct(String(row.produto || ''), productId))
+    .map((row: any) => {
     const price = Number(String(row.preco).replace(',', '.'));
     return {
       productId, productLabel,
@@ -136,7 +180,9 @@ export function normalizeIeaSp(data: any, productId: string, productLabel: strin
 
 export function normalizeIncaperEs(data: any, productId: string, productLabel: string): MarketQuote[] {
   if (!data?.precos) return [];
-  return data.precos.map((row: any) => {
+  return data.precos
+    .filter((row: any) => rowMatchesProduct(String(row.produto || ''), productId))
+    .map((row: any) => {
     const price = Number(String(row.medio).replace('R$', '').replace(',', '.').trim());
     return {
       productId, productLabel,
@@ -171,7 +217,9 @@ export function normalizeEpagriSc(data: any, productId: string, productLabel: st
 
 export function normalizeAiba(data: any, productId: string, productLabel: string): MarketQuote[] {
   if (!data?.rows) return [];
-  return data.rows.map((row: any) => {
+  return data.rows
+    .filter((row: any) => rowMatchesProduct(String(row.produto || ''), productId))
+    .map((row: any) => {
     const price = Number(String(row.preco).replace(',', '.'));
     return {
       productId, productLabel,

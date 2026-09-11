@@ -134,18 +134,28 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       if (boiMundoData) quotes = quotes.concat(normalizeBoiMundo(boiMundoData, produto, productLabel));
     }
 
-    // Filtra por estado, se pedido (mantém as internacionais/nacionais
-    // sem estado, já que elas servem de referência independente da
-    // região escolhida).
+    // Separa cotações REGIONAIS (bateram no estado pedido) de NACIONAIS
+    // (sem estado, servem de referência independente da região) em
+    // grupos distintos — antes elas ficavam misturadas na mesma lista
+    // quando um estado era pedido, o que contaminava qualquer tentativa
+    // de montar um filtro de localização a partir da resposta (uma
+    // cotação nacional não deve virar uma opção de "cidade" ou
+    // "estado" no seletor).
+    let quotesRegionais = quotes;
+    let quotesNacionais: MarketQuote[] = [];
     if (state) {
-      quotes = quotes.filter(q => !q.state || q.state === state);
+      quotesNacionais = quotes.filter(q => !q.state);
+      quotesRegionais = quotes.filter(q => q.state === state);
     }
 
     // Nunca deixa um preço null se disfarçar de zero — remove
     // completamente da lista quotes sem preço disponível, e informa
     // quantas foram descartadas por esse motivo (transparência).
-    const semPreco = quotes.filter(q => !q.isAvailable).length;
-    quotes = quotes.filter(q => q.isAvailable);
+    const todasAntes = [...quotesRegionais, ...quotesNacionais];
+    const semPreco = todasAntes.filter(q => !q.isAvailable).length;
+    quotesRegionais = quotesRegionais.filter(q => q.isAvailable);
+    quotesNacionais = quotesNacionais.filter(q => q.isAvailable);
+    quotes = [...quotesRegionais, ...quotesNacionais]; // mantém compatibilidade pra quem já lê "quotes" direto
 
     // Gravação de histórico em segundo plano (não atrasa a resposta pro
     // usuário) — limitada a 1x/hora por produto+estado, ver comentário
@@ -155,7 +165,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     return new Response(JSON.stringify({
       product: produto,
       state: state || null,
-      quotes,
+      quotes, // mantido por compatibilidade — regionais primeiro, depois nacionais
+      quotesRegionais, // só cotações que realmente batem no estado pedido — use isso pra montar filtro de localização
+      quotesNacionais, // referência nacional/internacional (sem estado) — mostrar separado, nunca usar pra montar dropdown de local
       totalEncontradas: quotes.length,
       semCotacaoDisponivel: semPreco,
       geradoEm: new Date().toISOString(),
