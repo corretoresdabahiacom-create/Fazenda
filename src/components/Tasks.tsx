@@ -238,7 +238,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                   value={formData.title || ''}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
                   placeholder="Ex: Vacinar gado do Pasto 03..."
@@ -249,7 +249,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Descrição do Trabalho</label>
                 <textarea 
                   required
-                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px] bg-theme-card text-theme-primary"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px] bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                   value={formData.description || ''}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   placeholder="Instruções claras..."
@@ -299,7 +299,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   ) : (
                     <input 
                       type="text" 
-                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
+                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                       value={formData.assignedTo || ''}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
                       placeholder="Nome do executor..."
@@ -311,7 +311,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   <label className="text-[10px] font-bold uppercase text-theme-secondary mb-1 block">Local para Execução</label>
                   <input 
                     type="text" 
-                    className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 bg-theme-card text-theme-primary"
+                    className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={formData.executionLocation || ''}
                     onChange={(e) => setFormData({...formData, executionLocation: e.target.value})}
                     placeholder="Ex: Pasto 02, Curral, Sede..."

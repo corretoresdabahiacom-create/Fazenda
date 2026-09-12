@@ -191,7 +191,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder={activeTab === 'variaveis' ? "Pesquisar despesa..." : "Pesquisar custo fixo..."}
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-theme-primary"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-theme-primary placeholder:text-theme-secondary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -425,7 +425,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                         <input 
                           type="text" 
                           placeholder="Ex: Energia, Ferramenta..." 
-                          className="w-full px-3 py-1.5 border border-theme rounded-lg bg-theme-card text-sm text-theme-primary"
+                          className="w-full px-3 py-1.5 border border-theme rounded-lg bg-theme-card text-sm text-theme-primary placeholder:text-theme-secondary"
                           value={newCustomType}
                           onChange={(e) => setNewCustomType(e.target.value)}
                         />
@@ -480,7 +480,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={formData.description || ''}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     placeholder="Ex: Nota fiscal Nº 453"
@@ -491,7 +491,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Vendedor ou Fornecedor</label>
                   <input 
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={formData.provider || ''}
                     onChange={(e) => setFormData({...formData, provider: e.target.value})}
                     placeholder="Nome da empresa ou revenda..."
@@ -513,7 +513,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <div className="col-span-2">
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Observações adicionais</label>
                   <textarea 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px] bg-theme-card text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px] bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={formData.observation || ''}
                     onChange={(e) => setFormData({...formData, observation: e.target.value})}
                     placeholder="Qualquer detalhe extra..."
@@ -577,7 +577,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card text-theme-primary"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                   value={fixedFormData.description || ''}
                   onChange={(e) => setFixedFormData({...fixedFormData, description: e.target.value})}
                   placeholder="Ex: Arrendamento da Sede, Energia Elétrica Cemig, Pro-Labore..."
@@ -610,7 +610,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     type="number" 
                     min="1" 
                     max="31" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={fixedFormData.dueDate || ''}
                     onChange={(e) => setFixedFormData({...fixedFormData, dueDate: e.target.value})}
                     placeholder="Ex: 10"

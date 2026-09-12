@@ -303,7 +303,7 @@ function FluxoTab({ payable, receivable }: { payable: AccountPayable[]; receivab
 
 // ---------- Shared UI helpers ----------
 
-const inputCls = "w-full border border-theme rounded-xl px-3 py-2 text-sm";
+const inputCls = "w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary placeholder:text-theme-secondary";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

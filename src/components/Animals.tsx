@@ -309,7 +309,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
           <input 
             type="text" 
             placeholder="Pesquisar por lote ou proprietário..." 
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm text-theme-primary"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm text-theme-primary placeholder:text-theme-secondary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -773,7 +773,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <input 
                       required
                       type="text" 
-                      className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-semibold bg-theme-card text-theme-primary"
+                      className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-semibold bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                       placeholder="Ex: JBS S/A, Sr. Antunes..."
                       value={saleFormData.buyerName}
                       onChange={(e) => setSaleFormData({...saleFormData, buyerName: e.target.value})}
@@ -816,7 +816,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     required={sellingAnimal.type !== AnimalType.RENT}
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-black text-theme-primary bg-theme-card"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-black text-theme-primary bg-theme-card placeholder:text-theme-secondary"
                     placeholder="Ex: 320"
                     disabled={sellingAnimal.type === AnimalType.RENT}
                     value={saleFormData.arrobaPrice || ''}
@@ -1113,7 +1113,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Raça</label>
                   <input 
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={formData.breed || ''}
                     onChange={(e) => setFormData({...formData, breed: e.target.value})}
                     placeholder="Ex: Nelore, Caracu, Angus, Tabapuã..."
@@ -1137,7 +1137,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <input 
                       required
                       type="text" 
-                      className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium text-sm bg-theme-card text-theme-primary"
+                      className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium text-sm bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                       value={formData.ownerName || ''}
                       onChange={(e) => setFormData({...formData, ownerName: e.target.value})}
                       placeholder="Nome do dono"
@@ -1150,7 +1150,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-extrabold text-sm text-theme-primary bg-theme-card"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-extrabold text-sm text-theme-primary bg-theme-card placeholder:text-theme-secondary"
                     value={formData.lotName || ''}
                     onChange={(e) => setFormData({...formData, lotName: e.target.value})}
                     placeholder="Ex: Lote Nelore 2026, S03..."
@@ -1228,7 +1228,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <label className="text-xs font-bold uppercase text-theme-primary mb-1 block">Valor do Aluguel (R$/mês por Cabeça)</label>
                       <input 
                         type="number" step="0.01"
-                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
+                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                         value={formData.rentValue || ''}
                         onChange={(e) => setFormData({...formData, rentValue: Number(e.target.value)})}
                         placeholder="Ex: 65"
@@ -1238,7 +1238,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <label className="text-xs font-bold uppercase text-theme-primary mb-1 block">Dia de Vencimento do Aluguel (todo mês)</label>
                       <input 
                         type="number" min="1" max="31"
-                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
+                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                         value={formData.rentDueDay || ''}
                         onChange={(e) => setFormData({...formData, rentDueDay: e.target.value ? Math.min(31, Math.max(1, Number(e.target.value))) : undefined})}
                         placeholder="Ex: 10"
@@ -1258,7 +1258,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         <Percent className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                         <input 
                           type="number" 
-                          className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
+                          className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                           placeholder="Ex: 50"
                           value={formData.partnershipFarmShare || ''}
                           onChange={(e) => setFormData({...formData, partnershipFarmShare: Number(e.target.value)})}

@@ -130,7 +130,7 @@ export default function AlertasCotacoes({ produto, produtoLabel, quotesResponse 
               value={alvoInput}
               onChange={e => setAlvoInput(e.target.value)}
               placeholder="Ex: 350,00"
-              className="text-xs border border-theme rounded-lg px-2 py-1 w-24"
+              className="text-xs border border-theme rounded-lg px-2 py-1 w-24 placeholder:text-theme-secondary"
             />
             <button onClick={salvarAlvo} className="text-xs font-bold bg-[var(--primary)] text-white px-2.5 py-1 rounded-lg">Salvar</button>
           </div>

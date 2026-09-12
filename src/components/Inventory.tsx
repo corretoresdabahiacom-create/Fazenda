@@ -138,7 +138,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder="Pesquisar estoque por item, fornecedor..." 
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm text-theme-primary"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm text-theme-primary placeholder:text-theme-secondary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -378,7 +378,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary"
+                  className="w-full px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary placeholder:text-theme-secondary"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   placeholder="Ex: Sal Proteinado, Vacina Aftosa, Arame Farpado..."
@@ -408,7 +408,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={formData.unit || ''}
                     onChange={(e) => setFormData({...formData, unit: e.target.value})}
                     placeholder="Ex: sacos, kg, litros, rolos..."
@@ -422,7 +422,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   <input 
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary bg-theme-card"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary bg-theme-card placeholder:text-theme-secondary"
                     value={formData.unitPrice || ''}
                     onChange={(e) => {
                       const val = Number(e.target.value);
@@ -456,7 +456,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                       <Store className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="text" 
-                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
+                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                         value={formData.storeName || ''}
                         onChange={(e) => setFormData({...formData, storeName: e.target.value})}
                         placeholder="Ex: Agropecuária Alvorada..."
@@ -470,7 +470,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="tel" 
-                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
+                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                         value={formData.contactPhone || ''}
                         onChange={(e) => setFormData({...formData, contactPhone: e.target.value})}
                         placeholder="Ex: (34) 99999-9999"
@@ -484,7 +484,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="text" 
-                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
+                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                         value={formData.responsiblePerson || ''}
                         onChange={(e) => setFormData({...formData, responsiblePerson: e.target.value})}
                         placeholder="Ex: Sr. Francisco Vaqueiro..."

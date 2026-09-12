@@ -344,7 +344,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     type="text"
                     required
                     placeholder="Ex: 5, P-10..."
-                    className="w-full px-3 py-1.5 border border-theme rounded-lg text-xs font-bold focus:ring-1 focus:ring-[var(--primary)] focus:outline-none bg-theme-card text-theme-primary"
+                    className="w-full px-3 py-1.5 border border-theme rounded-lg text-xs font-bold focus:ring-1 focus:ring-[var(--primary)] focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={newDirectNumber}
                     onChange={(e) => setNewDirectNumber(e.target.value)}
                   />
@@ -354,7 +354,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   <input
                     type="text"
                     placeholder="Ex: Reserva, Beira-Rio..."
-                    className="w-full px-3 py-1.5 border border-theme rounded-lg text-xs focus:ring-1 focus:ring-[var(--primary)] focus:outline-none bg-theme-card text-theme-primary"
+                    className="w-full px-3 py-1.5 border border-theme rounded-lg text-xs focus:ring-1 focus:ring-[var(--primary)] focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={newDirectName}
                     onChange={(e) => setNewDirectName(e.target.value)}
                   />
@@ -432,7 +432,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     type="text"
                     required
                     placeholder="Ex: Cerca caída, Nascente assoreada..."
-                    className="w-full px-3 py-1.5 border border-theme rounded-lg text-xs font-bold focus:ring-1 focus:ring-[var(--primary)] focus:outline-none bg-theme-card text-theme-primary"
+                    className="w-full px-3 py-1.5 border border-theme rounded-lg text-xs font-bold focus:ring-1 focus:ring-[var(--primary)] focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     value={occTitle}
                     onChange={(e) => setOccTitle(e.target.value)}
                   />
@@ -443,7 +443,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   <textarea
                     placeholder="Descreva o que precisa ser feito..."
                     rows={2}
-                    className="w-full px-3 py-1.5 border border-theme rounded-lg text-xs focus:ring-1 focus:ring-[var(--primary)] focus:outline-none bg-theme-card font-sans text-theme-primary"
+                    className="w-full px-3 py-1.5 border border-theme rounded-lg text-xs focus:ring-1 focus:ring-[var(--primary)] focus:outline-none bg-theme-card font-sans text-theme-primary placeholder:text-theme-secondary"
                     value={occDescription}
                     onChange={(e) => setOccDescription(e.target.value)}
                   />

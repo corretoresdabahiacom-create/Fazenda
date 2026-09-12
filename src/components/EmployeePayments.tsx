@@ -217,7 +217,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder={activeTab === 'colaboradores' ? "Pesquisar por colaborador..." : "Pesquisar por pagamentos..."}
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-theme-primary"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-theme-primary placeholder:text-theme-secondary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -552,7 +552,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card text-theme-primary"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                   value={employeeFormData.name || ''}
                   onChange={(e) => setEmployeeFormData({...employeeFormData, name: e.target.value})}
                   placeholder="Nome do colaborador..."
@@ -698,7 +698,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                         required
                         type="text" 
                         placeholder="Nome do funcionário..." 
-                        className="w-full px-4 py-2 border border-red-300 dark:border-red-700 rounded-xl focus:ring-2 focus:ring-red-300"
+                        className="w-full px-4 py-2 border border-red-300 dark:border-red-700 rounded-xl focus:ring-2 focus:ring-red-300 placeholder:text-theme-secondary"
                         value={paymentFormData.employeeName || ''}
                         onChange={(e) => setPaymentFormData({...paymentFormData, employeeName: e.target.value})}
                       />
@@ -775,7 +775,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <div className="col-span-2">
                   <label className="text-theme-secondary text-xs font-bold uppercase mb-1 block">Observação</label>
                   <textarea 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none text-sm min-h-[80px] bg-theme-card text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none text-sm min-h-[80px] bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                     placeholder="Ex: Pagamento referente a serviços de cerca em Maio..."
                     value={paymentFormData.observation || ''}
                     onChange={(e) => setPaymentFormData({...paymentFormData, observation: e.target.value})}

@@ -179,7 +179,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   required
                   value={formData.name ?? ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                   placeholder="Ex: Fazenda Terra Rica"
                 />
               </div>
@@ -266,7 +266,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                 <input
                   value={formData.car ?? ''}
                   onChange={(e) => setFormData({ ...formData, car: e.target.value })}
-                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary placeholder:text-theme-secondary"
                   placeholder="BA-0000000-XXXX.XXXX.XXXX.XXXX.XXXX"
                 />
               </div>
