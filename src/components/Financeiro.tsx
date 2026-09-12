@@ -189,13 +189,13 @@ function ContasTab({ kind, items, costCenters, onSave, onDelete }: {
             </div>
             <Field label="Centro de custo">
               <select value={form.costCenterId ?? ''} onChange={e => setForm({ ...form, costCenterId: e.target.value || undefined })} className={inputCls}>
-                <option value="">Nenhum</option>
-                {costCenters.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Nenhum</option>
+                {costCenters.map(c => <option key={c.id} value={c.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{c.name}</option>)}
               </select>
             </Field>
             <Field label="Status">
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as AccountStatus })} className={inputCls}>
-                {Object.values(AccountStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                {Object.values(AccountStatus).map(s => <option key={s} value={s} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{s}</option>)}
               </select>
             </Field>
             <SubmitRow onCancel={() => setIsOpen(false)} />
@@ -259,7 +259,7 @@ function CentrosTab({ costCenters, onSave, onDelete }: {
             </Field>
             <Field label="Tipo">
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as CostCenterType })} className={inputCls}>
-                {Object.values(CostCenterType).map(t => <option key={t} value={t}>{t}</option>)}
+                {Object.values(CostCenterType).map(t => <option key={t} value={t} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t}</option>)}
               </select>
             </Field>
             <Field label="Referência vinculada (opcional)">

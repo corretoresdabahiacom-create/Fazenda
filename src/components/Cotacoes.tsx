@@ -678,7 +678,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <div className="relative">
               <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
               <select value={pais} disabled className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none opacity-80 truncate text-theme-primary">
-                {PAISES.map(p => <option key={p} value={p}>{p}</option>)}
+                {PAISES.map(p => <option key={p} value={p} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{p}</option>)}
               </select>
             </div>
           </div>
@@ -691,8 +691,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 onChange={e => { setEstado(e.target.value); setRegiao(''); setCidade(''); setShowAllCities(false); }}
                 className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none truncate text-theme-primary"
               >
-                <option value="">Todos os estados</option>
-                {estadosComDado.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+                <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Todos os estados</option>
+                {estadosComDado.map(uf => <option key={uf} value={uf} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{uf}</option>)}
               </select>
             </div>
           </div>
@@ -706,8 +706,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 disabled={!estado || regioesNoEstado.length === 0}
                 className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60 truncate text-theme-primary"
               >
-                <option value="">{!estado ? 'Escolha estado' : regioesNoEstado.length === 0 ? 'Sem região' : 'Todas as regiões'}</option>
-                {regioesNoEstado.map(r => <option key={r} value={r}>{r}</option>)}
+                <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{!estado ? 'Escolha estado' : regioesNoEstado.length === 0 ? 'Sem região' : 'Todas as regiões'}</option>
+                {regioesNoEstado.map(r => <option key={r} value={r} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{r}</option>)}
               </select>
             </div>
           </div>
@@ -721,8 +721,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 disabled={!estado || locaisNoEstado.length === 0}
                 className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60 truncate text-theme-primary"
               >
-                <option value="">{!estado ? 'Escolha estado' : locaisNoEstado.length === 0 ? 'Sem cidade/praça' : 'Todas as cidades'}</option>
-                {locaisNoEstado.map(c => <option key={c} value={c}>{c}</option>)}
+                <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{!estado ? 'Escolha estado' : locaisNoEstado.length === 0 ? 'Sem cidade/praça' : 'Todas as cidades'}</option>
+                {locaisNoEstado.map(c => <option key={c} value={c} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{c}</option>)}
               </select>
             </div>
           </div>

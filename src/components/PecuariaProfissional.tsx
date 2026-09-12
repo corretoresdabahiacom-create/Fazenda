@@ -250,20 +250,20 @@ function AnimaisTab({ animals, onSave, onDelete }: {
             <div className="grid grid-cols-2 gap-3">
               <Field label="Sexo *">
                 <select value={form.sex} onChange={e => setForm({ ...form, sex: e.target.value as AnimalSex })} className={inputCls}>
-                  {Object.values(AnimalSex).map(s => <option key={s} value={s}>{s}</option>)}
+                  {Object.values(AnimalSex).map(s => <option key={s} value={s} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{s}</option>)}
                 </select>
               </Field>
               <Field label="Categoria *">
                 <select value={form.category ?? ''} onChange={e => setForm({ ...form, category: e.target.value as AnimalCategory })} className={inputCls}>
-                  <option value="">Selecione</option>
-                  {Object.values(AnimalCategory).map(c => <option key={c} value={c}>{c}</option>)}
+                  <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Selecione</option>
+                  {Object.values(AnimalCategory).map(c => <option key={c} value={c} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{c}</option>)}
                 </select>
               </Field>
             </div>
             <Field label="Grupo/Lote">
               <select value={form.lotGroup ?? ''} onChange={e => setForm({ ...form, lotGroup: (e.target.value as LotGroup) || undefined })} className={inputCls}>
-                <option value="">Nenhum</option>
-                {Object.values(LotGroup).map(l => <option key={l} value={l}>{l}</option>)}
+                <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Nenhum</option>
+                {Object.values(LotGroup).map(l => <option key={l} value={l} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{l}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
@@ -276,9 +276,9 @@ function AnimaisTab({ animals, onSave, onDelete }: {
             </div>
             <Field label="Status">
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as any })} className={inputCls}>
-                <option value="active">Ativo</option>
-                <option value="sold">Vendido</option>
-                <option value="dead">Morto</option>
+                <option value="active" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Ativo</option>
+                <option value="sold" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Vendido</option>
+                <option value="dead" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Morto</option>
               </select>
             </Field>
             <SubmitRow onCancel={() => setIsOpen(false)} />
@@ -380,7 +380,7 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Tipo de evento *">
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as ReproductionEventType })} className={inputCls}>
-                {Object.values(ReproductionEventType).map(t => <option key={t} value={t}>{t}</option>)}
+                {Object.values(ReproductionEventType).map(t => <option key={t} value={t} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
@@ -409,9 +409,9 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
             {isDiagnostico && (
               <Field label="Resultado">
                 <select value={form.pregnancyResult ?? 'pendente'} onChange={e => setForm({ ...form, pregnancyResult: e.target.value as any })} className={inputCls}>
-                  <option value="pendente">Pendente</option>
-                  <option value="positivo">Positivo</option>
-                  <option value="negativo">Negativo</option>
+                  <option value="pendente" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Pendente</option>
+                  <option value="positivo" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Positivo</option>
+                  <option value="negativo" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Negativo</option>
                 </select>
               </Field>
             )}
@@ -562,7 +562,7 @@ function EstacaoMontaTab({ seasons, reproductionEvents, onSave, onDelete }: {
             <p className="text-[11px] text-theme-secondary">Usual entre 60 e 120 dias — 90 dias é o mais recomendado para maximizar resultados reprodutivos e produtivos.</p>
             <Field label="Método">
               <select value={form.method} onChange={e => setForm({ ...form, method: e.target.value as BreedingMethod })} className={inputCls}>
-                {Object.values(BreedingMethod).map(m => <option key={m} value={m}>{m}</option>)}
+                {Object.values(BreedingMethod).map(m => <option key={m} value={m} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{m}</option>)}
               </select>
             </Field>
             {(form.method === BreedingMethod.MONTA_NATURAL || form.method === BreedingMethod.MISTA) && (
@@ -589,7 +589,7 @@ function EstacaoMontaTab({ seasons, reproductionEvents, onSave, onDelete }: {
             </label>
             <Field label="Status">
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as BreedingSeasonStatus })} className={inputCls}>
-                {Object.values(BreedingSeasonStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                {Object.values(BreedingSeasonStatus).map(s => <option key={s} value={s} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{s}</option>)}
               </select>
             </Field>
             <SubmitRow onCancel={() => setIsOpen(false)} />
@@ -691,7 +691,7 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Tipo *">
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as HealthEventType })} className={inputCls}>
-                {Object.values(HealthEventType).map(t => <option key={t} value={t}>{t}</option>)}
+                {Object.values(HealthEventType).map(t => <option key={t} value={t} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
@@ -825,9 +825,9 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
               </Field>
               <Field label="Período">
                 <select value={form.period} onChange={e => setForm({ ...form, period: e.target.value as any })} className={inputCls}>
-                  <option value="dia">Dia inteiro</option>
-                  <option value="manha">Manhã</option>
-                  <option value="tarde">Tarde</option>
+                  <option value="dia" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Dia inteiro</option>
+                  <option value="manha" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Manhã</option>
+                  <option value="tarde" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Tarde</option>
                 </select>
               </Field>
             </div>

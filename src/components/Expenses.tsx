@@ -408,7 +408,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                           value={formData.type}
                           onChange={(e) => setFormData({...formData, type: e.target.value as any})}
                         >
-                          {allExpenseTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                          {allExpenseTypes.map(type => <option key={type} value={type} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{type}</option>)}
                         </select>
                       </div>
                       <button 
@@ -592,14 +592,14 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     value={fixedFormData.expenseType}
                     onChange={(e) => setFixedFormData({...fixedFormData, expenseType: e.target.value})}
                   >
-                    <option value="Energia">⚡ Energia</option>
-                    <option value="Internet">🌐 Internet/Comunicação</option>
-                    <option value="Pro-Labore">💼 Pró-labore</option>
-                    <option value="Arrendamento">🌾 Arrendamento de Terra</option>
-                    <option value="Seguros">🛡️ Seguros</option>
-                    <option value="Taxas">📉 Taxas & Impostos</option>
-                    <option value="Manutencao_Fixa">🔧 Manutenção Sistemática</option>
-                    <option value="Outros">📌 Outros</option>
+                    <option value="Energia" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>⚡ Energia</option>
+                    <option value="Internet" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🌐 Internet/Comunicação</option>
+                    <option value="Pro-Labore" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>💼 Pró-labore</option>
+                    <option value="Arrendamento" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🌾 Arrendamento de Terra</option>
+                    <option value="Seguros" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🛡️ Seguros</option>
+                    <option value="Taxas" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>📉 Taxas & Impostos</option>
+                    <option value="Manutencao_Fixa" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🔧 Manutenção Sistemática</option>
+                    <option value="Outros" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>📌 Outros</option>
                   </select>
                 </div>
 

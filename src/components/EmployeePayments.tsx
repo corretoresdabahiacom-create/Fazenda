@@ -567,7 +567,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                     value={employeeFormData.role}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, role: e.target.value as EmployeeRole})}
                   >
-                    {EMPLOYEE_ROLES.map(role => <option key={role} value={role}>{role}</option>)}
+                    {EMPLOYEE_ROLES.map(role => <option key={role} value={role} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{role}</option>)}
                   </select>
                 </div>
 
@@ -591,10 +591,10 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                     value={employeeFormData.status}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, status: e.target.value as Employee['status']})}
                   >
-                    <option value="active">🟢 Ativo</option>
-                    <option value="notice">🟠 Aviso Prévio</option>
-                    <option value="vacation">🔵 Em Férias</option>
-                    <option value="inactive">🔴 Inativo</option>
+                    <option value="active" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🟢 Ativo</option>
+                    <option value="notice" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🟠 Aviso Prévio</option>
+                    <option value="vacation" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🔵 Em Férias</option>
+                    <option value="inactive" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🔴 Inativo</option>
                   </select>
                 </div>
 
@@ -689,8 +689,8 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                         });
                       }}
                     >
-                      <option value="">Selecione um colaborador da lista...</option>
-                      {employees.map(emp => <option key={emp.id} value={emp.name}>{emp.name} ({emp.role})</option>)}
+                      <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Selecione um colaborador da lista...</option>
+                      {employees.map(emp => <option key={emp.id} value={emp.name} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{emp.name} ({emp.role})</option>)}
                     </select>
                   ) : (
                     <div className="space-y-2">
@@ -725,7 +725,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                     value={paymentFormData.paymentType}
                     onChange={(e) => setPaymentFormData({...paymentFormData, paymentType: e.target.value as PaymentType})}
                   >
-                    {PAYMENT_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
+                    {PAYMENT_TYPES.map(type => <option key={type} value={type} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{type}</option>)}
                   </select>
                 </div>
 

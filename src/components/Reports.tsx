@@ -915,8 +915,8 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                     value={focusedEmployeeId}
                     onChange={(e) => setFocusedEmployeeId(e.target.value)}
                   >
-                    <option value="ALL">Todos os Funcionários</option>
-                    {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
+                    <option value="ALL" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Todos os Funcionários</option>
+                    {employees.map(emp => <option key={emp.id} value={emp.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{emp.name}</option>)}
                   </select>
                 </div>
               </div>

@@ -193,9 +193,9 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                     value={selectedLotId}
                     onChange={(e) => setSelectedLotId(e.target.value)}
                   >
-                    <option value="">-- Escolha um Lote --</option>
+                    <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>-- Escolha um Lote --</option>
                     {animals.filter(a => !a.isSold).map(a => (
-                      <option key={a.id} value={a.id}>
+                      <option key={a.id} value={a.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>
                         {a.lotName} • {a.category} ({a.quantity} cab.)
                       </option>
                     ))}
@@ -237,10 +237,10 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                     value={manualCategory}
                     onChange={(e) => setManualCategory(e.target.value as any)}
                   >
-                    <option value={AnimalCategory.BULL}>Boi / Novilho</option>
-                    <option value={AnimalCategory.COW}>Vaca Adulta</option>
-                    <option value={AnimalCategory.CALF}>Bezerro(a) Lactante</option>
-                    <option value={AnimalCategory.HEIFER}>Novilha Recria</option>
+                    <option value={AnimalCategory.BULL} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Boi / Novilho</option>
+                    <option value={AnimalCategory.COW} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Vaca Adulta</option>
+                    <option value={AnimalCategory.CALF} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Bezerro(a) Lactante</option>
+                    <option value={AnimalCategory.HEIFER} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Novilha Recria</option>
                   </select>
                 </div>
 

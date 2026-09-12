@@ -551,12 +551,12 @@ export default function WeighingWorksheet() {
                   }}
                   className="bg-theme-card border border-theme hover:border-[var(--primary)]/40 text-xs font-black text-theme-primary pl-8 pr-12 py-2.5 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/10 appearance-none flex items-center"
                 >
-                  <option value="">Carregar de Lotes de Animais...</option>
+                  <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Carregar de Lotes de Animais...</option>
                   {pastures.map(p => {
                     const countInPasture = animals.filter(a => a.currentPastureId === p.id).reduce((sum, a) => sum + (a.quantity || 0), 0);
                     if (countInPasture === 0) return null;
                     return (
-                      <option key={p.id} value={p.id}>
+                      <option key={p.id} value={p.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>
                         {p.number} - {p.name} ({countInPasture} cab.)
                       </option>
                     );

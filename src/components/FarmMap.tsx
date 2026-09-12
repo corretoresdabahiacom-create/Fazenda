@@ -419,10 +419,10 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                     value={occType}
                     onChange={(e) => setOccType(e.target.value as any)}
                   >
-                    <option value="nascente">💧 Nascente / Rec. Hídricos</option>
-                    <option value="cerca">🚧 Cerca Danificada</option>
-                    <option value="recuperacao">🌱 Pasto em Recuperação</option>
-                    <option value="outro">📍 Outro Ponto de Interesse</option>
+                    <option value="nascente" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>💧 Nascente / Rec. Hídricos</option>
+                    <option value="cerca" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🚧 Cerca Danificada</option>
+                    <option value="recuperacao" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🌱 Pasto em Recuperação</option>
+                    <option value="outro" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>📍 Outro Ponto de Interesse</option>
                   </select>
                 </div>
 

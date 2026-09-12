@@ -157,8 +157,8 @@ function EscalasTab({ items, teams, onSave, onDelete }: { items: WorkSchedule[];
             <Field label="Funcionário"><input value={form.employeeName ?? ''} onChange={e => setForm({ ...form, employeeName: e.target.value })} className={inputCls} /></Field>
             <Field label="Equipe">
               <select value={form.teamId ?? ''} onChange={e => setForm({ ...form, teamId: e.target.value || undefined })} className={inputCls}>
-                <option value="">Nenhuma</option>
-                {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Nenhuma</option>
+                {teams.map(t => <option key={t.id} value={t.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t.name}</option>)}
               </select>
             </Field>
             <Field label="Dias da semana"><input value={form.daysOfWeek ?? ''} onChange={e => setForm({ ...form, daysOfWeek: e.target.value })} className={inputCls} placeholder="Ex: Segunda a Sexta" /></Field>

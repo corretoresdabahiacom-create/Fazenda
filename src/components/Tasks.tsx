@@ -275,9 +275,9 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                     value={formData.priority}
                     onChange={(e) => setFormData({...formData, priority: e.target.value as any})}
                   >
-                    <option value="Low">Baixa</option>
-                    <option value="Medium">Média</option>
-                    <option value="High">Alta</option>
+                    <option value="Low" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Baixa</option>
+                    <option value="Medium" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Média</option>
+                    <option value="High" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Alta</option>
                   </select>
                 </div>
               </div>
@@ -291,9 +291,9 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                       value={formData.assignedTo || ''}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
                     >
-                      <option value="">Selecione...</option>
+                      <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Selecione...</option>
                       {employees.map(emp => (
-                        <option key={emp.id} value={emp.name}>{emp.name} ({emp.role})</option>
+                        <option key={emp.id} value={emp.name} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{emp.name} ({emp.role})</option>
                       ))}
                     </select>
                   ) : (

@@ -122,13 +122,13 @@ function AbaLocalizacao({ localizacoes }: { localizacoes: LocalizacaoManual[] })
           </div>
           <input value={form.pais} onChange={e => setForm({ ...form, pais: e.target.value })} placeholder="País" className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
           <select value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
-            {ESTADOS_BR.map(e => <option key={e}>{e}</option>)}
+            {ESTADOS_BR.map(e => <option key={e} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{e}</option>)}
           </select>
           <div className="flex gap-2">
             <select value={form.tipoLocal} onChange={e => setForm({ ...form, tipoLocal: e.target.value as any })} className="px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
-              <option value="cidade">Cidade</option>
-              <option value="praca">Praça</option>
-              <option value="regiao">Região</option>
+              <option value="cidade" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Cidade</option>
+              <option value="praca" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Praça</option>
+              <option value="regiao" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Região</option>
             </select>
             <input value={form.local} onChange={e => setForm({ ...form, local: e.target.value })} placeholder="Nome (ex: Feira de Santana, BA Oeste...)" className="flex-1 px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
           </div>
@@ -220,10 +220,10 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
             onChange={e => setForm({ ...form, categoria: e.target.value })}
             className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary"
           >
-            <option>Pecuária</option>
-            <option>Grãos</option>
-            <option>Agricultura</option>
-            <option>Outro</option>
+            <option style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Pecuária</option>
+            <option style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Grãos</option>
+            <option style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Agricultura</option>
+            <option style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Outro</option>
           </select>
           <button onClick={salvar} className="btn-primary w-full"><Save size={14} /> Salvar</button>
         </div>
@@ -322,14 +322,14 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
           <div>
             <label className="text-xs font-bold text-theme-secondary block mb-1">Produto</label>
             <select value={form.produtoId} onChange={e => setForm({ ...form, produtoId: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
-              {produtos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+              {produtos.map(p => <option key={p.id} value={p.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{p.nome}</option>)}
             </select>
           </div>
 
           <div>
             <label className="text-xs font-bold text-theme-secondary block mb-1">Localização</label>
             <select value={form.localizacaoId} onChange={e => setForm({ ...form, localizacaoId: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
-              {localizacoes.map(l => <option key={l.id} value={l.id}>{l.local} — {l.estado}</option>)}
+              {localizacoes.map(l => <option key={l.id} value={l.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{l.local} — {l.estado}</option>)}
             </select>
           </div>
 
@@ -341,7 +341,7 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
             <div>
               <label className="text-xs font-bold text-theme-secondary block mb-1">Unidade</label>
               <select value={form.unidade} onChange={e => setForm({ ...form, unidade: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
-                {UNIDADES_COMUNS.map(u => <option key={u}>{u}</option>)}
+                {UNIDADES_COMUNS.map(u => <option key={u} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{u}</option>)}
               </select>
             </div>
           </div>
@@ -354,9 +354,9 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
             <div>
               <label className="text-xs font-bold text-theme-secondary block mb-1">Tipo de negócio</label>
               <select value={form.tipoNegocio} onChange={e => setForm({ ...form, tipoNegocio: e.target.value as any })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
-                <option value="nao_informado">Não informa</option>
-                <option value="SIF">SIF</option>
-                <option value="FOB">FOB</option>
+                <option value="nao_informado" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Não informa</option>
+                <option value="SIF" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>SIF</option>
+                <option value="FOB" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>FOB</option>
               </select>
             </div>
           </div>

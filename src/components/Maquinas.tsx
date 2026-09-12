@@ -122,7 +122,7 @@ function CadastroTab({ machines, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Tipo">
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as MachineType })} className={inputCls}>
-                {Object.values(MachineType).map(t => <option key={t} value={t}>{t}</option>)}
+                {Object.values(MachineType).map(t => <option key={t} value={t} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t}</option>)}
               </select>
             </Field>
             <Field label="Nome/Modelo">
@@ -226,14 +226,14 @@ function ManutencaoTab({ records, machines, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Máquina">
               <select value={form.machineId ?? ''} onChange={e => setForm({ ...form, machineId: e.target.value || undefined })} className={inputCls}>
-                <option value="">Nenhuma específica</option>
-                {machines.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Nenhuma específica</option>
+                {machines.map(m => <option key={m.id} value={m.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{m.name}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Tipo">
                 <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as MaintenanceType })} className={inputCls}>
-                  {Object.values(MaintenanceType).map(t => <option key={t} value={t}>{t}</option>)}
+                  {Object.values(MaintenanceType).map(t => <option key={t} value={t} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t}</option>)}
                 </select>
               </Field>
               <Field label="Data">

@@ -415,9 +415,9 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         setNewTransferPastureId('');
                       }}
                     >
-                      <option value="">-- Escolha um Lote de Gado --</option>
+                      <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>-- Escolha um Lote de Gado --</option>
                       {animals.filter(a => !a.isSold).map(a => (
-                        <option key={a.id} value={a.id}>
+                        <option key={a.id} value={a.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>
                           {a.lotName} ({a.category} • {a.quantity} Cab.)
                         </option>
                       ))}
@@ -476,11 +476,11 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                           value={newTransferPastureId}
                           onChange={(e) => setNewTransferPastureId(e.target.value)}
                         >
-                          <option value="">-- Selecionar Pasto de Destino --</option>
+                          <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>-- Selecionar Pasto de Destino --</option>
                           {pastures
                             .filter(p => p.id !== animals.find(a => a.id === selectedTransferAnimalId)?.currentPastureId)
                             .map(p => (
-                              <option key={p.id} value={p.id}>
+                              <option key={p.id} value={p.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>
                                 {p.name} (Pasto {p.number})
                               </option>
                             ))
@@ -1105,7 +1105,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     value={formData.category}
                     onChange={(e) => setFormData({...formData, category: e.target.value as AnimalCategory})}
                   >
-                    {ANIMAL_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    {ANIMAL_CATEGORIES.map(cat => <option key={cat} value={cat} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{cat}</option>)}
                   </select>
                 </div>
 
@@ -1127,7 +1127,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     value={formData.type}
                     onChange={(e) => setFormData({...formData, type: e.target.value as AnimalType})}
                   >
-                    {Object.values(AnimalType).map(type => <option key={type} value={type}>{type}</option>)}
+                    {Object.values(AnimalType).map(type => <option key={type} value={type} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{type}</option>)}
                   </select>
                 </div>
 
@@ -1187,8 +1187,8 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     value={formData.currentPastureId}
                     onChange={(e) => setFormData({...formData, currentPastureId: e.target.value})}
                   >
-                    <option value="">-- Selecione o Pasto --</option>
-                    {pastures.map(p => <option key={p.id} value={p.id}>{p.name} (Pasto {p.number})</option>)}
+                    <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>-- Selecione o Pasto --</option>
+                    {pastures.map(p => <option key={p.id} value={p.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{p.name} (Pasto {p.number})</option>)}
                   </select>
                 </div>
 

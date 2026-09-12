@@ -133,7 +133,7 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
               <div>
                 <label className="text-xs font-semibold text-theme-secondary">Categoria</label>
                 <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value as DocumentCategory })} className={inputCls}>
-                  {Object.values(DocumentCategory).map(c => <option key={c} value={c}>{c}</option>)}
+                  {Object.values(DocumentCategory).map(c => <option key={c} value={c} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{c}</option>)}
                 </select>
               </div>
               <div>

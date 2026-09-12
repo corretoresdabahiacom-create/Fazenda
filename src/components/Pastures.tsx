@@ -466,9 +466,9 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     value={formData.purpose || 'engorda'}
                     onChange={(e) => setFormData({...formData, purpose: e.target.value as any})}
                   >
-                    <option value="engorda">🐂 Engorda</option>
-                    <option value="manutenção">🌾 Manutenção</option>
-                    <option value="finalização">🌟 Finalização</option>
+                    <option value="engorda" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🐂 Engorda</option>
+                    <option value="manutenção" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🌾 Manutenção</option>
+                    <option value="finalização" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>🌟 Finalização</option>
                   </select>
                 </div>
 
@@ -533,10 +533,10 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                       value={estimatorParams.animalCategory}
                       onChange={(e) => setEstimatorParams({...estimatorParams, animalCategory: e.target.value})}
                     >
-                      <option value="Bois Adultos (Engorda)">Bois Adultos (Engorda ~0.9 UA)</option>
-                      <option value="Bezerras / Bezerros (Recria)">Bezerras / Bezerros (Recria ~0.4 UA)</option>
-                      <option value="Vacas Prenhes / Amamentando">Vacas Prenhes/Amamentando (~1.0 UA)</option>
-                      <option value="Garrotes / Novilhas">Garrotes e Novilhas (~0.7 UA)</option>
+                      <option value="Bois Adultos (Engorda)" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Bois Adultos (Engorda ~0.9 UA)</option>
+                      <option value="Bezerras / Bezerros (Recria)" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Bezerras / Bezerros (Recria ~0.4 UA)</option>
+                      <option value="Vacas Prenhes / Amamentando" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Vacas Prenhes/Amamentando (~1.0 UA)</option>
+                      <option value="Garrotes / Novilhas" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Garrotes e Novilhas (~0.7 UA)</option>
                     </select>
                   </div>
 
@@ -547,10 +547,10 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                       value={estimatorParams.objective}
                       onChange={(e) => setEstimatorParams({...estimatorParams, objective: e.target.value})}
                     >
-                      <option value="Pastejo Rotacionado Intensivo">Rotacionado Intensivo</option>
-                      <option value="Pastejo Rotacionado Tradicional">Rotacionado Comercial</option>
-                      <option value="Engorda Rápida no Limite">Engorda Rápida (Fator Calibrado)</option>
-                      <option value="Pastejo Contínuo Extensivo">Contínuo Extensivo</option>
+                      <option value="Pastejo Rotacionado Intensivo" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Rotacionado Intensivo</option>
+                      <option value="Pastejo Rotacionado Tradicional" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Rotacionado Comercial</option>
+                      <option value="Engorda Rápida no Limite" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Engorda Rápida (Fator Calibrado)</option>
+                      <option value="Pastejo Contínuo Extensivo" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Contínuo Extensivo</option>
                     </select>
                   </div>
                 </div>

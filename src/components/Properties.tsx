@@ -193,7 +193,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                 >
                   {Object.values(PropertyType).map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                    <option key={t} value={t} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t}</option>
                   ))}
                 </select>
               </div>
@@ -217,7 +217,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                 >
                   {Object.values(AreaUnit).map((u) => (
-                    <option key={u} value={u}>{u}</option>
+                    <option key={u} value={u} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{u}</option>
                   ))}
                 </select>
               </div>

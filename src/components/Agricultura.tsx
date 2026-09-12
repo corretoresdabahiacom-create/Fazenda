@@ -204,7 +204,7 @@ function TalhoesTab({ talhoes, onSave, onDelete }: {
               </Field>
               <Field label="Unidade">
                 <select value={form.areaUnit ?? AreaUnit.HECTARE} onChange={e => setForm({ ...form, areaUnit: e.target.value as AreaUnit })} className={inputCls}>
-                  {Object.values(AreaUnit).map(u => <option key={u} value={u}>{u}</option>)}
+                  {Object.values(AreaUnit).map(u => <option key={u} value={u} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{u}</option>)}
                 </select>
               </Field>
             </div>
@@ -213,7 +213,7 @@ function TalhoesTab({ talhoes, onSave, onDelete }: {
             </Field>
             <Field label="Status">
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as TalhaoStatus })} className={inputCls}>
-                {Object.values(TalhaoStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                {Object.values(TalhaoStatus).map(s => <option key={s} value={s} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{s}</option>)}
               </select>
             </Field>
             <Field label="Tipo de solo">
@@ -310,13 +310,13 @@ function PlanejamentoTab({ cropPlans, talhoes, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Cultura">
               <select value={form.cultura} onChange={e => setForm({ ...form, cultura: e.target.value as Cultura })} className={inputCls}>
-                {Object.values(Cultura).map(c => <option key={c} value={c}>{c}</option>)}
+                {Object.values(Cultura).map(c => <option key={c} value={c} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{c}</option>)}
               </select>
             </Field>
             <Field label="Talhão">
               <select value={form.talhaoId ?? ''} onChange={e => setForm({ ...form, talhaoId: e.target.value || undefined })} className={inputCls}>
-                <option value="">Nenhum específico</option>
-                {talhoes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Nenhum específico</option>
+                {talhoes.map(t => <option key={t.id} value={t.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t.name}</option>)}
               </select>
             </Field>
             <Field label="Safra">
@@ -335,7 +335,7 @@ function PlanejamentoTab({ cropPlans, talhoes, onSave, onDelete }: {
             </Field>
             <Field label="Status">
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as CropPlanStatus })} className={inputCls}>
-                {Object.values(CropPlanStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                {Object.values(CropPlanStatus).map(s => <option key={s} value={s} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{s}</option>)}
               </select>
             </Field>
             <SubmitRow onCancel={() => setIsOpen(false)} />
@@ -464,7 +464,7 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Tipo">
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as FieldLogType })} className={inputCls}>
-                {Object.values(FieldLogType).map(t => <option key={t} value={t}>{t}</option>)}
+                {Object.values(FieldLogType).map(t => <option key={t} value={t} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t}</option>)}
               </select>
             </Field>
 
@@ -487,8 +487,8 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
               </Field>
               <Field label="Talhão">
                 <select value={form.talhaoId ?? ''} onChange={e => setForm({ ...form, talhaoId: e.target.value || undefined })} className={inputCls}>
-                  <option value="">Nenhum específico</option>
-                  {talhoes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Nenhum específico</option>
+                  {talhoes.map(t => <option key={t.id} value={t.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t.name}</option>)}
                 </select>
               </Field>
             </div>
@@ -606,7 +606,7 @@ function PragasTab({ records, talhoes, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Tipo de praga">
               <select value={form.pestType} onChange={e => setForm({ ...form, pestType: e.target.value as PestType })} className={inputCls}>
-                {Object.values(PestType).map(p => <option key={p} value={p}>{p}</option>)}
+                {Object.values(PestType).map(p => <option key={p} value={p} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{p}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
@@ -615,14 +615,14 @@ function PragasTab({ records, talhoes, onSave, onDelete }: {
               </Field>
               <Field label="Talhão">
                 <select value={form.talhaoId ?? ''} onChange={e => setForm({ ...form, talhaoId: e.target.value || undefined })} className={inputCls}>
-                  <option value="">Nenhum específico</option>
-                  {talhoes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Nenhum específico</option>
+                  {talhoes.map(t => <option key={t.id} value={t.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t.name}</option>)}
                 </select>
               </Field>
             </div>
             <Field label="Nível de infestação">
               <select value={form.infestationLevel} onChange={e => setForm({ ...form, infestationLevel: e.target.value as InfestationLevel })} className={inputCls}>
-                {Object.values(InfestationLevel).map(l => <option key={l} value={l}>{l}</option>)}
+                {Object.values(InfestationLevel).map(l => <option key={l} value={l} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{l}</option>)}
               </select>
             </Field>
             <Field label="Área afetada">
@@ -765,8 +765,8 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
             <div className="grid grid-cols-2 gap-3">
               <Field label="Talhão">
                 <select value={form.talhaoId ?? ''} onChange={e => setForm({ ...form, talhaoId: e.target.value || undefined })} className={inputCls}>
-                  <option value="">Selecione</option>
-                  {talhoes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Selecione</option>
+                  {talhoes.map(t => <option key={t.id} value={t.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t.name}</option>)}
                 </select>
               </Field>
               <Field label="Data programada">
@@ -815,7 +815,7 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
             </label>
             <Field label="Status">
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as SprayStatus })} className={inputCls}>
-                {Object.values(SprayStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                {Object.values(SprayStatus).map(s => <option key={s} value={s} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{s}</option>)}
               </select>
             </Field>
             <Field label="Observações">
@@ -909,7 +909,7 @@ function IrrigacaoTab({ records, talhoes, onSave, onDelete }: {
           <form onSubmit={handleSubmit} className="space-y-3">
             <Field label="Método">
               <select value={form.method} onChange={e => setForm({ ...form, method: e.target.value as IrrigationMethod })} className={inputCls}>
-                {Object.values(IrrigationMethod).map(m => <option key={m} value={m}>{m}</option>)}
+                {Object.values(IrrigationMethod).map(m => <option key={m} value={m} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{m}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
@@ -918,8 +918,8 @@ function IrrigacaoTab({ records, talhoes, onSave, onDelete }: {
               </Field>
               <Field label="Talhão">
                 <select value={form.talhaoId ?? ''} onChange={e => setForm({ ...form, talhaoId: e.target.value || undefined })} className={inputCls}>
-                  <option value="">Nenhum específico</option>
-                  {talhoes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Nenhum específico</option>
+                  {talhoes.map(t => <option key={t.id} value={t.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t.name}</option>)}
                 </select>
               </Field>
             </div>
