@@ -184,7 +184,7 @@ function AnimaisTab({ animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -207,7 +207,7 @@ function AnimaisTab({ animals, onSave, onDelete }: {
                 <td className="p-3 text-theme-secondary">{a.lotGroup || '—'}</td>
                 <td className="p-3">
                   <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${
-                    a.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-theme-secondary text-theme-secondary'
+                    a.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-theme-secondary text-theme-secondary'
                   }`}>
                     {a.status === 'active' ? 'Ativo' : a.status === 'sold' ? 'Vendido' : 'Morto'}
                   </span>
@@ -343,7 +343,7 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -521,7 +521,7 @@ function EstacaoMontaTab({ seasons, reproductionEvents, onSave, onDelete }: {
         {seasons.map((s) => {
           const preg = pregnancyRate(s);
           return (
-            <div key={s.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
+            <div key={s.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme text-theme-primary">
               <div className="flex items-start justify-between">
                 <h3 className="font-bold text-theme-primary">{s.name}</h3>
                 <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-theme-secondary text-theme-secondary">{s.status}</span>
@@ -640,10 +640,10 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       {upcoming.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-          <p className="text-xs font-bold text-amber-700 mb-1">Próximos reforços/vencimentos</p>
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+          <p className="text-xs font-bold text-amber-700 dark:text-amber-300 mb-1">Próximos reforços/vencimentos</p>
           {upcoming.slice(0, 5).map(e => (
-            <p key={e.id} className="text-xs text-amber-700">
+            <p key={e.id} className="text-xs text-amber-700 dark:text-amber-300">
               {e.animalEarTag} — {e.productName} em {format(new Date(e.nextDoseDate!), 'dd/MM/yyyy')}
             </p>
           ))}
@@ -656,7 +656,7 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -772,7 +772,7 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
+        <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme text-theme-primary">
           <p className="text-xs text-theme-secondary uppercase font-bold">Total no mês</p>
           <p className="text-2xl font-bold text-theme-primary">{totalMes.toFixed(1)} L</p>
         </div>
@@ -784,7 +784,7 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -887,7 +887,7 @@ function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
       <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary bg-theme-card text-theme-primary">Cancelar</button>
     </div>
   );
 }

@@ -173,7 +173,7 @@ function TalhoesTab({ talhoes, onSave, onDelete }: {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {talhoes.map((t) => (
-          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
+          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme text-theme-primary">
             <div className="flex items-start justify-between">
               <h3 className="font-bold text-theme-primary">{t.name}</h3>
               <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-theme-secondary text-theme-secondary">{t.status}</span>
@@ -273,7 +273,7 @@ function PlanejamentoTab({ cropPlans, talhoes, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -427,7 +427,7 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -472,10 +472,10 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
               <p className="text-xs text-theme-secondary">Checando o clima de hoje para esse tipo de atividade...</p>
             )}
             {relevantAlerts.map((a) => (
-              <div key={a.type} className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
+              <div key={a.type} className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3 flex items-start gap-2">
                 <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-bold text-amber-700">{a.title}</p>
+                  <p className="text-xs font-bold text-amber-700 dark:text-amber-300">{a.title}</p>
                   <p className="text-xs text-amber-600">{a.message} Você ainda pode registrar normalmente — é só um alerta.</p>
                 </div>
               </div>
@@ -557,10 +557,10 @@ function PragasTab({ records, talhoes, onSave, onDelete }: {
   }
 
   const levelColor: Record<string, string> = {
-    [InfestationLevel.BAIXO]: 'bg-green-100 text-green-700',
-    [InfestationLevel.MEDIO]: 'bg-amber-100 text-amber-700',
-    [InfestationLevel.ALTO]: 'bg-orange-100 text-orange-700',
-    [InfestationLevel.CRITICO]: 'bg-red-100 text-red-700',
+    [InfestationLevel.BAIXO]: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+    [InfestationLevel.MEDIO]: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+    [InfestationLevel.ALTO]: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
+    [InfestationLevel.CRITICO]: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
   };
 
   return (
@@ -571,7 +571,7 @@ function PragasTab({ records, talhoes, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -711,8 +711,8 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
 
   const statusColor: Record<string, string> = {
     [SprayStatus.PROGRAMADA]: 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300',
-    [SprayStatus.REALIZADA]: 'bg-green-50 text-green-700',
-    [SprayStatus.ADIADA]: 'bg-amber-50 text-amber-700',
+    [SprayStatus.REALIZADA]: 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300',
+    [SprayStatus.ADIADA]: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300',
     [SprayStatus.CANCELADA]: 'bg-theme-secondary text-theme-secondary',
   };
 
@@ -732,7 +732,7 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
         {[...sprays].sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate)).map((s) => {
           const talhao = talhoes.find(t => t.id === s.talhaoId);
           return (
-            <div key={s.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
+            <div key={s.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme text-theme-primary">
               <div className="flex items-start justify-between">
                 <h3 className="font-bold text-theme-primary">{s.product || 'Produto não informado'}</h3>
                 <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${statusColor[s.status]}`}>{s.status}</span>
@@ -741,7 +741,7 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
               {s.target && <p className="text-xs text-theme-secondary">Alvo: {s.target}</p>}
               {s.dosage && <p className="text-xs text-theme-secondary">Dose: {s.dosage}{s.sprayVolumePerHa ? ` | ${s.sprayVolumePerHa} L/ha` : ''}</p>}
               {(s.preHarvestIntervalDays || s.reentryIntervalHours) && (
-                <p className="text-xs text-amber-700">
+                <p className="text-xs text-amber-700 dark:text-amber-300">
                   {s.preHarvestIntervalDays ? `Carência: ${s.preHarvestIntervalDays}d` : ''}
                   {s.preHarvestIntervalDays && s.reentryIntervalHours ? ' | ' : ''}
                   {s.reentryIntervalHours ? `Reentrada: ${s.reentryIntervalHours}h` : ''}
@@ -775,9 +775,9 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
             </div>
 
             {isScheduledForToday && relevantAlerts.length > 0 && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2">
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3 flex gap-2">
                 <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
-                <div className="text-xs text-amber-800">
+                <div className="text-xs text-amber-800 dark:text-amber-300">
                   {relevantAlerts.map((a, i) => <p key={i}>{a.message}</p>)}
                   <p className="italic mt-1">Aviso apenas — você pode salvar mesmo assim.</p>
                 </div>
@@ -823,7 +823,7 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
             </Field>
             <div className="flex gap-2 pt-2">
               <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-              <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
+              <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary bg-theme-card text-theme-primary">Cancelar</button>
             </div>
           </form>
         </Modal>
@@ -874,7 +874,7 @@ function IrrigacaoTab({ records, talhoes, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -970,7 +970,7 @@ function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
       <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary bg-theme-card text-theme-primary">Cancelar</button>
     </div>
   );
 }

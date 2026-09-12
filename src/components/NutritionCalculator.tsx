@@ -132,7 +132,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
   return (
     <div className="space-y-6">
       {/* Introduction Card */}
-      <div className="bg-theme-card border border-theme p-6 md:p-8 rounded-3xl shadow-sm relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div className="bg-theme-card border border-theme p-6 md:p-8 rounded-3xl shadow-sm relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-theme-primary">
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
             <Leaf size={24} className="animate-pulse" />
@@ -144,7 +144,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
           </p>
         </div>
         
-        <div className="bg-theme-secondary px-4 py-3 border border-theme rounded-2xl flex items-center gap-3 w-full md:w-auto">
+        <div className="bg-theme-secondary px-4 py-3 border border-theme rounded-2xl flex items-center gap-3 w-full md:w-auto text-theme-primary">
           <Dumbbell className="text-green-700 dark:text-green-400" size={20} />
           <div>
             <span className="text-[9px] font-black uppercase text-theme-secondary block">Estimativa GMD Gado</span>
@@ -156,10 +156,10 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Parameters Column */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-theme-card border border-theme p-6 rounded-3xl shadow-sm space-y-6">
+          <div className="bg-theme-card border border-theme p-6 rounded-3xl shadow-sm space-y-6 text-theme-primary">
             <h3 className="font-serif italic font-bold text-green-700 dark:text-green-400 text-base border-b pb-2">1. Seleção do Lote ou Parâmetros</h3>
             
-            <div className="grid grid-cols-2 bg-theme-secondary p-1 rounded-xl border border-theme">
+            <div className="grid grid-cols-2 bg-theme-secondary p-1 rounded-xl border border-theme text-theme-primary">
               <button
                 onClick={() => setUsePresetLot(true)}
                 className={`py-2 text-xs font-black rounded-lg transition-all ${
@@ -320,13 +320,13 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
         <div className="lg:col-span-7 space-y-6">
           
           {/* Main Intake card indicators */}
-          <div className="bg-theme-card border border-theme p-6 md:p-8 rounded-3xl shadow-sm space-y-6">
+          <div className="bg-theme-card border border-theme p-6 md:p-8 rounded-3xl shadow-sm space-y-6 text-theme-primary">
             <h3 className="font-serif italic font-bold text-green-700 dark:text-green-400 text-base border-b pb-2">2. Consumo Sugerido e Planejamento</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
               {/* Mineral result */}
-              <div className="p-5 bg-theme-card border border-theme rounded-2xl shadow-sm space-y-2">
+              <div className="p-5 bg-theme-card border border-theme rounded-2xl shadow-sm space-y-2 text-theme-primary">
                 <span className="text-[9px] font-black uppercase text-green-700 dark:text-green-400 block">Sal / Suplemento Mineral</span>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-3xl font-black text-green-700 dark:text-green-400">
@@ -340,7 +340,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
               </div>
 
               {/* Protein result */}
-              <div className="p-5 bg-theme-card border border-theme rounded-2xl shadow-sm space-y-2">
+              <div className="p-5 bg-theme-card border border-theme rounded-2xl shadow-sm space-y-2 text-theme-primary">
                 <span className="text-[9px] font-black uppercase text-green-700 dark:text-green-400 block">Suplementação Proteica</span>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-3xl font-black text-green-700 dark:text-green-400">
@@ -355,14 +355,14 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
             </div>
 
             {/* Total Herd Demands */}
-            <div className="border border-theme p-5 rounded-2xl bg-theme-secondary space-y-4">
+            <div className="border border-theme p-5 rounded-2xl bg-theme-secondary space-y-4 text-theme-primary">
               <span className="text-[9px] font-black uppercase text-theme-secondary tracking-wider block">Consumo Agregado p/ o Lote Inteiro ({currentQuantity} cab.)</span>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <span className="text-[10px] text-theme-secondary font-bold block">Demanda Mineral Diária:</span>
                   <span className="text-base font-black text-theme-primary">{nutritionParameters.dailyMineralLotKg.toFixed(1)} kg/dia</span>
-                  <div className="flex items-center gap-1 bg-theme-card px-2 py-0.5 rounded-lg border border-theme w-fit text-[9px] font-black text-green-700 dark:text-green-400">
+                  <div className="flex items-center gap-1 bg-theme-card px-2 py-0.5 rounded-lg border border-theme w-fit text-[9px] font-black text-green-700 dark:text-green-400 text-theme-primary">
                     <ShoppingBag size={10} /> {nutritionParameters.sacksPerMonthMineral} sacas de 30kg / mês
                   </div>
                 </div>
@@ -370,7 +370,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                 <div className="space-y-1">
                   <span className="text-[10px] text-theme-secondary font-bold block">Demanda Proteica Diária:</span>
                   <span className="text-base font-black text-theme-primary">{nutritionParameters.dailyProteinLotKg.toFixed(1)} kg/dia</span>
-                  <div className="flex items-center gap-1 bg-theme-card px-2 py-0.5 rounded-lg border border-theme w-fit text-[9px] font-black text-green-700 dark:text-green-400">
+                  <div className="flex items-center gap-1 bg-theme-card px-2 py-0.5 rounded-lg border border-theme w-fit text-[9px] font-black text-green-700 dark:text-green-400 text-theme-primary">
                     <ShoppingBag size={10} /> {nutritionParameters.sacksPerMonthProtein} sacas de 30kg / mês
                   </div>
                 </div>
@@ -379,7 +379,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
           </div>
 
           {/* Supply / Stock integration matching */}
-          <div className="bg-theme-card border border-theme p-6 rounded-3xl shadow-sm space-y-4">
+          <div className="bg-theme-card border border-theme p-6 rounded-3xl shadow-sm space-y-4 text-theme-primary">
             <h4 className="font-serif italic font-bold text-sm text-green-700 dark:text-green-400 flex items-center gap-1.5">
               <Warehouse size={16} /> Verificação de Estoque Disp.
             </h4>
@@ -398,7 +398,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
                 const daysLeft = dailyRate > 0 ? Math.floor(balanceKg / dailyRate) : 0;
 
                 return (
-                  <div key={item.id} className="flex justify-between items-center bg-theme-secondary p-3 rounded-xl border border-theme text-xs">
+                  <div key={item.id} className="flex justify-between items-center bg-theme-secondary p-3 rounded-xl border border-theme text-xs text-theme-primary">
                     <div>
                       <span className="font-black text-theme-primary block">{item.name}</span>
                       <span className="text-[9px] text-theme-secondary uppercase font-bold">Saldo: {item.quantity} {item.unit} ({balanceKg} kg)</span>
@@ -421,7 +421,7 @@ export default function NutritionCalculator({ animals, inventory }: Props) {
               })}
 
               {matchedInventoryStocks.length === 0 && (
-                <div className="text-center py-6 text-xs italic text-theme-secondary bg-theme-secondary border border-theme rounded-2xl">
+                <div className="text-center py-6 text-xs italic text-theme-secondary bg-theme-secondary border border-theme rounded-2xl text-theme-primary">
                   Nenhum sal mineral ou proteinado identificado no estoque rural ativo.
                 </div>
               )}

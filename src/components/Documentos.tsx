@@ -77,12 +77,12 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
       </div>
 
       {expiringSoon.length > 0 && (
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-3">
-          <p className="text-xs font-bold text-orange-700 flex items-center gap-1.5 mb-1">
+        <div className="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-xl p-3">
+          <p className="text-xs font-bold text-orange-700 dark:text-orange-300 flex items-center gap-1.5 mb-1">
             <AlertTriangle size={14} /> Vencendo em até 30 dias
           </p>
           {expiringSoon.map(d => (
-            <p key={d.id} className="text-xs text-orange-700">{d.title}: vence em {format(new Date(d.expirationDate!), 'dd/MM/yyyy')}</p>
+            <p key={d.id} className="text-xs text-orange-700 dark:text-orange-300">{d.title}: vence em {format(new Date(d.expirationDate!), 'dd/MM/yyyy')}</p>
           ))}
         </div>
       )}
@@ -95,7 +95,7 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {documents.map((d) => (
-          <div key={d.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
+          <div key={d.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme text-theme-primary">
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-[10px] font-bold uppercase text-theme-secondary">{d.category}</span>
@@ -170,13 +170,13 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
                 </p>
               </div>
               {error && (
-                <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg p-2">{error}</p>
+                <p className="text-xs text-red-500 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-2">{error}</p>
               )}
               <div className="flex gap-2 pt-2">
                 <button type="submit" disabled={uploading} className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-60">
                   {uploading ? 'Enviando...' : 'Salvar'}
                 </button>
-                <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">
+                <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary bg-theme-card text-theme-primary">
                   Cancelar
                 </button>
               </div>

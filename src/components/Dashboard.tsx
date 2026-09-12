@@ -380,8 +380,8 @@ export default function Dashboard({
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className={`p-3.5 rounded-2xl shrink-0 ${
-              suggestion?.priority === 'High' ? 'bg-red-50 text-red-600' :
-              suggestion?.priority === 'Medium' ? 'bg-amber-50 text-amber-600' :
+              suggestion?.priority === 'High' ? 'bg-red-50 dark:bg-red-950/30 text-red-600' :
+              suggestion?.priority === 'Medium' ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600' :
               'bg-primary/10 text-primary'
             }`}>
               {loadingSuggestion ? (
@@ -398,8 +398,8 @@ export default function Dashboard({
                 </span>
                 {suggestion && (
                   <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${
-                    suggestion.priority === 'High' ? 'bg-red-100 text-red-800' :
-                    suggestion.priority === 'Medium' ? 'bg-amber-100 text-amber-800' :
+                    suggestion.priority === 'High' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' :
+                    suggestion.priority === 'Medium' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300' :
                     'bg-[var(--primary)]/10 text-theme-primary'
                   }`}>
                     Prioridade {suggestion.priority === 'High' ? 'Alta' : suggestion.priority === 'Medium' ? 'Média' : 'Baixa'}
@@ -508,12 +508,12 @@ export default function Dashboard({
               let alertBadge = "";
 
               if (isOverdue) {
-                bgStyle = "bg-red-50/60 border-red-100 text-red-900";
-                textStyle = "text-red-700 font-bold";
+                bgStyle = "bg-red-50 dark:bg-red-950/30/60 border-red-100 dark:border-red-800 text-red-900 dark:text-red-200";
+                textStyle = "text-red-700 dark:text-red-300 font-bold";
                 alertBadge = `Atrasado ${Math.abs(alert.daysRemaining)}d!`;
               } else if (isToday) {
-                bgStyle = "bg-amber-50 border-amber-200 text-amber-950";
-                textStyle = "text-amber-800 font-bold";
+                bgStyle = "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-950";
+                textStyle = "text-amber-800 dark:text-amber-300 font-bold";
                 alertBadge = "Vence Hoje!";
               } else {
                 alertBadge = `Faltam ${alert.daysRemaining}d`;
@@ -668,7 +668,7 @@ export default function Dashboard({
               <button 
                 onClick={() => onToggleTaskCompletion?.(task)}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer active:scale-95 transition-transform ${
-                  task.completed ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'btn-primary py-1.5 px-4'
+                  task.completed ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200' : 'btn-primary py-1.5 px-4'
                 }`}
               >
                 {task.completed ? '✓ Concluída' : 'Marcar Concluída'}

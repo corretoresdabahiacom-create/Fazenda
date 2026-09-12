@@ -100,7 +100,7 @@ function CadastroTab({ machines, onSave, onDelete }: {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {machines.map((m) => (
-          <div key={m.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
+          <div key={m.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme text-theme-primary">
             <span className="text-[10px] font-bold uppercase text-theme-secondary">{m.type}</span>
             <h3 className="font-bold text-theme-primary">{m.name}</h3>
             {m.plate && <p className="text-xs text-theme-secondary">Placa: {m.plate}</p>}
@@ -191,7 +191,7 @@ function ManutencaoTab({ records, machines, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -291,7 +291,7 @@ function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
       <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary bg-theme-card text-theme-primary">Cancelar</button>
     </div>
   );
 }

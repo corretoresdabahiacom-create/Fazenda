@@ -369,7 +369,7 @@ export default function WeighingWorksheet() {
   return (
     <div className="space-y-6 legacy-light">
       {/* View Selector Headers */}
-      <div className="flex border-b border-theme gap-4 mb-4">
+      <div className="flex border-b border-theme gap-4 mb-4 bg-theme-card text-theme-primary">
         <button 
           onClick={() => setActiveTab('sheets')}
           className={`pb-3 font-semibold text-sm transition-all relative ${
@@ -408,9 +408,9 @@ export default function WeighingWorksheet() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div 
             onClick={handleCreateNewSheet}
-            className="border-2 border-dashed border-theme hover:border-[var(--primary)] bg-theme-card p-8 rounded-3xl cursor-pointer flex flex-col items-center justify-center text-center gap-4 transition-all hover:shadow-md hover:scale-101 active:scale-99 group"
+            className="border-2 border-dashed border-theme hover:border-[var(--primary)] bg-theme-card p-8 rounded-3xl cursor-pointer flex flex-col items-center justify-center text-center gap-4 transition-all hover:shadow-md hover:scale-101 active:scale-99 group text-theme-primary"
           >
-            <div className="w-16 h-16 bg-theme-card rounded-full flex items-center justify-center border border-theme group-hover:bg-[var(--primary)]/5 group-hover:border-[var(--primary)]/20 group-hover:scale-110 transition-all">
+            <div className="w-16 h-16 bg-theme-card rounded-full flex items-center justify-center border border-theme group-hover:bg-[var(--primary)]/5 group-hover:border-[var(--primary)]/20 group-hover:scale-110 transition-all text-theme-primary">
               <Plus size={28} className="text-theme-primary" />
             </div>
             <div>
@@ -442,16 +442,16 @@ export default function WeighingWorksheet() {
                     setSheetNotes(sheet.notes || '');
                     setActiveTab('editor');
                   }}
-                  className="bg-theme-card p-6 rounded-3xl border border-theme shadow-xs cursor-pointer hover:shadow-md hover:border-[var(--primary)]/40 transition-all flex flex-col justify-between group relative overflow-hidden"
+                  className="bg-theme-card p-6 rounded-3xl border border-theme shadow-xs cursor-pointer hover:shadow-md hover:border-[var(--primary)]/40 transition-all flex flex-col justify-between group relative overflow-hidden text-theme-primary"
                 >
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
-                      <div className="p-2 bg-theme-card rounded-xl border border-theme">
+                      <div className="p-2 bg-theme-card rounded-xl border border-theme text-theme-primary">
                         <FileText size={20} className="text-theme-primary" />
                       </div>
                       <button
                         onClick={(e) => handleDeleteSheet(sheet.id, e)}
-                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 dark:bg-red-950/30 rounded-lg transition-all"
                         title="Deletar Planilha"
                       >
                         <Trash2 size={16} />
@@ -467,7 +467,7 @@ export default function WeighingWorksheet() {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-theme text-xs">
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-theme text-xs bg-theme-card text-theme-primary">
                       <div>
                         <span className="text-[10px] font-bold uppercase text-theme-secondary block">Total de Gado</span>
                         <strong className="text-sm font-black text-theme-primary">{heads} cab.</strong>
@@ -494,7 +494,7 @@ export default function WeighingWorksheet() {
         /* active spreadsheet workbench */
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="bg-theme-card p-6 rounded-3xl border border-theme flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+          <div className="bg-theme-card p-6 rounded-3xl border border-theme flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm text-theme-primary">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-theme-secondary text-theme-primary rounded-2xl">
                 <FileText size={24} />
@@ -506,7 +506,7 @@ export default function WeighingWorksheet() {
                       type="text" 
                       value={sheetName} 
                       onChange={(e) => setSheetName(e.target.value)}
-                      className="border border-theme px-3 py-1 text-lg font-bold rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                      className="border border-theme px-3 py-1 text-lg font-bold rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
                       onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
                       autoFocus
                     />
@@ -589,11 +589,11 @@ export default function WeighingWorksheet() {
           </div>
 
           {analiseResultado && (
-            <div className={`rounded-2xl border p-3 mb-4 ${analiseResultado.direcao === 'igual' ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
-              <p className={`text-xs font-bold mb-1 ${analiseResultado.direcao === 'igual' ? 'text-green-800' : 'text-amber-800'}`}>
+            <div className={`rounded-2xl border p-3 mb-4 ${analiseResultado.direcao === 'igual' ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' : 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800'}`}>
+              <p className={`text-xs font-bold mb-1 ${analiseResultado.direcao === 'igual' ? 'text-green-800 dark:text-green-300' : 'text-amber-800 dark:text-amber-300'}`}>
                 📊 Análise da planilha
               </p>
-              <p className={`text-xs ${analiseResultado.direcao === 'igual' ? 'text-green-700' : 'text-amber-700'}`}>
+              <p className={`text-xs ${analiseResultado.direcao === 'igual' ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300'}`}>
                 Total Geral calculado com precisão total: <strong>R$ {analiseResultado.totalExato.toFixed(2)}</strong>.{' '}
                 {analiseResultado.direcao === 'igual' ? (
                   <>Esse valor não muda mesmo se cada etapa fosse arredondada à mão — pode confiar nele com segurança (margem de erro: 0%).</>
@@ -605,7 +605,7 @@ export default function WeighingWorksheet() {
           )}
 
           {/* Excel Spreadsheet Table Interface */}
-          <div className="bg-theme-card rounded-3xl border border-theme overflow-hidden shadow-sm">
+          <div className="bg-theme-card rounded-3xl border border-theme overflow-hidden shadow-sm text-theme-primary">
             <div className="overflow-x-auto w-full scrollbar-thin">
               <table style={{ width: '1410px', minWidth: '1410px', tableLayout: 'fixed' }} className="text-left border-collapse">
                 <colgroup>
@@ -620,7 +620,7 @@ export default function WeighingWorksheet() {
                   <col style={colStyles[8]} />
                 </colgroup>
                 <thead>
-                  <tr className="bg-theme-card border-b border-theme h-14">
+                  <tr className="bg-theme-card border-b border-theme h-14 text-theme-primary">
                     <th style={colStyles[0]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Quantidade (Cab.)</th>
                     <th style={colStyles[1]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Peso (kg)</th>
                     <th style={colStyles[2]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Peso (kg)/ Animal</th>
@@ -647,11 +647,11 @@ export default function WeighingWorksheet() {
                            animate={{ opacity: 1 }}
                            exit={{ opacity: 0 }}
                            style={{ display: 'table-row' }}
-                           className="border-b border-theme hover:bg-theme-card/50"
+                           className="border-b border-theme hover:bg-theme-card/50 text-theme-primary"
                         >
                            {/* Quantidade */}
                            <td style={colStyles[0]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-28 justify-center mx-auto">
+                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-28 justify-center mx-auto text-theme-primary">
                                <input 
                                  type="number" 
                                  min="0"
@@ -666,7 +666,7 @@ export default function WeighingWorksheet() {
 
                            {/* Peso kg */}
                            <td style={colStyles[1]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-32 justify-center mx-auto">
+                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-32 justify-center mx-auto text-theme-primary">
                                <input 
                                  type="number" 
                                  min="0"
@@ -697,7 +697,7 @@ export default function WeighingWorksheet() {
 
                            {/* Valor Arroba R$ */}
                            <td style={colStyles[5]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-32 justify-center mx-auto">
+                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-32 justify-center mx-auto text-theme-primary">
                                <span className="text-[10px] font-black text-theme-secondary">R$</span>
                                <input 
                                  type="number" 
@@ -725,7 +725,7 @@ export default function WeighingWorksheet() {
                            <td style={colStyles[8]} className="p-3 text-center align-middle">
                              <button 
                                onClick={() => handleDeleteRow(row.id)}
-                               className="p-1 px-1.5 text-theme-secondary hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mx-auto block"
+                               className="p-1 px-1.5 text-theme-secondary hover:text-red-500 hover:bg-red-50 dark:bg-red-950/30 rounded-lg transition-colors mx-auto block"
                                title="Deletar linha"
                              >
                                <Trash2 size={14} />
@@ -737,7 +737,7 @@ export default function WeighingWorksheet() {
                   </AnimatePresence>
 
                   {/* !!! AS REQUESTED: Pule sempre uma linha !!! */}
-                  <tr className="bg-theme-card border-b border-theme">
+                  <tr className="bg-theme-card border-b border-theme text-theme-primary">
                     <td style={{ ...colStyles[0], height: '40px' }} />
                     <td style={{ ...colStyles[1], height: '40px' }} />
                     <td style={{ ...colStyles[2], height: '40px' }} />
@@ -752,7 +752,7 @@ export default function WeighingWorksheet() {
                   {/* !!! AS REQUESTED: Totais Row in order: 
                      "Quantidade total, peso total, divisão por 15, valor da arroba, total por unidade e total por quantidade" 
                   !!! */}
-                  <tr className="bg-theme-card font-black border-t-2 border-theme">
+                  <tr className="bg-theme-card font-black border-t-2 border-theme text-theme-primary">
                     {/* Quantidade total */}
                     <td style={colStyles[0]} className="p-4 px-2 text-center">
                       <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1">Qtd Total</div>
@@ -812,7 +812,7 @@ export default function WeighingWorksheet() {
                     {/* Total por quantidade - CENTER ALIGNED! */}
                     <td style={colStyles[7]} className="p-4 text-center">
                       <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1 text-orange-600">Total Geral</div>
-                      <span className="text-base font-black text-theme-primary font-mono bg-orange-100/30 px-3 py-1.5 rounded-xl border border-orange-200 whitespace-nowrap inline-block">
+                      <span className="text-base font-black text-theme-primary font-mono bg-orange-100 dark:bg-orange-900/30/30 px-3 py-1.5 rounded-xl border border-orange-200 dark:border-orange-800 whitespace-nowrap inline-block">
                         {totals.totalQuantityValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
                       </span>
                     </td>
@@ -825,7 +825,7 @@ export default function WeighingWorksheet() {
             </div>
 
             {/* Quick action footer */}
-            <div className="p-5 bg-theme-card border-t border-theme flex items-center justify-between">
+            <div className="p-5 bg-theme-card border-t border-theme flex items-center justify-between text-theme-primary">
               <button 
                 onClick={handleAddRow}
                 className="btn-outline px-4 py-2.5 text-xs"
@@ -840,18 +840,18 @@ export default function WeighingWorksheet() {
           </div>
 
           {/* Notes and description */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-theme-card p-6 rounded-3xl border border-theme">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-theme-card p-6 rounded-3xl border border-theme text-theme-primary">
             <div className="md:col-span-2 space-y-2">
               <label className="text-xs font-bold uppercase text-theme-secondary">Observações de Lote / Observações Gerais</label>
               <textarea 
                 value={sheetNotes}
                 onChange={(e) => setSheetNotes(e.target.value)}
                 placeholder="Exemplo: Vacina aplicada, condições climáticas do dia, destino do lote..."
-                className="w-full bg-theme-card border border-theme focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 focus:outline-none p-4 rounded-2xl text-xs font-semibold leading-relaxed h-20 shadow-theme"
+                className="w-full bg-theme-card border border-theme focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 focus:outline-none p-4 rounded-2xl text-xs font-semibold leading-relaxed h-20 shadow-theme text-theme-primary"
               />
             </div>
             
-            <div className="p-4 bg-theme-card rounded-2xl border border-theme space-y-3 shadow-xs">
+            <div className="p-4 bg-theme-card rounded-2xl border border-theme space-y-3 shadow-xs text-theme-primary">
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-theme-primary">
                 <TrendingUp size={16} /> Resumo Prático
               </div>
@@ -864,7 +864,7 @@ export default function WeighingWorksheet() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between bg-theme-card border border-theme rounded-3xl p-4 px-6 shadow-xs">
+          <div className="flex items-center justify-between bg-theme-card border border-theme rounded-3xl p-4 px-6 shadow-xs text-theme-primary">
             <button 
               onClick={() => setActiveTab('sheets')}
               className="btn-outline px-4 py-2 text-xs"
@@ -875,7 +875,7 @@ export default function WeighingWorksheet() {
             {activeSheetId && activeSheetId !== 'temp' && (
               <button 
                 onClick={() => handleDeleteSheet(activeSheetId)}
-                className="btn-outline text-red-500 hover:bg-red-50 hover:text-red-600 border-red-200 text-xs flex items-center gap-1.5"
+                className="btn-outline text-red-500 hover:bg-red-50 dark:bg-red-950/30 hover:text-red-600 border-red-200 dark:border-red-800 text-xs flex items-center gap-1.5"
               >
                 <Trash2 size={14} /> Excluir Planilha
               </button>
@@ -893,11 +893,11 @@ export default function WeighingWorksheet() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="bg-theme-card rounded-3xl border border-theme shadow-xl p-6 max-w-sm w-full space-y-4"
+              className="bg-theme-card rounded-3xl border border-theme shadow-xl p-6 max-w-sm w-full space-y-4 text-theme-primary"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 text-red-500">
-                <div className="p-3 bg-red-50 rounded-2xl border border-red-100">
+                <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-2xl border border-red-100 dark:border-red-800">
                   <Trash2 size={24} />
                 </div>
                 <div>

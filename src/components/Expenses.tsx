@@ -167,7 +167,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
   return (
     <div className="space-y-6 legacy-light">
       {/* Tabs */}
-      <div className="flex border-b border-theme gap-4">
+      <div className="flex border-b border-theme gap-4 bg-theme-card text-theme-primary">
         <button 
           onClick={() => { setActiveTab('variaveis'); setSearchTerm(''); }}
           className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'variaveis' ? 'text-theme-primary' : 'text-theme-secondary hover:text-theme-primary'}`}
@@ -191,7 +191,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder={activeTab === 'variaveis' ? "Pesquisar despesa..." : "Pesquisar custo fixo..."}
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-theme-primary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -224,8 +224,8 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
 
       {activeTab === 'fixas' && (
         /* Fixed Cost Proportional Cards Dashboard */
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-theme-card p-5 rounded-3xl border border-theme">
-          <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4 shadow-theme">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-theme-card p-5 rounded-3xl border border-theme text-theme-primary">
+          <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4 shadow-theme text-theme-primary">
             <div className="p-3 bg-[var(--primary)]/10 text-theme-primary rounded-xl">
               <Banknote size={24} />
             </div>
@@ -235,7 +235,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
             </div>
           </div>
 
-          <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4 shadow-theme">
+          <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4 shadow-theme text-theme-primary">
             <div className="p-3 bg-[var(--primary)]/10 text-theme-primary rounded-xl">
               <TrendingUp size={24} />
             </div>
@@ -259,11 +259,11 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
 
       {activeTab === 'variaveis' ? (
         /* Variable Expenses Table */
-        <div className="bg-theme-card rounded-3xl border border-theme overflow-hidden shadow-sm">
+        <div className="bg-theme-card rounded-3xl border border-theme overflow-hidden shadow-sm text-theme-primary">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-theme-card border-bottom border-theme">
+                <tr className="bg-theme-card border-bottom border-theme text-theme-primary">
                   <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Lançamento</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Vencimento</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Tipo</th>
@@ -305,7 +305,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                         <button onClick={() => handleEditExpense(e)} className="p-2 hover:bg-theme-secondary rounded-lg transition-colors text-theme-secondary">
                           <Edit3 size={18} />
                         </button>
-                        <button onClick={() => onDelete(e.id)} className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-400">
+                        <button onClick={() => onDelete(e.id)} className="p-2 hover:bg-red-50 dark:bg-red-950/30 rounded-lg transition-colors text-red-400">
                           <Trash2 size={18} />
                         </button>
                       </div>
@@ -327,7 +327,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
         /* Fixed Expenses list */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredFixed.map((f) => (
-            <div key={f.id} className="bg-theme-card p-6 rounded-3xl border border-theme space-y-4 hover:border-[var(--primary)]/30 transition-colors relative shadow-sm">
+            <div key={f.id} className="bg-theme-card p-6 rounded-3xl border border-theme space-y-4 hover:border-[var(--primary)]/30 transition-colors relative shadow-sm text-theme-primary">
               <div className="flex justify-between items-start">
                 <div>
                   <span className="px-3 py-0.5 bg-[var(--primary)]/10 text-theme-primary text-[10px] font-bold rounded-full uppercase block w-fit mb-1 border border-[var(--primary)]/20">{f.expenseType}</span>
@@ -339,7 +339,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-theme flex justify-between items-center text-xs text-theme-secondary font-bold">
+              <div className="pt-3 border-t border-theme flex justify-between items-center text-xs text-theme-secondary font-bold bg-theme-card text-theme-primary">
                 <span className="flex items-center gap-1"><Clock size={14} className="text-theme-primary" /> Dia Vencimento: {f.dueDate}</span>
                 <span className="bg-theme-card px-2 py-1 rounded text-[10px] text-theme-primary font-extrabold uppercase border border-theme">Suporta R$ {(totalActiveHeads > 0 ? f.value / totalActiveHeads : 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}/animal</span>
               </div>
@@ -348,7 +348,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <button onClick={() => handleEditFixed(f)} className="p-2 hover:bg-theme-secondary text-theme-secondary rounded-xl transition-colors">
                   <Edit3 size={16} />
                 </button>
-                <button onClick={() => handleDeleteFixed(f.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-xl transition-colors">
+                <button onClick={() => handleDeleteFixed(f.id)} className="p-2 hover:bg-red-50 dark:bg-red-950/30 text-red-500 rounded-xl transition-colors">
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -373,7 +373,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card text-theme-primary">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingExpense(null); }}
@@ -404,7 +404,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                       <div className="relative flex-1">
                         <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                         <select 
-                          className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none appearance-none bg-theme-card font-bold"
+                          className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none appearance-none bg-theme-card font-bold text-theme-primary"
                           value={formData.type}
                           onChange={(e) => setFormData({...formData, type: e.target.value as any})}
                         >
@@ -425,7 +425,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                         <input 
                           type="text" 
                           placeholder="Ex: Energia, Ferramenta..." 
-                          className="w-full px-3 py-1.5 border border-theme rounded-lg bg-theme-card text-sm"
+                          className="w-full px-3 py-1.5 border border-theme rounded-lg bg-theme-card text-sm text-theme-primary"
                           value={newCustomType}
                           onChange={(e) => setNewCustomType(e.target.value)}
                         />
@@ -455,7 +455,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     <input 
                       required
                       type="date" 
-                      className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                      className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
                       value={formData.date}
                       onChange={(e) => setFormData({...formData, date: e.target.value})}
                     />
@@ -468,7 +468,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                     <input 
                       type="date" 
-                      className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                      className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
                       value={formData.dueDate || ''}
                       onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
                     />
@@ -480,7 +480,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
                     value={formData.description || ''}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     placeholder="Ex: Nota fiscal Nº 453"
@@ -491,7 +491,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Vendedor ou Fornecedor</label>
                   <input 
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
                     value={formData.provider || ''}
                     onChange={(e) => setFormData({...formData, provider: e.target.value})}
                     placeholder="Nome da empresa ou revenda..."
@@ -504,7 +504,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     required
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary text-base"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary text-base bg-theme-card"
                     value={formData.value || ''}
                     onChange={(e) => setFormData({...formData, value: Number(e.target.value)})}
                   />
@@ -513,7 +513,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <div className="col-span-2">
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Observações adicionais</label>
                   <textarea 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px]"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px] bg-theme-card text-theme-primary"
                     value={formData.observation || ''}
                     onChange={(e) => setFormData({...formData, observation: e.target.value})}
                     placeholder="Qualquer detalhe extra..."
@@ -549,7 +549,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card text-theme-primary">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setIsFixedFormOpen(false)}
@@ -577,7 +577,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card text-theme-primary"
                   value={fixedFormData.description || ''}
                   onChange={(e) => setFixedFormData({...fixedFormData, description: e.target.value})}
                   placeholder="Ex: Arrendamento da Sede, Energia Elétrica Cemig, Pro-Labore..."
@@ -588,7 +588,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Categoria</label>
                   <select 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card font-medium"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card font-medium text-theme-primary"
                     value={fixedFormData.expenseType}
                     onChange={(e) => setFixedFormData({...fixedFormData, expenseType: e.target.value})}
                   >
@@ -610,7 +610,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                     type="number" 
                     min="1" 
                     max="31" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card text-theme-primary"
                     value={fixedFormData.dueDate || ''}
                     onChange={(e) => setFixedFormData({...fixedFormData, dueDate: e.target.value})}
                     placeholder="Ex: 10"
@@ -624,7 +624,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                   required
                   type="number" 
                   step="0.01" 
-                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none font-bold text-theme-primary text-lg"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none font-bold text-theme-primary text-lg bg-theme-card"
                   value={fixedFormData.value || ''}
                   onChange={(e) => setFixedFormData({...fixedFormData, value: Number(e.target.value)})}
                 />

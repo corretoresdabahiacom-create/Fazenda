@@ -88,7 +88,7 @@ function EquipesTab({ items, onSave, onDelete }: { items: Team[]; onSave: (t: Te
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {items.map((t) => (
-          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
+          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme text-theme-primary">
             <h3 className="font-bold text-theme-primary">{t.name}</h3>
             {t.memberNames && <p className="text-xs text-theme-secondary mt-1">{t.memberNames}</p>}
             <button onClick={() => confirm('Excluir?') && onDelete(t.id)} className="text-xs font-semibold text-red-400 mt-2 flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
@@ -132,7 +132,7 @@ function EscalasTab({ items, teams, onSave, onDelete }: { items: WorkSchedule[];
           <Plus size={18} /> Nova Escala
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Equipe</th><th className="text-left p-3">Dias</th><th className="text-left p-3">Horário</th><th className="p-3"></th></tr>
@@ -191,7 +191,7 @@ function TreinamentosTab({ items, onSave, onDelete }: { items: Training[]; onSav
           <Plus size={18} /> Novo Treinamento
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Data</th><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Treinamento</th><th className="text-left p-3">Fornecedor</th><th className="p-3"></th></tr>
@@ -244,7 +244,7 @@ function EpisTab({ items, onSave, onDelete }: { items: PPEItem[]; onSave: (p: PP
           <Plus size={18} /> Novo EPI
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Item</th><th className="text-left p-3">Entrega</th><th className="text-left p-3">Validade</th><th className="p-3"></th></tr>
@@ -297,7 +297,7 @@ function CertificacoesTab({ items, onSave, onDelete }: { items: Certification[];
           <Plus size={18} /> Nova Certificação
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Certificação</th><th className="text-left p-3">Emissão</th><th className="text-left p-3">Validade</th><th className="p-3"></th></tr>
@@ -362,7 +362,7 @@ function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
       <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary bg-theme-card text-theme-primary">Cancelar</button>
     </div>
   );
 }

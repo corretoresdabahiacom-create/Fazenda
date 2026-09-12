@@ -218,7 +218,7 @@ function buildEstadosTable(tables: ParsedTable[]): { estado: string; valor: stri
 function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry: CambioEntry | null; flag: string; decimals?: number }) {
   if (!entry) {
     return (
-      <div className="bg-theme-card rounded-2xl border border-theme p-3 min-w-0 shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme p-3 min-w-0 shadow-theme text-theme-primary">
         <p className="text-[11px] text-theme-secondary truncate">{flag} {label}</p>
         <p className="text-xs text-theme-secondary mt-1">Indisponível</p>
       </div>
@@ -231,7 +231,7 @@ function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry
   const formatted = entry.venda.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   const isLongValue = formatted.length > 9;
   return (
-    <div className="bg-theme-card rounded-2xl border border-theme p-3 min-w-0 overflow-hidden shadow-theme">
+    <div className="bg-theme-card rounded-2xl border border-theme p-3 min-w-0 overflow-hidden shadow-theme text-theme-primary">
       <div className="flex items-center justify-between mb-1.5 gap-1">
         <p className="text-[11px] font-bold text-theme-secondary truncate">{flag} {label}</p>
         {entry.variacaoPct !== 0 && (
@@ -261,7 +261,7 @@ function VerFonte({ fonte, dataHora, url }: { fonte: string; dataHora?: string; 
   return (
     <details className="mt-1.5 text-[10px]">
       <summary className="cursor-pointer font-semibold text-theme-secondary underline decoration-dotted select-none">Ver fonte</summary>
-      <div className="mt-1 pl-2 border-l-2 border-theme space-y-0.5">
+      <div className="mt-1 pl-2 border-l-2 border-theme space-y-0.5 bg-theme-card text-theme-primary">
         <p className="text-theme-secondary"><span className="font-bold">Fonte:</span> {fonte}</p>
         {dataHora && <p className="text-theme-secondary"><span className="font-bold">Data/hora:</span> {dataHora}</p>}
         {url ? (
@@ -279,7 +279,7 @@ function VerFonte({ fonte, dataHora, url }: { fonte: string; dataHora?: string; 
 function Badge({ kind }: { kind: 'atual' | 'futuro' }) {
   return (
     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap ${
-      kind === 'futuro' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300' : 'bg-green-50 text-green-700'
+      kind === 'futuro' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300' : 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300'
     }`}>
       {kind === 'futuro' ? 'Futuro B3' : 'Mercado Atual'}
     </span>
@@ -636,7 +636,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       {showBahiaDashboard && <DashboardBahia />}
       {showGrafico && <GraficoPrecoClima produto={produto} produtoLabel={produtoDef.label} estado={estado} cidade={cidade} />}
       <div>
-        {cambioError && <p className="text-xs text-red-500 bg-red-50 rounded-xl p-2 mb-2">{cambioError}</p>}
+        {cambioError && <p className="text-xs text-red-500 bg-red-50 dark:bg-red-950/30 rounded-xl p-2 mb-2">{cambioError}</p>}
         <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Moedas</p>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-2">
           <CambioCard label="Dólar (USD)" entry={cambio?.usd ?? null} flag="🇺🇸" decimals={4} />
@@ -660,10 +660,10 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         )}
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme p-4 space-y-3 shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 space-y-3 shadow-theme text-theme-primary">
         <button
           onClick={() => { setProdutoTemp(produto); setIsProdutoModalOpen(true); }}
-          className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-theme bg-theme-secondary text-left"
+          className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-theme bg-theme-secondary text-left text-theme-primary"
         >
           <div>
             <p className="text-[10px] uppercase text-theme-secondary font-bold">Produto selecionado</p>
@@ -677,7 +677,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <label className="text-[9px] font-bold text-theme-secondary uppercase block mb-0.5 ml-1">País</label>
             <div className="relative">
               <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
-              <select value={pais} disabled className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none opacity-80 truncate">
+              <select value={pais} disabled className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none opacity-80 truncate text-theme-primary">
                 {PAISES.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
@@ -689,7 +689,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               <select
                 value={estado}
                 onChange={e => { setEstado(e.target.value); setRegiao(''); setCidade(''); setShowAllCities(false); }}
-                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none truncate"
+                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none truncate text-theme-primary"
               >
                 <option value="">Todos os estados</option>
                 {estadosComDado.map(uf => <option key={uf} value={uf}>{uf}</option>)}
@@ -704,7 +704,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 value={regiao}
                 onChange={e => { setRegiao(e.target.value); setCidade(''); }}
                 disabled={!estado || regioesNoEstado.length === 0}
-                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60 truncate"
+                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60 truncate text-theme-primary"
               >
                 <option value="">{!estado ? 'Escolha estado' : regioesNoEstado.length === 0 ? 'Sem região' : 'Todas as regiões'}</option>
                 {regioesNoEstado.map(r => <option key={r} value={r}>{r}</option>)}
@@ -719,7 +719,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 value={cidade}
                 onChange={e => setCidade(e.target.value)}
                 disabled={!estado || locaisNoEstado.length === 0}
-                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60 truncate"
+                className="w-full pl-9 pr-3 py-2 bg-theme-secondary border border-theme rounded-xl text-sm appearance-none disabled:opacity-60 truncate text-theme-primary"
               >
                 <option value="">{!estado ? 'Escolha estado' : locaisNoEstado.length === 0 ? 'Sem cidade/praça' : 'Todas as cidades'}</option>
                 {locaisNoEstado.map(c => <option key={c} value={c}>{c}</option>)}
@@ -755,7 +755,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 </button>
               ))}
               {realCities.length > 8 && (
-                <button onClick={() => setShowAllCities(!showAllCities)} className="text-[10px] font-bold px-2 py-1 rounded-full border border-dashed border-theme text-[var(--primary)]">
+                <button onClick={() => setShowAllCities(!showAllCities)} className="text-[10px] font-bold px-2 py-1 rounded-full border border-dashed border-theme text-[var(--primary)] bg-theme-card text-theme-primary">
                   {showAllCities ? 'Ver menos' : `Ver todas (${realCities.length})`}
                 </button>
               )}
@@ -765,7 +765,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         <button
           onClick={handleDetectLocal}
           disabled={detectingLocal}
-          className="flex items-center justify-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-theme text-theme-secondary disabled:opacity-60 w-full sm:w-auto"
+          className="flex items-center justify-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-theme text-theme-secondary disabled:opacity-60 w-full sm:w-auto bg-theme-card text-theme-primary"
         >
           <Navigation size={14} /> {detectingLocal ? 'Detectando...' : 'Usar minha localização'}
         </button>
@@ -780,7 +780,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       {isProdutoModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-theme-card rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col shadow-theme">
-            <div className="p-4 border-b border-theme">
+            <div className="p-4 border-b border-theme bg-theme-card text-theme-primary">
               <h3 className="font-bold text-theme-primary text-sm">Escolha o produto</h3>
             </div>
             <div className="flex-1 overflow-y-auto p-2">
@@ -791,8 +791,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 </label>
               ))}
             </div>
-            <div className="p-4 border-t border-theme flex gap-2">
-              <button onClick={() => setIsProdutoModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-theme text-theme-secondary font-semibold text-sm">Cancelar</button>
+            <div className="p-4 border-t border-theme flex gap-2 bg-theme-card text-theme-primary">
+              <button onClick={() => setIsProdutoModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-theme text-theme-secondary font-semibold text-sm bg-theme-card text-theme-primary">Cancelar</button>
               <button onClick={() => { setProduto(produtoTemp); setEstado(''); setRegiao(''); setCidade(''); setShowAllCities(false); setIsProdutoModalOpen(false); }} className="flex-1 py-2.5 rounded-xl bg-[var(--primary)] text-white font-bold text-sm">Ok</button>
             </div>
           </div>
@@ -802,12 +802,12 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
       {loading && <p className="text-sm text-theme-secondary text-center py-8">Buscando cotações...</p>}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
           <AlertTriangle size={18} className="text-red-500 shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-red-700">Não foi possível buscar as cotações agora</p>
+            <p className="text-sm font-semibold text-red-700 dark:text-red-300">Não foi possível buscar as cotações agora</p>
             <p className="text-xs text-red-600 mt-1">{error}</p>
-            <button onClick={loadCotacoes} className="text-xs font-bold text-red-700 underline mt-2 flex items-center gap-1">
+            <button onClick={loadCotacoes} className="text-xs font-bold text-red-700 dark:text-red-300 underline mt-2 flex items-center gap-1">
               <RefreshCw size={12} /> Tentar novamente
             </button>
           </div>
@@ -986,30 +986,30 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               <h2 className="text-sm font-bold text-theme-primary">🇧🇷 Preço no Mercado Selecionado{localBusca ? ` — ${localBusca}` : ' — Geral (Brasil)'}</h2>
               <AlertasCotacoes produto={produto} produtoLabel={produtoDef.label} quotesResponse={quotesResponse} />
               {['novilho', 'novilha'].includes(produto) && !officialOverride && (
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
-                  <p className="text-xs text-amber-800">
+                <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-3">
+                  <p className="text-xs text-amber-800 dark:text-amber-300">
                     <strong>Cobertura limitada:</strong> {produtoDef.label} tem bem menos fontes públicas que Boi Gordo e Vaca. Hoje só encontramos dado oficial em São Paulo (IEA-SP). Para as demais praças, use o Boi Gordo e a Vaca como referência de mercado da região.
                   </p>
                 </div>
               )}
               {officialOverride && (
-                <div className={`border-2 rounded-2xl p-4 ${officialOverride.sourceUrl ? 'bg-green-50 border-green-300' : 'bg-blue-50 dark:bg-blue-950/40 border-blue-300'}`}>
+                <div className={`border-2 rounded-2xl p-4 ${officialOverride.sourceUrl ? 'bg-green-50 dark:bg-green-950/30 border-green-300 dark:border-green-700' : 'bg-blue-50 dark:bg-blue-950/40 border-blue-300'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${officialOverride.sourceUrl ? 'text-green-800 bg-green-100' : 'text-blue-800 dark:text-blue-200 bg-blue-100'}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${officialOverride.sourceUrl ? 'text-green-800 dark:text-green-300 bg-green-100 dark:bg-green-900/30' : 'text-blue-800 dark:text-blue-200 bg-blue-100'}`}>
                       {officialOverride.sourceUrl ? '🏛️' : '✍️'} {officialOverride.sourceUrl ? 'Fonte Oficial' : 'Cadastro Manual'} — {officialOverride.fonte}
                     </span>
                   </div>
-                  <p className={`text-2xl font-bold ${officialOverride.sourceUrl ? 'text-green-900' : 'text-blue-900 dark:text-blue-100'}`}>R$ {officialOverride.preco} <span className="text-sm font-normal">/{officialOverride.unidade}</span></p>
-                  <p className={`text-[10px] mt-1 ${officialOverride.sourceUrl ? 'text-green-700' : 'text-blue-700 dark:text-blue-300'}`}>
+                  <p className={`text-2xl font-bold ${officialOverride.sourceUrl ? 'text-green-900 dark:text-green-200' : 'text-blue-900 dark:text-blue-100'}`}>R$ {officialOverride.preco} <span className="text-sm font-normal">/{officialOverride.unidade}</span></p>
+                  <p className={`text-[10px] mt-1 ${officialOverride.sourceUrl ? 'text-green-700 dark:text-green-300' : 'text-blue-700 dark:text-blue-300'}`}>
                     {officialOverride.sourceUrl ? `Preço oficial específico de ${estado} — mais preciso que a referência nacional abaixo.` : 'Preço lançado manualmente no Painel Admin — confira a data antes de usar pra negociar.'}
                   </p>
                   <VerFonte fonte={officialOverride.fonte} dataHora={officialOverride.fetchedAt ? new Date(officialOverride.fetchedAt).toLocaleString('pt-BR') : undefined} url={officialOverride.sourceUrl || ''} />
                 </div>
               )}
-              {!primaryAtual && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4 shadow-theme">Nenhum dado de mercado atual encontrado para {produtoDef.label} no momento.</p>}
+              {!primaryAtual && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4 shadow-theme text-theme-primary">Nenhum dado de mercado atual encontrado para {produtoDef.label} no momento.</p>}
               {buscouCidadeEspecifica && !regionMatch && !officialOverride && (
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
-                  <p className="text-xs font-semibold text-amber-800">
+                <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-3">
+                  <p className="text-xs font-semibold text-amber-800 dark:text-amber-300">
                     Não temos cotação específica para <strong>{cidade}</strong> no momento.
                     {capitalPreco ? <> Como referência mais próxima, a capital <strong>{capitalNome}</strong> está cotada em <strong>R$ {capitalPreco}</strong>.</> : ' Veja o preço geral do estado/Brasil abaixo.'}
                   </p>
@@ -1032,7 +1032,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 </details>
               )}
               {primaryAtual && displayRow && !officialOverride && (
-                <div className={`bg-theme-card rounded-2xl border-2 p-4 ${priceCheck.isAnomaly ? 'border-red-300' : 'border-[var(--primary)]/20'}`}>
+                <div className={`bg-theme-card rounded-2xl border-2 p-4 ${priceCheck.isAnomaly ? 'border-red-300 dark:border-red-700' : 'border-[var(--primary)]/20'}`}>
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <Badge kind="atual" />
                     {localBusca && !regionMatch && <span className="text-[9px] text-theme-secondary">(local não encontrado, mostrando geral)</span>}
@@ -1042,9 +1042,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                     Indicador Nacional CEPEA/ESALQ — a referência oficial de preço à vista usada como base pros contratos futuros da B3. Não muda por estado porque é um número único, calculado pra todo o Brasil.
                   </p>
                   {priceCheck.isAnomaly && (
-                    <div className="bg-red-50 border border-red-200 rounded-xl p-2.5 mb-3 flex items-start gap-2">
+                    <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-2.5 mb-3 flex items-start gap-2">
                       <AlertTriangle size={14} className="text-red-500 shrink-0 mt-0.5" />
-                      <p className="text-[11px] text-red-700">
+                      <p className="text-[11px] text-red-700 dark:text-red-300">
                         <strong>Atenção:</strong> este valor está fora da faixa normal esperada pra {produtoDef.label} — pode ser oscilação real de mercado, ou um erro de leitura da fonte. Confira em "Ver fonte" antes de usar pra negociar.
                       </p>
                     </div>
@@ -1083,7 +1083,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 if (!ieaRow) return null;
                 const ieaAnomaly = checkSimplePriceAnomaly(produto, ieaRow.preco);
                 return (
-                  <div className={`bg-blue-50 dark:bg-blue-950/40 border rounded-2xl p-3 ${ieaAnomaly ? 'border-red-300' : 'border-blue-200 dark:border-blue-800'}`}>
+                  <div className={`bg-blue-50 dark:bg-blue-950/40 border rounded-2xl p-3 ${ieaAnomaly ? 'border-red-300 dark:border-red-700' : 'border-blue-200 dark:border-blue-800'}`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-bold text-blue-800 dark:text-blue-200">🏛️ IEA-SP (Oficial — só Estado de São Paulo)</p>
@@ -1158,7 +1158,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 if (!row) return null;
                 const aibaAnomaly = checkSimplePriceAnomaly(produto, row.preco);
                 return (
-                  <div className={`bg-blue-50 dark:bg-blue-950/40 border rounded-2xl p-3 ${aibaAnomaly ? 'border-red-300' : 'border-blue-200 dark:border-blue-800'}`}>
+                  <div className={`bg-blue-50 dark:bg-blue-950/40 border rounded-2xl p-3 ${aibaAnomaly ? 'border-red-300 dark:border-red-700' : 'border-blue-200 dark:border-blue-800'}`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-bold text-blue-800 dark:text-blue-200">🏛️ AIBA (Oeste da Bahia) — {row.produto}</p>
@@ -1175,9 +1175,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
             <div className="space-y-2">
               <h2 className="text-sm font-bold text-theme-primary">📈 Futuro B3 (b3.com.br)</h2>
-              {!primaryFuturo && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4 shadow-theme">Sem contrato futuro na B3 disponível para {produtoDef.label} no momento.</p>}
+              {!primaryFuturo && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4 shadow-theme text-theme-primary">Sem contrato futuro na B3 disponível para {produtoDef.label} no momento.</p>}
               {primaryFuturo && (
-                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
                   <div className="p-3 pb-1 flex items-center gap-2">
                     <Badge kind="futuro" />
                     <span className="text-[9px] font-bold text-theme-secondary bg-theme-secondary px-1.5 py-0.5 rounded-full">{detectCurrency(primaryFuturo.rows[0])}</span>
@@ -1200,9 +1200,9 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
 
             <div className="space-y-2">
               <h2 className="text-sm font-bold text-theme-primary">🗺️ Preço por Estados da Federação</h2>
-              {estadosTable.length === 0 && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4 shadow-theme">Sem comparativo por estado disponível para {produtoDef.label} no momento.</p>}
+              {estadosTable.length === 0 && <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4 shadow-theme text-theme-primary">Sem comparativo por estado disponível para {produtoDef.label} no momento.</p>}
               {estadosTable.length > 0 && (
-                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-theme-secondary">
@@ -1222,7 +1222,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 </div>
               )}
               {pecuariaData && pecuariaData.rows[0] && (
-                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
                   <div className="p-3 pb-1">
                     <p className="text-xs font-bold text-theme-primary">Pecuária.com.br — fonte de mercado (conferência)</p>
                     <p className="text-[9px] text-theme-secondary">{pecuariaData.unidade}</p>
@@ -1250,7 +1250,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
             <div className="space-y-2">
               <h2 className="text-sm font-bold text-theme-primary">🌍 Mercado Internacional</h2>
               {boiMundoData ? (
-                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+                <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
                   <div className="p-3 pb-1">
                     <p className="text-xs font-bold text-theme-primary">Comparativo internacional — Boi Gordo</p>
                     <p className="text-[9px] text-theme-secondary">{boiMundoData.unidade}</p>
@@ -1280,7 +1280,7 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                   )}
                 </div>
               ) : (
-                <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
+                <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme text-theme-primary">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div className="bg-theme-secondary rounded-xl p-3">
                       <p className="text-[10px] font-bold text-theme-secondary uppercase">🇺🇸 Estados Unidos</p>

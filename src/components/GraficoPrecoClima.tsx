@@ -74,9 +74,9 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
       <p className="text-xs font-bold text-theme-primary mb-1">{titulo}</p>
       <p className="text-[10px] text-theme-secondary mb-3">{dados.local} · {dados.granularidade === 'mes' ? 'por mês' : 'por dia'}</p>
       {dados.avisoPreco && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-2 mb-3 flex items-start gap-2">
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-2 mb-3 flex items-start gap-2">
           <AlertTriangle size={12} className="text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-[10px] text-amber-800">{dados.avisoPreco}</p>
+          <p className="text-[10px] text-amber-800 dark:text-amber-300">{dados.avisoPreco}</p>
         </div>
       )}
       <ResponsiveContainer width="100%" height={280}>
@@ -132,7 +132,7 @@ export default function GraficoPrecoClima({ produto, produtoLabel, estado, cidad
       </div>
 
       {atual.loading && <p className="text-xs text-theme-secondary text-center py-6">Montando o gráfico...</p>}
-      {atual.error && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">{atual.error}</p>}
+      {atual.error && <p className="text-xs text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3">{atual.error}</p>}
       <GraficoIndividual titulo={`${produtoLabel} × Clima — período selecionado`} dados={atual.dados} />
 
       {anoPassado.error && <p className="text-xs text-theme-secondary">Não foi possível comparar com o ano passado agora.</p>}

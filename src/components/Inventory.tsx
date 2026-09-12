@@ -138,7 +138,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder="Pesquisar estoque por item, fornecedor..." 
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm text-theme-primary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -172,14 +172,14 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
             <motion.div 
               key={item.id}
               layout
-              className="bg-theme-card p-6 rounded-3xl border border-theme shadow-sm flex flex-col justify-between hover:border-[var(--primary)]/40 transition-all group relative overflow-hidden"
+              className="bg-theme-card p-6 rounded-3xl border border-theme shadow-sm flex flex-col justify-between hover:border-[var(--primary)]/40 transition-all group relative overflow-hidden text-theme-primary"
             >
               <div>
                 <div className="flex items-start justify-between">
                   <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${
                     item.category === 'Supply' 
                       ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-100 text-blue-700 dark:text-blue-300' 
-                      : 'bg-orange-50 border-orange-100 text-orange-700'
+                      : 'bg-orange-50 dark:bg-orange-950/30 border-orange-100 dark:border-orange-800 text-orange-700 dark:text-orange-300'
                   }`}>
                     {item.category === 'Supply' ? '📦 Suprimento' : '⚙️ Equipamento'}
                   </span>
@@ -201,7 +201,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                     </button>
                     <button 
                       onClick={() => handleDelete(item.id)} 
-                      className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg"
+                      className="p-1.5 hover:bg-red-50 dark:bg-red-950/30 text-red-500 rounded-lg"
                       title="Excluir"
                     >
                       <Trash2 size={16} />
@@ -223,7 +223,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
 
                   {/* Store and contact detail section */}
                   {(item.storeName || item.contactPhone || item.responsiblePerson) && (
-                    <div className="mt-4 pt-3.5 border-t border-theme space-y-2 text-xs font-medium text-theme-secondary">
+                    <div className="mt-4 pt-3.5 border-t border-theme space-y-2 text-xs font-medium text-theme-secondary bg-theme-card text-theme-primary">
                       {item.storeName && (
                         <div className="flex items-center gap-1.5">
                           <Store size={14} className="text-theme-secondary" />
@@ -247,7 +247,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-theme flex justify-between items-center text-[10px] text-theme-secondary font-bold uppercase">
+              <div className="mt-4 pt-3 border-t border-theme flex justify-between items-center text-[10px] text-theme-secondary font-bold uppercase bg-theme-card text-theme-primary">
                 <span>Última Entrada</span>
                 <span>{format(new Date(item.lastUpdated), 'dd/MM/yyyy HH:mm')}</span>
               </div>
@@ -255,7 +255,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
           ))}
 
           {filteredInventory.length === 0 && (
-            <div className="col-span-full py-16 text-center text-theme-secondary italic bg-theme-card rounded-3xl border border-theme">
+            <div className="col-span-full py-16 text-center text-theme-secondary italic bg-theme-card rounded-3xl border border-theme text-theme-primary">
               Nenhum item em estoque correspondente aos filtros.
             </div>
           )}
@@ -264,7 +264,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
         {/* Right side change history analyzer */}
         <div className="xl:col-span-1">
           {selectedItemForHistory ? (
-            <div className="bg-theme-card border border-theme rounded-3xl p-6 shadow-sm space-y-4">
+            <div className="bg-theme-card border border-theme rounded-3xl p-6 shadow-sm space-y-4 text-theme-primary">
               <div className="flex justify-between items-start">
                 <div>
                   <h4 className="text-xs font-black text-theme-secondary uppercase">Linha do Tempo</h4>
@@ -278,7 +278,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 </button>
               </div>
 
-              <div className="space-y-4 pt-2 border-t border-theme overflow-y-auto max-h-[420px] pr-1">
+              <div className="space-y-4 pt-2 border-t border-theme overflow-y-auto max-h-[420px] pr-1 bg-theme-card text-theme-primary">
                 {selectedItemForHistory.history && selectedItemForHistory.history.length > 0 ? (
                   selectedItemForHistory.history.map((log, idx) => (
                     <div key={idx} className="flex gap-3 text-xs">
@@ -311,7 +311,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
               </div>
             </div>
           ) : (
-            <div className="bg-theme-card border border-dashed border-theme rounded-3xl p-6.5 text-center text-theme-secondary italic text-xs">
+            <div className="bg-theme-card border border-dashed border-theme rounded-3xl p-6.5 text-center text-theme-secondary italic text-xs text-theme-primary">
               💡 Clique no ícone de relógio (<History size={13} className="inline mx-0.5" />) em qualquer item do estoque para inspecionar seu histórico e rastreabilidade de compras ou suprimentos.
             </div>
           )}
@@ -326,7 +326,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card text-theme-primary">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setIsFormOpen(false)}
@@ -378,7 +378,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                  className="w-full px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   placeholder="Ex: Sal Proteinado, Vacina Aftosa, Arame Farpado..."
@@ -391,7 +391,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   <input 
                     required
                     type="number" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black bg-theme-card text-theme-primary"
                     value={formData.quantity || ''}
                     onChange={(e) => {
                       const qty = Number(e.target.value);
@@ -408,7 +408,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
                     value={formData.unit || ''}
                     onChange={(e) => setFormData({...formData, unit: e.target.value})}
                     placeholder="Ex: sacos, kg, litros, rolos..."
@@ -422,7 +422,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   <input 
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary bg-theme-card"
                     value={formData.unitPrice || ''}
                     onChange={(e) => {
                       const val = Number(e.target.value);
@@ -444,7 +444,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
               </div>
 
               {/* Advanced Tracking Custom fields */}
-              <div className="pt-2 border-t border-theme space-y-3">
+              <div className="pt-2 border-t border-theme space-y-3 bg-theme-card text-theme-primary">
                 <h4 className="text-xs font-black text-theme-secondary uppercase flex items-center gap-1">
                   <ShoppingCart size={13} className="text-theme-primary" /> Dados do Fornecedor & Rastreabilidade
                 </h4>
@@ -456,7 +456,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                       <Store className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="text" 
-                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium"
+                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
                         value={formData.storeName || ''}
                         onChange={(e) => setFormData({...formData, storeName: e.target.value})}
                         placeholder="Ex: Agropecuária Alvorada..."
@@ -470,7 +470,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="tel" 
-                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium"
+                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
                         value={formData.contactPhone || ''}
                         onChange={(e) => setFormData({...formData, contactPhone: e.target.value})}
                         placeholder="Ex: (34) 99999-9999"
@@ -484,7 +484,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="text" 
-                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium"
+                        className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
                         value={formData.responsiblePerson || ''}
                         onChange={(e) => setFormData({...formData, responsiblePerson: e.target.value})}
                         placeholder="Ex: Sr. Francisco Vaqueiro..."

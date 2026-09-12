@@ -133,7 +133,7 @@ export default function ConsultorRuralIA({
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-theme-card border border-theme rounded-2xl px-4 py-2.5 flex items-center gap-2 text-sm text-theme-secondary shadow-theme">
+            <div className="bg-theme-card border border-theme rounded-2xl px-4 py-2.5 flex items-center gap-2 text-sm text-theme-secondary shadow-theme text-theme-primary">
               <Loader2 size={14} className="animate-spin" /> Consultando...
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function ConsultorRuralIA({
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ex: posso plantar milho semana que vem?"
-          className="flex-1 border border-theme rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+          className="flex-1 border border-theme rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 bg-theme-card text-theme-primary"
         />
         <button
           type="submit"

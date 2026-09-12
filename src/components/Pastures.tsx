@@ -191,8 +191,8 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
       </AnimatePresence>
 
       {settings.farmName && (
-        <div className="bg-theme-card p-4 rounded-3xl border border-theme shadow-sm flex flex-wrap items-center gap-6">
-          <div className="flex items-center gap-3 pr-6 border-r border-theme">
+        <div className="bg-theme-card p-4 rounded-3xl border border-theme shadow-sm flex flex-wrap items-center gap-6 text-theme-primary">
+          <div className="flex items-center gap-3 pr-6 border-r border-theme bg-theme-card text-theme-primary">
             <div className="bg-[var(--primary)]/10 p-2 rounded-xl">
               <MapIcon className="text-theme-primary" size={20} />
             </div>
@@ -241,7 +241,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           <input 
             type="text" 
             placeholder="Pesquisar pastos..." 
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm text-theme-primary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -280,7 +280,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
             <motion.div 
               key={pasture.id}
               layout
-              className="bg-theme-card rounded-3xl border border-theme shadow-sm hover:border-[var(--primary)]/40 transition-colors flex flex-col justify-between overflow-hidden"
+              className="bg-theme-card rounded-3xl border border-theme shadow-sm hover:border-[var(--primary)]/40 transition-colors flex flex-col justify-between overflow-hidden text-theme-primary"
             >
               <div className="p-6 space-y-4">
                 <div className="flex justify-between items-start">
@@ -305,10 +305,10 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     >
                       <Sparkles size={14} />
                     </button>
-                    <button onClick={() => handleEdit(pasture)} className="p-1.5 hover:bg-theme-card border border-theme rounded-lg text-theme-secondary">
+                    <button onClick={() => handleEdit(pasture)} className="p-1.5 hover:bg-theme-card border border-theme rounded-lg text-theme-secondary text-theme-primary">
                       <Edit3 size={14} />
                     </button>
-                    <button onClick={() => handleDelete(pasture.id)} className="p-1.5 hover:bg-red-50 border border-red-100 rounded-lg text-red-500">
+                    <button onClick={() => handleDelete(pasture.id)} className="p-1.5 hover:bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-800 rounded-lg text-red-500">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -325,7 +325,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${
                       pasture.purpose === 'engorda' ? 'bg-[var(--primary)]/10 text-theme-primary border-[var(--primary)]/20' :
                       pasture.purpose === 'manutenção' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800' :
-                      'bg-purple-50 text-purple-800 border-purple-200'
+                      'bg-purple-50 dark:bg-purple-950/30 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-800'
                     }`}>
                       {pasture.purpose === 'engorda' ? '🐂 Engorda' :
                        pasture.purpose === 'manutenção' ? '🌾 Manutenção' :
@@ -335,7 +335,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 </div>
 
                 {/* stocking rate progress bar */}
-                <div className="space-y-1 pt-2 border-t border-theme">
+                <div className="space-y-1 pt-2 border-t border-theme bg-theme-card text-theme-primary">
                   <div className="flex justify-between text-xs font-bold">
                     <span className="text-theme-secondary">Lotação Atual ({season === 'aguas' ? 'Águas' : 'Seca'})</span>
                     <span className={pct > 100 ? 'text-red-500' : 'text-theme-primary'}>
@@ -364,7 +364,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      <div className={`p-2 rounded-xl flex items-center gap-2 border ${pasture.aiAnalysis.isTimeToTakeOutCattle ? 'bg-orange-50 border-orange-100 text-orange-700' : 'bg-slate-50 border-slate-100 text-theme-primary'}`}>
+                      <div className={`p-2 rounded-xl flex items-center gap-2 border ${pasture.aiAnalysis.isTimeToTakeOutCattle ? 'bg-orange-50 dark:bg-orange-950/30 border-orange-100 dark:border-orange-800 text-orange-700 dark:text-orange-300' : 'bg-slate-50 border-slate-100 text-theme-primary'}`}>
                         <span className="text-[10px] font-bold">{pasture.aiAnalysis.isTimeToTakeOutCattle ? '🚨 Saída Urgente (Pastejo Limite)' : '✅ Em Pastoreio'}</span>
                       </div>
                       <div className="p-2 rounded-xl bg-[var(--primary)]/5 border border-[var(--primary)]/10 text-theme-primary flex items-center gap-2">
@@ -381,7 +381,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           );
         })}
         {filteredPastures.length === 0 && (
-          <div className="col-span-full py-20 text-center text-theme-secondary bg-theme-card rounded-3xl border border-theme italic text-sm">
+          <div className="col-span-full py-20 text-center text-theme-secondary bg-theme-card rounded-3xl border border-theme italic text-sm text-theme-primary">
             Nenhum pasto cadastrado correspondente aos termos de pesquisa.
           </div>
         )}
@@ -395,7 +395,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card text-theme-primary">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingPasture(null); }}
@@ -425,7 +425,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-center text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-center text-theme-primary bg-theme-card"
                     value={formData.number || ''}
                     onChange={(e) => setFormData({...formData, number: e.target.value})}
                     placeholder="01"
@@ -436,7 +436,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
                     value={formData.name || ''}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     placeholder="Ex: Baixada do Rio, Morro Alto..."
@@ -451,7 +451,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     required
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black bg-theme-card text-theme-primary"
                     value={formData.size || ''}
                     onChange={(e) => setFormData({...formData, size: Number(e.target.value)})}
                     placeholder="Ex: 15.5"
@@ -462,7 +462,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Finalidade do Pasto</label>
                   <select 
                     required
-                    className="w-full px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                    className="w-full px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary"
                     value={formData.purpose || 'engorda'}
                     onChange={(e) => setFormData({...formData, purpose: e.target.value as any})}
                   >
@@ -477,13 +477,13 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div className="flex gap-2">
                     <input
                       type="date"
-                      className="flex-1 px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                      className="flex-1 px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary"
                       value={formData.nextRotationDate || ''}
                       onChange={(e) => setFormData({...formData, nextRotationDate: e.target.value || undefined})}
                     />
                     <input
                       type="time"
-                      className="w-28 px-2 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                      className="w-28 px-2 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary"
                       value={formData.nextRotationTime || ''}
                       onChange={(e) => setFormData({...formData, nextRotationTime: e.target.value || undefined})}
                     />
@@ -580,7 +580,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <input 
                     required
                     type="number" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-sm text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-sm text-theme-primary bg-theme-card"
                     value={formData.capacityAguas || ''}
                     onChange={(e) => setFormData({...formData, capacityAguas: Number(e.target.value)})}
                   />
@@ -590,7 +590,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <input 
                     required
                     type="number" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-sm text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-sm text-theme-primary bg-theme-card"
                     value={formData.capacitySeca || ''}
                     onChange={(e) => setFormData({...formData, capacitySeca: Number(e.target.value)})}
                   />

@@ -33,9 +33,9 @@ const TABS: { id: Tab; label: string; icon: typeof ArrowDownCircle }[] = [
 ];
 
 const statusColor: Record<string, string> = {
-  [AccountStatus.PENDENTE]: 'bg-amber-100 text-amber-700',
-  [AccountStatus.PAGO]: 'bg-green-100 text-green-700',
-  [AccountStatus.ATRASADO]: 'bg-red-100 text-red-700',
+  [AccountStatus.PENDENTE]: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+  [AccountStatus.PAGO]: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+  [AccountStatus.ATRASADO]: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
 };
 
 export default function Financeiro(props: Props) {
@@ -132,7 +132,7 @@ function ContasTab({ kind, items, costCenters, onSave, onDelete }: {
 
   return (
     <div className="space-y-3">
-      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme text-theme-primary">
         <p className="text-xs text-theme-secondary uppercase font-bold">Total {kind === 'pagar' ? 'a pagar' : 'a receber'}</p>
         <p className="text-2xl font-bold text-theme-primary">R$ {total.toFixed(2)}</p>
       </div>
@@ -143,7 +143,7 @@ function ContasTab({ kind, items, costCenters, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme text-theme-primary">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -239,7 +239,7 @@ function CentrosTab({ costCenters, onSave, onDelete }: {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {costCenters.map((c) => (
-          <div key={c.id} className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
+          <div key={c.id} className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme text-theme-primary">
             <span className="text-[10px] font-bold uppercase text-theme-secondary">{c.type}</span>
             <h3 className="font-bold text-theme-primary">{c.name}</h3>
             {c.linkedRef && <p className="text-xs text-theme-secondary">{c.linkedRef}</p>}
@@ -282,15 +282,15 @@ function FluxoTab({ payable, receivable }: { payable: AccountPayable[]; receivab
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme text-theme-primary">
         <p className="text-xs text-theme-secondary uppercase font-bold">Total a receber</p>
         <p className="text-2xl font-bold text-green-600">R$ {totalReceber.toFixed(2)}</p>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme text-theme-primary">
         <p className="text-xs text-theme-secondary uppercase font-bold">Total a pagar</p>
         <p className="text-2xl font-bold text-red-500">R$ {totalPagar.toFixed(2)}</p>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme text-theme-primary">
         <p className="text-xs text-theme-secondary uppercase font-bold">Saldo projetado</p>
         <p className={`text-2xl font-bold ${saldo >= 0 ? 'text-green-600' : 'text-red-500'}`}>R$ {saldo.toFixed(2)}</p>
       </div>
@@ -332,7 +332,7 @@ function SubmitRow({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex gap-2 pt-2">
       <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
+      <button type="button" onClick={onCancel} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary bg-theme-card text-theme-primary">Cancelar</button>
     </div>
   );
 }

@@ -107,9 +107,9 @@ export default function AlertasCotacoes({ produto, produtoLabel, quotesResponse 
   return (
     <div className="space-y-2">
       {alertas.map((a, i) => (
-        <div key={i} className={`rounded-xl p-2.5 flex items-start gap-2 ${a.severidade === 'atencao' ? 'bg-amber-50 border border-amber-200' : 'bg-green-50 border border-green-200'}`}>
+        <div key={i} className={`rounded-xl p-2.5 flex items-start gap-2 ${a.severidade === 'atencao' ? 'bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800' : 'bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800'}`}>
           {a.tipo === 'alvo_atingido' ? <Bell size={14} className="text-green-600 shrink-0 mt-0.5" /> : <AlertTriangle size={14} className="text-amber-600 shrink-0 mt-0.5" />}
-          <p className={`text-xs ${a.severidade === 'atencao' ? 'text-amber-800' : 'text-green-800'}`}>{a.mensagem}</p>
+          <p className={`text-xs ${a.severidade === 'atencao' ? 'text-amber-800 dark:text-amber-300' : 'text-green-800 dark:text-green-300'}`}>{a.mensagem}</p>
         </div>
       ))}
 

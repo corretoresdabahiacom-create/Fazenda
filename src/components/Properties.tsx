@@ -179,7 +179,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   required
                   value={formData.name ?? ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                   placeholder="Ex: Fazenda Terra Rica"
                 />
               </div>
@@ -190,7 +190,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   required
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as PropertyType })}
-                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                 >
                   {Object.values(PropertyType).map((t) => (
                     <option key={t} value={t}>{t}</option>
@@ -204,7 +204,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                   <input
                     value={formData.partnerName ?? ''}
                     onChange={(e) => setFormData({ ...formData, partnerName: e.target.value })}
-                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                   />
                 </div>
               )}
@@ -214,7 +214,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                 <select
                   value={formData.areaUnit ?? AreaUnit.HECTARE}
                   onChange={(e) => setFormData({ ...formData, areaUnit: e.target.value as AreaUnit })}
-                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                 >
                   {Object.values(AreaUnit).map((u) => (
                     <option key={u} value={u}>{u}</option>
@@ -229,7 +229,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                     type="number" step="0.01"
                     value={formData.areaTotal ?? ''}
                     onChange={(e) => setFormData({ ...formData, areaTotal: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                   />
                 </div>
                 <div>
@@ -238,7 +238,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                     type="number" step="0.01"
                     value={formData.areaProdutiva ?? ''}
                     onChange={(e) => setFormData({ ...formData, areaProdutiva: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                   />
                 </div>
                 <div>
@@ -247,7 +247,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                     type="number" step="0.01"
                     value={formData.areaPreservada ?? ''}
                     onChange={(e) => setFormData({ ...formData, areaPreservada: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                   />
                 </div>
                 <div>
@@ -256,7 +256,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                     type="number" step="0.01"
                     value={formData.reservaLegal ?? ''}
                     onChange={(e) => setFormData({ ...formData, reservaLegal: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                    className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                   />
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                 <input
                   value={formData.car ?? ''}
                   onChange={(e) => setFormData({ ...formData, car: e.target.value })}
-                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm"
+                  className="w-full border border-theme rounded-xl px-3 py-2 text-sm bg-theme-card text-theme-primary"
                   placeholder="BA-0000000-XXXX.XXXX.XXXX.XXXX.XXXX"
                 />
               </div>
@@ -302,7 +302,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
                 <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">
                   Salvar
                 </button>
-                <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">
+                <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary bg-theme-card text-theme-primary">
                   Cancelar
                 </button>
               </div>

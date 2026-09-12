@@ -115,7 +115,7 @@ function AbaLocalizacao({ localizacoes }: { localizacoes: LocalizacaoManual[] })
       </div>
 
       {mostrarForm && (
-        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3">
+        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3 text-theme-primary">
           <div className="flex items-center justify-between">
             <p className="font-bold text-theme-primary">{editando ? 'Editar localização' : 'Nova localização'}</p>
             <button onClick={() => setMostrarForm(false)}><X size={16} /></button>
@@ -136,17 +136,17 @@ function AbaLocalizacao({ localizacoes }: { localizacoes: LocalizacaoManual[] })
         </div>
       )}
 
-      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden">
+      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden text-theme-primary">
         {localizacoes.length === 0 && <p className="p-4 text-sm text-theme-secondary">Nenhuma localização cadastrada ainda.</p>}
         {localizacoes.map(l => (
-          <div key={l.id} className="flex items-center justify-between p-3 border-b border-theme last:border-0">
+          <div key={l.id} className="flex items-center justify-between p-3 border-b border-theme last:border-0 bg-theme-card text-theme-primary">
             <div>
               <p className="font-semibold text-theme-primary">{l.local} <span className="text-[10px] font-bold text-theme-primary/70 bg-[var(--primary)]/10 px-1.5 py-0.5 rounded-full ml-1">{TIPO_LABEL[l.tipoLocal]}</span></p>
               <p className="text-xs text-theme-secondary">{l.estado} — {l.pais}</p>
             </div>
             <div className="flex gap-1">
               <button onClick={() => abrirEdicao(l)} className="p-2 hover:bg-theme-secondary text-theme-secondary rounded-xl"><Edit3 size={14} /></button>
-              <button onClick={() => excluir(l.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-xl"><Trash2 size={14} /></button>
+              <button onClick={() => excluir(l.id)} className="p-2 hover:bg-red-50 dark:bg-red-950/30 text-red-500 rounded-xl"><Trash2 size={14} /></button>
             </div>
           </div>
         ))}
@@ -204,7 +204,7 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
       </div>
 
       {mostrarForm && (
-        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3">
+        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3 text-theme-primary">
           <div className="flex items-center justify-between">
             <p className="font-bold text-theme-primary">{editando ? 'Editar produto' : 'Novo produto'}</p>
             <button onClick={() => setMostrarForm(false)}><X size={16} /></button>
@@ -229,17 +229,17 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
         </div>
       )}
 
-      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden">
+      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden text-theme-primary">
         {produtos.length === 0 && <p className="p-4 text-sm text-theme-secondary">Nenhum produto cadastrado ainda.</p>}
         {produtos.map(p => (
-          <div key={p.id} className="flex items-center justify-between p-3 border-b border-theme last:border-0">
+          <div key={p.id} className="flex items-center justify-between p-3 border-b border-theme last:border-0 bg-theme-card text-theme-primary">
             <div>
               <p className="font-semibold text-theme-primary">{p.nome}</p>
               <p className="text-xs text-theme-secondary">{p.categoria}</p>
             </div>
             <div className="flex gap-1">
               <button onClick={() => abrirEdicao(p)} className="p-2 hover:bg-theme-secondary text-theme-secondary rounded-xl"><Edit3 size={14} /></button>
-              <button onClick={() => excluir(p.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-xl"><Trash2 size={14} /></button>
+              <button onClick={() => excluir(p.id)} className="p-2 hover:bg-red-50 dark:bg-red-950/30 text-red-500 rounded-xl"><Trash2 size={14} /></button>
             </div>
           </div>
         ))}
@@ -307,13 +307,13 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
       </div>
 
       {semCadastroBase && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
-          <p className="text-sm text-amber-800">Cadastre primeiro pelo menos um <strong>Produto</strong> e uma <strong>Localização</strong> nas outras abas antes de lançar preços.</p>
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-3">
+          <p className="text-sm text-amber-800 dark:text-amber-300">Cadastre primeiro pelo menos um <strong>Produto</strong> e uma <strong>Localização</strong> nas outras abas antes de lançar preços.</p>
         </div>
       )}
 
       {mostrarForm && (
-        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3">
+        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3 text-theme-primary">
           <div className="flex items-center justify-between">
             <p className="font-bold text-theme-primary">{editando ? 'Editar preço' : 'Novo preço'}</p>
             <button onClick={() => setMostrarForm(false)}><X size={16} /></button>
@@ -375,7 +375,7 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
         </div>
       )}
 
-      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden overflow-x-auto text-theme-primary">
         {precos.length === 0 && <p className="p-4 text-sm text-theme-secondary">Nenhum preço lançado ainda.</p>}
         {precos.length > 0 && (
           <table className="w-full text-sm">
@@ -392,7 +392,7 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
             </thead>
             <tbody>
               {precos.sort((a, b) => b.dataCotacao.localeCompare(a.dataCotacao)).map(p => (
-                <tr key={p.id} className="border-b border-theme last:border-0">
+                <tr key={p.id} className="border-b border-theme last:border-0 bg-theme-card text-theme-primary">
                   <td className="p-3 font-semibold text-theme-primary">{nomeProduto(p.produtoId)}</td>
                   <td className="p-3 text-theme-secondary">{nomeLocal(p.localizacaoId)}</td>
                   <td className="p-3 font-bold text-theme-primary">R$ {p.preco.toFixed(2)} <span className="text-[10px] font-normal text-theme-secondary">{p.unidade}</span></td>
@@ -402,7 +402,7 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
                   <td className="p-3">
                     <div className="flex gap-1">
                       <button onClick={() => abrirEdicao(p)} className="p-2 hover:bg-theme-secondary text-theme-secondary rounded-xl"><Edit3 size={14} /></button>
-                      <button onClick={() => excluir(p.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-xl"><Trash2 size={14} /></button>
+                      <button onClick={() => excluir(p.id)} className="p-2 hover:bg-red-50 dark:bg-red-950/30 text-red-500 rounded-xl"><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -433,7 +433,7 @@ export default function CotacoesManuais() {
         </p>
       </div>
 
-      <div className="flex gap-2 border-b border-theme">
+      <div className="flex gap-2 border-b border-theme bg-theme-card text-theme-primary">
         {[
           { id: 'precos' as const, label: `Preços (${precos.length})` },
           { id: 'produtos' as const, label: `Produtos (${produtos.length})` },

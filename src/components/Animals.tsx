@@ -287,7 +287,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
 
       {/* Tabs */}
       <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide animate-fade-in">
-        <div className="flex gap-2 bg-theme-card p-1 rounded-2xl border border-theme w-fit shadow-sm min-w-max">
+        <div className="flex gap-2 bg-theme-card p-1 rounded-2xl border border-theme w-fit shadow-sm min-w-max text-theme-primary">
           {[AnimalType.OWN, AnimalType.RENT, AnimalType.PARTIAL, AnimalType.THIRD_PARTY, AnimalType.OTHER, 'History'].map((tab) => (
             <button
               key={tab}
@@ -309,7 +309,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
           <input 
             type="text" 
             placeholder="Pesquisar por lote ou proprietário..." 
-            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm text-theme-primary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -385,7 +385,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[var(--primary)] via-[#4d6e56] to-[#d4a373]"></div>
 
               <div className="absolute top-5 right-5 z-10">
-                <button onClick={() => setShowQuickTransferPanel(false)} className="p-2 hover:bg-theme-secondary rounded-xl transition-colors text-theme-secondary cursor-pointer border border-theme bg-theme-card shadow-sm flex items-center justify-center">
+                <button onClick={() => setShowQuickTransferPanel(false)} className="p-2 hover:bg-theme-secondary rounded-xl transition-colors text-theme-secondary cursor-pointer border border-theme bg-theme-card shadow-sm flex items-center justify-center text-theme-primary">
                   <X size={16} />
                 </button>
               </div>
@@ -405,7 +405,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                 {/* Lot selection */}
                 <div className="space-y-4">
-                  <div className="bg-theme-card p-4 rounded-2xl border border-theme shadow-sm">
+                  <div className="bg-theme-card p-4 rounded-2xl border border-theme shadow-sm text-theme-primary">
                     <label className="text-[10px] font-black uppercase text-theme-primary mb-2 block tracking-wider">1. Selecionar Lotes Ativos</label>
                     <select
                       className="w-full px-4 py-2.5 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-sm bg-theme-card text-theme-primary"
@@ -432,9 +432,9 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-theme-card p-5 rounded-2xl border-l-4 border-l-[var(--primary)] border-y border-r border-theme space-y-3 text-xs shadow-inner"
+                        className="bg-theme-card p-5 rounded-2xl border-l-4 border-l-[var(--primary)] border-y border-r border-theme space-y-3 text-xs shadow-inner text-theme-primary"
                       >
-                        <div className="flex justify-between items-center pb-2 border-b border-theme mb-1">
+                        <div className="flex justify-between items-center pb-2 border-b border-theme mb-1 bg-theme-card text-theme-primary">
                           <span className="font-bold text-theme-secondary uppercase tracking-wider text-[10px]">Diagnóstico Clínico / Técnico</span>
                           <span className="px-2 py-0.5 bg-[var(--primary)]/10 text-theme-primary text-[9.5px] font-black rounded-md uppercase border border-[var(--primary)]/25">{selected.type}</span>
                         </div>
@@ -467,7 +467,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="space-y-4 animate-fade-in bg-theme-card p-4 rounded-2xl border border-theme shadow-sm flex-1 flex flex-col justify-between"
+                      className="space-y-4 animate-fade-in bg-theme-card p-4 rounded-2xl border border-theme shadow-sm flex-1 flex flex-col justify-between text-theme-primary"
                     >
                       <div className="space-y-3">
                         <label className="text-[10px] font-black uppercase text-theme-primary mb-2 block tracking-wider">2. Destinar ao Pasto de Destino</label>
@@ -524,8 +524,8 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       </button>
                     </motion.div>
                   ) : (
-                    <div className="h-full min-h-[160px] flex flex-col items-center justify-center border border-dashed border-theme rounded-2xl bg-theme-card p-8 text-center text-theme-secondary text-xs">
-                      <div className="w-12 h-12 rounded-full bg-theme-card border border-theme flex items-center justify-center mb-3">
+                    <div className="h-full min-h-[160px] flex flex-col items-center justify-center border border-dashed border-theme rounded-2xl bg-theme-card p-8 text-center text-theme-secondary text-xs text-theme-primary">
+                      <div className="w-12 h-12 rounded-full bg-theme-card border border-theme flex items-center justify-center mb-3 text-theme-primary">
                         <Beef size={20} className="text-theme-primary" />
                       </div>
                       <p className="font-bold text-theme-secondary mb-1">Painel Aguardando Seleção</p>
@@ -548,13 +548,13 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-theme-card p-6 rounded-3xl border border-theme shadow-sm hover:border-[var(--primary)]/30 hover:shadow-md transition-all relative overflow-hidden"
+              className="bg-theme-card p-6 rounded-3xl border border-theme shadow-sm hover:border-[var(--primary)]/30 hover:shadow-md transition-all relative overflow-hidden text-theme-primary"
             >
               <div className="absolute top-0 right-0 p-4">
                 {animal.isSold ? (
-                  <span className="px-3 py-1 bg-red-100 text-red-700 text-[10px] font-black rounded-full uppercase border border-red-200">Lote Vendido</span>
+                  <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-[10px] font-black rounded-full uppercase border border-red-200 dark:border-red-800">Lote Vendido</span>
                 ) : (
-                  <span className="px-3 py-1 bg-green-50 text-green-700 text-[10px] font-black rounded-full uppercase border border-green-200">{animal.type}</span>
+                  <span className="px-3 py-1 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 text-[10px] font-black rounded-full uppercase border border-green-200 dark:border-green-800">{animal.type}</span>
                 )}
               </div>
 
@@ -570,7 +570,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 </div>
               </div>
 
-              <div className="space-y-2.5 mb-5 text-sm font-medium text-theme-secondary border-t border-theme pt-3.5">
+              <div className="space-y-2.5 mb-5 text-sm font-medium text-theme-secondary border-t border-theme pt-3.5 bg-theme-card text-theme-primary">
                 {animal.ownerName && (
                   <div className="flex justify-between">
                     <span className="text-theme-secondary">Proprietário</span>
@@ -594,24 +594,24 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
 
                 {/* Sell metrics info block if Sold! */}
                 {animal.isSold && animal.saleDetails && (
-                  <div className="bg-red-50/50 p-4 rounded-2xl border border-red-100 space-y-2.5 text-xs text-red-950 font-medium">
-                    <div className="flex justify-between border-b pb-1.5 border-red-100">
+                  <div className="bg-red-50 dark:bg-red-950/30/50 dark:bg-red-950/30 p-4 rounded-2xl border border-red-100 dark:border-red-800 space-y-2.5 text-xs text-red-950 font-medium">
+                    <div className="flex justify-between border-b pb-1.5 border-red-100 dark:border-red-800">
                       <span>Comprador:</span>
                       <span className="font-bold">{animal.saleDetails.buyerName || 'Não Informado'}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-1.5 border-red-100">
+                    <div className="flex justify-between border-b pb-1.5 border-red-100 dark:border-red-800">
                       <span>Preço Arroba (@):</span>
                       <span className="font-bold">R$ {animal.saleDetails.arrobaPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-1.5 border-red-100">
+                    <div className="flex justify-between border-b pb-1.5 border-red-100 dark:border-red-800">
                       <span>Faturamento Total Bruto:</span>
                       <span className="font-extrabold text-theme-primary">R$ {animal.saleDetails.totalSaleValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-1.5 border-red-100 font-bold text-red-900">
+                    <div className="flex justify-between border-b pb-1.5 border-red-100 dark:border-red-800 font-bold text-red-900 dark:text-red-200">
                       <span>Custos Comercialização:</span>
                       <span>R$ {((animal.saleDetails.shippingCost || 0) + (animal.saleDetails.funruralCost || 0) + (animal.saleDetails.taxesCost || 0) + (animal.saleDetails.otherSaleCosts || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="p-2.5 bg-theme-card border border-red-200 rounded-xl space-y-1 mt-1 text-[11px]">
+                    <div className="p-2.5 bg-theme-card border border-red-200 dark:border-red-800 rounded-xl space-y-1 mt-1 text-[11px]">
                       <div className="flex justify-between text-theme-primary font-bold">
                         <span>Lucro Bruto Ciclo:</span>
                         <span className="text-theme-primary">R$ {animal.saleDetails.grossProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
@@ -630,14 +630,14 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
 
                 {/* Purchase stats if not sold */}
                 {!animal.isSold && animal.type === AnimalType.OWN && (
-                  <div className="pt-2 border-t border-theme">
+                  <div className="pt-2 border-t border-theme bg-theme-card text-theme-primary">
                     <div className="flex justify-between">
                       <span className="text-theme-secondary">Preço Proposto Compra:</span>
                       <span className="font-bold text-theme-primary">R$ {(animal.purchasePrice || 0).toLocaleString()} / cab.</span>
                     </div>
                     <div className="flex justify-between mt-1">
                       <span className="text-theme-secondary">Custo de Aquisição:</span>
-                      <span className="font-bold text-red-600">R$ {((animal.purchasePrice || 0) * animal.quantity).toLocaleString()}</span>
+                      <span className="font-bold text-red-600 dark:text-red-400">R$ {((animal.purchasePrice || 0) * animal.quantity).toLocaleString()}</span>
                     </div>
                   </div>
                 )}
@@ -684,7 +684,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         <ArrowRightLeft size={13} /> Mudar Pasto
                       </button>
                     )}
-                    <button onClick={() => handleEdit(animal)} className="p-2 hover:bg-theme-secondary border border-theme rounded-xl text-xs font-bold text-theme-secondary cursor-pointer" title="Editar Lote">
+                    <button onClick={() => handleEdit(animal)} className="p-2 hover:bg-theme-secondary border border-theme rounded-xl text-xs font-bold text-theme-secondary cursor-pointer text-theme-primary" title="Editar Lote">
                       <Edit3 size={15} />
                     </button>
                     <button 
@@ -700,7 +700,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     </button>
                   </>
                 ) : null}
-                <button onClick={() => handleDelete(animal.id)} className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded-xl transition-colors cursor-pointer" title="Excluir Lote">
+                <button onClick={() => handleDelete(animal.id)} className="px-3 py-2 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-800 rounded-xl transition-colors cursor-pointer" title="Excluir Lote">
                   <Trash2 size={15} />
                 </button>
               </div>
@@ -714,7 +714,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
             </motion.div>
           ))}
           {filteredAnimals.length === 0 && (
-            <div className="col-span-full py-20 text-center text-theme-secondary italic bg-theme-card rounded-3xl border border-theme">
+            <div className="col-span-full py-20 text-center text-theme-secondary italic bg-theme-card rounded-3xl border border-theme text-theme-primary">
               Nenhum lote de gado para este filtro.
             </div>
           )}
@@ -731,7 +731,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card text-theme-primary">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setIsSellModalOpen(false)}
@@ -754,7 +754,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
             </div>
 
             <form onSubmit={handleSaleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[80vh]">
-              <div className="p-4 bg-theme-card border border-theme rounded-2xl flex items-center justify-between">
+              <div className="p-4 bg-theme-card border border-theme rounded-2xl flex items-center justify-between text-theme-primary">
                 <div>
                   <span className="text-[10px] text-theme-secondary uppercase font-bold block">Adquirido por:</span>
                   <span className="font-extrabold text-theme-primary">R$ {((sellingAnimal.purchasePrice || 0) * sellingAnimal.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
@@ -773,7 +773,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <input 
                       required
                       type="text" 
-                      className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-semibold"
+                      className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-semibold bg-theme-card text-theme-primary"
                       placeholder="Ex: JBS S/A, Sr. Antunes..."
                       value={saleFormData.buyerName}
                       onChange={(e) => setSaleFormData({...saleFormData, buyerName: e.target.value})}
@@ -786,7 +786,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <input 
                     required
                     type="date" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-semibold"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-semibold bg-theme-card text-theme-primary"
                     value={saleFormData.saleDate}
                     onChange={(e) => setSaleFormData({...saleFormData, saleDate: e.target.value})}
                   />
@@ -803,7 +803,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     required={sellingAnimal.type !== AnimalType.RENT}
                     type="number" 
                     step="0.1"
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-black text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-black text-theme-primary bg-theme-card"
                     value={saleFormData.averageWeight || ''}
                     disabled={sellingAnimal.type === AnimalType.RENT}
                     onChange={(e) => setSaleFormData({...saleFormData, averageWeight: Number(e.target.value)})}
@@ -816,7 +816,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     required={sellingAnimal.type !== AnimalType.RENT}
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-black text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-black text-theme-primary bg-theme-card"
                     placeholder="Ex: 320"
                     disabled={sellingAnimal.type === AnimalType.RENT}
                     value={saleFormData.arrobaPrice || ''}
@@ -838,7 +838,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <input 
                         required
                         type="number" 
-                        className="w-full px-3 py-1.5 border border-theme rounded-xl focus:outline-none text-xs font-extrabold text-theme-primary"
+                        className="w-full px-3 py-1.5 border border-theme rounded-xl focus:outline-none text-xs font-extrabold text-theme-primary bg-theme-card"
                         value={saleFormData.partnershipFarmShare}
                         onChange={(e) => setSaleFormData({...saleFormData, partnershipFarmShare: Number(e.target.value)})}
                       />
@@ -869,43 +869,43 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
               )}
 
               {/* sales cost list */}
-              <div className="p-4 bg-orange-50/40 border border-orange-100 rounded-2xl space-y-3">
-                <h4 className="text-xs font-black text-orange-850 uppercase block">Custos e Deduções do Lote na Comercialização</h4>
+              <div className="p-4 bg-orange-50 dark:bg-orange-950/30/40 border border-orange-100 dark:border-orange-800 rounded-2xl space-y-3">
+                <h4 className="text-xs font-black text-orange-700 dark:text-orange-300 uppercase block">Custos e Deduções do Lote na Comercialização</h4>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div>
-                    <label className="text-[10px] font-bold uppercase text-orange-800 mb-1 block">Frete (Contratado)</label>
+                    <label className="text-[10px] font-bold uppercase text-orange-800 dark:text-orange-300 mb-1 block">Frete (Contratado)</label>
                     <input 
                       type="number"
-                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-theme-card text-xs font-bold"
+                      className="w-full px-3 py-1.5 border border-orange-200 dark:border-orange-800 rounded-lg bg-theme-card text-xs font-bold"
                       value={saleFormData.shippingCost || ''}
                       onChange={(e) => setSaleFormData({...saleFormData, shippingCost: Number(e.target.value)})}
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold uppercase text-orange-800 mb-1 block">Funrural (%)</label>
+                    <label className="text-[10px] font-bold uppercase text-orange-800 dark:text-orange-300 mb-1 block">Funrural (%)</label>
                     <input 
                       type="number"
                       step="0.01"
-                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-theme-card text-xs font-bold"
+                      className="w-full px-3 py-1.5 border border-orange-200 dark:border-orange-800 rounded-lg bg-theme-card text-xs font-bold"
                       value={saleFormData.funruralCost || ''}
                       onChange={(e) => setSaleFormData({...saleFormData, funruralCost: Number(e.target.value)})}
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold uppercase text-orange-800 mb-1 block">Encargos/Tributos</label>
+                    <label className="text-[10px] font-bold uppercase text-orange-800 dark:text-orange-300 mb-1 block">Encargos/Tributos</label>
                     <input 
                       type="number"
-                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-theme-card text-xs font-bold"
+                      className="w-full px-3 py-1.5 border border-orange-200 dark:border-orange-800 rounded-lg bg-theme-card text-xs font-bold"
                       value={saleFormData.taxesCost || ''}
                       onChange={(e) => setSaleFormData({...saleFormData, taxesCost: Number(e.target.value)})}
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold uppercase text-orange-800 mb-1 block">Outras Despesas</label>
+                    <label className="text-[10px] font-bold uppercase text-orange-800 dark:text-orange-300 mb-1 block">Outras Despesas</label>
                     <input 
                       type="number"
-                      className="w-full px-3 py-1.5 border border-orange-200 rounded-lg bg-theme-card text-xs font-bold"
+                      className="w-full px-3 py-1.5 border border-orange-200 dark:border-orange-800 rounded-lg bg-theme-card text-xs font-bold"
                       value={saleFormData.otherSaleCosts || ''}
                       onChange={(e) => setSaleFormData({...saleFormData, otherSaleCosts: Number(e.target.value)})}
                     />
@@ -1074,7 +1074,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card text-theme-primary">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingAnimal(null); }}
@@ -1101,7 +1101,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 <div>
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Espécie / Categoria</label>
                   <select 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card font-bold text-sm"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card font-bold text-sm text-theme-primary"
                     value={formData.category}
                     onChange={(e) => setFormData({...formData, category: e.target.value as AnimalCategory})}
                   >
@@ -1113,7 +1113,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Raça</label>
                   <input 
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium bg-theme-card text-theme-primary"
                     value={formData.breed || ''}
                     onChange={(e) => setFormData({...formData, breed: e.target.value})}
                     placeholder="Ex: Nelore, Caracu, Angus, Tabapuã..."
@@ -1123,7 +1123,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                 <div>
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Regime de Posse (Tipo)</label>
                   <select 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card font-medium"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card font-medium text-theme-primary"
                     value={formData.type}
                     onChange={(e) => setFormData({...formData, type: e.target.value as AnimalType})}
                   >
@@ -1137,7 +1137,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                     <input 
                       required
                       type="text" 
-                      className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium text-sm"
+                      className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium text-sm bg-theme-card text-theme-primary"
                       value={formData.ownerName || ''}
                       onChange={(e) => setFormData({...formData, ownerName: e.target.value})}
                       placeholder="Nome do dono"
@@ -1150,7 +1150,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-extrabold text-sm text-theme-primary"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-extrabold text-sm text-theme-primary bg-theme-card"
                     value={formData.lotName || ''}
                     onChange={(e) => setFormData({...formData, lotName: e.target.value})}
                     placeholder="Ex: Lote Nelore 2026, S03..."
@@ -1162,7 +1162,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <input 
                     required
                     type="number" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black bg-theme-card text-theme-primary"
                     value={formData.quantity || ''}
                     onChange={(e) => setFormData({...formData, quantity: Number(e.target.value)})}
                   />
@@ -1173,7 +1173,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <input 
                     required
                     type="date" 
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card text-theme-primary"
                     value={formData.entryDate}
                     onChange={(e) => setFormData({...formData, entryDate: e.target.value})}
                   />
@@ -1183,7 +1183,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Alocação de Pasto</label>
                   <select 
                     required
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card font-medium text-sm"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card font-medium text-sm text-theme-primary"
                     value={formData.currentPastureId}
                     onChange={(e) => setFormData({...formData, currentPastureId: e.target.value})}
                   >
@@ -1196,7 +1196,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Peso Médio de Entrada (Kg)</label>
                   <input 
                     type="number" step="0.1"
-                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
                     value={formData.averageWeight || ''}
                     onChange={(e) => setFormData({...formData, averageWeight: Number(e.target.value)})}
                   />
@@ -1208,7 +1208,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <label className="text-xs font-bold uppercase text-theme-primary mb-1 block">Preço de Compra p/ Cabeça (R$)</label>
                       <input 
                         type="number" step="0.01"
-                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary"
+                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-theme-primary bg-theme-card"
                         value={formData.purchasePrice || ''}
                         onChange={(e) => setFormData({...formData, purchasePrice: Number(e.target.value)})}
                       />
@@ -1228,7 +1228,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <label className="text-xs font-bold uppercase text-theme-primary mb-1 block">Valor do Aluguel (R$/mês por Cabeça)</label>
                       <input 
                         type="number" step="0.01"
-                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
                         value={formData.rentValue || ''}
                         onChange={(e) => setFormData({...formData, rentValue: Number(e.target.value)})}
                         placeholder="Ex: 65"
@@ -1238,7 +1238,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <label className="text-xs font-bold uppercase text-theme-primary mb-1 block">Dia de Vencimento do Aluguel (todo mês)</label>
                       <input 
                         type="number" min="1" max="31"
-                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
                         value={formData.rentDueDay || ''}
                         onChange={(e) => setFormData({...formData, rentDueDay: e.target.value ? Math.min(31, Math.max(1, Number(e.target.value))) : undefined})}
                         placeholder="Ex: 10"
@@ -1258,7 +1258,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                         <Percent className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                         <input 
                           type="number" 
-                          className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                          className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
                           placeholder="Ex: 50"
                           value={formData.partnershipFarmShare || ''}
                           onChange={(e) => setFormData({...formData, partnershipFarmShare: Number(e.target.value)})}
@@ -1269,7 +1269,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <label className="text-xs font-bold uppercase text-theme-primary mb-1 block">Peso Final de Saída (kg)</label>
                       <input 
                         type="number" 
-                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold bg-theme-card text-theme-primary"
                         value={formData.partnershipExitWeight || ''}
                         onChange={(e) => setFormData({...formData, partnershipExitWeight: Number(e.target.value)})}
                       />

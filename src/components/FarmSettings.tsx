@@ -256,7 +256,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-12 legacy-light">
-      <div className="bg-theme-card p-8 rounded-3xl border border-theme shadow-sm space-y-6">
+      <div className="bg-theme-card p-8 rounded-3xl border border-theme shadow-sm space-y-6 text-theme-primary">
         <h3 className="text-xl font-bold flex items-center gap-2 text-theme-primary">
           <Building2 size={24} /> Configurações da Fazenda
         </h3>
@@ -268,7 +268,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-xl flex items-center gap-3"
+              className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 p-4 rounded-xl flex items-center gap-3"
             >
               <CheckCircle2 size={20} className="text-green-600 flex-shrink-0" />
               <div className="text-sm font-bold">
@@ -283,7 +283,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
             <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Nome da Fazenda</label>
             <input 
               type="text" 
-              className="w-full px-4 py-3 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-lg"
+              className="w-full px-4 py-3 border border-theme rounded-xl bg-theme-card text-theme-primary focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none placeholder:text-theme-secondary font-bold text-lg"
               value={formData.farmName}
               onChange={(e) => setFormData({...formData, farmName: e.target.value})}
             />
@@ -296,7 +296,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
               <input 
                 type="text" 
                 placeholder="Ex: Goiânia, MT"
-                className="w-full pl-12 pr-4 py-3 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+                className="w-full pl-12 pr-4 py-3 border border-theme rounded-xl bg-theme-card text-theme-primary focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none placeholder:text-theme-secondary font-bold"
                 value={formData.city}
                 onChange={(e) => setFormData({...formData, city: e.target.value})}
               />
@@ -310,7 +310,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
             <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Data de Aniversário (opcional)</label>
             <input
               type="date"
-              className="w-full px-4 py-3 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
+              className="w-full px-4 py-3 border border-theme rounded-xl bg-theme-card text-theme-primary focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none placeholder:text-theme-secondary font-bold"
               value={formData.ownerBirthday ? `2000-${formData.ownerBirthday}` : ''}
               onChange={(e) => setFormData({...formData, ownerBirthday: e.target.value ? e.target.value.slice(5) : undefined})}
             />
@@ -336,7 +336,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                 }
               }}
               disabled={pushStatus === 'loading' || pushStatus === 'ok'}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-theme rounded-xl font-bold text-sm disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-theme rounded-xl font-bold text-sm disabled:opacity-70 bg-theme-card text-theme-primary"
             >
               <Bell size={16} />
               {pushStatus === 'ok' ? 'Notificações ativadas ✓' : pushStatus === 'loading' ? 'Ativando...' : 'Ativar notificações push'}
@@ -373,7 +373,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
         </button>
 
         {!isDemoMode && userRole === 'admin' && (
-          <div className="pt-6 border-t border-theme space-y-3">
+          <div className="pt-6 border-t border-theme space-y-3 bg-theme-card text-theme-primary">
             <h4 className="text-xs font-bold text-theme-primary uppercase tracking-wider">Carga de Dados</h4>
             <p className="text-xs text-theme-secondary leading-relaxed">
               Povoar o banco de dados com os registros de rebanhos, pastos, tarefas e funcionários iniciais de demonstração (ideal para novos usuários).
@@ -391,7 +391,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
 
         {/* Backup and Restore Section */}
         {(isDemoMode || userRole === 'admin') && (
-          <div className="pt-6 border-t border-theme space-y-4">
+          <div className="pt-6 border-t border-theme space-y-4 bg-theme-card text-theme-primary">
             <div>
               <h4 className="text-xs font-bold text-theme-primary uppercase tracking-wider mb-1">Backup de Segurança</h4>
               <p className="text-xs text-theme-secondary leading-relaxed">
@@ -411,7 +411,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
               </button>
 
               {/* Import backup */}
-              <label className="btn-outline flex items-center justify-center gap-2 py-2.5 text-xs cursor-pointer text-center border-orange-600/30 text-orange-700 hover:bg-orange-50">
+              <label className="btn-outline flex items-center justify-center gap-2 py-2.5 text-xs cursor-pointer text-center border-orange-600/30 text-orange-700 dark:text-orange-300 hover:bg-orange-50 dark:bg-orange-950/30">
                 <UploadCloud size={14} />
                 Importar Backup
                 <input
@@ -426,7 +426,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
         )}
       </div>
 
-      <div className="bg-theme-card p-6 rounded-3xl border border-theme flex flex-col md:flex-row items-center gap-6">
+      <div className="bg-theme-card p-6 rounded-3xl border border-theme flex flex-col md:flex-row items-center gap-6 text-theme-primary">
         <div className="bg-[var(--primary)]/10 p-4 rounded-2xl flex-shrink-0">
           <CloudSun className="text-theme-primary w-8 h-8" />
         </div>
@@ -447,7 +447,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="bg-theme-card rounded-3xl border border-theme shadow-2xl overflow-hidden max-w-2xl w-full flex flex-col max-h-[90vh]"
+              className="bg-theme-card rounded-3xl border border-theme shadow-2xl overflow-hidden max-w-2xl w-full flex flex-col max-h-[90vh] text-theme-primary"
             >
               {/* Header */}
               <div className="bg-[var(--primary)] text-white p-6 relative">
@@ -472,7 +472,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                   {weatherData.forecast.map((day, idx) => (
                     <div 
                       key={idx} 
-                      className="bg-theme-card p-3 rounded-2xl border border-theme text-center flex flex-col justify-between shadow-xs hover:border-[var(--primary)]/30 hover:shadow-xs transition-shadow"
+                      className="bg-theme-card p-3 rounded-2xl border border-theme text-center flex flex-col justify-between shadow-xs hover:border-[var(--primary)]/30 hover:shadow-xs transition-shadow text-theme-primary"
                     >
                       <div>
                         <div className="text-[10px] font-black uppercase text-theme-secondary">
@@ -502,7 +502,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                   ))}
                 </div>
 
-                <div className="bg-theme-card p-4 rounded-2xl border border-theme text-center md:flex items-center justify-between gap-4 shadow-theme">
+                <div className="bg-theme-card p-4 rounded-2xl border border-theme text-center md:flex items-center justify-between gap-4 shadow-theme text-theme-primary">
                   <div className="text-left">
                     <span className="text-[10px] uppercase font-bold text-theme-primary block">Capacidade Estimativa</span>
                     <p className="text-[11px] text-theme-secondary font-medium max-w-md leading-relaxed">
