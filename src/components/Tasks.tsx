@@ -123,13 +123,13 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
             <motion.div 
               key={task.id}
               layout
-              className={`bg-white p-5 rounded-3xl border transition-all flex items-start gap-4 hover:border-[#3d5a45]/30 group relative ${
-                task.completed ? 'opacity-55 border-transparent shadow-none bg-neutral-50/50' : 'border-[#e5e0d8] shadow-sm'
+              className={`bg-theme-card p-5 rounded-3xl border transition-all flex items-start gap-4 hover:border-[var(--primary)]/30 group relative ${
+                task.completed ? 'opacity-55 border-transparent shadow-none bg-neutral-50/50' : 'border-theme shadow-sm'
               }`}
             >
               <button 
                 onClick={() => toggleTask(task.id)}
-                className={`mt-1.5 transition-colors ${task.completed ? 'text-[#3d5a45]' : 'text-[#8d8a86] hover:text-[#3d5a45]'}`}
+                className={`mt-1.5 transition-colors ${task.completed ? 'text-theme-primary' : 'text-[#8d8a86] hover:text-theme-primary'}`}
               >
                 {task.completed ? <CheckCircle2 size={24} className="stroke-2" /> : <Circle size={24} className="stroke-2" />}
               </button>
@@ -147,7 +147,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                     }`}>
                       Prioridade: {task.priority}
                     </span>
-                    <button onClick={() => handleEditTask(task)} className="p-1 hover:bg-[#f5f2ed] rounded-lg text-[#6d6a66]">
+                    <button onClick={() => handleEditTask(task)} className="p-1 hover:bg-theme-secondary rounded-lg text-theme-secondary">
                       <Edit3 size={15} />
                     </button>
                     <button onClick={() => handleDeleteTask(task.id)} className="p-1 hover:bg-red-50 text-red-500 rounded-lg">
@@ -162,21 +162,21 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
 
                 {/* Highly finished assignee, location, deadline details block */}
                 <div className="flex flex-wrap gap-4 items-center text-xs font-bold uppercase text-[#8d8a86] tracking-wider pt-2.5 border-t border-[#fcfaf7]">
-                  <div className={`flex items-center gap-1.5 ${isOverdue ? 'text-red-500' : 'text-[#3d5a45]'}`}>
+                  <div className={`flex items-center gap-1.5 ${isOverdue ? 'text-red-500' : 'text-theme-primary'}`}>
                     <Calendar size={14} />
                     Prazo: {format(taskDate, "dd 'de' MMMM", { locale: ptBR })}
                   </div>
 
                   {task.assignedTo && (
                     <div className="flex items-center gap-1.5 text-slate-800 bg-neutral-100/70 px-2.5 py-0.5 rounded-full border border-neutral-200">
-                      <UserCheck size={13} className="text-[#3d5a45]" />
+                      <UserCheck size={13} className="text-theme-primary" />
                       Designado: <span className="font-extrabold">{task.assignedTo}</span>
                     </div>
                   )}
 
                   {task.executionLocation && (
                     <div className="flex items-center gap-1.5 text-neutral-800 bg-neutral-100/70 px-2.5 py-0.5 rounded-full border border-neutral-200">
-                      <MapPin size={13} className="text-[#3d5a45]" />
+                      <MapPin size={13} className="text-theme-primary" />
                       Local: <span className="font-extrabold">{task.executionLocation}</span>
                     </div>
                   )}
@@ -194,8 +194,8 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
         })}
 
         {tasks.length === 0 && (
-          <div className="text-center py-20 bg-[#fcfaf7] border-2 border-dashed border-[#e5e0d8] rounded-3xl">
-            <Clock size={48} className="mx-auto mb-4 text-[#e5e0d8]" />
+          <div className="text-center py-20 bg-[#fcfaf7] border-2 border-dashed border-theme rounded-3xl">
+            <Clock size={48} className="mx-auto mb-4 text-theme-secondary" />
             <p className="text-[#8d8a86] font-bold">Nenhuma tarefa agendada. Tudo em dia por aqui!</p>
           </div>
         )}
@@ -207,25 +207,25 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-theme-card w-full max-w-md rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-[#e5e0d8] bg-[#fcfaf7] flex items-center justify-between">
+            <div className="p-6 border-b border-theme bg-[#fcfaf7] flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingTask(null); }}
-                  className="p-2 -ml-2 text-[#8d8a86] hover:text-[#3d5a45] hover:bg-[#e5e0d8] rounded-full transition-colors md:hidden"
+                  className="p-2 -ml-2 text-[#8d8a86] hover:text-theme-primary hover:bg-theme-secondary rounded-full transition-colors md:hidden"
                   title="Voltar"
                 >
                   <ArrowLeft size={18} />
                 </button>
-                <h3 className="text-base font-black text-[#3d5a45] flex items-center gap-2">
+                <h3 className="text-base font-black text-theme-primary flex items-center gap-2">
                   <Flag size={18} />
                   {editingTask ? 'Editar Detalhes da Tarefa' : 'Criar Nova Tarefa'}
                 </h3>
               </div>
               <button 
                 onClick={() => { setIsFormOpen(false); setEditingTask(null); }}
-                className="p-1.5 hover:bg-[#e5e0d8] rounded-full transition-colors"
+                className="p-1.5 hover:bg-theme-secondary rounded-full transition-colors"
                 type="button"
               >
                 <X size={18} />
@@ -238,7 +238,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
                   value={formData.title || ''}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
                   placeholder="Ex: Vacinar gado do Pasto 03..."
@@ -249,7 +249,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Descrição do Trabalho</label>
                 <textarea 
                   required
-                  className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none text-sm min-h-[70px]"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px]"
                   value={formData.description || ''}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   placeholder="Instruções claras..."
@@ -262,7 +262,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   <input 
                     required
                     type="date" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none text-sm font-bold text-[#3d5a45]"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm font-bold text-theme-primary"
                     value={formData.dueDate}
                     onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
                   />
@@ -271,7 +271,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Prioridade</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card font-medium"
                     value={formData.priority}
                     onChange={(e) => setFormData({...formData, priority: e.target.value as any})}
                   >
@@ -287,7 +287,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Designar Colaborador</label>
                   {employees && employees.length > 0 ? (
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
+                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
                       value={formData.assignedTo || ''}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
                     >
@@ -299,7 +299,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   ) : (
                     <input 
                       type="text" 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                       value={formData.assignedTo || ''}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
                       placeholder="Nome do executor..."
@@ -311,7 +311,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Local para Execução</label>
                   <input 
                     type="text" 
-                    className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20"
+                    className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
                     value={formData.executionLocation || ''}
                     onChange={(e) => setFormData({...formData, executionLocation: e.target.value})}
                     placeholder="Ex: Pasto 02, Curral, Sede..."

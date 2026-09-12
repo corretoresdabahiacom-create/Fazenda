@@ -95,49 +95,49 @@ export default function DashboardBahia() {
     <div className="space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-sm font-bold text-[#3d5a45]">🗺️ Dashboard Bahia — Produtos Prioritários</h2>
-          <p className="text-[10px] text-[#6d6a66]">
+          <h2 className="text-sm font-bold text-theme-primary">🗺️ Dashboard Bahia — Produtos Prioritários</h2>
+          <p className="text-[10px] text-theme-secondary">
             {loading ? 'Buscando...' : `${disponiveis} de ${BAHIA_PRIORITY_PRODUCTS.length} produtos com cotação disponível para a Bahia. Atualizado em ${lastUpdate}.`}
           </p>
         </div>
-        <button onClick={loadDashboard} disabled={loading} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border border-[#e5e0d8] text-[#6d6a66] disabled:opacity-60">
+        <button onClick={loadDashboard} disabled={loading} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border border-theme text-theme-secondary disabled:opacity-60">
           <RefreshCw size={12} className={loading ? 'animate-spin' : ''} /> Atualizar
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#e5e0d8] overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-[#f5f2ed]">
-              <th className="text-left p-2.5 text-xs font-bold text-[#3d5a45]">Produto</th>
-              <th className="text-left p-2.5 text-xs font-bold text-[#3d5a45]">Preço</th>
-              <th className="text-left p-2.5 text-xs font-bold text-[#3d5a45]">Local</th>
-              <th className="text-left p-2.5 text-xs font-bold text-[#3d5a45]">Data</th>
-              <th className="text-left p-2.5 text-xs font-bold text-[#3d5a45]">Fonte</th>
-              <th className="text-left p-2.5 text-xs font-bold text-[#3d5a45]">Confiabilidade</th>
+            <tr className="bg-theme-secondary">
+              <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Produto</th>
+              <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Preço</th>
+              <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Local</th>
+              <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Data</th>
+              <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Fonte</th>
+              <th className="text-left p-2.5 text-xs font-bold text-theme-primary">Confiabilidade</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e5e0d8]">
+          <tbody className="divide-y divide-theme">
             {rows.map((r, i) => (
               <tr key={i}>
-                <td className="p-2.5 text-xs font-semibold text-[#3d5a45] whitespace-nowrap">{r.emoji} {r.label}</td>
+                <td className="p-2.5 text-xs font-semibold text-theme-primary whitespace-nowrap">{r.emoji} {r.label}</td>
                 <td className="p-2.5 text-xs">
                   {r.preco != null ? (
-                    <span className="font-bold text-[#3d5a45]">R$ {r.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} <span className="font-normal text-[#6d6a66]">/{r.unidade}</span></span>
+                    <span className="font-bold text-theme-primary">R$ {r.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} <span className="font-normal text-theme-secondary">/{r.unidade}</span></span>
                   ) : (
-                    <span className="text-[#6d6a66] italic">Sem cotação disponível</span>
+                    <span className="text-theme-secondary italic">Sem cotação disponível</span>
                   )}
                 </td>
-                <td className="p-2.5 text-xs text-[#6d6a66]">{r.local || '—'}</td>
-                <td className="p-2.5 text-xs text-[#6d6a66] whitespace-nowrap">{r.data || '—'}</td>
-                <td className="p-2.5 text-xs text-[#6d6a66]">
+                <td className="p-2.5 text-xs text-theme-secondary">{r.local || '—'}</td>
+                <td className="p-2.5 text-xs text-theme-secondary whitespace-nowrap">{r.data || '—'}</td>
+                <td className="p-2.5 text-xs text-theme-secondary">
                   {r.sourceUrl ? <a href={r.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[var(--primary)] underline">{r.fonte}</a> : '—'}
                 </td>
                 <td className="p-2.5 text-xs">
                   {r.confiabilidade ? (
                     <span className={`font-bold px-2 py-0.5 rounded-full text-[10px] ${
                       r.confiabilidade === 'Oficial' ? 'bg-green-50 text-green-700' :
-                      r.confiabilidade === 'Internacional' ? 'bg-blue-50 text-blue-700' : 'bg-[#f5f2ed] text-[#6d6a66]'
+                      r.confiabilidade === 'Internacional' ? 'bg-blue-50 text-blue-700' : 'bg-theme-secondary text-theme-secondary'
                     }`}>{r.confiabilidade}</span>
                   ) : '—'}
                 </td>
@@ -146,7 +146,7 @@ export default function DashboardBahia() {
           </tbody>
         </table>
       </div>
-      <p className="text-[10px] text-[#6d6a66]">
+      <p className="text-[10px] text-theme-secondary">
         Ovelha, Peixe, Mamão, Manga e Limão ainda não têm nenhuma fonte real de cotação pra Bahia mapeada — aparecem aqui pra deixar claro o que falta, não porque encontramos e escondemos.
       </p>
     </div>

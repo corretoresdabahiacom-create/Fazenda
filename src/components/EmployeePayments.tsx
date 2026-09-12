@@ -193,20 +193,20 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
   return (
     <div className="space-y-6 legacy-light">
       {/* Tab Selectors */}
-      <div className="flex border-b border-[#e5e0d8] gap-4">
+      <div className="flex border-b border-theme gap-4">
         <button 
           onClick={() => { setActiveTab('colaboradores'); setSearchTerm(''); }}
-          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'colaboradores' ? 'text-[#3d5a45]' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
+          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'colaboradores' ? 'text-theme-primary' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
         >
           📁 Cadastro de Colaboradores
-          {activeTab === 'colaboradores' && <motion.div layoutId="employee_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3d5a45]" />}
+          {activeTab === 'colaboradores' && <motion.div layoutId="employee_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--primary)]" />}
         </button>
         <button 
           onClick={() => { setActiveTab('pagamentos'); setSearchTerm(''); }}
-          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'pagamentos' ? 'text-[#3d5a45]' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
+          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'pagamentos' ? 'text-theme-primary' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
         >
           💸 Lançamentos de Pagamento
-          {activeTab === 'pagamentos' && <motion.div layoutId="employee_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3d5a45]" />}
+          {activeTab === 'pagamentos' && <motion.div layoutId="employee_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--primary)]" />}
         </button>
       </div>
 
@@ -217,7 +217,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           <input 
             type="text" 
             placeholder={activeTab === 'colaboradores' ? "Pesquisar por colaborador..." : "Pesquisar por pagamentos..."}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -266,11 +266,11 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Employee List Grid */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="bg-white rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
+            <div className="bg-theme-card rounded-3xl border border-theme overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#fcfaf7] border-b border-[#e5e0d8]">
+                    <tr className="bg-[#fcfaf7] border-b border-theme">
                       <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Nome / Função</th>
                       <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Admissão</th>
                       <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Status</th>
@@ -282,7 +282,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                       <tr 
                         key={emp.id} 
                         onClick={() => setSelectedEmployee(emp)}
-                        className={`hover:bg-[#fcfaf7] transition-colors cursor-pointer ${selectedEmployee?.id === emp.id ? 'bg-[#fcfaf7] border-l-4 border-l-[#3d5a45]' : ''}`}
+                        className={`hover:bg-[#fcfaf7] transition-colors cursor-pointer ${selectedEmployee?.id === emp.id ? 'bg-[#fcfaf7] border-l-4 border-l-[var(--primary)]' : ''}`}
                       >
                         <td className="px-6 py-4">
                           <div>
@@ -302,7 +302,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                           <div className="flex items-center justify-end gap-2">
                             <button 
                               onClick={() => handleEditEmployee(emp)} 
-                              className="p-2 hover:bg-[#f5f2ed] rounded-lg transition-colors text-[#6d6a66]"
+                              className="p-2 hover:bg-theme-secondary rounded-lg transition-colors text-theme-secondary"
                               title="Editar Ficha"
                             >
                               <Edit3 size={16} />
@@ -334,8 +334,8 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           {/* Details / History Column */}
           <div className="lg:col-span-1">
             {selectedEmployee ? (
-              <div className="bg-white border border-[#e5e0d8] rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 h-2 w-full bg-[#3d5a45]"></div>
+              <div className="bg-theme-card border border-theme rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 h-2 w-full bg-[var(--primary)]"></div>
                 
                 <div className="flex justify-between items-start">
                   <div>
@@ -354,7 +354,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-[#8d8a86] uppercase block">Férias Agendada</span>
-                    <span className="font-bold text-sm text-[#3d5a45]">
+                    <span className="font-bold text-sm text-theme-primary">
                       {selectedEmployee.vacationDate ? format(new Date(selectedEmployee.vacationDate + 'T12:00:00'), 'dd/MM/yyyy') : 'Sem previsão'}
                     </span>
                   </div>
@@ -371,12 +371,12 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 {/* Sub History sections */}
                 <div className="space-y-3.5 pt-4 border-t border-[#f0f0f0]">
                   <h4 className="text-xs font-bold uppercase text-[#8d8a86] flex items-center gap-1.5">
-                    <Calendar size={14} className="text-[#3d5a45]" /> Histórico de Férias e Avisos
+                    <Calendar size={14} className="text-theme-primary" /> Histórico de Férias e Avisos
                   </h4>
-                  <div className="text-xs space-y-1.5 max-h-32 overflow-y-auto pr-1 bg-[#fcfaf7] p-3 rounded-xl border border-[#e5e0d8]">
+                  <div className="text-xs space-y-1.5 max-h-32 overflow-y-auto pr-1 bg-[#fcfaf7] p-3 rounded-xl border border-theme">
                     {selectedEmployee.vacationHistory && selectedEmployee.vacationHistory.length > 0 ? (
                       selectedEmployee.vacationHistory.map((vac, idx) => (
-                        <div key={idx} className="flex justify-between text-[#6d6a66] font-medium border-b border-[#f0f0f0] pb-1 last:border-0 last:pb-0">
+                        <div key={idx} className="flex justify-between text-theme-secondary font-medium border-b border-[#f0f0f0] pb-1 last:border-0 last:pb-0">
                           <span>🌴 Gozo de Férias:</span>
                           <span className="font-semibold text-blue-700">{format(new Date(vac.start + 'T12:00:00'), 'dd/MM/yyyy')}</span>
                         </div>
@@ -386,9 +386,9 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                     )}
 
                     {selectedEmployee.noticeHistory && selectedEmployee.noticeHistory.length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-[#e5e0d8] space-y-1">
+                      <div className="mt-2 pt-2 border-t border-theme space-y-1">
                         {selectedEmployee.noticeHistory.map((not, idx) => (
-                          <div key={idx} className="flex justify-between text-[#6d6a66] last:border-0 pb-1">
+                          <div key={idx} className="flex justify-between text-theme-secondary last:border-0 pb-1">
                             <span>⚠️ Notificação de Aviso:</span>
                             <span className="font-bold text-orange-700">{format(new Date(not + 'T12:00:00'), 'dd/MM/yyyy')}</span>
                           </div>
@@ -401,7 +401,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 {/* Payment summary inside card */}
                 <div className="space-y-3 pt-4 border-t border-[#f0f0f0]">
                   <h4 className="text-xs font-bold uppercase text-[#8d8a86] flex items-center gap-1.5">
-                    <Banknote size={14} className="text-[#3d5a45]" /> Histórico de Pagamentos Recebidos
+                    <Banknote size={14} className="text-theme-primary" /> Histórico de Pagamentos Recebidos
                   </h4>
                   <div className="max-h-48 overflow-y-auto space-y-2 pr-1">
                     {payments.filter(pay => pay.employeeName === selectedEmployee.name).length > 0 ? (
@@ -409,18 +409,18 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                         .filter(pay => pay.employeeName === selectedEmployee.name)
                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                         .map((pay) => (
-                          <div key={pay.id} className="flex justify-between items-center bg-[#fcfaf7] p-2.5 rounded-xl border border-[#e5e0d8] text-xs">
+                          <div key={pay.id} className="flex justify-between items-center bg-[#fcfaf7] p-2.5 rounded-xl border border-theme text-xs">
                             <div>
                               <div className="font-bold text-[#2d2a26]">{pay.paymentType}</div>
                               <div className="text-[#8d8a86]">{format(new Date(pay.date + 'T12:00:00'), 'dd/MM/yyyy')}</div>
                             </div>
-                            <div className="font-bold text-[#3d5a45]">
+                            <div className="font-bold text-theme-primary">
                               R$ {pay.totalValue.toLocaleString()}
                             </div>
                           </div>
                         ))
                     ) : (
-                      <div className="text-xs text-[#8d8a86] italic text-center py-4 bg-[#fcfaf7] rounded-xl border border-dashed border-[#e5e0d8]">
+                      <div className="text-xs text-[#8d8a86] italic text-center py-4 bg-[#fcfaf7] rounded-xl border border-dashed border-theme">
                         Nenhum pagamento efetuado para {selectedEmployee.name} ainda.
                       </div>
                     )}
@@ -428,7 +428,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 </div>
               </div>
             ) : (
-              <div className="bg-[#fcfaf7] border border-dashed border-[#e5e0d8] rounded-3xl p-8 text-center text-[#8d8a86] italic text-sm">
+              <div className="bg-[#fcfaf7] border border-dashed border-theme rounded-3xl p-8 text-center text-[#8d8a86] italic text-sm">
                 💡 Clique em um colaborador para visualizar o histórico completo de pagamentos, gozo de férias e notificações de aviso.
               </div>
             )}
@@ -438,25 +438,25 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
         /* Payments Logs list */
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-[#fcfaf7] border border-[#e5e0d8] p-5 rounded-2xl">
+            <div className="bg-[#fcfaf7] border border-theme p-5 rounded-2xl">
               <div className="text-xs text-[#8d8a86] uppercase font-bold tracking-wider mb-1">Mês Atual</div>
-              <div className="text-2xl font-black text-[#3d5a45]">R$ {payments.reduce((acc, p) => acc + p.totalValue, 0).toLocaleString()}</div>
+              <div className="text-2xl font-black text-theme-primary">R$ {payments.reduce((acc, p) => acc + p.totalValue, 0).toLocaleString()}</div>
             </div>
-            <div className="bg-[#fcfaf7] border border-[#e5e0d8] p-5 rounded-2xl">
+            <div className="bg-[#fcfaf7] border border-theme p-5 rounded-2xl">
               <div className="text-xs text-[#8d8a86] uppercase font-bold tracking-wider mb-1">Qtd. Diárias Pagas</div>
               <div className="text-2xl font-black text-blue-700">{payments.filter(p => p.paymentType === PaymentType.DAILY).length} diárias</div>
             </div>
-            <div className="bg-[#fcfaf7] border border-[#e5e0d8] p-5 rounded-2xl">
+            <div className="bg-[#fcfaf7] border border-theme p-5 rounded-2xl">
               <div className="text-xs text-[#8d8a86] uppercase font-bold tracking-wider mb-1">Total Salários</div>
-              <div className="text-2xl font-black text-[#6d6a66]">R$ {payments.filter(p => p.paymentType === PaymentType.SALARY).reduce((acc, p) => acc + p.totalValue, 0).toLocaleString()}</div>
+              <div className="text-2xl font-black text-theme-secondary">R$ {payments.filter(p => p.paymentType === PaymentType.SALARY).reduce((acc, p) => acc + p.totalValue, 0).toLocaleString()}</div>
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl border border-[#e5e0d8] overflow-hidden shadow-sm">
+          <div className="bg-theme-card rounded-3xl border border-theme overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-[#fcfaf7] border-b border-[#e5e0d8]">
+                  <tr className="bg-[#fcfaf7] border-b border-theme">
                     <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Data</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Funcionário</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Tipo</th>
@@ -485,12 +485,12 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                           {p.paymentType}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-extrabold text-[#3d5a45] text-sm">
+                      <td className="px-6 py-4 font-extrabold text-theme-primary text-sm">
                         R$ {p.totalValue.toLocaleString()}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => handleEditPayment(p)} className="p-2 hover:bg-[#f5f2ed] rounded-lg transition-colors text-[#6d6a66]">
+                          <button onClick={() => handleEditPayment(p)} className="p-2 hover:bg-theme-secondary rounded-lg transition-colors text-theme-secondary">
                             <Edit3 size={17} />
                           </button>
                           <button onClick={() => handleDeletePayment(p.id)} className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500">
@@ -522,25 +522,25 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => setIsEmployeeFormOpen(false)}
-                  className="p-2 -ml-2 text-[#8d8a86] hover:text-[#3d5a45] hover:bg-[#f5f2ed] rounded-full transition-colors"
+                  className="p-2 -ml-2 text-[#8d8a86] hover:text-theme-primary hover:bg-theme-secondary rounded-full transition-colors"
                   title="Voltar"
                 >
                   <ArrowLeft size={18} />
                 </button>
-                <h3 className="text-base font-bold flex items-center gap-2 text-[#3d5a45]">
+                <h3 className="text-base font-bold flex items-center gap-2 text-theme-primary">
                   <Briefcase size={18} />
                   {editingEmployee ? 'Editar Ficha do Colaborador' : 'Novo Cadastro de Colaborador'}
                 </h3>
               </div>
               <button 
                 onClick={() => setIsEmployeeFormOpen(false)}
-                className="p-1.5 hover:bg-[#e5e0d8] rounded-full transition-colors"
+                className="p-1.5 hover:bg-theme-secondary rounded-full transition-colors"
               >
                 <X size={18} />
               </button>
@@ -552,7 +552,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <input 
                   required
                   type="text" 
-                  className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none"
+                  className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none"
                   value={employeeFormData.name || ''}
                   onChange={(e) => setEmployeeFormData({...employeeFormData, name: e.target.value})}
                   placeholder="Nome do colaborador..."
@@ -563,7 +563,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Função / Cargo</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card font-medium"
                     value={employeeFormData.role}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, role: e.target.value as EmployeeRole})}
                   >
@@ -576,7 +576,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                   <input 
                     required
                     type="date" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none"
                     value={employeeFormData.admissionDate || ''}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, admissionDate: e.target.value})}
                   />
@@ -587,7 +587,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <div>
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Status Atual</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card font-medium"
                     value={employeeFormData.status}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, status: e.target.value as Employee['status']})}
                   >
@@ -602,7 +602,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block text-blue-700">Previsão Férias (Gozo)</label>
                   <input 
                     type="date" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none"
                     value={employeeFormData.vacationDate || ''}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, vacationDate: e.target.value})}
                   />
@@ -614,7 +614,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                   <label className="text-xs font-bold uppercase text-orange-850 mb-1 block">Data do Aviso Prévio</label>
                   <input 
                     type="date" 
-                    className="w-full px-4 py-2 border border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500/25 focus:outline-none bg-white"
+                    className="w-full px-4 py-2 border border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500/25 focus:outline-none bg-theme-card"
                     value={employeeFormData.noticeDate || ''}
                     onChange={(e) => setEmployeeFormData({...employeeFormData, noticeDate: e.target.value})}
                   />
@@ -648,25 +648,25 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-theme-card w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => setIsPaymentFormOpen(false)}
-                  className="p-2 -ml-2 text-[#8d8a86] hover:text-[#3d5a45] hover:bg-[#f5f2ed] rounded-full transition-colors"
+                  className="p-2 -ml-2 text-[#8d8a86] hover:text-theme-primary hover:bg-theme-secondary rounded-full transition-colors"
                   title="Voltar"
                 >
                   <ArrowLeft size={18} />
                 </button>
-                <h3 className="text-base font-bold flex items-center gap-2 text-[#3d5a45]">
+                <h3 className="text-base font-bold flex items-center gap-2 text-theme-primary">
                   <Banknote size={18} />
                   {editingPayment ? 'Editar Lançamento de Pagamento' : 'Novo Lançamento de Pagamento'}
                 </h3>
               </div>
               <button 
                 onClick={() => setIsPaymentFormOpen(false)}
-                className="p-1.5 hover:bg-[#e5e0d8] rounded-full transition-colors"
+                className="p-1.5 hover:bg-theme-secondary rounded-full transition-colors"
               >
                 <X size={18} />
               </button>
@@ -678,7 +678,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Colaborador</label>
                   {employees.length > 0 ? (
                     <select 
-                      className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-bold"
+                      className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card font-bold"
                       value={paymentFormData.employeeName}
                       onChange={(e) => {
                         const selectedEmp = employees.find(emp => emp.name === e.target.value);
@@ -712,7 +712,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                   <input 
                     required
                     type="date" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none"
                     value={paymentFormData.date}
                     onChange={(e) => setPaymentFormData({...paymentFormData, date: e.target.value})}
                   />
@@ -721,7 +721,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <div className="col-span-1">
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Tipo de Pagamento</label>
                   <select 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card font-medium"
                     value={paymentFormData.paymentType}
                     onChange={(e) => setPaymentFormData({...paymentFormData, paymentType: e.target.value as PaymentType})}
                   >
@@ -736,7 +736,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                       <input 
                         type="number" 
                         step="1"
-                        className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none font-bold"
+                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none font-bold"
                         value={paymentFormData.dailyQuantity || ''}
                         onChange={(e) => setPaymentFormData({...paymentFormData, dailyQuantity: Number(e.target.value)})}
                       />
@@ -746,15 +746,15 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                       <input 
                         type="number" 
                         step="0.01"
-                        className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none font-bold"
+                        className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none font-bold"
                         value={paymentFormData.dailyValue || ''}
                         onChange={(e) => setPaymentFormData({...paymentFormData, dailyValue: Number(e.target.value)})}
                       />
                     </div>
                     <div className="col-span-2">
-                      <div className="p-3 bg-[#fcfaf7] border border-[#e5e0d8] rounded-xl text-center">
+                      <div className="p-3 bg-[#fcfaf7] border border-theme rounded-xl text-center">
                         <span className="text-[10px] font-bold text-[#8d8a86] uppercase block">Total Diária Calculado</span>
-                        <span className="font-extrabold text-[#3d5a45] text-lg">R$ {((paymentFormData.dailyQuantity || 0) * (paymentFormData.dailyValue || 0)).toLocaleString()}</span>
+                        <span className="font-extrabold text-theme-primary text-lg">R$ {((paymentFormData.dailyQuantity || 0) * (paymentFormData.dailyValue || 0)).toLocaleString()}</span>
                       </div>
                     </div>
                   </>
@@ -765,7 +765,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                       required
                       type="number" 
                       step="0.01"
-                      className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none font-bold text-[#3d5a45]"
+                      className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none font-bold text-theme-primary"
                       value={paymentFormData.totalValue || ''}
                       onChange={(e) => setPaymentFormData({...paymentFormData, totalValue: Number(e.target.value)})}
                     />
@@ -775,7 +775,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 <div className="col-span-2">
                   <label className="text-[#8d8a86] text-xs font-bold uppercase mb-1 block">Observação</label>
                   <textarea 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/25 focus:outline-none text-sm min-h-[80px]"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none text-sm min-h-[80px]"
                     placeholder="Ex: Pagamento referente a serviços de cerca em Maio..."
                     value={paymentFormData.observation || ''}
                     onChange={(e) => setPaymentFormData({...paymentFormData, observation: e.target.value})}

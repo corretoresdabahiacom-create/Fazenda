@@ -191,21 +191,21 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
       </AnimatePresence>
 
       {settings.farmName && (
-        <div className="bg-white p-4 rounded-3xl border border-[#e5e0d8] shadow-sm flex flex-wrap items-center gap-6">
-          <div className="flex items-center gap-3 pr-6 border-r border-[#e5e0d8]">
-            <div className="bg-[#3d5a45]/10 p-2 rounded-xl">
-              <MapIcon className="text-[#3d5a45]" size={20} />
+        <div className="bg-theme-card p-4 rounded-3xl border border-theme shadow-sm flex flex-wrap items-center gap-6">
+          <div className="flex items-center gap-3 pr-6 border-r border-theme">
+            <div className="bg-[var(--primary)]/10 p-2 rounded-xl">
+              <MapIcon className="text-theme-primary" size={20} />
             </div>
             <div>
               <div className="text-[10px] font-black uppercase text-[#8d8a86]">Área Total Fazenda</div>
-              <div className="text-sm font-bold text-[#3d5a45]">
+              <div className="text-sm font-bold text-theme-primary">
                 {pastures.reduce((acc, p) => acc + (p.size || 0), 0).toLocaleString()} <span className="text-[10px]">ha em {pastures.length} pastos</span>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="bg-[#3d5a45]/5 p-2 rounded-xl text-[#3d5a45]">
+            <div className="bg-[var(--primary)]/5 p-2 rounded-xl text-theme-primary">
               <Users size={20} />
             </div>
             <div>
@@ -217,10 +217,10 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           </div>
 
           {/* Toggle Season */}
-          <div className="ml-auto flex bg-[#f5f2ed] border p-0.5 rounded-xl text-xs font-bold text-[#8d8a86]">
+          <div className="ml-auto flex bg-theme-secondary border p-0.5 rounded-xl text-xs font-bold text-[#8d8a86]">
             <button 
               onClick={() => setSeason('aguas')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${season === 'aguas' ? 'bg-[#3d5a45] text-white shadow-sm' : ''}`}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${season === 'aguas' ? 'bg-[var(--primary)] text-white shadow-sm' : ''}`}
             >
               <Droplets size={14} /> Águas
             </button>
@@ -241,7 +241,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           <input 
             type="text" 
             placeholder="Pesquisar pastos..." 
-            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3d5a45]/20 font-medium text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-theme-card border border-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 font-medium text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -280,12 +280,12 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
             <motion.div 
               key={pasture.id}
               layout
-              className="bg-white rounded-3xl border border-[#e5e0d8] shadow-sm hover:border-[#3d5a45]/40 transition-colors flex flex-col justify-between overflow-hidden"
+              className="bg-theme-card rounded-3xl border border-theme shadow-sm hover:border-[var(--primary)]/40 transition-colors flex flex-col justify-between overflow-hidden"
             >
               <div className="p-6 space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#fcfaf7] rounded-xl flex items-center justify-center text-[#3d5a45] border border-[#e5e0d8] font-bold text-sm">
+                    <div className="w-10 h-10 bg-[#fcfaf7] rounded-xl flex items-center justify-center text-theme-primary border border-theme font-bold text-sm">
                       {pasture.number}
                     </div>
                     <div>
@@ -300,12 +300,12 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                         setSelectedPastureForAnalysis(pasture);
                         setIsAIScanning(true);
                       }}
-                      className="p-1.5 hover:bg-[#f5f2ed] border text-[#3d5a45] bg-[#3d5a45]/5 border-[#3d5a45]/15 rounded-lg transition-transform hover:scale-105"
+                      className="p-1.5 hover:bg-theme-secondary border text-theme-primary bg-[var(--primary)]/5 border-[var(--primary)]/15 rounded-lg transition-transform hover:scale-105"
                       title="AI Scan"
                     >
                       <Sparkles size={14} />
                     </button>
-                    <button onClick={() => handleEdit(pasture)} className="p-1.5 hover:bg-[#fcfaf7] border border-[#e5e0d8] rounded-lg text-[#6d6a66]">
+                    <button onClick={() => handleEdit(pasture)} className="p-1.5 hover:bg-[#fcfaf7] border border-theme rounded-lg text-theme-secondary">
                       <Edit3 size={14} />
                     </button>
                     <button onClick={() => handleDelete(pasture.id)} className="p-1.5 hover:bg-red-50 border border-red-100 rounded-lg text-red-500">
@@ -317,13 +317,13 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 {/* Grass types bullets */}
                 <div className="flex flex-wrap gap-1">
                   {pasture.grassTypes.map(t => (
-                    <span key={t} className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-[#3d5a45]/10 text-[#3d5a45] border border-[#3d5a45]/20">
+                    <span key={t} className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-[var(--primary)]/10 text-theme-primary border border-[var(--primary)]/20">
                       🌿 {t}
                     </span>
                   ))}
                   {pasture.purpose && (
                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${
-                      pasture.purpose === 'engorda' ? 'bg-[#3d5a45]/10 text-[#3d5a45] border-[#3d5a45]/20' :
+                      pasture.purpose === 'engorda' ? 'bg-[var(--primary)]/10 text-theme-primary border-[var(--primary)]/20' :
                       pasture.purpose === 'manutenção' ? 'bg-blue-50 text-blue-800 border-blue-200' :
                       'bg-purple-50 text-purple-800 border-purple-200'
                     }`}>
@@ -335,16 +335,16 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 </div>
 
                 {/* stocking rate progress bar */}
-                <div className="space-y-1 pt-2 border-t border-[#f5f2ed]">
+                <div className="space-y-1 pt-2 border-t border-theme">
                   <div className="flex justify-between text-xs font-bold">
                     <span className="text-[#8d8a86]">Lotação Atual ({season === 'aguas' ? 'Águas' : 'Seca'})</span>
-                    <span className={pct > 100 ? 'text-red-500' : 'text-[#3d5a45]'}>
+                    <span className={pct > 100 ? 'text-red-500' : 'text-theme-primary'}>
                       {count} / {limit} cab. ({pct.toFixed(0)}%)
                     </span>
                   </div>
                   <div className="w-full h-2 bg-[#fcfaf7] border rounded-full overflow-hidden">
                     <div 
-                      className={`h-full transition-all duration-500 ${pct > 100 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-[#3d5a45]'}`}
+                      className={`h-full transition-all duration-500 ${pct > 100 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-[var(--primary)]'}`}
                       style={{ width: `${Math.min(100, pct)}%` }}
                     />
                   </div>
@@ -352,9 +352,9 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
 
                 {/* AI technical insights if scanned */}
                 {pasture.aiAnalysis && (
-                  <div className="bg-[#3d5a45]/5 p-3.5 rounded-2xl border border-[#3d5a45]/10 space-y-2 mt-2">
+                  <div className="bg-[var(--primary)]/5 p-3.5 rounded-2xl border border-[var(--primary)]/10 space-y-2 mt-2">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-[#3d5a45]">
+                      <div className="flex items-center gap-1 text-theme-primary">
                         <Sparkles size={12} />
                         <span className="text-[10px] font-bold uppercase">Análise Agronômica IA</span>
                       </div>
@@ -367,13 +367,13 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                       <div className={`p-2 rounded-xl flex items-center gap-2 border ${pasture.aiAnalysis.isTimeToTakeOutCattle ? 'bg-orange-50 border-orange-100 text-orange-700' : 'bg-slate-50 border-slate-100 text-slate-700'}`}>
                         <span className="text-[10px] font-bold">{pasture.aiAnalysis.isTimeToTakeOutCattle ? '🚨 Saída Urgente (Pastejo Limite)' : '✅ Em Pastoreio'}</span>
                       </div>
-                      <div className="p-2 rounded-xl bg-[#3d5a45]/5 border border-[#3d5a45]/10 text-[#3d5a45] flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-[var(--primary)]/5 border border-[var(--primary)]/10 text-theme-primary flex items-center gap-2">
                         <Activity size={12} />
                         <span className="text-[10px] font-bold">{pasture.aiAnalysis.heightCm}cm | {pasture.aiAnalysis.crudeProtein} PB | {pasture.aiAnalysis.ndt} NDT</span>
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-[#6d6a66] italic leading-tight"><strong>Laudo Técnico:</strong> {pasture.aiAnalysis.technicalJustification}</p>
+                    <p className="text-[11px] text-theme-secondary italic leading-tight"><strong>Laudo Técnico:</strong> {pasture.aiAnalysis.technicalJustification}</p>
                   </div>
                 )}
               </div>
@@ -381,7 +381,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           );
         })}
         {filteredPastures.length === 0 && (
-          <div className="col-span-full py-20 text-center text-[#8d8a86] bg-[#fcfaf7] rounded-3xl border border-[#e5e0d8] italic text-sm">
+          <div className="col-span-full py-20 text-center text-[#8d8a86] bg-[#fcfaf7] rounded-3xl border border-theme italic text-sm">
             Nenhum pasto cadastrado correspondente aos termos de pesquisa.
           </div>
         )}
@@ -393,25 +393,25 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-[#e5e0d8] flex items-center justify-between bg-[#fcfaf7]">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-[#fcfaf7]">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingPasture(null); }}
-                  className="p-2 -ml-2 text-[#8d8a86] hover:text-[#3d5a45] hover:bg-[#e5e0d8] rounded-full transition-colors md:hidden"
+                  className="p-2 -ml-2 text-[#8d8a86] hover:text-theme-primary hover:bg-theme-secondary rounded-full transition-colors md:hidden"
                   title="Voltar"
                 >
                   <ArrowLeft size={18} />
                 </button>
-                <h3 className="text-base font-black flex items-center gap-2 text-[#3d5a45]">
+                <h3 className="text-base font-black flex items-center gap-2 text-theme-primary">
                   <MapIcon size={18} />
                   {editingPasture ? 'Editar Cadastro de Pasto' : 'Novo Cadastro de Pasto'}
                 </h3>
               </div>
               <button 
                 onClick={() => { setIsFormOpen(false); setEditingPasture(null); }}
-                className="p-1.5 hover:bg-[#e5e0d8] rounded-full transition-colors"
+                className="p-1.5 hover:bg-theme-secondary rounded-full transition-colors"
                 type="button"
               >
                 <X size={18} />
@@ -425,7 +425,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-black text-center text-[#3d5a45]"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-center text-theme-primary"
                     value={formData.number || ''}
                     onChange={(e) => setFormData({...formData, number: e.target.value})}
                     placeholder="01"
@@ -436,7 +436,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <input 
                     required
                     type="text" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
                     value={formData.name || ''}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     placeholder="Ex: Baixada do Rio, Morro Alto..."
@@ -451,7 +451,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     required
                     type="number" 
                     step="0.01"
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-black"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black"
                     value={formData.size || ''}
                     onChange={(e) => setFormData({...formData, size: Number(e.target.value)})}
                     placeholder="Ex: 15.5"
@@ -462,7 +462,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Finalidade do Pasto</label>
                   <select 
                     required
-                    className="w-full px-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                    className="w-full px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
                     value={formData.purpose || 'engorda'}
                     onChange={(e) => setFormData({...formData, purpose: e.target.value as any})}
                   >
@@ -477,13 +477,13 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div className="flex gap-2">
                     <input
                       type="date"
-                      className="flex-1 px-4 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                      className="flex-1 px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
                       value={formData.nextRotationDate || ''}
                       onChange={(e) => setFormData({...formData, nextRotationDate: e.target.value || undefined})}
                     />
                     <input
                       type="time"
-                      className="w-28 px-2 py-2 bg-white border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                      className="w-28 px-2 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
                       value={formData.nextRotationTime || ''}
                       onChange={(e) => setFormData({...formData, nextRotationTime: e.target.value || undefined})}
                     />
@@ -496,10 +496,10 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1.5 block">Gramíneas (Marque)</label>
                 <div className="grid grid-cols-3 gap-2">
                   {PASTURE_TYPES.map(type => (
-                    <label key={type} className={`flex items-center gap-2 p-2 rounded-xl border border-[#e5e0d8] hover:bg-[#fcfaf7] cursor-pointer transition-colors ${formData.grassTypes?.includes(type) ? 'bg-[#3d5a45]/10 border-[#3d5a45]/30' : ''}`}>
+                    <label key={type} className={`flex items-center gap-2 p-2 rounded-xl border border-theme hover:bg-[#fcfaf7] cursor-pointer transition-colors ${formData.grassTypes?.includes(type) ? 'bg-[var(--primary)]/10 border-[var(--primary)]/30' : ''}`}>
                       <input 
                         type="checkbox"
-                        className="rounded text-[#3d5a45] focus:ring-[#3d5a45]"
+                        className="rounded text-theme-primary focus:ring-[var(--primary)]"
                         checked={formData.grassTypes?.includes(type) || false}
                         onChange={(e) => {
                           const types = formData.grassTypes || [];
@@ -510,26 +510,26 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                           }
                         }}
                       />
-                      <span className="text-[10px] font-bold text-[#6d6a66]">{type}</span>
+                      <span className="text-[10px] font-bold text-theme-secondary">{type}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               {/* AUTOMATIC AI SIMULATOR CARD COMPONENT */}
-              <div className="p-4 bg-[#3d5a45]/5 border border-[#3d5a45]/15 rounded-2xl space-y-3.5">
-                <div className="flex items-center gap-2 text-[#3d5a45]">
+              <div className="p-4 bg-[var(--primary)]/5 border border-[var(--primary)]/15 rounded-2xl space-y-3.5">
+                <div className="flex items-center gap-2 text-theme-primary">
                   <Sparkles size={16} />
                   <h4 className="text-xs font-black uppercase">Simulador IA Agronômico de Capacidade</h4>
                 </div>
                 
-                <p className="text-[10px] text-[#6d6a66] leading-normal font-medium">Divida e calcule as capacidades estimadas de "Águas" e "Seca" cientificamente segundo recomendações da Embrapa, baseando-se nas espécies de gramíneas e dimensão do pasto.</p>
+                <p className="text-[10px] text-theme-secondary leading-normal font-medium">Divida e calcule as capacidades estimadas de "Águas" e "Seca" cientificamente segundo recomendações da Embrapa, baseando-se nas espécies de gramíneas e dimensão do pasto.</p>
 
                 <div className="grid grid-cols-2 gap-3.5 pt-1">
                   <div>
                     <label className="text-[9px] font-bold uppercase text-[#8d8a86] mb-1 block">Loteamento Previsto</label>
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-bold text-slate-800 focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                       value={estimatorParams.animalCategory}
                       onChange={(e) => setEstimatorParams({...estimatorParams, animalCategory: e.target.value})}
                     >
@@ -543,7 +543,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div>
                     <label className="text-[9px] font-bold uppercase text-[#8d8a86] mb-1 block">Objetivo Produtivo</label>
                     <select 
-                      className="w-full px-3 py-1.5 border border-[#e5e0d8] rounded-xl text-xs bg-white font-bold text-slate-800 focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                       value={estimatorParams.objective}
                       onChange={(e) => setEstimatorParams({...estimatorParams, objective: e.target.value})}
                     >
@@ -567,8 +567,8 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 </div>
 
                 {capacityJustification && (
-                  <div className="p-3 bg-white border border-[#e5e0d8] rounded-xl text-[10px] text-[#3d5a45] font-medium leading-tight select-none">
-                    <p className="flex items-start gap-1"><AlertCircle size={12} className="text-[#3d5a45] shrink-0 mt-0.5" /> {capacityJustification}</p>
+                  <div className="p-3 bg-theme-card border border-theme rounded-xl text-[10px] text-theme-primary font-medium leading-tight select-none">
+                    <p className="flex items-start gap-1"><AlertCircle size={12} className="text-theme-primary shrink-0 mt-0.5" /> {capacityJustification}</p>
                   </div>
                 )}
               </div>
@@ -576,21 +576,21 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
               {/* Core Limits values */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block font-bold text-[#3d5a45]">Capacidade Máxima Águas</label>
+                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block font-bold text-theme-primary">Capacidade Máxima Águas</label>
                   <input 
                     required
                     type="number" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-black text-sm text-[#3d5a45]"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-sm text-theme-primary"
                     value={formData.capacityAguas || ''}
                     onChange={(e) => setFormData({...formData, capacityAguas: Number(e.target.value)})}
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block font-bold text-[#3d5a45]">Capacidade Máxima Seca</label>
+                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block font-bold text-theme-primary">Capacidade Máxima Seca</label>
                   <input 
                     required
                     type="number" 
-                    className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-black text-sm text-[#3d5a45]"
+                    className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-black text-sm text-theme-primary"
                     value={formData.capacitySeca || ''}
                     onChange={(e) => setFormData({...formData, capacitySeca: Number(e.target.value)})}
                   />

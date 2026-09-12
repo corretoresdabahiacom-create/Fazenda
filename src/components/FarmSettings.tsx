@@ -256,8 +256,8 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-12 legacy-light">
-      <div className="bg-white p-8 rounded-3xl border border-[#e5e0d8] shadow-sm space-y-6">
-        <h3 className="text-xl font-bold flex items-center gap-2 text-[#3d5a45]">
+      <div className="bg-theme-card p-8 rounded-3xl border border-theme shadow-sm space-y-6">
+        <h3 className="text-xl font-bold flex items-center gap-2 text-theme-primary">
           <Building2 size={24} /> Configurações da Fazenda
         </h3>
         
@@ -283,7 +283,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
             <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Nome da Fazenda</label>
             <input 
               type="text" 
-              className="w-full px-4 py-3 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold text-lg"
+              className="w-full px-4 py-3 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-lg"
               value={formData.farmName}
               onChange={(e) => setFormData({...formData, farmName: e.target.value})}
             />
@@ -296,7 +296,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
               <input 
                 type="text" 
                 placeholder="Ex: Goiânia, MT"
-                className="w-full pl-12 pr-4 py-3 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+                className="w-full pl-12 pr-4 py-3 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
                 value={formData.city}
                 onChange={(e) => setFormData({...formData, city: e.target.value})}
               />
@@ -310,7 +310,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
             <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Data de Aniversário (opcional)</label>
             <input
               type="date"
-              className="w-full px-4 py-3 border border-[#e5e0d8] rounded-xl focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none font-bold"
+              className="w-full px-4 py-3 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
               value={formData.ownerBirthday ? `2000-${formData.ownerBirthday}` : ''}
               onChange={(e) => setFormData({...formData, ownerBirthday: e.target.value ? e.target.value.slice(5) : undefined})}
             />
@@ -336,7 +336,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                 }
               }}
               disabled={pushStatus === 'loading' || pushStatus === 'ok'}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-[#e5e0d8] rounded-xl font-bold text-sm disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-theme rounded-xl font-bold text-sm disabled:opacity-70"
             >
               <Bell size={16} />
               {pushStatus === 'ok' ? 'Notificações ativadas ✓' : pushStatus === 'loading' ? 'Ativando...' : 'Ativar notificações push'}
@@ -351,9 +351,9 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                 type="checkbox"
                 checked={!formData.pushNotificationsDisabled}
                 onChange={(e) => setFormData({ ...formData, pushNotificationsDisabled: !e.target.checked })}
-                className="w-4 h-4 accent-[#3d5a45]"
+                className="w-4 h-4 accent-[var(--primary)]"
               />
-              <span className="text-xs text-[#3d5a45] font-semibold">
+              <span className="text-xs text-theme-primary font-semibold">
                 Pedir permissão de notificação automaticamente ao entrar no app
               </span>
             </label>
@@ -373,9 +373,9 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
         </button>
 
         {!isDemoMode && userRole === 'admin' && (
-          <div className="pt-6 border-t border-[#e5e0d8] space-y-3">
-            <h4 className="text-xs font-bold text-[#3d5a45] uppercase tracking-wider">Carga de Dados</h4>
-            <p className="text-xs text-[#6d6a66] leading-relaxed">
+          <div className="pt-6 border-t border-theme space-y-3">
+            <h4 className="text-xs font-bold text-theme-primary uppercase tracking-wider">Carga de Dados</h4>
+            <p className="text-xs text-theme-secondary leading-relaxed">
               Povoar o banco de dados com os registros de rebanhos, pastos, tarefas e funcionários iniciais de demonstração (ideal para novos usuários).
             </p>
             <button
@@ -391,10 +391,10 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
 
         {/* Backup and Restore Section */}
         {(isDemoMode || userRole === 'admin') && (
-          <div className="pt-6 border-t border-[#e5e0d8] space-y-4">
+          <div className="pt-6 border-t border-theme space-y-4">
             <div>
-              <h4 className="text-xs font-bold text-[#3d5a45] uppercase tracking-wider mb-1">Backup de Segurança</h4>
-              <p className="text-xs text-[#6d6a66] leading-relaxed">
+              <h4 className="text-xs font-bold text-theme-primary uppercase tracking-wider mb-1">Backup de Segurança</h4>
+              <p className="text-xs text-theme-secondary leading-relaxed">
                 Exporte uma cópia completa dos registros da fazenda para seu computador ou restaure um arquivo salvo anteriormente.
               </p>
             </div>
@@ -426,13 +426,13 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
         )}
       </div>
 
-      <div className="bg-[#fcfaf7] p-6 rounded-3xl border border-[#e5e0d8] flex flex-col md:flex-row items-center gap-6">
-        <div className="bg-[#3d5a45]/10 p-4 rounded-2xl flex-shrink-0">
-          <CloudSun className="text-[#3d5a45] w-8 h-8" />
+      <div className="bg-[#fcfaf7] p-6 rounded-3xl border border-theme flex flex-col md:flex-row items-center gap-6">
+        <div className="bg-[var(--primary)]/10 p-4 rounded-2xl flex-shrink-0">
+          <CloudSun className="text-theme-primary w-8 h-8" />
         </div>
         <div>
-          <h4 className="font-bold text-[#3d5a45] mb-1">Nota sobre Gestão Geográfica</h4>
-          <p className="text-sm text-[#6d6a66] leading-relaxed">
+          <h4 className="font-bold text-theme-primary mb-1">Nota sobre Gestão Geográfica</h4>
+          <p className="text-sm text-theme-secondary leading-relaxed">
             As taxas de Unidade Animal (UA) por hectare são influenciadas pelo bioma da sua região. 
             Mantenha a cidade atualizada para receber estimativas mais precisas de suporte de pastagem.
           </p>
@@ -447,13 +447,13 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="bg-[#fcfaf7] rounded-3xl border border-[#e5e0d8] shadow-2xl overflow-hidden max-w-2xl w-full flex flex-col max-h-[90vh]"
+              className="bg-[#fcfaf7] rounded-3xl border border-theme shadow-2xl overflow-hidden max-w-2xl w-full flex flex-col max-h-[90vh]"
             >
               {/* Header */}
-              <div className="bg-[#3d5a45] text-white p-6 relative">
+              <div className="bg-[var(--primary)] text-white p-6 relative">
                 <button 
                   onClick={() => setIsWeatherModalOpen(false)}
-                  className="absolute right-4 top-4 text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                  className="absolute right-4 top-4 text-white/80 hover:text-white p-1 rounded-full hover:bg-theme-card/10 transition-colors cursor-pointer"
                 >
                   <X size={20} />
                 </button>
@@ -472,13 +472,13 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                   {weatherData.forecast.map((day, idx) => (
                     <div 
                       key={idx} 
-                      className="bg-white p-3 rounded-2xl border border-[#e5e0d8] text-center flex flex-col justify-between shadow-xs hover:border-[#3d5a45]/30 hover:shadow-xs transition-shadow"
+                      className="bg-theme-card p-3 rounded-2xl border border-theme text-center flex flex-col justify-between shadow-xs hover:border-[var(--primary)]/30 hover:shadow-xs transition-shadow"
                     >
                       <div>
                         <div className="text-[10px] font-black uppercase text-[#8d8a86]">
                           {day.weekdayStr}
                         </div>
-                        <div className="text-xs font-black text-[#3d5a45] mb-2">
+                        <div className="text-xs font-black text-theme-primary mb-2">
                           {day.dayStr}
                         </div>
                       </div>
@@ -502,10 +502,10 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                   ))}
                 </div>
 
-                <div className="bg-white p-4 rounded-2xl border border-[#e5e0d8] text-center md:flex items-center justify-between gap-4">
+                <div className="bg-theme-card p-4 rounded-2xl border border-theme text-center md:flex items-center justify-between gap-4">
                   <div className="text-left">
-                    <span className="text-[10px] uppercase font-bold text-[#3d5a45] block">Capacidade Estimativa</span>
-                    <p className="text-[11px] text-[#6d6a66] font-medium max-w-md leading-relaxed">
+                    <span className="text-[10px] uppercase font-bold text-theme-primary block">Capacidade Estimativa</span>
+                    <p className="text-[11px] text-theme-secondary font-medium max-w-md leading-relaxed">
                       Este modelo simula dados com base no histórico local brasileiro da cidade configurada, refinando sua UA/ha automaticamente.
                     </p>
                   </div>

@@ -70,9 +70,9 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
   }));
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e5e0d8] p-4">
-      <p className="text-xs font-bold text-[#3d5a45] mb-1">{titulo}</p>
-      <p className="text-[10px] text-[#6d6a66] mb-3">{dados.local} · {dados.granularidade === 'mes' ? 'por mês' : 'por dia'}</p>
+    <div className="bg-theme-card rounded-2xl border border-theme p-4">
+      <p className="text-xs font-bold text-theme-primary mb-1">{titulo}</p>
+      <p className="text-[10px] text-theme-secondary mb-3">{dados.local} · {dados.granularidade === 'mes' ? 'por mês' : 'por dia'}</p>
       {dados.avisoPreco && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-2 mb-3 flex items-start gap-2">
           <AlertTriangle size={12} className="text-amber-600 shrink-0 mt-0.5" />
@@ -114,28 +114,28 @@ export default function GraficoPrecoClima({ produto, produtoLabel, estado, cidad
   const anoPassado = useChartData(produto, estado, cidade, inicioAnoPassado, fimAnoPassado);
 
   if (!estado && !cidade) {
-    return <p className="text-xs text-[#6d6a66] bg-white border border-[#e5e0d8] rounded-2xl p-4">Escolha um estado ou cidade acima pra ver o gráfico de preço x clima.</p>;
+    return <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4">Escolha um estado ou cidade acima pra ver o gráfico de preço x clima.</p>;
   }
 
   return (
     <div className="space-y-3">
-      <div className="bg-white rounded-2xl border border-[#e5e0d8] p-3 flex flex-wrap items-end gap-3">
+      <div className="bg-theme-card rounded-2xl border border-theme p-3 flex flex-wrap items-end gap-3">
         <div>
-          <label className="text-[10px] font-bold text-[#6d6a66] uppercase block mb-1">De</label>
-          <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="text-xs border border-[#e5e0d8] rounded-lg px-2 py-1.5" />
+          <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">De</label>
+          <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="text-xs border border-theme rounded-lg px-2 py-1.5" />
         </div>
         <div>
-          <label className="text-[10px] font-bold text-[#6d6a66] uppercase block mb-1">Até</label>
-          <input type="date" value={dataFim} max={dataFimMax} onChange={e => setDataFim(e.target.value)} className="text-xs border border-[#e5e0d8] rounded-lg px-2 py-1.5" />
+          <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">Até</label>
+          <input type="date" value={dataFim} max={dataFimMax} onChange={e => setDataFim(e.target.value)} className="text-xs border border-theme rounded-lg px-2 py-1.5" />
         </div>
-        <p className="text-[10px] text-[#6d6a66]">Previsão de clima disponível até {new Date(dataFimMax).toLocaleDateString('pt-BR')} (limite de 16 dias à frente do Open-Meteo). Selecione só um mês pra ver o detalhe por dia.</p>
+        <p className="text-[10px] text-theme-secondary">Previsão de clima disponível até {new Date(dataFimMax).toLocaleDateString('pt-BR')} (limite de 16 dias à frente do Open-Meteo). Selecione só um mês pra ver o detalhe por dia.</p>
       </div>
 
-      {atual.loading && <p className="text-xs text-[#6d6a66] text-center py-6">Montando o gráfico...</p>}
+      {atual.loading && <p className="text-xs text-theme-secondary text-center py-6">Montando o gráfico...</p>}
       {atual.error && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">{atual.error}</p>}
       <GraficoIndividual titulo={`${produtoLabel} × Clima — período selecionado`} dados={atual.dados} />
 
-      {anoPassado.error && <p className="text-xs text-[#6d6a66]">Não foi possível comparar com o ano passado agora.</p>}
+      {anoPassado.error && <p className="text-xs text-theme-secondary">Não foi possível comparar com o ano passado agora.</p>}
       <GraficoIndividual titulo={`${produtoLabel} × Clima — mesmo período, ano anterior`} dados={anoPassado.dados} />
     </div>
   );
