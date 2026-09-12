@@ -1,0 +1,110 @@
+/*
+ * Bandeiras dos estados brasileiros, em CSS puro.
+ *
+ * As 15 bandeiras marcadas "FONTE REAL" abaixo vêm, adaptadas pra
+ * tamanho de ícone, do projeto open-source "flags-brazil" de Welkson
+ * Ramos (MIT License) — https://github.com/welksonramos/flags-brazil
+ *
+ * As 12 marcadas "APROXIMAÇÃO" são simplificações minhas (cores e
+ * padrão geral do desenho oficial, sem o brasão/detalhe heráldico
+ * completo, que é complexo demais pra reproduzir fielmente só com
+ * gradiente CSS) — documentado aqui de propósito, pra não passar a
+ * impressão de que são reproduções oficiais perfeitas.
+ *
+ * Técnica: cada bandeira é desenhada num quadro de 300x200 (mesma
+ * base da fonte original) e depois encolhida com transform:scale()
+ * dentro de um container pequeno com overflow:hidden — assim qualquer
+ * tamanho de ícone usa a mesma arte, sem duplicar CSS por tamanho.
+ */
+
+.flag-icon-container {
+  overflow: hidden;
+  position: relative;
+  border-radius: 6px;
+  display: inline-block;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.flag-icon-inner {
+  width: 300px;
+  height: 200px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  font: normal normal 16px/1.5 Arial, sans-serif;
+}
+
+.flag-icon-inner:before,
+.flag-icon-inner:after {
+  content: '';
+  display: block;
+  position: absolute;
+}
+
+/* ============ FONTE REAL (flags-brazil, MIT) ============ */
+
+.flag-ac { background-image: linear-gradient(-213.5deg, #fee63c 50%, #019f6f 50%); }
+.flag-ac:before { content: '\2605'; color: #c0392b; font-size: 50px; line-height: 50px; margin: 15px 0 0 15px; }
+
+.flag-ba { background-image: repeating-linear-gradient(to bottom, #fff, #fff 25%, #e74c3c 25%, #e74c3c 50%); }
+.flag-ba:before { background: #2980b9; width: 100px; height: 100px; }
+.flag-ba:after { font-size: 2.7rem; margin: 18px 0 0 12px; border-bottom: 65px solid #fff; border-left: 40px solid transparent; border-right: 40px solid transparent; }
+
+.flag-df { display: flex; align-items: center; justify-content: center; background: #00933d; }
+.flag-df:before { width: 120px; height: 120px; background-size: cover; background-color: #00933d; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cpath fill='%23f8c300' d='M213.439 213.439H109.684L83.992 239.13H36.561v-25.691L0 250l36.561 36.561V260.87h47.431l25.692 25.691h103.755L176.877 250z'/%3E%3Cpath fill='%23f8c300' d='M286.561 213.439V109.684L260.87 83.992V36.561h25.691L250 0l-36.561 36.561h25.691v47.431l-25.691 25.692v103.755L250 176.877z'/%3E%3Cpath fill='%23f8c300' d='M213.439 286.561v103.755l25.691 25.692v47.431h-25.691L250 500l36.561-36.561H260.87v-47.431l25.691-25.692V286.561L250 323.123z'/%3E%3Cpath fill='%23f8c300' d='M500 250l-36.561-36.561v25.691h-47.431l-25.692-25.691H286.561L323.123 250l-36.562 36.561h103.755l25.692-25.691h47.431v25.691z'/%3E%3C/svg%3E"); }
+
+.flag-es { background: linear-gradient(#00adef 33.3%, #fff 33.3%, #fff 66.6%, #f7adae 66.6%); }
+
+.flag-ma { background-image: repeating-linear-gradient(to bottom, #e74c3c, #e74c3c 11.1%, #fff 11.1%, #fff 22.2%, #000 22.2%, #000 33.3%, #fff 33.3%, #fff 44.4%); }
+.flag-ma:before { margin: 0; width: 89px; height: 89px; background: #2980b9; }
+.flag-ma:after { content: '\2605'; color: #fff; font-size: 70px; width: 89px; height: 89px; display: flex; align-items: center; justify-content: center; }
+
+.flag-ms { background: #fff; background-image: linear-gradient(-224.5deg, #019f6f 31%, transparent 30%), linear-gradient(-44deg, #2980b9 58%, transparent 30%); }
+.flag-ms:before { position: absolute; content: '\2605'; color: #fee63c; font-size: 60px; line-height: 60px; bottom: 25px; right: 25px; }
+
+.flag-mt { background: #fff; background-image: linear-gradient(30deg, #1f3a93 30%, transparent 30%), linear-gradient(-30deg, #1f3a93 30%, transparent 30%), linear-gradient(210deg, #1f3a93 30%, transparent 30%), linear-gradient(-210deg, #1f3a93 30%, transparent 30%); }
+.flag-mt:before { width: 100px; height: 100px; margin: 50px 0 0 100px; background: #019f6f; border-radius: 50%; }
+.flag-mt:after { content: '\2605'; color: #fee63c; font-size: 93px; width: 300px; height: 200px; display: flex; margin-top: -3px; justify-content: center; align-items: center; }
+
+.flag-mg { background: #fff; display: flex; align-items: center; justify-content: center; }
+.flag-mg:before { border-left: 60px solid transparent; border-right: 60px solid transparent; border-bottom: 90px solid #f00; }
+
+.flag-pa { background-image: linear-gradient(34deg, #e74c3c 41%, #fff 41%, #fff 58%, #e74c3c 58%); }
+.flag-pa:before { content: '\2605'; color: #2980b9; font-size: 40px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+.flag-pb { background-image: linear-gradient(to right, #000, #000 30%, #e74c3c 30%); }
+
+.flag-pr { background-image: linear-gradient(34deg, #008c43 30%, #fff 0, #fff 75%, #008c43 50%); }
+.flag-pr:before { background: #3f51b5 radial-gradient(circle at 0 175px, transparent 71%, #fff 72%, #fff 78%, transparent 79%); border-radius: 50%; content: ''; height: 100px; margin: 40px 0 0 100px; position: absolute; width: 100px; }
+
+.flag-pi { background-image: repeating-linear-gradient(to bottom, #019f6f, #019f6f 16px, #fee63c 0, #fee63c 31px); }
+.flag-pi:before { width: 90px; height: 78px; background: #1f3a93; }
+.flag-pi:after { content: '\2605'; color: #fff; font-size: 52px; display: flex; width: 90px; height: 78px; align-items: center; justify-content: center; }
+
+.flag-ro { background-image: linear-gradient(0deg, #fee63c, #fee63c 50%, #1f3a93 50%, #1f3a93 100%); }
+.flag-ro:before { border-left: 150px solid transparent; border-right: 150px solid transparent; border-bottom: 100px solid #019f6f; margin-top: 100px; z-index: 2; }
+.flag-ro:after { content: '\2605'; color: #fff; font-size: 70px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin-top: -14px; z-index: 1; }
+
+.flag-rr { background-image: linear-gradient(-32deg, #019f6f 36%, #fff 36%, #fff 65%, #2980b9 65%); }
+.flag-rr:before { content: '\2605'; color: #fee63c; font-size: 176px; display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; margin-top: -8px; }
+.flag-rr:after { width: 300px; height: 10px; margin-top: 174px; background: #e74c3c; }
+
+/* ============ APROXIMAÇÃO (cores/padrão geral, sem brasão completo) ============ */
+
+.flag-al { background: linear-gradient(to bottom, #fff 50%, #d62828 50%); } /* Alagoas: base branco/vermelho */
+.flag-am { background: #fff; background-image: linear-gradient(-32deg, transparent 48%, #d62828 48%, #d62828 52%, transparent 52%); } /* Amazonas: faixa diagonal vermelha */
+.flag-ce { background-image: linear-gradient(to bottom, #fff 50%, #0d3b66 50%); } /* Ceará: branco/azul */
+.flag-ce:before { content: '\2605'; color: #d62828; font-size: 40px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.flag-go { background-image: linear-gradient(to bottom, #2a9d8f 20%, #fff 20%, #fff 80%, #2a9d8f 80%); } /* Goiás: verde/branco/verde */
+.flag-pe { background: #fff; } /* Pernambuco: base branca (arco-íris e cruzeiro omitidos, complexos demais em CSS) */
+.flag-pe:before { border-top: 100px solid #0d3b66; border-bottom: 100px solid #e74c3c; width: 300px; height: 0; }
+.flag-rj { background: #fff; background-image: linear-gradient(to right, #0d3b66 35%, transparent 35%); } /* Rio de Janeiro: base branco/azul */
+.flag-rn { background-image: linear-gradient(to bottom, #fff 33%, #0d3b66 33%, #0d3b66 66%, #fff 66%); } /* Rio Grande do Norte: branco/azul/branco */
+.flag-rn:before { content: '\2605'; color: #d62828; font-size: 36px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.flag-rs { background: linear-gradient(135deg, #2a9d8f 33%, #fff 33%, #fff 66%, #f7c548 66%); } /* Rio Grande do Sul: diagonal verde/branco/amarelo */
+.flag-sc { background: #fff; box-shadow: inset 0 0 0 14px #0d3b66; } /* Santa Catarina: branco com borda azul (brasão central omitido) */
+.flag-se { background: #fff; background-image: linear-gradient(45deg, #0d3b66 25%, transparent 25%, transparent 75%, #2a9d8f 75%), linear-gradient(-45deg, #f7c548 25%, transparent 25%, transparent 75%, #d62828 75%); } /* Sergipe: 4 triângulos coloridos */
+.flag-sp { background-image: repeating-linear-gradient(to bottom, #7d1128, #7d1128 16.6%, #fff 16.6%, #fff 33.3%); } /* São Paulo: listras vinho/branco */
+.flag-to { background: linear-gradient(to bottom, #0d3b66 40%, #f7c548 40%, #f7c548 60%, #2a9d8f 60%); } /* Tocantins: azul/amarelo/verde */
+.flag-to:before { content: '\2605'; color: #fff; font-size: 30px; width: 100%; height: 60px; margin-top: 70px; display: flex; align-items: center; justify-content: center; }

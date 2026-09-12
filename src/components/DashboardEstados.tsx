@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, Edit3 } from 'lucide-react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import '../styles/bandeirasEstados.css';
 
 const ESTADOS_UF: { nome: string; uf: string; cor: string }[] = [
   { nome: 'Acre', uf: 'AC', cor: '#1a936f' },
@@ -48,14 +49,23 @@ const ESTADOS_UF: { nome: string; uf: string; cor: string }[] = [
   { nome: 'Tocantins', uf: 'TO', cor: '#7f4f24' },
 ];
 
-function SeloEstado({ uf, cor }: { uf: string; cor: string }) {
+// Bandeira real do estado, em CSS puro (ver src/styles/bandeirasEstados.css
+// pra saber quais são fiéis à fonte MIT original e quais são
+// aproximação simplificada). Tamanho de ícone via escala do desenho
+// original de 300x200.
+const TAMANHO_ICONE = 28;
+const ESCALA = TAMANHO_ICONE / 300;
+
+function SeloEstado({ uf }: { uf: string; cor?: string }) {
   return (
     <span
-      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-white text-[10px] font-black shrink-0"
-      style={{ backgroundColor: cor }}
-      title={`Selo do estado (Unicode não tem bandeira estadual) — ${uf}`}
+      className="flag-icon-container shrink-0"
+      style={{ width: TAMANHO_ICONE, height: TAMANHO_ICONE * (200 / 300) }}
     >
-      {uf}
+      <span
+        className={`flag-icon-inner flag flag-${uf.toLowerCase()}`}
+        style={{ transform: `scale(${ESCALA})` }}
+      />
     </span>
   );
 }
