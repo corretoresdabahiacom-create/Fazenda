@@ -8,6 +8,7 @@ import { isPriceAnomalous, extractNumber, findPriceCell } from '../lib/priceSani
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import DashboardBahia from './DashboardBahia';
+import DashboardEstados from './DashboardEstados';
 import AlertasCotacoes from './AlertasCotacoes';
 import GraficoPrecoClima from './GraficoPrecoClima';
 import {
@@ -643,7 +644,6 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           <CambioCard label="Euro (EUR)" entry={cambio?.eur ?? null} flag="🇪🇺" decimals={4} />
           <CambioCard label="Iene (JPY)" entry={cambio?.jpy ?? null} flag="🇯🇵" decimals={4} />
           <CambioCard label="Yuan (CNY)" entry={cambio?.cny ?? null} flag="🇨🇳" decimals={4} />
-          <CambioCard label="Rublo (RUB)" entry={cambio?.rub ?? null} flag="🇷🇺" decimals={4} />
         </div>
         <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Outros ativos</p>
         <div className="grid grid-cols-2 gap-2">
@@ -659,6 +659,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           </div>
         )}
       </div>
+
+      <DashboardEstados />
 
       <div className="bg-theme-card rounded-2xl border border-theme p-4 space-y-3 shadow-theme text-theme-primary">
         <button

@@ -74,6 +74,7 @@ import HelpScreen from './components/HelpScreen';
 import AdminPanel from './components/AdminPanel';
 import Logo from './components/Logo';
 import Cotacoes from './components/Cotacoes';
+import AvisoLegalCotacoes from './components/AvisoLegalCotacoes';
 import { enablePushNotifications } from './lib/pushNotifications';
 import MinhaAssinatura from './components/MinhaAssinatura';
 import SalesPage from './components/SalesPage';
@@ -705,7 +706,7 @@ export default function App() {
   const renderView = () => {
     switch (activeView) {
       case 'cotacoes':
-        return <Cotacoes defaultRegion={settings.city} />;
+        return <AvisoLegalCotacoes><Cotacoes defaultRegion={settings.city} /></AvisoLegalCotacoes>;
       case 'clima':
         return (
           <iframe

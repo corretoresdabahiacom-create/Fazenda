@@ -389,12 +389,11 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const debug: string[] = [];
 
   try {
-    const [usd, eur, jpy, cny, rub, b3Extras] = await Promise.all([
+    const [usd, eur, jpy, cny, b3Extras] = await Promise.all([
       fetchMoeda('USD', debug),
       fetchMoeda('EUR', debug),
       fetchMoeda('JPY', debug),
       fetchMoeda('CNY', debug),
-      fetchMoeda('RUB', debug),
       fetchB3Extras(),
     ]);
 
@@ -404,7 +403,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     ]);
 
     const response = new Response(JSON.stringify({
-      usd, eur, jpy, cny, rub, xau, btc,
+      usd, eur, jpy, cny, xau, btc,
       dolarFuturoB3: b3Extras.dolarFuturo,
       fonte: 'Banco Central do Brasil (PTAX oficial) — Bitcoin via Mercado Bitcoin, Ouro via B3/Stooq, Dólar Futuro via B3/Notícias Agrícolas',
       debug: debug.length > 0 ? debug : undefined,
