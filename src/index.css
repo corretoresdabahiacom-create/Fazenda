@@ -8,6 +8,7 @@
 
 /* ===== CORES PADRÃO ===== */
 :root {
+  color-scheme: light;
   --primary: #2d6a4f;
   --primary-dark: #1b4d3e;
   --primary-light: #40916c;
@@ -27,6 +28,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --primary: #5fc785;
   --primary-dark: #4caf6e;
   --primary-light: #7dd6a0;
