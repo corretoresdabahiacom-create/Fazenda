@@ -25,12 +25,22 @@ export default function AvisoLegalCotacoes({ children }: { children: ReactNode }
   }, []);
 
   async function aceitar() {
+    // Sempre libera o acesso ao clicar em "Ciente" — se a gravação no
+    // Firestore falhar (ex: regra de segurança não liberou esse
+    // caminho ainda), só loga o erro, nunca trava o usuário na tela de
+    // aviso por causa disso. Bug real corrigido: sem o try/catch, um
+    // erro aqui interrompia a função antes de chegar no setStatus,
+    // dando a impressão de que o botão "não fazia nada".
     const uid = auth.currentUser?.uid;
     if (uid) {
-      await setDoc(doc(db, 'users', uid, 'preferences', 'cotacoesAviso'), {
-        aceito: true,
-        aceitoEm: new Date().toISOString(),
-      });
+      try {
+        await setDoc(doc(db, 'users', uid, 'preferences', 'cotacoesAviso'), {
+          aceito: true,
+          aceitoEm: new Date().toISOString(),
+        });
+      } catch (erro) {
+        console.error('Não foi possível salvar a ciência do aviso de Cotações:', erro);
+      }
     }
     setStatus('aceito');
   }
