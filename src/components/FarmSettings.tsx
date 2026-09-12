@@ -246,7 +246,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
       case 'sunny':
         return <Sun size={size} className="text-amber-500 fill-amber-300/30 animate-pulse" />;
       case 'rainy':
-        return <CloudRain size={size} className="text-blue-500" />;
+        return <CloudRain size={size} className="text-blue-500 dark:text-blue-300" />;
       case 'storm':
         return <CloudLightning size={size} className="text-indigo-600" />;
       default:
@@ -493,7 +493,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                           {day.minTemp}°C / {day.maxTemp}°C
                         </div>
                         {/* Rain Probability/Volume */}
-                        <div className="flex items-center justify-center gap-1 text-[10px] text-blue-600 font-bold">
+                        <div className="flex items-center justify-center gap-1 text-[10px] text-blue-600 dark:text-blue-300 font-bold">
                           <Droplets size={10} />
                           {day.rainVolume > 0 ? `${day.rainVolume} mm` : `${day.rainProbability}%`}
                         </div>

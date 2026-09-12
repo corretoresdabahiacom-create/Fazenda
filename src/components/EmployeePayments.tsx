@@ -182,7 +182,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
       case 'notice':
         return <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full font-bold text-[10px] uppercase border border-orange-200">Aviso Prévio</span>;
       case 'vacation':
-        return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-bold text-[10px] uppercase border border-blue-200">Em Férias</span>;
+        return <span className="px-3 py-1 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 rounded-full font-bold text-[10px] uppercase border border-blue-200 dark:border-blue-800">Em Férias</span>;
       case 'inactive':
         return <span className="px-3 py-1 bg-theme-secondary text-theme-secondary rounded-full font-bold text-[10px] uppercase border border-theme">Inativo</span>;
       default:
@@ -378,7 +378,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                       selectedEmployee.vacationHistory.map((vac, idx) => (
                         <div key={idx} className="flex justify-between text-theme-secondary font-medium border-b border-theme pb-1 last:border-0 last:pb-0">
                           <span>🌴 Gozo de Férias:</span>
-                          <span className="font-semibold text-blue-700">{format(new Date(vac.start + 'T12:00:00'), 'dd/MM/yyyy')}</span>
+                          <span className="font-semibold text-blue-700 dark:text-blue-300">{format(new Date(vac.start + 'T12:00:00'), 'dd/MM/yyyy')}</span>
                         </div>
                       ))
                     ) : (
@@ -444,7 +444,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
             </div>
             <div className="bg-theme-card border border-theme p-5 rounded-2xl">
               <div className="text-xs text-theme-secondary uppercase font-bold tracking-wider mb-1">Qtd. Diárias Pagas</div>
-              <div className="text-2xl font-black text-blue-700">{payments.filter(p => p.paymentType === PaymentType.DAILY).length} diárias</div>
+              <div className="text-2xl font-black text-blue-700 dark:text-blue-300">{payments.filter(p => p.paymentType === PaymentType.DAILY).length} diárias</div>
             </div>
             <div className="bg-theme-card border border-theme p-5 rounded-2xl">
               <div className="text-xs text-theme-secondary uppercase font-bold tracking-wider mb-1">Total Salários</div>
@@ -480,7 +480,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
-                          p.paymentType === PaymentType.DAILY ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+                          p.paymentType === PaymentType.DAILY ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300' : 'bg-green-50 text-green-700'
                         }`}>
                           {p.paymentType}
                         </span>
@@ -599,7 +599,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block text-blue-700">Previsão Férias (Gozo)</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block text-blue-700 dark:text-blue-300">Previsão Férias (Gozo)</label>
                   <input 
                     type="date" 
                     className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none"

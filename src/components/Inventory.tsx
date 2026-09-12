@@ -178,7 +178,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 <div className="flex items-start justify-between">
                   <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${
                     item.category === 'Supply' 
-                      ? 'bg-blue-50 border-blue-100 text-blue-700' 
+                      ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-100 text-blue-700 dark:text-blue-300' 
                       : 'bg-orange-50 border-orange-100 text-orange-700'
                   }`}>
                     {item.category === 'Supply' ? '📦 Suprimento' : '⚙️ Equipamento'}
@@ -194,7 +194,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                     </button>
                     <button 
                       onClick={() => handleEdit(item)} 
-                      className="p-1.5 hover:bg-neutral-100 text-neutral-600 rounded-lg"
+                      className="p-1.5 hover:bg-neutral-100 text-theme-secondary rounded-lg"
                       title="Editar"
                     >
                       <Edit3 size={16} />

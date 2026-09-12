@@ -136,14 +136,14 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
 
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1.5">
-                  <h3 className={`font-black text-base ${task.completed ? 'line-through text-neutral-500' : 'text-theme-primary'}`}>
+                  <h3 className={`font-black text-base ${task.completed ? 'line-through text-theme-secondary' : 'text-theme-primary'}`}>
                     {task.title}
                   </h3>
                   <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
                     <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${
                       task.priority === 'High' ? 'bg-red-50 text-red-600 border border-red-100' : 
                       task.priority === 'Medium' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 
-                      'bg-blue-50 text-blue-600 border border-blue-100'
+                      'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 border border-blue-100'
                     }`}>
                       Prioridade: {task.priority}
                     </span>
@@ -156,7 +156,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   </div>
                 </div>
                 
-                <p className={`text-sm mb-3.5 leading-relaxed font-medium ${task.completed ? 'text-neutral-400 font-normal line-through' : 'text-theme-secondary'}`}>
+                <p className={`text-sm mb-3.5 leading-relaxed font-medium ${task.completed ? 'text-theme-secondary font-normal line-through' : 'text-theme-secondary'}`}>
                   {task.description}
                 </p>
 
@@ -168,14 +168,14 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   </div>
 
                   {task.assignedTo && (
-                    <div className="flex items-center gap-1.5 text-slate-800 bg-neutral-100/70 px-2.5 py-0.5 rounded-full border border-neutral-200">
+                    <div className="flex items-center gap-1.5 text-theme-primary bg-neutral-100/70 px-2.5 py-0.5 rounded-full border border-neutral-200">
                       <UserCheck size={13} className="text-theme-primary" />
                       Designado: <span className="font-extrabold">{task.assignedTo}</span>
                     </div>
                   )}
 
                   {task.executionLocation && (
-                    <div className="flex items-center gap-1.5 text-neutral-800 bg-neutral-100/70 px-2.5 py-0.5 rounded-full border border-neutral-200">
+                    <div className="flex items-center gap-1.5 text-theme-primary bg-neutral-100/70 px-2.5 py-0.5 rounded-full border border-neutral-200">
                       <MapPin size={13} className="text-theme-primary" />
                       Local: <span className="font-extrabold">{task.executionLocation}</span>
                     </div>
@@ -287,7 +287,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   <label className="text-[10px] font-bold uppercase text-theme-secondary mb-1 block">Designar Colaborador</label>
                   {employees && employees.length > 0 ? (
                     <select 
-                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-semibold text-theme-primary focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
                       value={formData.assignedTo || ''}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
                     >

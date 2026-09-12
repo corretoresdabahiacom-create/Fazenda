@@ -279,7 +279,7 @@ function VerFonte({ fonte, dataHora, url }: { fonte: string; dataHora?: string; 
 function Badge({ kind }: { kind: 'atual' | 'futuro' }) {
   return (
     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap ${
-      kind === 'futuro' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+      kind === 'futuro' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300' : 'bg-green-50 text-green-700'
     }`}>
       {kind === 'futuro' ? 'Futuro B3' : 'Mercado Atual'}
     </span>
@@ -651,11 +651,11 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           <CambioCard label="Bitcoin (BTC)" entry={cambio?.btc ?? null} flag="₿" decimals={0} />
         </div>
         {cambio?.dolarFuturoB3 && (
-          <div className="mt-2 bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-between">
-            <p className="text-xs font-semibold text-blue-800">
+          <div className="mt-2 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between">
+            <p className="text-xs font-semibold text-blue-800 dark:text-blue-200">
               📈 Dólar Futuro (B3){cambio.dolarFuturoB3.vencimento ? ` — vencimento ${cambio.dolarFuturoB3.vencimento}` : ''}
             </p>
-            <p className="text-sm font-bold text-blue-800">{cambio.dolarFuturoB3.valor}</p>
+            <p className="text-sm font-bold text-blue-800 dark:text-blue-200">{cambio.dolarFuturoB3.valor}</p>
           </div>
         )}
       </div>
@@ -993,14 +993,14 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 </div>
               )}
               {officialOverride && (
-                <div className={`border-2 rounded-2xl p-4 ${officialOverride.sourceUrl ? 'bg-green-50 border-green-300' : 'bg-blue-50 border-blue-300'}`}>
+                <div className={`border-2 rounded-2xl p-4 ${officialOverride.sourceUrl ? 'bg-green-50 border-green-300' : 'bg-blue-50 dark:bg-blue-950/40 border-blue-300'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${officialOverride.sourceUrl ? 'text-green-800 bg-green-100' : 'text-blue-800 bg-blue-100'}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${officialOverride.sourceUrl ? 'text-green-800 bg-green-100' : 'text-blue-800 dark:text-blue-200 bg-blue-100'}`}>
                       {officialOverride.sourceUrl ? '🏛️' : '✍️'} {officialOverride.sourceUrl ? 'Fonte Oficial' : 'Cadastro Manual'} — {officialOverride.fonte}
                     </span>
                   </div>
-                  <p className={`text-2xl font-bold ${officialOverride.sourceUrl ? 'text-green-900' : 'text-blue-900'}`}>R$ {officialOverride.preco} <span className="text-sm font-normal">/{officialOverride.unidade}</span></p>
-                  <p className={`text-[10px] mt-1 ${officialOverride.sourceUrl ? 'text-green-700' : 'text-blue-700'}`}>
+                  <p className={`text-2xl font-bold ${officialOverride.sourceUrl ? 'text-green-900' : 'text-blue-900 dark:text-blue-100'}`}>R$ {officialOverride.preco} <span className="text-sm font-normal">/{officialOverride.unidade}</span></p>
+                  <p className={`text-[10px] mt-1 ${officialOverride.sourceUrl ? 'text-green-700' : 'text-blue-700 dark:text-blue-300'}`}>
                     {officialOverride.sourceUrl ? `Preço oficial específico de ${estado} — mais preciso que a referência nacional abaixo.` : 'Preço lançado manualmente no Painel Admin — confira a data antes de usar pra negociar.'}
                   </p>
                   <VerFonte fonte={officialOverride.fonte} dataHora={officialOverride.fetchedAt ? new Date(officialOverride.fetchedAt).toLocaleString('pt-BR') : undefined} url={officialOverride.sourceUrl || ''} />
@@ -1083,13 +1083,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 if (!ieaRow) return null;
                 const ieaAnomaly = checkSimplePriceAnomaly(produto, ieaRow.preco);
                 return (
-                  <div className={`bg-blue-50 border rounded-2xl p-3 ${ieaAnomaly ? 'border-red-300' : 'border-blue-200'}`}>
+                  <div className={`bg-blue-50 dark:bg-blue-950/40 border rounded-2xl p-3 ${ieaAnomaly ? 'border-red-300' : 'border-blue-200 dark:border-blue-800'}`}>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-bold text-blue-800">🏛️ IEA-SP (Oficial — só Estado de São Paulo)</p>
-                        <p className="text-[9px] text-blue-700">{ieaRow.produto} — preço recebido pelo produtor, exclusivo de SP</p>
+                        <p className="text-[10px] font-bold text-blue-800 dark:text-blue-200">🏛️ IEA-SP (Oficial — só Estado de São Paulo)</p>
+                        <p className="text-[9px] text-blue-700 dark:text-blue-300">{ieaRow.produto} — preço recebido pelo produtor, exclusivo de SP</p>
                       </div>
-                      <p className="text-sm font-bold text-blue-800">R$ {ieaRow.preco} <span className="text-[10px] font-normal">/{ieaRow.unidade}</span></p>
+                      <p className="text-sm font-bold text-blue-800 dark:text-blue-200">R$ {ieaRow.preco} <span className="text-[10px] font-normal">/{ieaRow.unidade}</span></p>
                     </div>
                     {ieaAnomaly && <p className="text-[10px] text-red-600 font-semibold mt-1">⚠️ Valor fora da faixa esperada — confira a fonte.</p>}
                     {ieaData.sourceUrl && <VerFonte fonte="IEA-SP (Governo de São Paulo)" dataHora={ieaData.fetchedAt ? new Date(ieaData.fetchedAt).toLocaleString('pt-BR') : undefined} url={ieaData.sourceUrl} />}
@@ -1099,12 +1099,12 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
               {produto === 'boi_gordo' && (!estado || estado === 'São Paulo') && ieaData?.recebidosPelosProdutores.find(r => /boi gordo \(china\)/i.test(r.produto)) && (() => {
                 const chinaRow = ieaData.recebidosPelosProdutores.find(r => /boi gordo \(china\)/i.test(r.produto))!;
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 flex items-center justify-between">
+                  <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl p-3 flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] font-bold text-blue-800">🏛️ IEA-SP (Oficial, só SP) — Padrão China</p>
-                      <p className="text-[9px] text-blue-700">Boi Gordo com padrão de exportação para a China, em São Paulo</p>
+                      <p className="text-[10px] font-bold text-blue-800 dark:text-blue-200">🏛️ IEA-SP (Oficial, só SP) — Padrão China</p>
+                      <p className="text-[9px] text-blue-700 dark:text-blue-300">Boi Gordo com padrão de exportação para a China, em São Paulo</p>
                     </div>
-                    <p className="text-sm font-bold text-blue-800">R$ {chinaRow.preco} <span className="text-[10px] font-normal">/{chinaRow.unidade}</span></p>
+                    <p className="text-sm font-bold text-blue-800 dark:text-blue-200">R$ {chinaRow.preco} <span className="text-[10px] font-normal">/{chinaRow.unidade}</span></p>
                   </div>
                 );
               })()}
@@ -1118,13 +1118,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 const row = incaperData.precos.find(r => keyword.test(r.produto));
                 if (!row) return null;
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+                  <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-bold text-blue-800">🏛️ Incaper (Oficial — só Espírito Santo)</p>
-                        <p className="text-[9px] text-blue-700">{row.produto} — mín. {row.minimo} / máx. {row.maximo}</p>
+                        <p className="text-[10px] font-bold text-blue-800 dark:text-blue-200">🏛️ Incaper (Oficial — só Espírito Santo)</p>
+                        <p className="text-[9px] text-blue-700 dark:text-blue-300">{row.produto} — mín. {row.minimo} / máx. {row.maximo}</p>
                       </div>
-                      <p className="text-sm font-bold text-blue-800">R$ {row.medio} <span className="text-[10px] font-normal">médio/@</span></p>
+                      <p className="text-sm font-bold text-blue-800 dark:text-blue-200">R$ {row.medio} <span className="text-[10px] font-normal">médio/@</span></p>
                     </div>
                     {incaperData.sourceUrl && <VerFonte fonte="Incaper (Governo do Espírito Santo)" dataHora={incaperData.fetchedAt ? new Date(incaperData.fetchedAt).toLocaleString('pt-BR') : undefined} url={incaperData.sourceUrl} />}
                   </div>
@@ -1137,13 +1137,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 const row = produto === 'boi_gordo' ? epagriData.boiGordo : produto === 'vaca' ? epagriData.vacaGorda : null;
                 if (!row) return null;
                 return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+                  <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-bold text-blue-800">🏛️ Epagri/Cepa (Oficial — só Santa Catarina)</p>
-                        <p className="text-[9px] text-blue-700">{row.praca ? `${row.praca} — ` : ''}{row.data}</p>
+                        <p className="text-[10px] font-bold text-blue-800 dark:text-blue-200">🏛️ Epagri/Cepa (Oficial — só Santa Catarina)</p>
+                        <p className="text-[9px] text-blue-700 dark:text-blue-300">{row.praca ? `${row.praca} — ` : ''}{row.data}</p>
                       </div>
-                      <p className="text-sm font-bold text-blue-800">R$ {row.preco.toFixed(2)} <span className="text-[10px] font-normal">/@</span></p>
+                      <p className="text-sm font-bold text-blue-800 dark:text-blue-200">R$ {row.preco.toFixed(2)} <span className="text-[10px] font-normal">/@</span></p>
                     </div>
                     {epagriData.sourceUrl && <VerFonte fonte="Epagri/Cepa (Governo de Santa Catarina)" dataHora={epagriData.fetchedAt ? new Date(epagriData.fetchedAt).toLocaleString('pt-BR') : undefined} url={epagriData.sourceUrl} />}
                   </div>
@@ -1158,13 +1158,13 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
                 if (!row) return null;
                 const aibaAnomaly = checkSimplePriceAnomaly(produto, row.preco);
                 return (
-                  <div className={`bg-blue-50 border rounded-2xl p-3 ${aibaAnomaly ? 'border-red-300' : 'border-blue-200'}`}>
+                  <div className={`bg-blue-50 dark:bg-blue-950/40 border rounded-2xl p-3 ${aibaAnomaly ? 'border-red-300' : 'border-blue-200 dark:border-blue-800'}`}>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-bold text-blue-800">🏛️ AIBA (Oeste da Bahia) — {row.produto}</p>
-                        <p className="text-[9px] text-blue-700">{row.data} · {row.variacaoPct}%</p>
+                        <p className="text-[10px] font-bold text-blue-800 dark:text-blue-200">🏛️ AIBA (Oeste da Bahia) — {row.produto}</p>
+                        <p className="text-[9px] text-blue-700 dark:text-blue-300">{row.data} · {row.variacaoPct}%</p>
                       </div>
-                      <p className="text-sm font-bold text-blue-800">R$ {row.preco} <span className="text-[10px] font-normal">/{row.unidade}</span></p>
+                      <p className="text-sm font-bold text-blue-800 dark:text-blue-200">R$ {row.preco} <span className="text-[10px] font-normal">/{row.unidade}</span></p>
                     </div>
                     {aibaAnomaly && <p className="text-[10px] text-red-600 font-semibold mt-1">⚠️ Valor fora da faixa esperada — confira a fonte.</p>}
                     {aibaData.sourceUrl && <VerFonte fonte="AIBA (Associação de Agricultores e Irrigantes da Bahia)" dataHora={aibaData.fetchedAt ? new Date(aibaData.fetchedAt).toLocaleString('pt-BR') : undefined} url={aibaData.sourceUrl} />}

@@ -324,7 +324,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   {pasture.purpose && (
                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${
                       pasture.purpose === 'engorda' ? 'bg-[var(--primary)]/10 text-theme-primary border-[var(--primary)]/20' :
-                      pasture.purpose === 'manutenção' ? 'bg-blue-50 text-blue-800 border-blue-200' :
+                      pasture.purpose === 'manutenção' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800' :
                       'bg-purple-50 text-purple-800 border-purple-200'
                     }`}>
                       {pasture.purpose === 'engorda' ? '🐂 Engorda' :
@@ -364,7 +364,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      <div className={`p-2 rounded-xl flex items-center gap-2 border ${pasture.aiAnalysis.isTimeToTakeOutCattle ? 'bg-orange-50 border-orange-100 text-orange-700' : 'bg-slate-50 border-slate-100 text-slate-700'}`}>
+                      <div className={`p-2 rounded-xl flex items-center gap-2 border ${pasture.aiAnalysis.isTimeToTakeOutCattle ? 'bg-orange-50 border-orange-100 text-orange-700' : 'bg-slate-50 border-slate-100 text-theme-primary'}`}>
                         <span className="text-[10px] font-bold">{pasture.aiAnalysis.isTimeToTakeOutCattle ? '🚨 Saída Urgente (Pastejo Limite)' : '✅ Em Pastoreio'}</span>
                       </div>
                       <div className="p-2 rounded-xl bg-[var(--primary)]/5 border border-[var(--primary)]/10 text-theme-primary flex items-center gap-2">
@@ -529,7 +529,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div>
                     <label className="text-[9px] font-bold uppercase text-theme-secondary mb-1 block">Loteamento Previsto</label>
                     <select 
-                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-bold text-theme-primary focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                       value={estimatorParams.animalCategory}
                       onChange={(e) => setEstimatorParams({...estimatorParams, animalCategory: e.target.value})}
                     >
@@ -543,7 +543,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   <div>
                     <label className="text-[9px] font-bold uppercase text-theme-secondary mb-1 block">Objetivo Produtivo</label>
                     <select 
-                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-bold text-theme-primary focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                       value={estimatorParams.objective}
                       onChange={(e) => setEstimatorParams({...estimatorParams, objective: e.target.value})}
                     >

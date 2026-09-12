@@ -710,7 +710,7 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
   }
 
   const statusColor: Record<string, string> = {
-    [SprayStatus.PROGRAMADA]: 'bg-blue-50 text-blue-700',
+    [SprayStatus.PROGRAMADA]: 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300',
     [SprayStatus.REALIZADA]: 'bg-green-50 text-green-700',
     [SprayStatus.ADIADA]: 'bg-amber-50 text-amber-700',
     [SprayStatus.CANCELADA]: 'bg-theme-secondary text-theme-secondary',

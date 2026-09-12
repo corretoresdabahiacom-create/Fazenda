@@ -612,11 +612,11 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                       <span>R$ {((animal.saleDetails.shippingCost || 0) + (animal.saleDetails.funruralCost || 0) + (animal.saleDetails.taxesCost || 0) + (animal.saleDetails.otherSaleCosts || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                     <div className="p-2.5 bg-theme-card border border-red-200 rounded-xl space-y-1 mt-1 text-[11px]">
-                      <div className="flex justify-between text-neutral-800 font-bold">
+                      <div className="flex justify-between text-theme-primary font-bold">
                         <span>Lucro Bruto Ciclo:</span>
                         <span className="text-theme-primary">R$ {animal.saleDetails.grossProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
-                      <div className="flex justify-between text-neutral-800 font-bold">
+                      <div className="flex justify-between text-theme-primary font-bold">
                         <span>Lucro Líquido Ciclo:</span>
                         <span className="text-theme-primary">R$ {animal.saleDetails.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </div>
@@ -679,7 +679,7 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                             }
                           }, 100);
                         }}
-                        className="flex-1 flex items-center justify-center gap-1 bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-600 hover:text-white py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                        className="flex-1 flex items-center justify-center gap-1 bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800 hover:bg-blue-600 hover:text-white py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer"
                       >
                         <ArrowRightLeft size={13} /> Mudar Pasto
                       </button>
@@ -852,14 +852,14 @@ export default function Animals({ animals, onAdd, onDelete, pastures, transactio
                   <span className="text-[10px] font-black uppercase text-theme-primary block">Cálculo de Estadia do Aluguel de Pasto</span>
                   <div className="grid grid-cols-2 gap-4 text-xs font-semibold">
                     <div>
-                      <span className="text-neutral-500 block">Dias de Estadia Decorridos:</span>
+                      <span className="text-theme-secondary block">Dias de Estadia Decorridos:</span>
                       <span className="font-extrabold text-theme-primary">
                         {differenceInDays(new Date(saleFormData.saleDate), new Date(sellingAnimal.entryDate))} dias 
                         <span className="text-theme-secondary font-normal"> (~ {(differenceInDays(new Date(saleFormData.saleDate), new Date(sellingAnimal.entryDate)) / 30).toFixed(1)} meses)</span>
                       </span>
                     </div>
                     <div>
-                      <span className="text-neutral-500 block">Taxa Mensal p/ Cabeça Acertada:</span>
+                      <span className="text-theme-secondary block">Taxa Mensal p/ Cabeça Acertada:</span>
                       <span className="font-extrabold text-theme-primary">
                         R$ {(sellingAnimal.rentValue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} / mês
                       </span>

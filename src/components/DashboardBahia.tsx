@@ -137,7 +137,7 @@ export default function DashboardBahia() {
                   {r.confiabilidade ? (
                     <span className={`font-bold px-2 py-0.5 rounded-full text-[10px] ${
                       r.confiabilidade === 'Oficial' ? 'bg-green-50 text-green-700' :
-                      r.confiabilidade === 'Internacional' ? 'bg-blue-50 text-blue-700' : 'bg-theme-secondary text-theme-secondary'
+                      r.confiabilidade === 'Internacional' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300' : 'bg-theme-secondary text-theme-secondary'
                     }`}>{r.confiabilidade}</span>
                   ) : '—'}
                 </td>
