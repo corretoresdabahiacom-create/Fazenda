@@ -170,14 +170,14 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
       <div className="flex border-b border-theme gap-4">
         <button 
           onClick={() => { setActiveTab('variaveis'); setSearchTerm(''); }}
-          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'variaveis' ? 'text-theme-primary' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
+          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'variaveis' ? 'text-theme-primary' : 'text-theme-secondary hover:text-theme-primary'}`}
         >
           🧾 Lançamentos de Despesas (Variáveis)
           {activeTab === 'variaveis' && <motion.div layoutId="expense_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--primary)]" />}
         </button>
         <button 
           onClick={() => { setActiveTab('fixas'); setSearchTerm(''); }}
-          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'fixas' ? 'text-theme-primary' : 'text-[#8d8a86] hover:text-[#2d2a26]'}`}
+          className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'fixas' ? 'text-theme-primary' : 'text-theme-secondary hover:text-theme-primary'}`}
         >
           📌 Custos & Despesas Fixas da Fazenda
           {activeTab === 'fixas' && <motion.div layoutId="expense_tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--primary)]" />}
@@ -187,7 +187,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
       {/* Header filter actions */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={18} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={18} />
           <input 
             type="text" 
             placeholder={activeTab === 'variaveis' ? "Pesquisar despesa..." : "Pesquisar custo fixo..."}
@@ -224,14 +224,14 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
 
       {activeTab === 'fixas' && (
         /* Fixed Cost Proportional Cards Dashboard */
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#fcfaf7] p-5 rounded-3xl border border-theme">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-theme-card p-5 rounded-3xl border border-theme">
           <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4 shadow-theme">
             <div className="p-3 bg-[var(--primary)]/10 text-theme-primary rounded-xl">
               <Banknote size={24} />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-[#8d8a86] uppercase block">Custo Fixo Total Mensal</span>
-              <span className="text-xl font-black text-[#2d2a26]">R$ {totalFixedExpensesCurrentMonth.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+              <span className="text-[10px] font-bold text-theme-secondary uppercase block">Custo Fixo Total Mensal</span>
+              <span className="text-xl font-black text-theme-primary">R$ {totalFixedExpensesCurrentMonth.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
 
@@ -240,8 +240,8 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
               <TrendingUp size={24} />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-[#8d8a86] uppercase block">Animais Ativos</span>
-              <span className="text-xl font-black text-[#2d2a26]">{totalActiveHeads} cabeças</span>
+              <span className="text-[10px] font-bold text-theme-secondary uppercase block">Animais Ativos</span>
+              <span className="text-xl font-black text-theme-primary">{totalActiveHeads} cabeças</span>
             </div>
           </div>
 
@@ -263,21 +263,21 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#fcfaf7] border-bottom border-theme">
-                  <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Lançamento</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Vencimento</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Tipo</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Descrição</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Fornecedor</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86]">Valor</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase text-[#8d8a86] text-right">Ações</th>
+                <tr className="bg-theme-card border-bottom border-theme">
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Lançamento</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Vencimento</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Tipo</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Descrição</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Fornecedor</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary">Valor</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-theme-secondary text-right">Ações</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f0f0]">
+              <tbody className="divide-y divide-theme">
                 {filteredExpenses.map((e) => (
-                  <tr key={e.id} className="hover:bg-[#fcfaf7] transition-colors">
+                  <tr key={e.id} className="hover:bg-theme-card transition-colors">
                     <td className="px-6 py-4">
-                      <div className="font-medium text-xs text-[#8d8a86]">
+                      <div className="font-medium text-xs text-theme-secondary">
                         {format(new Date(e.date + 'T12:00:00'), 'dd/MM/yyyy')}
                       </div>
                     </td>
@@ -292,7 +292,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                       </span>
                     </td>
                     <td className="px-6 py-4 underline decoration-[var(--border-color)] underline-offset-4 decoration-dotted">
-                      <div className="font-medium text-[#2d2a26] text-sm">{e.description}</div>
+                      <div className="font-medium text-theme-primary text-sm">{e.description}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-bold text-theme-primary text-xs uppercase tracking-tight">{e.provider || '-'}</div>
@@ -314,7 +314,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 ))}
                 {filteredExpenses.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-[#8d8a86] italic text-sm">
+                    <td colSpan={7} className="px-6 py-12 text-center text-theme-secondary italic text-sm">
                       Nenhuma despesa operacional cadastrada.
                     </td>
                   </tr>
@@ -331,17 +331,17 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
               <div className="flex justify-between items-start">
                 <div>
                   <span className="px-3 py-0.5 bg-[var(--primary)]/10 text-theme-primary text-[10px] font-bold rounded-full uppercase block w-fit mb-1 border border-[var(--primary)]/20">{f.expenseType}</span>
-                  <h4 className="text-base font-black text-[#2d2a26]">{f.description}</h4>
+                  <h4 className="text-base font-black text-theme-primary">{f.description}</h4>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-[#8d8a86] font-bold uppercase block">Valor Mensal</span>
+                  <span className="text-[10px] text-theme-secondary font-bold uppercase block">Valor Mensal</span>
                   <span className="text-lg font-black text-theme-primary">R$ {f.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-[#f0f0f0] flex justify-between items-center text-xs text-theme-secondary font-bold">
+              <div className="pt-3 border-t border-theme flex justify-between items-center text-xs text-theme-secondary font-bold">
                 <span className="flex items-center gap-1"><Clock size={14} className="text-theme-primary" /> Dia Vencimento: {f.dueDate}</span>
-                <span className="bg-[#fcfaf7] px-2 py-1 rounded text-[10px] text-theme-primary font-extrabold uppercase border border-theme">Suporta R$ {(totalActiveHeads > 0 ? f.value / totalActiveHeads : 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}/animal</span>
+                <span className="bg-theme-card px-2 py-1 rounded text-[10px] text-theme-primary font-extrabold uppercase border border-theme">Suporta R$ {(totalActiveHeads > 0 ? f.value / totalActiveHeads : 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}/animal</span>
               </div>
 
               <div className="absolute bottom-4 right-4 flex gap-1.5 opacity-80 hover:opacity-100">
@@ -356,7 +356,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
           ))}
 
           {filteredFixed.length === 0 && (
-            <div className="col-span-2 text-center py-12 text-[#8d8a86] italic text-sm">
+            <div className="col-span-2 text-center py-12 text-theme-secondary italic text-sm">
               Nenhuma despesa fixa cadastrada ainda. Adicione itens como Energia, Arrendamento ou salários fixos.
             </div>
           )}
@@ -373,7 +373,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-[#fcfaf7]">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingExpense(null); }}
@@ -398,11 +398,11 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Tipo de Despesa</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Tipo de Despesa</label>
                   {!isAddingCustomType ? (
                     <div className="flex gap-2">
                       <div className="relative flex-1">
-                        <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
+                        <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                         <select 
                           className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none appearance-none bg-theme-card font-bold"
                           value={formData.type}
@@ -449,9 +449,9 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 </div>
 
                 <div className="col-span-1">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Data Lançamento</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Data Lançamento</label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                     <input 
                       required
                       type="date" 
@@ -463,9 +463,9 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 </div>
 
                 <div className="col-span-1">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Vencimento</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Vencimento</label>
                   <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                     <input 
                       type="date" 
                       className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
@@ -476,7 +476,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Descrição do Lançamento</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Descrição do Lançamento</label>
                   <input 
                     required
                     type="text" 
@@ -488,7 +488,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Vendedor ou Fornecedor</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Vendedor ou Fornecedor</label>
                   <input 
                     type="text" 
                     className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
@@ -499,7 +499,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Valor Gasto (R$)</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Valor Gasto (R$)</label>
                   <input 
                     required
                     type="number" 
@@ -511,7 +511,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Observações adicionais</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Observações adicionais</label>
                   <textarea 
                     className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px]"
                     value={formData.observation || ''}
@@ -549,7 +549,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-[#fcfaf7]">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setIsFixedFormOpen(false)}
@@ -573,7 +573,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
 
             <form onSubmit={handleFixedSubmit} className="p-6 space-y-4">
               <div>
-                <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Nome do Custo Fixo (Descrição)</label>
+                <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Nome do Custo Fixo (Descrição)</label>
                 <input 
                   required
                   type="text" 
@@ -586,7 +586,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Categoria</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Categoria</label>
                   <select 
                     className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/25 focus:outline-none bg-theme-card font-medium"
                     value={fixedFormData.expenseType}
@@ -604,7 +604,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Dia de Vencimento (Fixo)</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Dia de Vencimento (Fixo)</label>
                   <input 
                     required
                     type="number" 
@@ -619,7 +619,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
               </div>
 
               <div>
-                <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Valor Mensal (R$)</label>
+                <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Valor Mensal (R$)</label>
                 <input 
                   required
                   type="number" 

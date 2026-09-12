@@ -586,7 +586,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <button 
               onClick={() => setActiveTab('financial')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
-                activeTab === 'financial' ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === 'financial' ? 'btn-primary' : 'text-theme-secondary hover:bg-theme-card'
               }`}
             >
               <Coins size={15} /> 1. Fluxo Financeiro (Geral)
@@ -595,7 +595,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <button 
               onClick={() => setActiveTab('employees')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
-                activeTab === 'employees' ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === 'employees' ? 'btn-primary' : 'text-theme-secondary hover:bg-theme-card'
               }`}
             >
               <Users size={15} /> 2. Despesas de Funcionários
@@ -604,7 +604,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <button 
               onClick={() => setActiveTab('livestock')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
-                activeTab === 'livestock' ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === 'livestock' ? 'btn-primary' : 'text-theme-secondary hover:bg-theme-card'
               }`}
             >
               <Beef size={15} /> 3. Estatísticas de Animais
@@ -613,7 +613,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <button 
               onClick={() => setActiveTab('commercial')}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all ${
-                activeTab === 'commercial' ? 'btn-primary' : 'text-[#8d8a86] hover:bg-[#fcfaf7]'
+                activeTab === 'commercial' ? 'btn-primary' : 'text-theme-secondary hover:bg-theme-card'
               }`}
             >
               <Warehouse size={15} /> 4. Comercialização & Estoque
@@ -632,22 +632,22 @@ export default function Reports({ payments, expenses, animals, transactions, pas
       {/* Control Area: Shared date criteria filter (only applies to Financial Flow logs rendering) */}
       {activeTab === 'financial' && (
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-theme-card p-5 rounded-3xl border border-theme shadow-sm animate-fade-in">
-          <div className="flex items-center gap-2 bg-[#fcfaf7] p-0.5 rounded-xl border">
+          <div className="flex items-center gap-2 bg-theme-card p-0.5 rounded-xl border">
             <button
               onClick={() => setReportType('monthly')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'monthly' ? 'btn-primary' : 'text-[#8d8a86]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'monthly' ? 'btn-primary' : 'text-theme-secondary'}`}
             >
               Mês Completo
             </button>
             <button
               onClick={() => setReportType('daily')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'daily' ? 'btn-primary' : 'text-[#8d8a86]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'daily' ? 'btn-primary' : 'text-theme-secondary'}`}
             >
               Resumo Diário
             </button>
             <button
               onClick={() => setReportType('custom')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'custom' ? 'btn-primary' : 'text-[#8d8a86]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${reportType === 'custom' ? 'btn-primary' : 'text-theme-secondary'}`}
             >
               Personalizado
             </button>
@@ -657,7 +657,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             {reportType === 'monthly' && (
               <input 
                 type="month" 
-                className="px-4 py-2 bg-[#fcfaf7] border border-theme rounded-xl font-bold text-xs text-theme-primary focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                className="px-4 py-2 bg-theme-card border border-theme rounded-xl font-bold text-xs text-theme-primary focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
               />
@@ -665,7 +665,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             {reportType === 'daily' && (
               <input 
                 type="date" 
-                className="px-4 py-2 bg-[#fcfaf7] border border-theme rounded-xl font-bold text-xs text-theme-primary focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                className="px-4 py-2 bg-theme-card border border-theme rounded-xl font-bold text-xs text-theme-primary focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
               />
@@ -674,14 +674,14 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               <div className="flex items-center gap-2 text-xs">
                 <input 
                   type="date" 
-                  className="px-3 py-1.5 bg-[#fcfaf7] border rounded-xl font-bold focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                  className="px-3 py-1.5 bg-theme-card border rounded-xl font-bold focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
-                <span className="font-bold text-[#8d8a86]">até</span>
+                <span className="font-bold text-theme-secondary">até</span>
                 <input 
                   type="date" 
-                  className="px-3 py-1.5 bg-[#fcfaf7] border rounded-xl font-bold focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
+                  className="px-3 py-1.5 bg-theme-card border rounded-xl font-bold focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
@@ -708,19 +708,19 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               <div className="bg-theme-card p-8 rounded-3xl border border-theme shadow-sm">
                 <div className="flex justify-between items-baseline mb-6">
                   <h3 className="font-serif italic text-lg font-bold text-theme-primary">Balancete Geral de Caixa</h3>
-                  <span className="text-[10px] font-black uppercase text-[#8d8a86] tracking-widest">
+                  <span className="text-[10px] font-black uppercase text-theme-secondary tracking-widest">
                     Período: {reportType === 'monthly' ? format(parseISO(`${selectedMonth}-01`), 'MMMM yyyy', { locale: ptBR }) : reportType === 'daily' ? format(parseISO(selectedDate), 'dd/MM/yyyy') : 'Customizado'}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-6 mb-8">
                   <div className="p-4 bg-red-50/50 border border-red-100 rounded-2xl">
-                    <span className="text-[9px] font-black uppercase text-[#8d8a86] block">Total Desembolsos Caixa</span>
+                    <span className="text-[9px] font-black uppercase text-theme-secondary block">Total Desembolsos Caixa</span>
                     <span className="text-2xl font-black text-red-650">R$ {reportData.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     <span className="text-[10px] text-red-850 font-semibold block mt-1">{reportData.countExp + reportData.countPay} notas lançadas</span>
                   </div>
                   <div className="p-4 bg-[var(--primary)]/10 border border-[var(--primary)]/20 rounded-2xl">
-                    <span className="text-[9px] font-black uppercase text-[#8d8a86] block">Custo rateado por cabeça ativa</span>
+                    <span className="text-[9px] font-black uppercase text-theme-secondary block">Custo rateado por cabeça ativa</span>
                     <span className="text-2xl font-black text-theme-primary">
                       R$ {animals.length > 0 ? (reportData.total / animals.reduce((a,c) => a + (c.isSold ? 0 : c.quantity), 0)).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) : 0}
                     </span>
@@ -742,7 +742,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                         <div key={idx} className="flex justify-between items-center text-xs py-2 px-1 border-b border-neutral-50 hover:bg-neutral-50 transition-colors">
                           <div>
                             <span className="font-extrabold text-slate-800 block">{title}</span>
-                            <span className="text-[9px] text-[#8d8a86] uppercase font-bold">{tag} • {format(new Date(item.date), 'dd/MM/yyyy')}</span>
+                            <span className="text-[9px] text-theme-secondary uppercase font-bold">{tag} • {format(new Date(item.date), 'dd/MM/yyyy')}</span>
                           </div>
                           <span className="font-black text-red-600">- R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
@@ -750,7 +750,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                     })}
                   
                   {[...reportData.expenses, ...reportData.payments].length === 0 && (
-                    <div className="text-center py-10 text-xs italic text-[#8d8a86] bg-[#fcfaf7] border rounded-2xl">
+                    <div className="text-center py-10 text-xs italic text-theme-secondary bg-theme-card border rounded-2xl">
                       Nenhuma saída documentada no período filtrado.
                     </div>
                   )}
@@ -760,12 +760,12 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               {/* Month-by-month Fixed vs Variable Expenses comparative bar chart */}
               <div className="bg-theme-card p-8 rounded-3xl border border-theme shadow-sm space-y-4">
                 <div className="flex justify-between items-baseline mb-2">
-                  <h3 className="font-serif italic text-lg font-bold text-theme-primary dark:text-[#5fa875]">Comparativo Trimestral de Custos</h3>
-                  <span className="text-[10px] font-black uppercase text-[#8d8a86] tracking-widest">
+                  <h3 className="font-serif italic text-lg font-bold text-theme-primary">Comparativo Trimestral de Custos</h3>
+                  <span className="text-[10px] font-black uppercase text-theme-secondary tracking-widest">
                     Previsibilidade (Fixo vs Variável)
                   </span>
                 </div>
-                <p className="text-xs text-[#8d8a86] mb-4">
+                <p className="text-xs text-theme-secondary mb-4">
                   Visualização da previsibilidade financeira. Despesas fixas recorrentes comparadas aos desembolsos variáveis de consumo e serviços lançados em cada período.
                 </p>
                 <div className="h-64 w-full text-xs font-semibold pt-2">
@@ -830,39 +830,39 @@ export default function Reports({ payments, expenses, animals, transactions, pas
 
                   <div className="pt-2.5 border-t border-dashed">
                     <div className="flex justify-between items-baseline mb-1">
-                      <span className="text-xs font-bold text-[#2d2a26]">
+                      <span className="text-xs font-bold text-theme-primary">
                         Rendimento Próprios (LL1):
                       </span>
                       <span className="font-black text-sm text-theme-primary">
                         R$ {tradingAnalysis.lucroLiquido1.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <span className="text-[9px] text-[#8d8a86] block leading-none">
+                    <span className="text-[9px] text-theme-secondary block leading-none">
                       (Vendas Próprias menos custos operacionais da fazenda: -R$ {tradingAnalysis.farmGeneralCosts.toLocaleString()})
                     </span>
                   </div>
 
                   <div className="pt-2.5 border-t border-dashed space-y-1">
                     <div className="flex justify-between items-baseline">
-                      <span className="text-xs font-bold text-[#2d2a26]">
+                      <span className="text-xs font-bold text-theme-primary">
                         Rendimento Meia/Aluguel (LL2):
                       </span>
                       <span className="font-black text-sm text-theme-primary">
                         R$ {tradingAnalysis.lucroLiquido2.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <span className="text-[9px] text-[#8d8a86] block mb-2 leading-none">
+                    <span className="text-[9px] text-theme-secondary block mb-2 leading-none">
                       (Itemizado abaixo e unificado no LL2)
                     </span>
-                    <div className="grid grid-cols-2 gap-2 bg-[#fcfaf7] p-2 rounded-xl text-[10px] font-semibold border">
+                    <div className="grid grid-cols-2 gap-2 bg-theme-card p-2 rounded-xl text-[10px] font-semibold border">
                       <div>
-                        <span className="text-[#8d8a86] uppercase text-[8px] block">Aluguel LL2:</span>
+                        <span className="text-theme-secondary uppercase text-[8px] block">Aluguel LL2:</span>
                         <span className="font-bold text-slate-800">
                           R$ {tradingAnalysis.lucroLiquido2_Aluguel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[#8d8a86] uppercase text-[8px] block">Parceria Meia LL2:</span>
+                        <span className="text-theme-secondary uppercase text-[8px] block">Parceria Meia LL2:</span>
                         <span className="font-bold text-slate-800">
                           R$ {tradingAnalysis.lucroLiquido2_Meia.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </span>
@@ -905,11 +905,11 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               <div className="flex justify-between items-center pb-3 border-b">
                 <div>
                   <h3 className="font-serif italic text-lg font-bold text-theme-primary">Acompanhamento e Custos de Pessoal</h3>
-                  <p className="text-xs text-[#8d8a86]">Exibe datas importantes, contratos ativos, férias e total acumulado pago a cada colaborador.</p>
+                  <p className="text-xs text-theme-secondary">Exibe datas importantes, contratos ativos, férias e total acumulado pago a cada colaborador.</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-[#8d8a86] uppercase">Filtrar Colaborador:</span>
+                  <span className="text-xs font-bold text-theme-secondary uppercase">Filtrar Colaborador:</span>
                   <select 
                     className="px-3 py-1.5 border rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
                     value={focusedEmployeeId}
@@ -924,7 +924,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-[#f0f0f0] text-[#8d8a86] font-black uppercase tracking-wider text-[10px]">
+                    <tr className="border-b border-theme text-theme-secondary font-black uppercase tracking-wider text-[10px]">
                       <th className="pb-3 pr-2">Colaborador / Cargo</th>
                       <th className="pb-3 pr-2">Admissão</th>
                       <th className="pb-3 pr-2">Status</th>
@@ -940,7 +940,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                         <tr key={emp.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors">
                           <td className="py-3">
                             <span className="font-black text-slate-800 block text-sm">{emp.name}</span>
-                            <span className="text-[10px] text-[#8d8a86] font-extrabold uppercase flex items-center gap-1 mt-0.5"><Briefcase size={10} /> {emp.role}</span>
+                            <span className="text-[10px] text-theme-secondary font-extrabold uppercase flex items-center gap-1 mt-0.5"><Briefcase size={10} /> {emp.role}</span>
                           </td>
                           <td className="py-3 font-semibold text-slate-700">
                             {emp.admissionDate ? format(new Date(emp.admissionDate), 'dd/MM/yyyy') : 'N/A'}
@@ -956,23 +956,23 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                           </td>
                           <td className="py-3 font-semibold text-amber-900">
                             {emp.vacationDate ? format(new Date(emp.vacationDate), 'dd/MM/yyyy') : (
-                              <span className="text-[#8d8a86] italic font-normal">Não Agendadas</span>
+                              <span className="text-theme-secondary italic font-normal">Não Agendadas</span>
                             )}
                           </td>
                           <td className="py-3 font-medium text-orange-950">
                             {emp.noticeDate ? format(new Date(emp.noticeDate), 'dd/MM/yyyy') : (
-                              <span className="text-[#8d8a86] italic font-normal">Nenhum</span>
+                              <span className="text-theme-secondary italic font-normal">Nenhum</span>
                             )}
                           </td>
                           <td className="py-3 text-right font-black text-theme-primary text-sm">
                             R$ {stats.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                            <span className="text-[10px] text-[#8d8a86] font-normal block">{stats.paymentsCount} lançamentos</span>
+                            <span className="text-[10px] text-theme-secondary font-normal block">{stats.paymentsCount} lançamentos</span>
                           </td>
                         </tr>
                       ))}
                     {employees.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="text-center py-8 italic text-[#8d8a86]">Nenhum colaborador registrado no cadastro de funcionários.</td>
+                        <td colSpan={6} className="text-center py-8 italic text-theme-secondary">Nenhum colaborador registrado no cadastro de funcionários.</td>
                       </tr>
                     )}
                   </tbody>
@@ -999,7 +999,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                   {cattleAnalyticsGrouped.categories.map(cat => (
                     <div key={cat.name} className="flex justify-between items-center text-xs py-1.5 border-b border-neutral-50">
                       <span className="font-bold text-slate-800 uppercase">{cat.name}</span>
-                      <span className="font-extrabold text-theme-primary">{cat.heads} cabeças <span className="text-[10px] text-[#8d8a86] font-normal">({cat.count} lotes)</span></span>
+                      <span className="font-extrabold text-theme-primary">{cat.heads} cabeças <span className="text-[10px] text-theme-secondary font-normal">({cat.count} lotes)</span></span>
                     </div>
                   ))}
                 </div>
@@ -1021,13 +1021,13 @@ export default function Reports({ payments, expenses, animals, transactions, pas
             <div className="bg-theme-card p-6 rounded-3xl border border-theme shadow-sm space-y-4">
               <div>
                 <h3 className="font-serif italic text-base font-bold text-theme-primary">Inventário Individual de Lotes de Gado</h3>
-                <p className="text-xs text-[#8d8a86]">Rastreabilidade detalhada: tipo de posse, ano/data de entrada, peso de nascimento/entrada, peso de comercialização/saída, e tempo total de pastoreamento.</p>
+                <p className="text-xs text-theme-secondary">Rastreabilidade detalhada: tipo de posse, ano/data de entrada, peso de nascimento/entrada, peso de comercialização/saída, e tempo total de pastoreamento.</p>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-[#f0f0f0] text-[#8d8a86] font-black uppercase tracking-wider text-[10px]">
+                    <tr className="border-b border-theme text-theme-secondary font-black uppercase tracking-wider text-[10px]">
                       <th className="pb-3 pr-2">Lote / Registro</th>
                       <th className="pb-3 pr-2">Tipo / Categoria</th>
                       <th className="pb-3 pr-2">Data Entrada</th>
@@ -1042,7 +1042,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                       <tr key={a.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors">
                         <td className="py-3">
                           <span className="font-extrabold text-slate-800 block text-sm">{a.lotName}</span>
-                          <span className="text-[10px] text-[#8d8a86] font-bold uppercase">{a.breed || 'Sem Raça'} • {a.quantity} cabeças</span>
+                          <span className="text-[10px] text-theme-secondary font-bold uppercase">{a.breed || 'Sem Raça'} • {a.quantity} cabeças</span>
                         </td>
                         <td className="py-3">
                           <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
@@ -1059,7 +1059,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                           {a.entryYear}
                         </td>
                         <td className="py-3 text-center text-slate-800 font-bold">
-                          {a.stayMonths} meses <span className="text-[10px] text-[#8d8a86] font-normal">({a.stayDays} dias)</span>
+                          {a.stayMonths} meses <span className="text-[10px] text-theme-secondary font-normal">({a.stayDays} dias)</span>
                         </td>
                         <td className="py-3 text-right font-bold text-slate-800">
                           {a.averageWeight} kg
@@ -1068,7 +1068,7 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                           {a.isSold && a.saleDetails ? (
                             <span>{a.saleDetails.averageWeight} kg</span>
                           ) : (
-                            <span className="text-[#8d8a86] italic font-normal">Ainda no pasto</span>
+                            <span className="text-theme-secondary italic font-normal">Ainda no pasto</span>
                           )}
                         </td>
                       </tr>
@@ -1096,9 +1096,9 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                   <Coins size={28} />
                 </div>
                 <div>
-                  <span className="text-[10px] text-[#8d8a86] uppercase font-black tracking-wider block">Lucro Bruto Total</span>
+                  <span className="text-[10px] text-theme-secondary uppercase font-black tracking-wider block">Lucro Bruto Total</span>
                   <span className="text-xl font-black text-theme-primary">R$ {tradingAnalysis.lucroBrutoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                  <span className="text-[10px] text-[#8d8a86] block mt-0.5">Ciclo total faturado acumulado</span>
+                  <span className="text-[10px] text-theme-secondary block mt-0.5">Ciclo total faturado acumulado</span>
                 </div>
               </div>
 
@@ -1107,9 +1107,9 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                   <TrendingUp size={28} />
                 </div>
                 <div>
-                  <span className="text-[10px] text-[#8d8a86] uppercase font-black tracking-wider block">Lucro Líquido 1</span>
+                  <span className="text-[10px] text-theme-secondary uppercase font-black tracking-wider block">Lucro Líquido 1</span>
                   <span className="text-xl font-black text-blue-800">R$ {tradingAnalysis.lucroLiquido1.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                  <span className="text-[10px] text-[#8d8a86] block mt-0.5">Animais Próprios (com custos fazenda)</span>
+                  <span className="text-[10px] text-theme-secondary block mt-0.5">Animais Próprios (com custos fazenda)</span>
                 </div>
               </div>
 
@@ -1118,9 +1118,9 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                   <Users size={28} />
                 </div>
                 <div>
-                  <span className="text-[10px] text-[#8d8a86] uppercase font-black tracking-wider block">Lucro Líquido 2 (Aluguel/Meia)</span>
+                  <span className="text-[10px] text-theme-secondary uppercase font-black tracking-wider block">Lucro Líquido 2 (Aluguel/Meia)</span>
                   <span className="text-xl font-black text-purple-800">R$ {tradingAnalysis.lucroLiquido2.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                  <span className="text-[10px] text-[#8d8a86] block mt-0.5">Soma de Aluguel + Parceria de Meia</span>
+                  <span className="text-[10px] text-theme-secondary block mt-0.5">Soma de Aluguel + Parceria de Meia</span>
                 </div>
               </div>
             </div>
@@ -1159,27 +1159,27 @@ export default function Reports({ payments, expenses, animals, transactions, pas
                 <h4 className="font-serif italic text-base font-bold text-theme-primary border-b pb-2">Patrimônio em Estoque / Depósito (Estoque)</h4>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-[#fcfaf7] rounded-xl border border-theme">
-                    <span className="text-[9px] uppercase font-bold text-[#8d8a86] block">Ativos em Depósito</span>
+                  <div className="p-3 bg-theme-card rounded-xl border border-theme">
+                    <span className="text-[9px] uppercase font-bold text-theme-secondary block">Ativos em Depósito</span>
                     <span className="font-black text-slate-800 text-lg">R$ {stockInventoryReport.totalStockValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="p-3 bg-[#fcfaf7] rounded-xl border border-theme">
-                    <span className="text-[9px] uppercase font-bold text-[#8d8a86] block">Categorias de Insumo</span>
+                  <div className="p-3 bg-theme-card rounded-xl border border-theme">
+                    <span className="text-[9px] uppercase font-bold text-theme-secondary block">Categorias de Insumo</span>
                     <span className="font-black text-slate-800 text-lg">{stockInventoryReport.categories.length} cadastradas</span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase text-[#8d8a86] block">Balanço do Estoque por Categoria</span>
+                  <span className="text-[10px] font-black uppercase text-theme-secondary block">Balanço do Estoque por Categoria</span>
                   {stockInventoryReport.categories.map(cat => (
                     <div key={cat.name} className="flex justify-between items-center text-xs py-1 border-b border-neutral-50">
                       <span className="font-extrabold text-slate-700">{cat.name}</span>
-                      <span className="font-black text-theme-primary">R$ {cat.val.toLocaleString()} <span className="text-[10px] text-[#8d8a86] font-normal">({cat.heads} itens)</span></span>
+                      <span className="font-black text-theme-primary">R$ {cat.val.toLocaleString()} <span className="text-[10px] text-theme-secondary font-normal">({cat.heads} itens)</span></span>
                     </div>
                   ))}
 
                   {stockInventoryReport.categories.length === 0 && (
-                    <div className="text-center text-xs italic text-[#8d8a86] py-4">Nenhum suprimento no depósito.</div>
+                    <div className="text-center text-xs italic text-theme-secondary py-4">Nenhum suprimento no depósito.</div>
                   )}
                 </div>
               </div>
@@ -1199,7 +1199,7 @@ function employeeRolesBreakdownList(roles: { role: string, value: number }[]) {
     const payment = roles.find(r => r.role === role)?.value || 0;
     return (
       <div key={role} className="bg-theme-card p-4.5 rounded-3xl border border-theme shadow-sm select-none">
-        <span className="text-[9px] font-black text-[#8d8a86] uppercase block leading-none mb-1">{role}</span>
+        <span className="text-[9px] font-black text-theme-secondary uppercase block leading-none mb-1">{role}</span>
         <span className="text-base font-black text-slate-800 block">R$ {payment.toLocaleString('pt-BR')}</span>
         <span className="text-[9px] font-semibold text-theme-primary uppercase block mt-0.5">Custo De Folha</span>
       </div>

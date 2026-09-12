@@ -90,8 +90,8 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
     <div className="max-w-3xl mx-auto space-y-6 legacy-light">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-black text-[#2d2a26]">Painel de Tarefas Fazenda</h2>
-          <p className="text-sm text-[#8d8a86]">Acompanhe o que precisa ser feito pelo pessoal.</p>
+          <h2 className="text-2xl font-black text-theme-primary">Painel de Tarefas Fazenda</h2>
+          <p className="text-sm text-theme-secondary">Acompanhe o que precisa ser feito pelo pessoal.</p>
         </div>
         <button 
           onClick={() => {
@@ -129,14 +129,14 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
             >
               <button 
                 onClick={() => toggleTask(task.id)}
-                className={`mt-1.5 transition-colors ${task.completed ? 'text-theme-primary' : 'text-[#8d8a86] hover:text-theme-primary'}`}
+                className={`mt-1.5 transition-colors ${task.completed ? 'text-theme-primary' : 'text-theme-secondary hover:text-theme-primary'}`}
               >
                 {task.completed ? <CheckCircle2 size={24} className="stroke-2" /> : <Circle size={24} className="stroke-2" />}
               </button>
 
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1.5">
-                  <h3 className={`font-black text-base ${task.completed ? 'line-through text-neutral-500' : 'text-[#2d2a26]'}`}>
+                  <h3 className={`font-black text-base ${task.completed ? 'line-through text-neutral-500' : 'text-theme-primary'}`}>
                     {task.title}
                   </h3>
                   <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
@@ -156,12 +156,12 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                   </div>
                 </div>
                 
-                <p className={`text-sm mb-3.5 leading-relaxed font-medium ${task.completed ? 'text-neutral-400 font-normal line-through' : 'text-[#64615d]'}`}>
+                <p className={`text-sm mb-3.5 leading-relaxed font-medium ${task.completed ? 'text-neutral-400 font-normal line-through' : 'text-theme-secondary'}`}>
                   {task.description}
                 </p>
 
                 {/* Highly finished assignee, location, deadline details block */}
-                <div className="flex flex-wrap gap-4 items-center text-xs font-bold uppercase text-[#8d8a86] tracking-wider pt-2.5 border-t border-[#fcfaf7]">
+                <div className="flex flex-wrap gap-4 items-center text-xs font-bold uppercase text-theme-secondary tracking-wider pt-2.5 border-t border-theme">
                   <div className={`flex items-center gap-1.5 ${isOverdue ? 'text-red-500' : 'text-theme-primary'}`}>
                     <Calendar size={14} />
                     Prazo: {format(taskDate, "dd 'de' MMMM", { locale: ptBR })}
@@ -194,9 +194,9 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
         })}
 
         {tasks.length === 0 && (
-          <div className="text-center py-20 bg-[#fcfaf7] border-2 border-dashed border-theme rounded-3xl">
+          <div className="text-center py-20 bg-theme-card border-2 border-dashed border-theme rounded-3xl">
             <Clock size={48} className="mx-auto mb-4 text-theme-secondary" />
-            <p className="text-[#8d8a86] font-bold">Nenhuma tarefa agendada. Tudo em dia por aqui!</p>
+            <p className="text-theme-secondary font-bold">Nenhuma tarefa agendada. Tudo em dia por aqui!</p>
           </div>
         )}
       </div>
@@ -209,11 +209,11 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-md rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme bg-[#fcfaf7] flex items-center justify-between">
+            <div className="p-6 border-b border-theme bg-theme-card flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingTask(null); }}
-                  className="p-2 -ml-2 text-[#8d8a86] hover:text-theme-primary hover:bg-theme-secondary rounded-full transition-colors md:hidden"
+                  className="p-2 -ml-2 text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary rounded-full transition-colors md:hidden"
                   title="Voltar"
                 >
                   <ArrowLeft size={18} />
@@ -234,7 +234,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Título da Atividade</label>
+                <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Título da Atividade</label>
                 <input 
                   required
                   type="text" 
@@ -246,7 +246,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
               </div>
 
               <div>
-                <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Descrição do Trabalho</label>
+                <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Descrição do Trabalho</label>
                 <textarea 
                   required
                   className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none text-sm min-h-[70px]"
@@ -258,7 +258,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Prazo Final (Limite)</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Prazo Final (Limite)</label>
                   <input 
                     required
                     type="date" 
@@ -269,7 +269,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Prioridade</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Prioridade</label>
                   <select 
                     className="w-full px-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none bg-theme-card font-medium"
                     value={formData.priority}
@@ -282,9 +282,9 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#f2ece4]">
+              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-theme">
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Designar Colaborador</label>
+                  <label className="text-[10px] font-bold uppercase text-theme-secondary mb-1 block">Designar Colaborador</label>
                   {employees && employees.length > 0 ? (
                     <select 
                       className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
@@ -308,7 +308,7 @@ export default function Tasks({ tasks, onSave, onDelete }: Props) {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Local para Execução</label>
+                  <label className="text-[10px] font-bold uppercase text-theme-secondary mb-1 block">Local para Execução</label>
                   <input 
                     type="text" 
                     className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"

@@ -373,7 +373,7 @@ export default function WeighingWorksheet() {
         <button 
           onClick={() => setActiveTab('sheets')}
           className={`pb-3 font-semibold text-sm transition-all relative ${
-            activeTab === 'sheets' ? 'text-theme-primary font-bold border-b-2 border-[var(--primary)]' : 'text-[#8d8a86] hover:text-[#2d2a26]'
+            activeTab === 'sheets' ? 'text-theme-primary font-bold border-b-2 border-[var(--primary)]' : 'text-theme-secondary hover:text-theme-primary'
           }`}
         >
           <span className="flex items-center gap-1.5 px-1">
@@ -394,7 +394,7 @@ export default function WeighingWorksheet() {
             setActiveTab('editor');
           }}
           className={`pb-3 font-semibold text-sm transition-all relative ${
-            activeTab === 'editor' ? 'text-theme-primary font-bold border-b-2 border-[var(--primary)]' : 'text-[#8d8a86] hover:text-[#2d2a26]'
+            activeTab === 'editor' ? 'text-theme-primary font-bold border-b-2 border-[var(--primary)]' : 'text-theme-secondary hover:text-theme-primary'
           }`}
         >
           <span className="flex items-center gap-1.5 px-1">
@@ -410,12 +410,12 @@ export default function WeighingWorksheet() {
             onClick={handleCreateNewSheet}
             className="border-2 border-dashed border-theme hover:border-[var(--primary)] bg-theme-card p-8 rounded-3xl cursor-pointer flex flex-col items-center justify-center text-center gap-4 transition-all hover:shadow-md hover:scale-101 active:scale-99 group"
           >
-            <div className="w-16 h-16 bg-[#fcfaf7] rounded-full flex items-center justify-center border border-theme group-hover:bg-[var(--primary)]/5 group-hover:border-[var(--primary)]/20 group-hover:scale-110 transition-all">
+            <div className="w-16 h-16 bg-theme-card rounded-full flex items-center justify-center border border-theme group-hover:bg-[var(--primary)]/5 group-hover:border-[var(--primary)]/20 group-hover:scale-110 transition-all">
               <Plus size={28} className="text-theme-primary" />
             </div>
             <div>
               <h3 className="font-bold text-theme-primary text-lg group-hover:underline">Criar Nova Planilha</h3>
-              <p className="text-[#8d8a86] text-xs mt-1">Insira e calcule as médias de pesagens de gado instantaneamente.</p>
+              <p className="text-theme-secondary text-xs mt-1">Insira e calcule as médias de pesagens de gado instantaneamente.</p>
             </div>
           </div>
 
@@ -446,7 +446,7 @@ export default function WeighingWorksheet() {
                 >
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
-                      <div className="p-2 bg-[#fcfaf7] rounded-xl border border-theme">
+                      <div className="p-2 bg-theme-card rounded-xl border border-theme">
                         <FileText size={20} className="text-theme-primary" />
                       </div>
                       <button
@@ -462,18 +462,18 @@ export default function WeighingWorksheet() {
                       <h4 className="font-serif italic text-base font-bold text-theme-primary truncate group-hover:underline">
                         {sheet.name}
                       </h4>
-                      <p className="text-[10px] uppercase font-black text-[#8d8a86] mt-1 flex items-center gap-1">
+                      <p className="text-[10px] uppercase font-black text-theme-secondary mt-1 flex items-center gap-1">
                         <Calendar size={10} /> {new Date(sheet.date).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 pt-2 border-t border-theme text-xs">
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-[#8d8a86] block">Total de Gado</span>
+                        <span className="text-[10px] font-bold uppercase text-theme-secondary block">Total de Gado</span>
                         <strong className="text-sm font-black text-theme-primary">{heads} cab.</strong>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-[#8d8a86] block">Arrobas Totais</span>
+                        <span className="text-[10px] font-bold uppercase text-theme-secondary block">Arrobas Totais</span>
                         <strong className="text-sm font-black text-orange-600">
                           {totalAt.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 5 })} @
                         </strong>
@@ -481,7 +481,7 @@ export default function WeighingWorksheet() {
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 flex items-center justify-between text-xs font-semibold text-[#8d8a86] group-hover:text-theme-primary">
+                  <div className="mt-4 pt-3 flex items-center justify-between text-xs font-semibold text-theme-secondary group-hover:text-theme-primary">
                     <span>{rowCount} {rowCount === 1 ? 'linha' : 'linhas'} cadastradas</span>
                     <ChevronRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -524,14 +524,14 @@ export default function WeighingWorksheet() {
                     </h2>
                     <button 
                       onClick={() => setIsEditingName(true)}
-                      className="p-1 text-[#8d8a86] hover:text-theme-primary hover:bg-[#fcfaf7] rounded-lg transition-all"
+                      className="p-1 text-theme-secondary hover:text-theme-primary hover:bg-theme-card rounded-lg transition-all"
                       title="Editar nome"
                     >
                       <Edit size={16} />
                     </button>
                   </div>
                 )}
-                <div className="flex items-center gap-2 text-xs text-[#8d8a86] font-medium">
+                <div className="flex items-center gap-2 text-xs text-theme-secondary font-medium">
                   <span>Modo de edição ativo</span>
                   <span>•</span>
                   <span>Calculado em tempo real</span>
@@ -549,7 +549,7 @@ export default function WeighingWorksheet() {
                       e.target.value = ''; // Reset selection
                     }
                   }}
-                  className="bg-[#fcfaf7] border border-theme hover:border-[var(--primary)]/40 text-xs font-black text-theme-primary pl-8 pr-12 py-2.5 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/10 appearance-none flex items-center"
+                  className="bg-theme-card border border-theme hover:border-[var(--primary)]/40 text-xs font-black text-theme-primary pl-8 pr-12 py-2.5 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/10 appearance-none flex items-center"
                 >
                   <option value="">Carregar de Lotes de Animais...</option>
                   {pastures.map(p => {
@@ -565,7 +565,7 @@ export default function WeighingWorksheet() {
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-primary">
                   <Layers size={14} />
                 </div>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold pointer-events-none text-[#8d8a86]">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold pointer-events-none text-theme-secondary">
                   ▼
                 </div>
               </div>
@@ -620,18 +620,18 @@ export default function WeighingWorksheet() {
                   <col style={colStyles[8]} />
                 </colgroup>
                 <thead>
-                  <tr className="bg-[#fcfaf7] border-b border-theme h-14">
-                    <th style={colStyles[0]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Quantidade (Cab.)</th>
-                    <th style={colStyles[1]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Peso (kg)</th>
-                    <th style={colStyles[2]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Peso (kg)/ Animal</th>
-                    <th style={colStyles[3]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">
+                  <tr className="bg-theme-card border-b border-theme h-14">
+                    <th style={colStyles[0]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Quantidade (Cab.)</th>
+                    <th style={colStyles[1]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Peso (kg)</th>
+                    <th style={colStyles[2]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Peso (kg)/ Animal</th>
+                    <th style={colStyles[3]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">
                       <div>Divisão por 15</div>
-                      <div className="text-[8px] font-bold text-[#8d8a86]/80 mt-0.5 lowercase">(total @)</div>
+                      <div className="text-[8px] font-bold text-theme-secondary/80 mt-0.5 lowercase">(total @)</div>
                     </th>
-                    <th style={colStyles[4]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Média @/Animal</th>
-                    <th style={colStyles[5]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Valor da Arroba (R$)</th>
-                    <th style={colStyles[6]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Valor parcial/ animal</th>
-                    <th style={colStyles[7]} className="p-4 text-[10px] font-black uppercase text-[#8d8a86] text-center overflow-hidden text-ellipsis whitespace-nowrap">Total Geral</th>
+                    <th style={colStyles[4]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Média @/Animal</th>
+                    <th style={colStyles[5]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Valor da Arroba (R$)</th>
+                    <th style={colStyles[6]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Valor parcial/ animal</th>
+                    <th style={colStyles[7]} className="p-4 text-[10px] font-black uppercase text-theme-secondary text-center overflow-hidden text-ellipsis whitespace-nowrap">Total Geral</th>
                     <th style={colStyles[8]} className="p-4"></th>
                   </tr>
                 </thead>
@@ -647,11 +647,11 @@ export default function WeighingWorksheet() {
                            animate={{ opacity: 1 }}
                            exit={{ opacity: 0 }}
                            style={{ display: 'table-row' }}
-                           className="border-b border-theme hover:bg-[#fcfaf7]/50"
+                           className="border-b border-theme hover:bg-theme-card/50"
                         >
                            {/* Quantidade */}
                            <td style={colStyles[0]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-theme-card w-28 justify-center mx-auto">
+                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-28 justify-center mx-auto">
                                <input 
                                  type="number" 
                                  min="0"
@@ -660,13 +660,13 @@ export default function WeighingWorksheet() {
                                  onChange={(e) => handleUpdateRowField(row.id, 'quantity', Math.max(0, parseInt(e.target.value) || 0))}
                                  onKeyDown={handleInputKeyDown}
                                />
-                               <span className="text-[10px] uppercase font-black text-[#8d8a86]">cab.</span>
+                               <span className="text-[10px] uppercase font-black text-theme-secondary">cab.</span>
                              </div>
                             </td>
 
                            {/* Peso kg */}
                            <td style={colStyles[1]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-theme-card w-32 justify-center mx-auto">
+                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-32 justify-center mx-auto">
                                <input 
                                  type="number" 
                                  min="0"
@@ -676,7 +676,7 @@ export default function WeighingWorksheet() {
                                  onChange={(e) => handleUpdateRowField(row.id, 'weight', Math.max(0, parseFloat(e.target.value) || 0))}
                                  onKeyDown={handleInputKeyDown}
                                />
-                               <span className="text-[10px] uppercase font-black text-[#8d8a86]">kg</span>
+                               <span className="text-[10px] uppercase font-black text-theme-secondary">kg</span>
                              </div>
                             </td>
 
@@ -697,8 +697,8 @@ export default function WeighingWorksheet() {
 
                            {/* Valor Arroba R$ */}
                            <td style={colStyles[5]} className="p-3 text-center align-middle">
-                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-[#fafafa]/50 focus-within:bg-theme-card w-32 justify-center mx-auto">
-                               <span className="text-[10px] font-black text-[#8d8a86]">R$</span>
+                             <div className="inline-flex items-center gap-1 border border-theme focus-within:border-[var(--primary)] rounded-xl px-2 py-1.5 bg-theme-card/50 focus-within:bg-theme-card w-32 justify-center mx-auto">
+                               <span className="text-[10px] font-black text-theme-secondary">R$</span>
                                <input 
                                  type="number" 
                                  step="any"
@@ -717,7 +717,7 @@ export default function WeighingWorksheet() {
                             </td>
 
                            {/* Parcial Total - CENTER ALIGNED! */}
-                           <td style={colStyles[7]} className="p-3 text-center font-mono text-sm text-[#2d2a26] font-black whitespace-nowrap align-middle">
+                           <td style={colStyles[7]} className="p-3 text-center font-mono text-sm text-theme-primary font-black whitespace-nowrap align-middle">
                              {parcialTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
                             </td>
 
@@ -725,7 +725,7 @@ export default function WeighingWorksheet() {
                            <td style={colStyles[8]} className="p-3 text-center align-middle">
                              <button 
                                onClick={() => handleDeleteRow(row.id)}
-                               className="p-1 px-1.5 text-[#8d8a86] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mx-auto block"
+                               className="p-1 px-1.5 text-theme-secondary hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mx-auto block"
                                title="Deletar linha"
                              >
                                <Trash2 size={14} />
@@ -737,7 +737,7 @@ export default function WeighingWorksheet() {
                   </AnimatePresence>
 
                   {/* !!! AS REQUESTED: Pule sempre uma linha !!! */}
-                  <tr className="bg-[#fefdfc] border-b border-theme">
+                  <tr className="bg-theme-card border-b border-theme">
                     <td style={{ ...colStyles[0], height: '40px' }} />
                     <td style={{ ...colStyles[1], height: '40px' }} />
                     <td style={{ ...colStyles[2], height: '40px' }} />
@@ -752,26 +752,26 @@ export default function WeighingWorksheet() {
                   {/* !!! AS REQUESTED: Totais Row in order: 
                      "Quantidade total, peso total, divisão por 15, valor da arroba, total por unidade e total por quantidade" 
                   !!! */}
-                  <tr className="bg-[#fcfaf7] font-black border-t-2 border-theme">
+                  <tr className="bg-theme-card font-black border-t-2 border-theme">
                     {/* Quantidade total */}
                     <td style={colStyles[0]} className="p-4 px-2 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Qtd Total</div>
+                      <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1">Qtd Total</div>
                       <span className="text-xs font-black text-theme-primary block whitespace-nowrap">
-                        {totals.qTotal} <span className="text-[10px] font-medium text-[#8d8a86]">cab.</span>
+                        {totals.qTotal} <span className="text-[10px] font-medium text-theme-secondary">cab.</span>
                       </span>
                     </td>
 
                     {/* Peso total sum */}
                     <td style={colStyles[1]} className="p-4 px-2 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Peso Total</div>
-                      <span className="text-xs font-black text-[#2d2a26] block whitespace-nowrap">
+                      <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1">Peso Total</div>
+                      <span className="text-xs font-black text-theme-primary block whitespace-nowrap">
                         {totals.weightSum.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 5 })} kg
                       </span>
                     </td>
 
                     {/* Peso (kg)/ Animal (Average Weight per head) */}
                     <td style={colStyles[2]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Média kg/Animal</div>
+                      <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1">Média kg/Animal</div>
                       <span className="text-xs font-black text-theme-primary block whitespace-nowrap">
                         {totals.averageWeight.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 5 })} kg
                       </span>
@@ -779,7 +779,7 @@ export default function WeighingWorksheet() {
 
                     {/* Divisão por 15 (Total @) */}
                     <td style={colStyles[3]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Divisão por 15</div>
+                      <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1">Divisão por 15</div>
                       <span className="text-xs font-black text-theme-primary font-mono whitespace-nowrap block">
                         {totals.totalDivisionBy15.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 5 })} @
                       </span>
@@ -787,7 +787,7 @@ export default function WeighingWorksheet() {
 
                     {/* Parcial de Arroba por Animal (Sum/Avg) */}
                     <td style={colStyles[4]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Média @/Animal</div>
+                      <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1">Média @/Animal</div>
                       <span className="text-xs font-black text-theme-primary font-mono whitespace-nowrap block">
                         {totals.averageArrobas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 5 })} @
                       </span>
@@ -795,7 +795,7 @@ export default function WeighingWorksheet() {
 
                     {/* Valor da Arroba (Weighted Price Average) */}
                     <td style={colStyles[5]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Valor da Arroba</div>
+                      <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1">Valor da Arroba</div>
                       <span className="text-xs font-bold text-orange-600 font-mono whitespace-nowrap">
                         {totals.weightedArrobaValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
                        </span>
@@ -803,7 +803,7 @@ export default function WeighingWorksheet() {
 
                     {/* Valor parcial/ animal (Average Value per Head) - CENTER ALIGNED! */}
                     <td style={colStyles[6]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1">Valor parcial/ animal</div>
+                      <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1">Valor parcial/ animal</div>
                       <span className="text-sm font-black text-theme-primary font-mono whitespace-nowrap">
                         {totals.averageValuePerHead.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
                       </span>
@@ -811,8 +811,8 @@ export default function WeighingWorksheet() {
 
                     {/* Total por quantidade - CENTER ALIGNED! */}
                     <td style={colStyles[7]} className="p-4 text-center">
-                      <div className="text-[9px] uppercase font-bold text-[#8d8a86] tracking-wider mb-1 text-orange-600">Total Geral</div>
-                      <span className="text-base font-black text-[#2d2a26] font-mono bg-orange-100/30 px-3 py-1.5 rounded-xl border border-orange-200 whitespace-nowrap inline-block">
+                      <div className="text-[9px] uppercase font-bold text-theme-secondary tracking-wider mb-1 text-orange-600">Total Geral</div>
+                      <span className="text-base font-black text-theme-primary font-mono bg-orange-100/30 px-3 py-1.5 rounded-xl border border-orange-200 whitespace-nowrap inline-block">
                         {totals.totalQuantityValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 5 })}
                       </span>
                     </td>
@@ -825,7 +825,7 @@ export default function WeighingWorksheet() {
             </div>
 
             {/* Quick action footer */}
-            <div className="p-5 bg-[#fcfaf7] border-t border-theme flex items-center justify-between">
+            <div className="p-5 bg-theme-card border-t border-theme flex items-center justify-between">
               <button 
                 onClick={handleAddRow}
                 className="btn-outline px-4 py-2.5 text-xs"
@@ -833,16 +833,16 @@ export default function WeighingWorksheet() {
                 <Plus size={14} /> Adicionar Nova Linha
               </button>
               
-              <div className="text-[10px] text-[#8d8a86] uppercase font-bold flex items-center gap-1">
+              <div className="text-[10px] text-theme-secondary uppercase font-bold flex items-center gap-1">
                 <Sparkles size={12} className="text-orange-500 animate-spin" /> Digite diretamente nas celulas para recalcular
               </div>
             </div>
           </div>
 
           {/* Notes and description */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#fcfaf7] p-6 rounded-3xl border border-theme">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-theme-card p-6 rounded-3xl border border-theme">
             <div className="md:col-span-2 space-y-2">
-              <label className="text-xs font-bold uppercase text-[#8d8a86]">Observações de Lote / Observações Gerais</label>
+              <label className="text-xs font-bold uppercase text-theme-secondary">Observações de Lote / Observações Gerais</label>
               <textarea 
                 value={sheetNotes}
                 onChange={(e) => setSheetNotes(e.target.value)}
@@ -901,7 +901,7 @@ export default function WeighingWorksheet() {
                   <Trash2 size={24} />
                 </div>
                 <div>
-                  <h3 className="font-serif italic font-bold text-lg text-[#2d2a26]">Deletar Planilha</h3>
+                  <h3 className="font-serif italic font-bold text-lg text-theme-primary">Deletar Planilha</h3>
                   <p className="text-[10px] uppercase font-black tracking-wider text-red-500/80">Ação irreversível</p>
                 </div>
               </div>

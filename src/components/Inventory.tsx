@@ -134,7 +134,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
       {/* Top Filter and Search bar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={18} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={18} />
           <input 
             type="text" 
             placeholder="Pesquisar estoque por item, fornecedor..." 
@@ -210,36 +210,36 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 </div>
 
                 <div className="mt-4">
-                  <h3 className="text-base font-black text-[#2d2a26]">{item.name}</h3>
+                  <h3 className="text-base font-black text-theme-primary">{item.name}</h3>
                   
                   <div className="mt-2.5 flex items-baseline gap-1.5">
                     <span className="text-3xl font-black text-theme-primary">{item.quantity}</span>
-                    <span className="text-xs font-bold text-[#8d8a86] uppercase">{item.unit}</span>
+                    <span className="text-xs font-bold text-theme-secondary uppercase">{item.unit}</span>
                   </div>
 
                   {item.unitPrice && item.unitPrice > 0 ? (
-                    <p className="text-[10px] text-[#8d8a86] font-bold mt-1 uppercase">Valor Unitário: <span className="text-theme-primary">R$ {item.unitPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span> (Total: R$ {item.totalPrice?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</p>
+                    <p className="text-[10px] text-theme-secondary font-bold mt-1 uppercase">Valor Unitário: <span className="text-theme-primary">R$ {item.unitPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span> (Total: R$ {item.totalPrice?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</p>
                   ) : null}
 
                   {/* Store and contact detail section */}
                   {(item.storeName || item.contactPhone || item.responsiblePerson) && (
-                    <div className="mt-4 pt-3.5 border-t border-[#f2ece4] space-y-2 text-xs font-medium text-theme-secondary">
+                    <div className="mt-4 pt-3.5 border-t border-theme space-y-2 text-xs font-medium text-theme-secondary">
                       {item.storeName && (
                         <div className="flex items-center gap-1.5">
-                          <Store size={14} className="text-[#8d8a86]" />
-                          <span>Adquirido em: <span className="font-bold text-[#2d2a26]">{item.storeName}</span></span>
+                          <Store size={14} className="text-theme-secondary" />
+                          <span>Adquirido em: <span className="font-bold text-theme-primary">{item.storeName}</span></span>
                         </div>
                       )}
                       {item.contactPhone && (
                         <div className="flex items-center gap-1.5">
-                          <Phone size={14} className="text-[#8d8a86]" />
-                          <span>Telefone loja: <span className="font-bold text-[#2d2a26]">{item.contactPhone}</span></span>
+                          <Phone size={14} className="text-theme-secondary" />
+                          <span>Telefone loja: <span className="font-bold text-theme-primary">{item.contactPhone}</span></span>
                         </div>
                       )}
                       {item.responsiblePerson && (
                         <div className="flex items-center gap-1.5">
-                          <User size={14} className="text-[#8d8a86]" />
-                          <span>Responsável: <span className="font-bold text-[#2d2a26]">{item.responsiblePerson}</span></span>
+                          <User size={14} className="text-theme-secondary" />
+                          <span>Responsável: <span className="font-bold text-theme-primary">{item.responsiblePerson}</span></span>
                         </div>
                       )}
                     </div>
@@ -247,7 +247,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-[#f2ece4] flex justify-between items-center text-[10px] text-[#8d8a86] font-bold uppercase">
+              <div className="mt-4 pt-3 border-t border-theme flex justify-between items-center text-[10px] text-theme-secondary font-bold uppercase">
                 <span>Última Entrada</span>
                 <span>{format(new Date(item.lastUpdated), 'dd/MM/yyyy HH:mm')}</span>
               </div>
@@ -255,7 +255,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
           ))}
 
           {filteredInventory.length === 0 && (
-            <div className="col-span-full py-16 text-center text-[#8d8a86] italic bg-[#fcfaf7] rounded-3xl border border-theme">
+            <div className="col-span-full py-16 text-center text-theme-secondary italic bg-theme-card rounded-3xl border border-theme">
               Nenhum item em estoque correspondente aos filtros.
             </div>
           )}
@@ -267,8 +267,8 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
             <div className="bg-theme-card border border-theme rounded-3xl p-6 shadow-sm space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h4 className="text-xs font-black text-[#8d8a86] uppercase">Linha do Tempo</h4>
-                  <h3 className="text-base font-black text-[#2d2a26] pr-4">{selectedItemForHistory.name}</h3>
+                  <h4 className="text-xs font-black text-theme-secondary uppercase">Linha do Tempo</h4>
+                  <h3 className="text-base font-black text-theme-primary pr-4">{selectedItemForHistory.name}</h3>
                 </div>
                 <button 
                   onClick={() => setSelectedItemForHistory(null)}
@@ -278,7 +278,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                 </button>
               </div>
 
-              <div className="space-y-4 pt-2 border-t border-[#f0f0f0] overflow-y-auto max-h-[420px] pr-1">
+              <div className="space-y-4 pt-2 border-t border-theme overflow-y-auto max-h-[420px] pr-1">
                 {selectedItemForHistory.history && selectedItemForHistory.history.length > 0 ? (
                   selectedItemForHistory.history.map((log, idx) => (
                     <div key={idx} className="flex gap-3 text-xs">
@@ -291,10 +291,10 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                         )}
                       </div>
                       <div className="flex-1 pb-4">
-                        <div className="font-bold text-[#2d2a26]">
+                        <div className="font-bold text-theme-primary">
                           {log.changeType === 'add' ? '🆕 Registro Inicial' : log.changeType === 'edit' ? '✏️ Dados Modificados' : '📊 Ajuste de Quantidade'}
                         </div>
-                        <p className="text-[#8d8a86] font-medium">{format(new Date(log.date), 'dd/MM/yyyy HH:mm')}</p>
+                        <p className="text-theme-secondary font-medium">{format(new Date(log.date), 'dd/MM/yyyy HH:mm')}</p>
                         {log.quantity !== 0 && (
                           <p className="font-bold text-theme-primary mt-1">
                             Ajuste: {log.quantity > 0 ? '+' : ''}{log.quantity} {selectedItemForHistory.unit}
@@ -304,14 +304,14 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                     </div>
                   ))
                 ) : (
-                  <div className="text-xs text-[#8d8a86] italic text-center py-6">
+                  <div className="text-xs text-theme-secondary italic text-center py-6">
                     Mapeando histórico acumulável a partir deste momento.
                   </div>
                 )}
               </div>
             </div>
           ) : (
-            <div className="bg-[#fcfaf7] border border-dashed border-theme rounded-3xl p-6.5 text-center text-[#8d8a86] italic text-xs">
+            <div className="bg-theme-card border border-dashed border-theme rounded-3xl p-6.5 text-center text-theme-secondary italic text-xs">
               💡 Clique no ícone de relógio (<History size={13} className="inline mx-0.5" />) em qualquer item do estoque para inspecionar seu histórico e rastreabilidade de compras ou suprimentos.
             </div>
           )}
@@ -326,7 +326,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-[#fcfaf7]">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setIsFormOpen(false)}
@@ -350,7 +350,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[80vh]">
               <div>
-                <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1.5 block">Categoria do Item</label>
+                <label className="text-xs font-bold uppercase text-theme-secondary mb-1.5 block">Categoria do Item</label>
                 <div className="flex gap-2">
                   <button 
                     type="button"
@@ -374,7 +374,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
               </div>
 
               <div>
-                <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Nome do Item</label>
+                <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Nome do Item</label>
                 <input 
                   required
                   type="text" 
@@ -387,7 +387,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Quantidade</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Quantidade</label>
                   <input 
                     required
                     type="number" 
@@ -404,7 +404,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Unidade de Medida</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Unidade de Medida</label>
                   <input 
                     required
                     type="text" 
@@ -418,7 +418,7 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Preço Unitário (R$)</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Preço Unitário (R$)</label>
                   <input 
                     type="number" 
                     step="0.01"
@@ -436,24 +436,24 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Estimado Total</label>
-                  <div className="w-full px-4 py-2.5 bg-[#fcfaf7] border border-theme rounded-xl font-black text-theme-primary">
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Estimado Total</label>
+                  <div className="w-full px-4 py-2.5 bg-theme-card border border-theme rounded-xl font-black text-theme-primary">
                     R$ {((formData.quantity || 0) * (formData.unitPrice || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </div>
                 </div>
               </div>
 
               {/* Advanced Tracking Custom fields */}
-              <div className="pt-2 border-t border-[#f2ece4] space-y-3">
-                <h4 className="text-xs font-black text-[#5d5a56] uppercase flex items-center gap-1">
+              <div className="pt-2 border-t border-theme space-y-3">
+                <h4 className="text-xs font-black text-theme-secondary uppercase flex items-center gap-1">
                   <ShoppingCart size={13} className="text-theme-primary" /> Dados do Fornecedor & Rastreabilidade
                 </h4>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Nome Comercial da Loja</label>
+                    <label className="text-[10px] font-bold uppercase text-theme-secondary mb-1 block">Nome Comercial da Loja</label>
                     <div className="relative">
-                      <Store className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
+                      <Store className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="text" 
                         className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium"
@@ -465,9 +465,9 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Contato de Telefone</label>
+                    <label className="text-[10px] font-bold uppercase text-theme-secondary mb-1 block">Contato de Telefone</label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="tel" 
                         className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium"
@@ -479,9 +479,9 @@ export default function Inventory({ inventory, onAdd, onDelete }: Props) {
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold uppercase text-[#8d8a86] mb-1 block">Responsável Compra</label>
+                    <label className="text-[10px] font-bold uppercase text-theme-secondary mb-1 block">Responsável Compra</label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={16} />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={16} />
                       <input 
                         type="text" 
                         className="w-full pl-10 pr-4 py-2 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-medium"

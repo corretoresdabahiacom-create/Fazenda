@@ -148,7 +148,7 @@ export default function ConsultorRuralIA({
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ex: posso plantar milho semana que vem?"
-          className="flex-1 border border-theme rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/20"
+          className="flex-1 border border-theme rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
         />
         <button
           type="submit"

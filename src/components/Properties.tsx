@@ -97,7 +97,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
             <div
               key={p.id}
               className={`rounded-2xl border p-4 space-y-2 transition-all ${
-                isActive ? 'border-[#2d6a4f] ring-2 ring-[#2d6a4f]/20 bg-[var(--primary)]/5' : 'border-theme bg-theme-card'
+                isActive ? 'border-[var(--primary)] ring-2 ring-[var(--primary)]/20 bg-[var(--primary)]/5' : 'border-theme bg-theme-card'
               }`}
             >
               <div className="flex items-start justify-between">

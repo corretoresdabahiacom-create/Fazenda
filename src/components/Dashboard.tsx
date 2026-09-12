@@ -400,7 +400,7 @@ export default function Dashboard({
                   <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${
                     suggestion.priority === 'High' ? 'bg-red-100 text-red-800' :
                     suggestion.priority === 'Medium' ? 'bg-amber-100 text-amber-800' :
-                    'bg-[#e2efe4] text-black'
+                    'bg-[var(--primary)]/10 text-black'
                   }`}>
                     Prioridade {suggestion.priority === 'High' ? 'Alta' : suggestion.priority === 'Medium' ? 'Média' : 'Baixa'}
                   </span>
@@ -503,7 +503,7 @@ export default function Dashboard({
             {activeAlerts.slice(0, 4).map((alert) => {
               const isOverdue = alert.daysRemaining < 0;
               const isToday = alert.daysRemaining === 0;
-              let bgStyle = "bg-[#fdfcfb] border-theme";
+              let bgStyle = "bg-theme-card border-theme";
               let textStyle = "text-theme-secondary";
               let alertBadge = "";
 

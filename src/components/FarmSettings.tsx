@@ -250,7 +250,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
       case 'storm':
         return <CloudLightning size={size} className="text-indigo-600" />;
       default:
-        return <Cloud size={size} className="text-[#a8a39a]" />;
+        return <Cloud size={size} className="text-theme-secondary" />;
     }
   };
 
@@ -280,7 +280,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
 
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Nome da Fazenda</label>
+            <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Nome da Fazenda</label>
             <input 
               type="text" 
               className="w-full px-4 py-3 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold text-lg"
@@ -290,9 +290,9 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
           </div>
 
           <div>
-            <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Cidade / Região</label>
+            <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Cidade / Região</label>
             <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={20} />
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-secondary" size={20} />
               <input 
                 type="text" 
                 placeholder="Ex: Goiânia, MT"
@@ -301,26 +301,26 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                 onChange={(e) => setFormData({...formData, city: e.target.value})}
               />
             </div>
-            <p className="text-[10px] text-[#8d8a86] mt-2 italic px-1">
+            <p className="text-[10px] text-theme-secondary mt-2 italic px-1">
               * A cidade informada é utilizada para o cálculo climático e taxas de lotação ideais.
             </p>
           </div>
 
           <div>
-            <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Data de Aniversário (opcional)</label>
+            <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Data de Aniversário (opcional)</label>
             <input
               type="date"
               className="w-full px-4 py-3 border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
               value={formData.ownerBirthday ? `2000-${formData.ownerBirthday}` : ''}
               onChange={(e) => setFormData({...formData, ownerBirthday: e.target.value ? e.target.value.slice(5) : undefined})}
             />
-            <p className="text-[10px] text-[#8d8a86] mt-2 italic px-1">
+            <p className="text-[10px] text-theme-secondary mt-2 italic px-1">
               * Guardamos só o dia e o mês (não o ano) — usado apenas para eventuais mensagens de aniversário. Nunca é obrigatório.
             </p>
           </div>
 
           <div>
-            <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Notificações no celular</label>
+            <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Notificações no celular</label>
             <button
               type="button"
               onClick={async () => {
@@ -342,7 +342,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
               {pushStatus === 'ok' ? 'Notificações ativadas ✓' : pushStatus === 'loading' ? 'Ativando...' : 'Ativar notificações push'}
             </button>
             {pushStatus === 'error' && <p className="text-[11px] text-red-500 mt-1">{pushError}</p>}
-            <p className="text-[10px] text-[#8d8a86] mt-2 italic px-1">
+            <p className="text-[10px] text-theme-secondary mt-2 italic px-1">
               * Receba avisos de vencimento e comunicados do administrador direto no seu celular, mesmo com o app fechado.
             </p>
 
@@ -357,7 +357,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                 Pedir permissão de notificação automaticamente ao entrar no app
               </span>
             </label>
-            <p className="text-[10px] text-[#8d8a86] mt-1 italic px-1">
+            <p className="text-[10px] text-theme-secondary mt-1 italic px-1">
               * Ligado por padrão. Desmarque aqui se preferir ativar manualmente (pelo botão acima) ou não usar notificações push. Não precisa salvar separado — some junto com o botão "Salvar" no fim da tela.
             </p>
           </div>
@@ -426,7 +426,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
         )}
       </div>
 
-      <div className="bg-[#fcfaf7] p-6 rounded-3xl border border-theme flex flex-col md:flex-row items-center gap-6">
+      <div className="bg-theme-card p-6 rounded-3xl border border-theme flex flex-col md:flex-row items-center gap-6">
         <div className="bg-[var(--primary)]/10 p-4 rounded-2xl flex-shrink-0">
           <CloudSun className="text-theme-primary w-8 h-8" />
         </div>
@@ -447,7 +447,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="bg-[#fcfaf7] rounded-3xl border border-theme shadow-2xl overflow-hidden max-w-2xl w-full flex flex-col max-h-[90vh]"
+              className="bg-theme-card rounded-3xl border border-theme shadow-2xl overflow-hidden max-w-2xl w-full flex flex-col max-h-[90vh]"
             >
               {/* Header */}
               <div className="bg-[var(--primary)] text-white p-6 relative">
@@ -475,7 +475,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                       className="bg-theme-card p-3 rounded-2xl border border-theme text-center flex flex-col justify-between shadow-xs hover:border-[var(--primary)]/30 hover:shadow-xs transition-shadow"
                     >
                       <div>
-                        <div className="text-[10px] font-black uppercase text-[#8d8a86]">
+                        <div className="text-[10px] font-black uppercase text-theme-secondary">
                           {day.weekdayStr}
                         </div>
                         <div className="text-xs font-black text-theme-primary mb-2">

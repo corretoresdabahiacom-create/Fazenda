@@ -197,7 +197,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
               <MapIcon className="text-theme-primary" size={20} />
             </div>
             <div>
-              <div className="text-[10px] font-black uppercase text-[#8d8a86]">Área Total Fazenda</div>
+              <div className="text-[10px] font-black uppercase text-theme-secondary">Área Total Fazenda</div>
               <div className="text-sm font-bold text-theme-primary">
                 {pastures.reduce((acc, p) => acc + (p.size || 0), 0).toLocaleString()} <span className="text-[10px]">ha em {pastures.length} pastos</span>
               </div>
@@ -209,15 +209,15 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
               <Users size={20} />
             </div>
             <div>
-              <div className="text-[10px] font-black uppercase text-[#8d8a86]">Capacidade Total ({season === 'aguas' ? 'Águas' : 'Seca'})</div>
-              <div className="text-sm font-extrabold text-[#2d2a26]">
+              <div className="text-[10px] font-black uppercase text-theme-secondary">Capacidade Total ({season === 'aguas' ? 'Águas' : 'Seca'})</div>
+              <div className="text-sm font-extrabold text-theme-primary">
                 {pastures.reduce((acc, p) => acc + (season === 'aguas' ? p.capacityAguas : p.capacitySeca), 0)} cabeças
               </div>
             </div>
           </div>
 
           {/* Toggle Season */}
-          <div className="ml-auto flex bg-theme-secondary border p-0.5 rounded-xl text-xs font-bold text-[#8d8a86]">
+          <div className="ml-auto flex bg-theme-secondary border p-0.5 rounded-xl text-xs font-bold text-theme-secondary">
             <button 
               onClick={() => setSeason('aguas')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${season === 'aguas' ? 'bg-[var(--primary)] text-white shadow-sm' : ''}`}
@@ -237,7 +237,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8d8a86]" size={18} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary" size={18} />
           <input 
             type="text" 
             placeholder="Pesquisar pastos..." 
@@ -285,12 +285,12 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
               <div className="p-6 space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#fcfaf7] rounded-xl flex items-center justify-center text-theme-primary border border-theme font-bold text-sm">
+                    <div className="w-10 h-10 bg-theme-card rounded-xl flex items-center justify-center text-theme-primary border border-theme font-bold text-sm">
                       {pasture.number}
                     </div>
                     <div>
-                      <h3 className="font-extrabold text-[#2d2a26] text-base">{pasture.name}</h3>
-                      <p className="text-[10px] text-[#8d8a86] font-bold uppercase">{pasture.size} Hectares</p>
+                      <h3 className="font-extrabold text-theme-primary text-base">{pasture.name}</h3>
+                      <p className="text-[10px] text-theme-secondary font-bold uppercase">{pasture.size} Hectares</p>
                     </div>
                   </div>
                   
@@ -305,7 +305,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                     >
                       <Sparkles size={14} />
                     </button>
-                    <button onClick={() => handleEdit(pasture)} className="p-1.5 hover:bg-[#fcfaf7] border border-theme rounded-lg text-theme-secondary">
+                    <button onClick={() => handleEdit(pasture)} className="p-1.5 hover:bg-theme-card border border-theme rounded-lg text-theme-secondary">
                       <Edit3 size={14} />
                     </button>
                     <button onClick={() => handleDelete(pasture.id)} className="p-1.5 hover:bg-red-50 border border-red-100 rounded-lg text-red-500">
@@ -337,12 +337,12 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 {/* stocking rate progress bar */}
                 <div className="space-y-1 pt-2 border-t border-theme">
                   <div className="flex justify-between text-xs font-bold">
-                    <span className="text-[#8d8a86]">Lotação Atual ({season === 'aguas' ? 'Águas' : 'Seca'})</span>
+                    <span className="text-theme-secondary">Lotação Atual ({season === 'aguas' ? 'Águas' : 'Seca'})</span>
                     <span className={pct > 100 ? 'text-red-500' : 'text-theme-primary'}>
                       {count} / {limit} cab. ({pct.toFixed(0)}%)
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-[#fcfaf7] border rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-theme-card border rounded-full overflow-hidden">
                     <div 
                       className={`h-full transition-all duration-500 ${pct > 100 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-[var(--primary)]'}`}
                       style={{ width: `${Math.min(100, pct)}%` }}
@@ -381,7 +381,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
           );
         })}
         {filteredPastures.length === 0 && (
-          <div className="col-span-full py-20 text-center text-[#8d8a86] bg-[#fcfaf7] rounded-3xl border border-theme italic text-sm">
+          <div className="col-span-full py-20 text-center text-theme-secondary bg-theme-card rounded-3xl border border-theme italic text-sm">
             Nenhum pasto cadastrado correspondente aos termos de pesquisa.
           </div>
         )}
@@ -395,11 +395,11 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
             animate={{ opacity: 1, scale: 1 }}
             className="bg-theme-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-theme flex items-center justify-between bg-[#fcfaf7]">
+            <div className="p-6 border-b border-theme flex items-center justify-between bg-theme-card">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => { setIsFormOpen(false); setEditingPasture(null); }}
-                  className="p-2 -ml-2 text-[#8d8a86] hover:text-theme-primary hover:bg-theme-secondary rounded-full transition-colors md:hidden"
+                  className="p-2 -ml-2 text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary rounded-full transition-colors md:hidden"
                   title="Voltar"
                 >
                   <ArrowLeft size={18} />
@@ -421,7 +421,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[85vh] space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="sm:col-span-1">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Nº Pasto</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Nº Pasto</label>
                   <input 
                     required
                     type="text" 
@@ -432,7 +432,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   />
                 </div>
                 <div className="sm:col-span-3">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Nome do Setor / Pasto</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Nome do Setor / Pasto</label>
                   <input 
                     required
                     type="text" 
@@ -446,7 +446,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-1">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Tamanho (Hectares - ha)</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Tamanho (Hectares - ha)</label>
                   <input 
                     required
                     type="number" 
@@ -459,7 +459,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 </div>
 
                 <div className="col-span-1">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Finalidade do Pasto</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Finalidade do Pasto</label>
                   <select 
                     required
                     className="w-full px-4 py-2 bg-theme-card border border-theme rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none font-bold"
@@ -473,7 +473,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                 </div>
 
                 <div className="col-span-1">
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block">Próximo Remanejo (opcional)</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block">Próximo Remanejo (opcional)</label>
                   <div className="flex gap-2">
                     <input
                       type="date"
@@ -488,15 +488,15 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                       onChange={(e) => setFormData({...formData, nextRotationTime: e.target.value || undefined})}
                     />
                   </div>
-                  <p className="text-[10px] text-[#8d8a86] mt-1">Avisa na Central de Obrigações 2 dias antes. Se definir um horário, o aviso do dia só fica "urgente" a partir dele.</p>
+                  <p className="text-[10px] text-theme-secondary mt-1">Avisa na Central de Obrigações 2 dias antes. Se definir um horário, o aviso do dia só fica "urgente" a partir dele.</p>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1.5 block">Gramíneas (Marque)</label>
+                <label className="text-xs font-bold uppercase text-theme-secondary mb-1.5 block">Gramíneas (Marque)</label>
                 <div className="grid grid-cols-3 gap-2">
                   {PASTURE_TYPES.map(type => (
-                    <label key={type} className={`flex items-center gap-2 p-2 rounded-xl border border-theme hover:bg-[#fcfaf7] cursor-pointer transition-colors ${formData.grassTypes?.includes(type) ? 'bg-[var(--primary)]/10 border-[var(--primary)]/30' : ''}`}>
+                    <label key={type} className={`flex items-center gap-2 p-2 rounded-xl border border-theme hover:bg-theme-card cursor-pointer transition-colors ${formData.grassTypes?.includes(type) ? 'bg-[var(--primary)]/10 border-[var(--primary)]/30' : ''}`}>
                       <input 
                         type="checkbox"
                         className="rounded text-theme-primary focus:ring-[var(--primary)]"
@@ -527,7 +527,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
 
                 <div className="grid grid-cols-2 gap-3.5 pt-1">
                   <div>
-                    <label className="text-[9px] font-bold uppercase text-[#8d8a86] mb-1 block">Loteamento Previsto</label>
+                    <label className="text-[9px] font-bold uppercase text-theme-secondary mb-1 block">Loteamento Previsto</label>
                     <select 
                       className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                       value={estimatorParams.animalCategory}
@@ -541,7 +541,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   </div>
 
                   <div>
-                    <label className="text-[9px] font-bold uppercase text-[#8d8a86] mb-1 block">Objetivo Produtivo</label>
+                    <label className="text-[9px] font-bold uppercase text-theme-secondary mb-1 block">Objetivo Produtivo</label>
                     <select 
                       className="w-full px-3 py-1.5 border border-theme rounded-xl text-xs bg-theme-card font-bold text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
                       value={estimatorParams.objective}
@@ -576,7 +576,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
               {/* Core Limits values */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block font-bold text-theme-primary">Capacidade Máxima Águas</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block font-bold text-theme-primary">Capacidade Máxima Águas</label>
                   <input 
                     required
                     type="number" 
@@ -586,7 +586,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold uppercase text-[#8d8a86] mb-1 block font-bold text-theme-primary">Capacidade Máxima Seca</label>
+                  <label className="text-xs font-bold uppercase text-theme-secondary mb-1 block font-bold text-theme-primary">Capacidade Máxima Seca</label>
                   <input 
                     required
                     type="number" 
