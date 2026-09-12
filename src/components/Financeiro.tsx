@@ -132,7 +132,7 @@ function ContasTab({ kind, items, costCenters, onSave, onDelete }: {
 
   return (
     <div className="space-y-3">
-      <div className="bg-theme-card rounded-2xl border border-theme p-4">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
         <p className="text-xs text-theme-secondary uppercase font-bold">Total {kind === 'pagar' ? 'a pagar' : 'a receber'}</p>
         <p className="text-2xl font-bold text-theme-primary">R$ {total.toFixed(2)}</p>
       </div>
@@ -143,7 +143,7 @@ function ContasTab({ kind, items, costCenters, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -239,7 +239,7 @@ function CentrosTab({ costCenters, onSave, onDelete }: {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {costCenters.map((c) => (
-          <div key={c.id} className="bg-theme-card rounded-2xl border border-theme p-4">
+          <div key={c.id} className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
             <span className="text-[10px] font-bold uppercase text-theme-secondary">{c.type}</span>
             <h3 className="font-bold text-theme-primary">{c.name}</h3>
             {c.linkedRef && <p className="text-xs text-theme-secondary">{c.linkedRef}</p>}
@@ -282,15 +282,15 @@ function FluxoTab({ payable, receivable }: { payable: AccountPayable[]; receivab
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <div className="bg-theme-card rounded-2xl border border-theme p-4">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
         <p className="text-xs text-theme-secondary uppercase font-bold">Total a receber</p>
         <p className="text-2xl font-bold text-green-600">R$ {totalReceber.toFixed(2)}</p>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme p-4">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
         <p className="text-xs text-theme-secondary uppercase font-bold">Total a pagar</p>
         <p className="text-2xl font-bold text-red-500">R$ {totalPagar.toFixed(2)}</p>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme p-4">
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
         <p className="text-xs text-theme-secondary uppercase font-bold">Saldo projetado</p>
         <p className={`text-2xl font-bold ${saldo >= 0 ? 'text-green-600' : 'text-red-500'}`}>R$ {saldo.toFixed(2)}</p>
       </div>
@@ -317,7 +317,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto shadow-theme">
         <div className="flex items-center justify-between">
           <h2 className="font-bold text-theme-primary">{title}</h2>
           <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>

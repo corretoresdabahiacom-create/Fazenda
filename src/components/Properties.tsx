@@ -164,7 +164,7 @@ export default function Properties({ properties, activePropertyId, onSetActive, 
 
       {isFormOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+          <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto shadow-theme">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-theme-primary">{editing ? 'Editar Propriedade' : 'Nova Propriedade'}</h2>
               <button onClick={() => setIsFormOpen(false)}>

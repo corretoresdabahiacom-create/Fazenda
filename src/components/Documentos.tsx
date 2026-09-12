@@ -95,7 +95,7 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {documents.map((d) => (
-          <div key={d.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1">
+          <div key={d.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-[10px] font-bold uppercase text-theme-secondary">{d.category}</span>
@@ -124,7 +124,7 @@ export default function Documentos({ documents, saveDocument, deleteDocument }: 
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+          <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto shadow-theme">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-theme-primary">Novo Documento</h2>
               <button onClick={() => setIsOpen(false)}><X size={20} className="text-theme-secondary" /></button>

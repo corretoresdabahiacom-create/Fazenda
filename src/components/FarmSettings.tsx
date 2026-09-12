@@ -502,7 +502,7 @@ export default function FarmSettingsComp({ settings, setSettings, uid }: Props) 
                   ))}
                 </div>
 
-                <div className="bg-theme-card p-4 rounded-2xl border border-theme text-center md:flex items-center justify-between gap-4">
+                <div className="bg-theme-card p-4 rounded-2xl border border-theme text-center md:flex items-center justify-between gap-4 shadow-theme">
                   <div className="text-left">
                     <span className="text-[10px] uppercase font-bold text-theme-primary block">Capacidade Estimativa</span>
                     <p className="text-[11px] text-theme-secondary font-medium max-w-md leading-relaxed">

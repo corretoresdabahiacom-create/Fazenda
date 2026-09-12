@@ -88,7 +88,7 @@ function EquipesTab({ items, onSave, onDelete }: { items: Team[]; onSave: (t: Te
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {items.map((t) => (
-          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4">
+          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
             <h3 className="font-bold text-theme-primary">{t.name}</h3>
             {t.memberNames && <p className="text-xs text-theme-secondary mt-1">{t.memberNames}</p>}
             <button onClick={() => confirm('Excluir?') && onDelete(t.id)} className="text-xs font-semibold text-red-400 mt-2 flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
@@ -132,7 +132,7 @@ function EscalasTab({ items, teams, onSave, onDelete }: { items: WorkSchedule[];
           <Plus size={18} /> Nova Escala
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Equipe</th><th className="text-left p-3">Dias</th><th className="text-left p-3">Horário</th><th className="p-3"></th></tr>
@@ -191,7 +191,7 @@ function TreinamentosTab({ items, onSave, onDelete }: { items: Training[]; onSav
           <Plus size={18} /> Novo Treinamento
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Data</th><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Treinamento</th><th className="text-left p-3">Fornecedor</th><th className="p-3"></th></tr>
@@ -244,7 +244,7 @@ function EpisTab({ items, onSave, onDelete }: { items: PPEItem[]; onSave: (p: PP
           <Plus size={18} /> Novo EPI
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Item</th><th className="text-left p-3">Entrega</th><th className="text-left p-3">Validade</th><th className="p-3"></th></tr>
@@ -297,7 +297,7 @@ function CertificacoesTab({ items, onSave, onDelete }: { items: Certification[];
           <Plus size={18} /> Nova Certificação
         </button>
       </div>
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr><th className="text-left p-3">Funcionário</th><th className="text-left p-3">Certificação</th><th className="text-left p-3">Emissão</th><th className="text-left p-3">Validade</th><th className="p-3"></th></tr>
@@ -347,7 +347,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto shadow-theme">
         <div className="flex items-center justify-between">
           <h2 className="font-bold text-theme-primary">{title}</h2>
           <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>

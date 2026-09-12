@@ -70,7 +70,7 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
   }));
 
   return (
-    <div className="bg-theme-card rounded-2xl border border-theme p-4">
+    <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
       <p className="text-xs font-bold text-theme-primary mb-1">{titulo}</p>
       <p className="text-[10px] text-theme-secondary mb-3">{dados.local} · {dados.granularidade === 'mes' ? 'por mês' : 'por dia'}</p>
       {dados.avisoPreco && (
@@ -114,12 +114,12 @@ export default function GraficoPrecoClima({ produto, produtoLabel, estado, cidad
   const anoPassado = useChartData(produto, estado, cidade, inicioAnoPassado, fimAnoPassado);
 
   if (!estado && !cidade) {
-    return <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4">Escolha um estado ou cidade acima pra ver o gráfico de preço x clima.</p>;
+    return <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4 shadow-theme">Escolha um estado ou cidade acima pra ver o gráfico de preço x clima.</p>;
   }
 
   return (
     <div className="space-y-3">
-      <div className="bg-theme-card rounded-2xl border border-theme p-3 flex flex-wrap items-end gap-3">
+      <div className="bg-theme-card rounded-2xl border border-theme p-3 flex flex-wrap items-end gap-3 shadow-theme">
         <div>
           <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">De</label>
           <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="text-xs border border-theme rounded-lg px-2 py-1.5" />

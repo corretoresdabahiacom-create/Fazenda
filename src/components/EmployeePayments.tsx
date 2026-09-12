@@ -184,7 +184,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
       case 'vacation':
         return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-bold text-[10px] uppercase border border-blue-200">Em Férias</span>;
       case 'inactive':
-        return <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full font-bold text-[10px] uppercase border border-gray-200">Inativo</span>;
+        return <span className="px-3 py-1 bg-theme-secondary text-theme-secondary rounded-full font-bold text-[10px] uppercase border border-theme">Inativo</span>;
       default:
         return null;
     }

@@ -173,7 +173,7 @@ function TalhoesTab({ talhoes, onSave, onDelete }: {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {talhoes.map((t) => (
-          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1">
+          <div key={t.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
             <div className="flex items-start justify-between">
               <h3 className="font-bold text-theme-primary">{t.name}</h3>
               <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-theme-secondary text-theme-secondary">{t.status}</span>
@@ -273,7 +273,7 @@ function PlanejamentoTab({ cropPlans, talhoes, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -427,7 +427,7 @@ function CadernoTab({ entries, talhoes, onSave, onDelete, activeProperty }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -571,7 +571,7 @@ function PragasTab({ records, talhoes, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -713,12 +713,12 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
     [SprayStatus.PROGRAMADA]: 'bg-blue-50 text-blue-700',
     [SprayStatus.REALIZADA]: 'bg-green-50 text-green-700',
     [SprayStatus.ADIADA]: 'bg-amber-50 text-amber-700',
-    [SprayStatus.CANCELADA]: 'bg-gray-100 text-gray-500',
+    [SprayStatus.CANCELADA]: 'bg-theme-secondary text-theme-secondary',
   };
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-400 bg-gray-50 rounded-xl p-3">
+      <p className="text-xs text-theme-secondary bg-theme-secondary rounded-xl p-3">
         Planeje aplicações com antecedência, com os parâmetros que a receita agronômica normalmente exige: dose,
         taxa de aplicação, carência antes da colheita e intervalo de reentrada de pessoas na área.
       </p>
@@ -732,14 +732,14 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
         {[...sprays].sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate)).map((s) => {
           const talhao = talhoes.find(t => t.id === s.talhaoId);
           return (
-            <div key={s.id} className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1">
+            <div key={s.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
               <div className="flex items-start justify-between">
-                <h3 className="font-bold text-gray-800">{s.product || 'Produto não informado'}</h3>
+                <h3 className="font-bold text-theme-primary">{s.product || 'Produto não informado'}</h3>
                 <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${statusColor[s.status]}`}>{s.status}</span>
               </div>
-              <p className="text-xs text-gray-500">{format(new Date(s.scheduledDate), 'dd/MM/yyyy')}{talhao ? ` — ${talhao.name}` : ''}</p>
-              {s.target && <p className="text-xs text-gray-500">Alvo: {s.target}</p>}
-              {s.dosage && <p className="text-xs text-gray-500">Dose: {s.dosage}{s.sprayVolumePerHa ? ` | ${s.sprayVolumePerHa} L/ha` : ''}</p>}
+              <p className="text-xs text-theme-secondary">{format(new Date(s.scheduledDate), 'dd/MM/yyyy')}{talhao ? ` — ${talhao.name}` : ''}</p>
+              {s.target && <p className="text-xs text-theme-secondary">Alvo: {s.target}</p>}
+              {s.dosage && <p className="text-xs text-theme-secondary">Dose: {s.dosage}{s.sprayVolumePerHa ? ` | ${s.sprayVolumePerHa} L/ha` : ''}</p>}
               {(s.preHarvestIntervalDays || s.reentryIntervalHours) && (
                 <p className="text-xs text-amber-700">
                   {s.preHarvestIntervalDays ? `Carência: ${s.preHarvestIntervalDays}d` : ''}
@@ -748,14 +748,14 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
                 </p>
               )}
               <div className="flex gap-2 pt-2">
-                <button onClick={() => openEdit(s)} className="text-xs font-semibold text-gray-500">Editar</button>
+                <button onClick={() => openEdit(s)} className="text-xs font-semibold text-theme-secondary">Editar</button>
                 <button onClick={() => confirm('Excluir?') && onDelete(s.id)} className="text-xs font-semibold text-red-400 ml-auto flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
               </div>
             </div>
           );
         })}
         {sprays.length === 0 && (
-          <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhuma pulverização programada ainda.</p>
+          <p className="text-sm text-theme-secondary col-span-full text-center py-8">Nenhuma pulverização programada ainda.</p>
         )}
       </div>
 
@@ -809,7 +809,7 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
                 <input type="number" value={form.reentryIntervalHours ?? ''} onChange={e => setForm({ ...form, reentryIntervalHours: e.target.value ? Number(e.target.value) : undefined })} className={inputCls} />
               </Field>
             </div>
-            <label className="flex items-center gap-2 text-xs text-gray-600">
+            <label className="flex items-center gap-2 text-xs text-theme-secondary">
               <input type="checkbox" checked={form.hasAgronomicPrescription ?? false} onChange={e => setForm({ ...form, hasAgronomicPrescription: e.target.checked })} />
               Há receituário agronômico assinado por profissional habilitado
             </label>
@@ -823,7 +823,7 @@ function PulverizacaoTab({ sprays, talhoes, activeProperty, onSave, onDelete }: 
             </Field>
             <div className="flex gap-2 pt-2">
               <button type="submit" className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2.5 rounded-xl font-bold text-sm">Salvar</button>
-              <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-gray-200 py-2.5 rounded-xl font-semibold text-sm text-gray-600">Cancelar</button>
+              <button type="button" onClick={() => setIsOpen(false)} className="flex-1 border border-theme py-2.5 rounded-xl font-semibold text-sm text-theme-secondary">Cancelar</button>
             </div>
           </form>
         </Modal>
@@ -874,7 +874,7 @@ function IrrigacaoTab({ records, talhoes, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -955,7 +955,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto shadow-theme">
         <div className="flex items-center justify-between">
           <h2 className="font-bold text-theme-primary">{title}</h2>
           <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>

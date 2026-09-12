@@ -108,44 +108,44 @@ function AbaLocalizacao({ localizacoes }: { localizacoes: LocalizacaoManual[] })
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-[#3d5a45]">País / Estado / Cidade, Praça ou Região</h3>
+        <h3 className="text-lg font-bold text-theme-primary">País / Estado / Cidade, Praça ou Região</h3>
         <button onClick={() => { setEditando(null); setForm({ pais: 'Brasil', estado: 'Bahia', local: '', tipoLocal: 'cidade' }); setMostrarForm(true); }} className="btn-primary text-xs px-3 py-2">
           <Plus size={14} /> Nova Localização
         </button>
       </div>
 
       {mostrarForm && (
-        <div className="bg-white border border-[#e5e0d8] rounded-2xl p-4 space-y-3">
+        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[#3d5a45]">{editando ? 'Editar localização' : 'Nova localização'}</p>
+            <p className="font-bold text-theme-primary">{editando ? 'Editar localização' : 'Nova localização'}</p>
             <button onClick={() => setMostrarForm(false)}><X size={16} /></button>
           </div>
-          <input value={form.pais} onChange={e => setForm({ ...form, pais: e.target.value })} placeholder="País" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
-          <select value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
+          <input value={form.pais} onChange={e => setForm({ ...form, pais: e.target.value })} placeholder="País" className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
+          <select value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
             {ESTADOS_BR.map(e => <option key={e}>{e}</option>)}
           </select>
           <div className="flex gap-2">
-            <select value={form.tipoLocal} onChange={e => setForm({ ...form, tipoLocal: e.target.value as any })} className="px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
+            <select value={form.tipoLocal} onChange={e => setForm({ ...form, tipoLocal: e.target.value as any })} className="px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
               <option value="cidade">Cidade</option>
               <option value="praca">Praça</option>
               <option value="regiao">Região</option>
             </select>
-            <input value={form.local} onChange={e => setForm({ ...form, local: e.target.value })} placeholder="Nome (ex: Feira de Santana, BA Oeste...)" className="flex-1 px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
+            <input value={form.local} onChange={e => setForm({ ...form, local: e.target.value })} placeholder="Nome (ex: Feira de Santana, BA Oeste...)" className="flex-1 px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
           </div>
           <button onClick={salvar} className="btn-primary w-full"><Save size={14} /> Salvar</button>
         </div>
       )}
 
-      <div className="bg-white border border-[#e5e0d8] rounded-2xl overflow-hidden">
-        {localizacoes.length === 0 && <p className="p-4 text-sm text-[#6d6a66]">Nenhuma localização cadastrada ainda.</p>}
+      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden">
+        {localizacoes.length === 0 && <p className="p-4 text-sm text-theme-secondary">Nenhuma localização cadastrada ainda.</p>}
         {localizacoes.map(l => (
-          <div key={l.id} className="flex items-center justify-between p-3 border-b border-[#e5e0d8] last:border-0">
+          <div key={l.id} className="flex items-center justify-between p-3 border-b border-theme last:border-0">
             <div>
-              <p className="font-semibold text-[#3d5a45]">{l.local} <span className="text-[10px] font-bold text-[#3d5a45]/70 bg-[#3d5a45]/10 px-1.5 py-0.5 rounded-full ml-1">{TIPO_LABEL[l.tipoLocal]}</span></p>
-              <p className="text-xs text-[#6d6a66]">{l.estado} — {l.pais}</p>
+              <p className="font-semibold text-theme-primary">{l.local} <span className="text-[10px] font-bold text-theme-primary/70 bg-[var(--primary)]/10 px-1.5 py-0.5 rounded-full ml-1">{TIPO_LABEL[l.tipoLocal]}</span></p>
+              <p className="text-xs text-theme-secondary">{l.estado} — {l.pais}</p>
             </div>
             <div className="flex gap-1">
-              <button onClick={() => abrirEdicao(l)} className="p-2 hover:bg-[#f5f2ed] text-[#6d6a66] rounded-xl"><Edit3 size={14} /></button>
+              <button onClick={() => abrirEdicao(l)} className="p-2 hover:bg-theme-secondary text-theme-secondary rounded-xl"><Edit3 size={14} /></button>
               <button onClick={() => excluir(l.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-xl"><Trash2 size={14} /></button>
             </div>
           </div>
@@ -190,7 +190,7 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h3 className="text-lg font-bold text-[#3d5a45]">Produtos</h3>
+        <h3 className="text-lg font-bold text-theme-primary">Produtos</h3>
         <div className="flex gap-2">
           {produtos.length === 0 && (
             <button onClick={popularPadrao} className="btn-outline text-xs px-3 py-2">
@@ -204,21 +204,21 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
       </div>
 
       {mostrarForm && (
-        <div className="bg-white border border-[#e5e0d8] rounded-2xl p-4 space-y-3">
+        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[#3d5a45]">{editando ? 'Editar produto' : 'Novo produto'}</p>
+            <p className="font-bold text-theme-primary">{editando ? 'Editar produto' : 'Novo produto'}</p>
             <button onClick={() => setMostrarForm(false)}><X size={16} /></button>
           </div>
           <input
             value={form.nome}
             onChange={e => setForm({ ...form, nome: e.target.value })}
             placeholder="Nome do produto (ex: Garrote)"
-            className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c] focus:ring-2 focus:ring-[#3d5a45]/20 focus:outline-none"
+            className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none"
           />
           <select
             value={form.categoria}
             onChange={e => setForm({ ...form, categoria: e.target.value })}
-            className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]"
+            className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary"
           >
             <option>Pecuária</option>
             <option>Grãos</option>
@@ -229,16 +229,16 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
         </div>
       )}
 
-      <div className="bg-white border border-[#e5e0d8] rounded-2xl overflow-hidden">
-        {produtos.length === 0 && <p className="p-4 text-sm text-[#6d6a66]">Nenhum produto cadastrado ainda.</p>}
+      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden">
+        {produtos.length === 0 && <p className="p-4 text-sm text-theme-secondary">Nenhum produto cadastrado ainda.</p>}
         {produtos.map(p => (
-          <div key={p.id} className="flex items-center justify-between p-3 border-b border-[#e5e0d8] last:border-0">
+          <div key={p.id} className="flex items-center justify-between p-3 border-b border-theme last:border-0">
             <div>
-              <p className="font-semibold text-[#3d5a45]">{p.nome}</p>
-              <p className="text-xs text-[#6d6a66]">{p.categoria}</p>
+              <p className="font-semibold text-theme-primary">{p.nome}</p>
+              <p className="text-xs text-theme-secondary">{p.categoria}</p>
             </div>
             <div className="flex gap-1">
-              <button onClick={() => abrirEdicao(p)} className="p-2 hover:bg-[#f5f2ed] text-[#6d6a66] rounded-xl"><Edit3 size={14} /></button>
+              <button onClick={() => abrirEdicao(p)} className="p-2 hover:bg-theme-secondary text-theme-secondary rounded-xl"><Edit3 size={14} /></button>
               <button onClick={() => excluir(p.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-xl"><Trash2 size={14} /></button>
             </div>
           </div>
@@ -297,7 +297,7 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-[#3d5a45]">Preços Cadastrados Manualmente</h3>
+        <h3 className="text-lg font-bold text-theme-primary">Preços Cadastrados Manualmente</h3>
         <button
           onClick={() => { if (semCadastroBase) { alert('Cadastre pelo menos um Produto e uma Localização antes de lançar um preço.'); return; } setEditando(null); setForm(vazio); setMostrarForm(true); }}
           className="btn-primary text-xs px-3 py-2"
@@ -313,34 +313,34 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
       )}
 
       {mostrarForm && (
-        <div className="bg-white border border-[#e5e0d8] rounded-2xl p-4 space-y-3">
+        <div className="bg-theme-card border border-theme rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[#3d5a45]">{editando ? 'Editar preço' : 'Novo preço'}</p>
+            <p className="font-bold text-theme-primary">{editando ? 'Editar preço' : 'Novo preço'}</p>
             <button onClick={() => setMostrarForm(false)}><X size={16} /></button>
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#6d6a66] block mb-1">Produto</label>
-            <select value={form.produtoId} onChange={e => setForm({ ...form, produtoId: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
+            <label className="text-xs font-bold text-theme-secondary block mb-1">Produto</label>
+            <select value={form.produtoId} onChange={e => setForm({ ...form, produtoId: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
               {produtos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
             </select>
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#6d6a66] block mb-1">Localização</label>
-            <select value={form.localizacaoId} onChange={e => setForm({ ...form, localizacaoId: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
+            <label className="text-xs font-bold text-theme-secondary block mb-1">Localização</label>
+            <select value={form.localizacaoId} onChange={e => setForm({ ...form, localizacaoId: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
               {localizacoes.map(l => <option key={l.id} value={l.id}>{l.local} — {l.estado}</option>)}
             </select>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-xs font-bold text-[#6d6a66] block mb-1">Preço (R$)</label>
-              <input type="number" step="0.01" value={form.preco || ''} onChange={e => setForm({ ...form, preco: Number(e.target.value) })} placeholder="0,00" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
+              <label className="text-xs font-bold text-theme-secondary block mb-1">Preço (R$)</label>
+              <input type="number" step="0.01" value={form.preco || ''} onChange={e => setForm({ ...form, preco: Number(e.target.value) })} placeholder="0,00" className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
             </div>
             <div>
-              <label className="text-xs font-bold text-[#6d6a66] block mb-1">Unidade</label>
-              <select value={form.unidade} onChange={e => setForm({ ...form, unidade: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
+              <label className="text-xs font-bold text-theme-secondary block mb-1">Unidade</label>
+              <select value={form.unidade} onChange={e => setForm({ ...form, unidade: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
                 {UNIDADES_COMUNS.map(u => <option key={u}>{u}</option>)}
               </select>
             </div>
@@ -348,12 +348,12 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-xs font-bold text-[#6d6a66] block mb-1">Prazo (dias)</label>
-              <input type="number" value={form.prazoDias} onChange={e => setForm({ ...form, prazoDias: Number(e.target.value) })} placeholder="0 = à vista" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
+              <label className="text-xs font-bold text-theme-secondary block mb-1">Prazo (dias)</label>
+              <input type="number" value={form.prazoDias} onChange={e => setForm({ ...form, prazoDias: Number(e.target.value) })} placeholder="0 = à vista" className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
             </div>
             <div>
-              <label className="text-xs font-bold text-[#6d6a66] block mb-1">Tipo de negócio</label>
-              <select value={form.tipoNegocio} onChange={e => setForm({ ...form, tipoNegocio: e.target.value as any })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45]">
+              <label className="text-xs font-bold text-theme-secondary block mb-1">Tipo de negócio</label>
+              <select value={form.tipoNegocio} onChange={e => setForm({ ...form, tipoNegocio: e.target.value as any })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary">
                 <option value="nao_informado">Não informa</option>
                 <option value="SIF">SIF</option>
                 <option value="FOB">FOB</option>
@@ -362,46 +362,46 @@ function AbaPrecos({ precos, produtos, localizacoes }: { precos: PrecoManual[]; 
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#6d6a66] block mb-1">Data da cotação</label>
-            <input type="date" value={form.dataCotacao} onChange={e => setForm({ ...form, dataCotacao: e.target.value })} className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
+            <label className="text-xs font-bold text-theme-secondary block mb-1">Data da cotação</label>
+            <input type="date" value={form.dataCotacao} onChange={e => setForm({ ...form, dataCotacao: e.target.value })} className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#6d6a66] block mb-1">Observação (opcional)</label>
-            <input value={form.observacao} onChange={e => setForm({ ...form, observacao: e.target.value })} placeholder="Ex: negociado direto com produtor X" className="w-full px-4 py-2 border border-[#e5e0d8] rounded-xl bg-white text-[#3d5a45] placeholder:text-[#a8a49c]" />
+            <label className="text-xs font-bold text-theme-secondary block mb-1">Observação (opcional)</label>
+            <input value={form.observacao} onChange={e => setForm({ ...form, observacao: e.target.value })} placeholder="Ex: negociado direto com produtor X" className="w-full px-4 py-2 border border-theme rounded-xl bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
           </div>
 
           <button onClick={salvar} className="btn-primary w-full"><Save size={14} /> Salvar</button>
         </div>
       )}
 
-      <div className="bg-white border border-[#e5e0d8] rounded-2xl overflow-hidden overflow-x-auto">
-        {precos.length === 0 && <p className="p-4 text-sm text-[#6d6a66]">Nenhum preço lançado ainda.</p>}
+      <div className="bg-theme-card border border-theme rounded-2xl overflow-hidden overflow-x-auto">
+        {precos.length === 0 && <p className="p-4 text-sm text-theme-secondary">Nenhum preço lançado ainda.</p>}
         {precos.length > 0 && (
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-[#f5f2ed]">
-                <th className="text-left p-3 text-xs font-bold text-[#3d5a45]">Produto</th>
-                <th className="text-left p-3 text-xs font-bold text-[#3d5a45]">Local</th>
-                <th className="text-left p-3 text-xs font-bold text-[#3d5a45]">Preço</th>
-                <th className="text-left p-3 text-xs font-bold text-[#3d5a45]">Prazo</th>
-                <th className="text-left p-3 text-xs font-bold text-[#3d5a45]">Tipo</th>
-                <th className="text-left p-3 text-xs font-bold text-[#3d5a45]">Data</th>
+              <tr className="bg-theme-secondary">
+                <th className="text-left p-3 text-xs font-bold text-theme-primary">Produto</th>
+                <th className="text-left p-3 text-xs font-bold text-theme-primary">Local</th>
+                <th className="text-left p-3 text-xs font-bold text-theme-primary">Preço</th>
+                <th className="text-left p-3 text-xs font-bold text-theme-primary">Prazo</th>
+                <th className="text-left p-3 text-xs font-bold text-theme-primary">Tipo</th>
+                <th className="text-left p-3 text-xs font-bold text-theme-primary">Data</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {precos.sort((a, b) => b.dataCotacao.localeCompare(a.dataCotacao)).map(p => (
-                <tr key={p.id} className="border-b border-[#e5e0d8] last:border-0">
-                  <td className="p-3 font-semibold text-[#3d5a45]">{nomeProduto(p.produtoId)}</td>
-                  <td className="p-3 text-[#6d6a66]">{nomeLocal(p.localizacaoId)}</td>
-                  <td className="p-3 font-bold text-[#3d5a45]">R$ {p.preco.toFixed(2)} <span className="text-[10px] font-normal text-[#6d6a66]">{p.unidade}</span></td>
-                  <td className="p-3 text-[#6d6a66]">{p.prazoDias === 0 ? 'À vista' : `${p.prazoDias}d`}</td>
-                  <td className="p-3 text-[#6d6a66]">{p.tipoNegocio === 'nao_informado' ? '—' : p.tipoNegocio}</td>
-                  <td className="p-3 text-[#6d6a66]">{new Date(p.dataCotacao + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+                <tr key={p.id} className="border-b border-theme last:border-0">
+                  <td className="p-3 font-semibold text-theme-primary">{nomeProduto(p.produtoId)}</td>
+                  <td className="p-3 text-theme-secondary">{nomeLocal(p.localizacaoId)}</td>
+                  <td className="p-3 font-bold text-theme-primary">R$ {p.preco.toFixed(2)} <span className="text-[10px] font-normal text-theme-secondary">{p.unidade}</span></td>
+                  <td className="p-3 text-theme-secondary">{p.prazoDias === 0 ? 'À vista' : `${p.prazoDias}d`}</td>
+                  <td className="p-3 text-theme-secondary">{p.tipoNegocio === 'nao_informado' ? '—' : p.tipoNegocio}</td>
+                  <td className="p-3 text-theme-secondary">{new Date(p.dataCotacao + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
                   <td className="p-3">
                     <div className="flex gap-1">
-                      <button onClick={() => abrirEdicao(p)} className="p-2 hover:bg-[#f5f2ed] text-[#6d6a66] rounded-xl"><Edit3 size={14} /></button>
+                      <button onClick={() => abrirEdicao(p)} className="p-2 hover:bg-theme-secondary text-theme-secondary rounded-xl"><Edit3 size={14} /></button>
                       <button onClick={() => excluir(p.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-xl"><Trash2 size={14} /></button>
                     </div>
                   </td>
@@ -427,13 +427,13 @@ export default function CotacoesManuais() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-bold text-[#3d5a45]">Cotações Manuais</h2>
-        <p className="text-sm text-[#6d6a66]">
+        <h2 className="text-xl font-bold text-theme-primary">Cotações Manuais</h2>
+        <p className="text-sm text-theme-secondary">
           Cadastre preços à mão pra suprir a falta de fonte automática num local/produto específico. Esses preços aparecem em Cotações identificados como "Cadastro manual", nunca misturados com dado de fonte automática sem identificação.
         </p>
       </div>
 
-      <div className="flex gap-2 border-b border-[#e5e0d8]">
+      <div className="flex gap-2 border-b border-theme">
         {[
           { id: 'precos' as const, label: `Preços (${precos.length})` },
           { id: 'produtos' as const, label: `Produtos (${produtos.length})` },
@@ -442,7 +442,7 @@ export default function CotacoesManuais() {
           <button
             key={t.id}
             onClick={() => setAba(t.id)}
-            className={`px-4 py-2 text-sm font-bold border-b-2 transition-colors ${aba === t.id ? 'border-[#3d5a45] text-[#3d5a45]' : 'border-transparent text-[#6d6a66]'}`}
+            className={`px-4 py-2 text-sm font-bold border-b-2 transition-colors ${aba === t.id ? 'border-[var(--primary)] text-theme-primary' : 'border-transparent text-theme-secondary'}`}
           >
             {t.label}
           </button>

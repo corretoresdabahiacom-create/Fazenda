@@ -225,7 +225,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
       {activeTab === 'fixas' && (
         /* Fixed Cost Proportional Cards Dashboard */
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#fcfaf7] p-5 rounded-3xl border border-theme">
-          <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4">
+          <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4 shadow-theme">
             <div className="p-3 bg-[var(--primary)]/10 text-theme-primary rounded-xl">
               <Banknote size={24} />
             </div>
@@ -235,7 +235,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
             </div>
           </div>
 
-          <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4">
+          <div className="bg-theme-card p-5 rounded-2xl border border-theme flex items-center gap-4 shadow-theme">
             <div className="p-3 bg-[var(--primary)]/10 text-theme-primary rounded-xl">
               <TrendingUp size={24} />
             </div>

@@ -951,7 +951,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                   ) : (
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                       {getPastureAnimals(selectedPasture.id).map(lot => {
-                        let badgeColor = 'bg-[#fcfaf7] text-gray-800 border-gray-200';
+                        let badgeColor = 'bg-[#fcfaf7] text-theme-primary border-theme';
                         let ownerDesc = 'Próprio';
                         if (lot.ownerName && lot.ownerName.toLowerCase() !== 'próprio' && lot.ownerName.toLowerCase() !== 'proprio') {
                           // Meia or Aluguel
@@ -959,7 +959,7 @@ export default function FarmMap({ pastures, animals, onUpdatePasture, farmSettin
                           badgeColor = 'bg-[#fef9c3] text-[#713f12] border-[#fde047]';
                         }
                         return (
-                          <div key={lot.id} className="p-3 bg-theme-card border border-theme rounded-2xl flex items-center justify-between">
+                          <div key={lot.id} className="p-3 bg-theme-card border border-theme rounded-2xl flex items-center justify-between shadow-theme">
                             <div>
                               <div className="flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />

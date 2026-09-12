@@ -184,7 +184,7 @@ function AnimaisTab({ animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -343,7 +343,7 @@ function ReproducaoTab({ events, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -507,7 +507,7 @@ function EstacaoMontaTab({ seasons, reproductionEvents, onSave, onDelete }: {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-400 bg-gray-50 rounded-xl p-3">
+      <p className="text-xs text-theme-secondary bg-theme-secondary rounded-xl p-3">
         Período concentrado de reprodução (monta natural ou IA/IATF), usado para agrupar nascimentos numa época
         favorável. Duração usual: 60 a 120 dias (mais comum 90), começando geralmente no início das águas.
       </p>
@@ -521,27 +521,27 @@ function EstacaoMontaTab({ seasons, reproductionEvents, onSave, onDelete }: {
         {seasons.map((s) => {
           const preg = pregnancyRate(s);
           return (
-            <div key={s.id} className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1">
+            <div key={s.id} className="bg-theme-card rounded-2xl border border-theme p-4 space-y-1 shadow-theme">
               <div className="flex items-start justify-between">
-                <h3 className="font-bold text-gray-800">{s.name}</h3>
-                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-600">{s.status}</span>
+                <h3 className="font-bold text-theme-primary">{s.name}</h3>
+                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-theme-secondary text-theme-secondary">{s.status}</span>
               </div>
-              <p className="text-xs text-gray-500">{format(new Date(s.startDate), 'dd/MM/yyyy')} → {s.endDate ? format(new Date(s.endDate), 'dd/MM/yyyy') : '—'} ({s.durationDays} dias)</p>
-              <p className="text-xs text-gray-500">Método: {s.method}</p>
-              {s.bullEarTags && <p className="text-xs text-gray-500">Touro(s): {s.bullEarTags}{s.bullToCowRatio ? ` (${s.bullToCowRatio})` : ''}</p>}
-              {s.femaleLotGroup && <p className="text-xs text-gray-500">Lote de fêmeas: {s.femaleLotGroup}{s.femaleCount ? ` (${s.femaleCount} cab.)` : ''}</p>}
+              <p className="text-xs text-theme-secondary">{format(new Date(s.startDate), 'dd/MM/yyyy')} → {s.endDate ? format(new Date(s.endDate), 'dd/MM/yyyy') : '—'} ({s.durationDays} dias)</p>
+              <p className="text-xs text-theme-secondary">Método: {s.method}</p>
+              {s.bullEarTags && <p className="text-xs text-theme-secondary">Touro(s): {s.bullEarTags}{s.bullToCowRatio ? ` (${s.bullToCowRatio})` : ''}</p>}
+              {s.femaleLotGroup && <p className="text-xs text-theme-secondary">Lote de fêmeas: {s.femaleLotGroup}{s.femaleCount ? ` (${s.femaleCount} cab.)` : ''}</p>}
               {preg && (
                 <p className="text-xs font-bold text-[var(--primary)]">Taxa de prenhez: {preg.rate.toFixed(0)}% ({preg.total} diagnóstico(s))</p>
               )}
               <div className="flex gap-2 pt-2">
-                <button onClick={() => openEdit(s)} className="text-xs font-semibold text-gray-500">Editar</button>
+                <button onClick={() => openEdit(s)} className="text-xs font-semibold text-theme-secondary">Editar</button>
                 <button onClick={() => confirm('Excluir?') && onDelete(s.id)} className="text-xs font-semibold text-red-400 ml-auto flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
               </div>
             </div>
           );
         })}
         {seasons.length === 0 && (
-          <p className="text-sm text-gray-400 col-span-full text-center py-8">Nenhuma estação de monta cadastrada ainda.</p>
+          <p className="text-sm text-theme-secondary col-span-full text-center py-8">Nenhuma estação de monta cadastrada ainda.</p>
         )}
       </div>
 
@@ -559,7 +559,7 @@ function EstacaoMontaTab({ seasons, reproductionEvents, onSave, onDelete }: {
                 <input type="number" value={form.durationDays ?? 90} onChange={e => setForm({ ...form, durationDays: Number(e.target.value) })} className={inputCls} />
               </Field>
             </div>
-            <p className="text-[11px] text-gray-400">Usual entre 60 e 120 dias — 90 dias é o mais recomendado para maximizar resultados reprodutivos e produtivos.</p>
+            <p className="text-[11px] text-theme-secondary">Usual entre 60 e 120 dias — 90 dias é o mais recomendado para maximizar resultados reprodutivos e produtivos.</p>
             <Field label="Método">
               <select value={form.method} onChange={e => setForm({ ...form, method: e.target.value as BreedingMethod })} className={inputCls}>
                 {Object.values(BreedingMethod).map(m => <option key={m} value={m}>{m}</option>)}
@@ -583,7 +583,7 @@ function EstacaoMontaTab({ seasons, reproductionEvents, onSave, onDelete }: {
                 <input type="number" value={form.femaleCount ?? ''} onChange={e => setForm({ ...form, femaleCount: e.target.value ? Number(e.target.value) : undefined })} className={inputCls} />
               </Field>
             </div>
-            <label className="flex items-center gap-2 text-xs text-gray-600">
+            <label className="flex items-center gap-2 text-xs text-theme-secondary">
               <input type="checkbox" checked={form.bullAndrologicalExamDone ?? false} onChange={e => setForm({ ...form, bullAndrologicalExamDone: e.target.checked })} />
               Exame andrológico do(s) touro(s) realizado
             </label>
@@ -656,7 +656,7 @@ function SanidadeTab({ events, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -772,7 +772,7 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <div className="bg-theme-card rounded-2xl border border-theme p-4">
+        <div className="bg-theme-card rounded-2xl border border-theme p-4 shadow-theme">
           <p className="text-xs text-theme-secondary uppercase font-bold">Total no mês</p>
           <p className="text-2xl font-bold text-theme-primary">{totalMes.toFixed(1)} L</p>
         </div>
@@ -784,7 +784,7 @@ function LeiteTab({ records, animals, onSave, onDelete }: {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead className="bg-theme-secondary text-theme-secondary text-xs uppercase">
             <tr>
@@ -872,7 +872,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div className="bg-theme-card rounded-2xl w-full max-w-md p-5 space-y-3 max-h-[90vh] overflow-y-auto shadow-theme">
         <div className="flex items-center justify-between">
           <h2 className="font-bold text-theme-primary">{title}</h2>
           <button onClick={onClose}><X size={20} className="text-theme-secondary" /></button>

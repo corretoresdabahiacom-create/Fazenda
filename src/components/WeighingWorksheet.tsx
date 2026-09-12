@@ -847,7 +847,7 @@ export default function WeighingWorksheet() {
                 value={sheetNotes}
                 onChange={(e) => setSheetNotes(e.target.value)}
                 placeholder="Exemplo: Vacina aplicada, condições climáticas do dia, destino do lote..."
-                className="w-full bg-theme-card border border-theme focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 focus:outline-none p-4 rounded-2xl text-xs font-semibold leading-relaxed h-20"
+                className="w-full bg-theme-card border border-theme focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 focus:outline-none p-4 rounded-2xl text-xs font-semibold leading-relaxed h-20 shadow-theme"
               />
             </div>
             

@@ -105,7 +105,7 @@ export default function DashboardBahia() {
         </button>
       </div>
 
-      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto">
+      <div className="bg-theme-card rounded-2xl border border-theme overflow-hidden overflow-x-auto shadow-theme">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-theme-secondary">
