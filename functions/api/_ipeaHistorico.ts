@@ -104,11 +104,31 @@ async function descobrirSerie(produto: string, diagnostico: string[]): Promise<S
   }
 
   for (const termo of termos) {
-    // Estratégia A: filtro só por nome (o mais simples que existe —
-    // filtros compostos com SERSTATUS/PERNOME foram a suspeita nº1 de
-    // por que a v1 voltava vazia).
-    const filtro = encodeURIComponent(`contains(SERNOME,'${termo}')`);
-    const json = await buscarJson(`/Metadados?$filter=${filtro}`, diagnostico);
+    // CAUSA DO HTTP 400 IDENTIFICADA PELO DIAGNÓSTICO: a v2 usava
+    // encodeURIComponent no filtro inteiro, o que transforma a vírgula
+    // de contains(SERNOME,'boi') em %2C — e o servidor OData do
+    // IPEADATA rejeita a consulta com 400. Vírgula e parênteses são
+    // caracteres LEGAIS numa query string, então a forma certa é
+    // montar a URL crua. Tentamos as duas formas, na ordem, e também
+    // uma terceira via $select (payload pequeno, filtro feito aqui no
+    // código) — se qualquer uma responder, seguimos com ela.
+    const tentativas = [
+      { nome: 'filtro cru', caminho: `/Metadados?$filter=contains(SERNOME,'${termo}')` },
+      { nome: 'filtro codificado', caminho: `/Metadados?$filter=${encodeURIComponent(`contains(SERNOME,'${termo}')`)}` },
+      { nome: 'catálogo enxuto (filtro no código)', caminho: `/Metadados?$select=SERCODIGO,SERNOME,UNINOME,PERNOME,FNTSIGLA,SERSTATUS` },
+    ];
+
+    let json: any = null;
+    for (const t of tentativas) {
+      diagnostico.push(`Tentando estratégia "${t.nome}" para o termo "${termo}"...`);
+      json = await buscarJson(t.caminho, diagnostico);
+      if (json?.value?.length > 0) {
+        diagnostico.push(`  -> estratégia "${t.nome}" funcionou.`);
+        break;
+      }
+      json = null;
+    }
+
     const candidatas: any[] = json?.value || [];
     diagnostico.push(`Termo "${termo}": ${candidatas.length} séries retornadas pelo catálogo.`);
     if (candidatas.length === 0) continue;
