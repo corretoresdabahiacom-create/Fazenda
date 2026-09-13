@@ -100,7 +100,14 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
       <ResponsiveContainer width="100%" height={340}>
         <ComposedChart data={chartData} margin={{ top: 20, right: 5, left: -15, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
-          <XAxis dataKey="label" tick={{ fontSize: 10 }} interval={0} angle={chartData.length > 8 ? -35 : 0} textAnchor={chartData.length > 8 ? 'end' : 'middle'} height={chartData.length > 8 ? 45 : 25} />
+          <XAxis
+            dataKey="label"
+            tick={{ fontSize: 9 }}
+            interval={chartData.length > 20 ? Math.ceil(chartData.length / 15) - 1 : 0}
+            angle={chartData.length > 8 ? -60 : 0}
+            textAnchor={chartData.length > 8 ? 'end' : 'middle'}
+            height={chartData.length > 8 ? 55 : 25}
+          />
           <YAxis yAxisId="chuva" tick={{ fontSize: 10 }} label={{ value: 'mm de chuva', angle: -90, fontSize: 9, position: 'insideLeft' }} />
           <YAxis yAxisId="preco" orientation="right" tick={{ fontSize: 10 }} label={{ value: 'R$', angle: 90, fontSize: 9, position: 'insideRight' }} />
           <Tooltip contentStyle={{ fontSize: 11 }} formatter={(valor: any, nome: string) => [typeof valor === 'number' ? valor.toFixed(2) : valor, nome]} />

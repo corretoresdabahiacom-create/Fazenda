@@ -209,6 +209,52 @@ async function buscarChuvaInmet(lat: number, lon: number, dataInicio: string, da
 
 interface PricePoint { data: string; preco: number }
 
+// Busca o preço de HOJE (fonte ao vivo, mesma usada em Cotações) e o
+// preço do contrato futuro B3 mais próximo do vencimento — que é o
+// único dado de "preço futuro" que existe de verdade no mercado (B3 é
+// bolsa de valores, não adivinhação). Usado pra preencher os próximos
+// 16 dias do gráfico com uma referência real, já que não existe (e não
+// deveria existir) "previsão de preço" fabricada, só o que o mercado
+// futuro já precifica de fato.
+async function buscarPrecoAtualEFuturo(origin: string, produto: string, estado: string): Promise<{ hoje: PricePoint | null; futuro: { preco: number; vencimento: string } | null }> {
+  let hoje: PricePoint | null = null;
+  let futuro: { preco: number; vencimento: string } | null = null;
+
+  try {
+    const params = new URLSearchParams({ product: produto });
+    if (estado) params.set('state', estado);
+    const res = await fetch(`${origin}/api/quotes?${params}`);
+    if (res.ok) {
+      const json = (await res.json()) as any;
+      const melhor = (json.quotesRegionais?.[0] || json.quotes?.[0]);
+      if (melhor?.price > 0) {
+        hoje = { data: new Date().toISOString().slice(0, 10), preco: melhor.price };
+      }
+    }
+  } catch { /* segue sem preço de hoje se falhar */ }
+
+  try {
+    const res = await fetch(`${origin}/api/cotacoes?produto=${produto}`);
+    if (res.ok) {
+      const json = (await res.json()) as any;
+      const tabelaFuturo = (json.tables || []).find((t: any) => /futuro|pregão|vencimento/i.test(t.heading || ''));
+      if (tabelaFuturo?.rows?.length > 1) {
+        // Primeira linha de dado (depois do cabeçalho) é o contrato de
+        // vencimento mais próximo — exatamente o que representa "os
+        // próximos dias/semanas" pro mercado.
+        const linha = tabelaFuturo.rows[1];
+        const precoTexto = linha.find((c: string) => /\d{1,3}[.,]\d{2}/.test(c) && !/^\d{2}\/\d{2}/.test(c));
+        if (precoTexto) {
+          const preco = Number(precoTexto.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.'));
+          if (preco > 0) futuro = { preco, vencimento: linha[0] || '' };
+        }
+      }
+    }
+  } catch { /* segue sem futuro se falhar */ }
+
+  return { hoje, futuro };
+}
+
 async function buscarHistoricoPreco(env: Env, produto: string, estado: string): Promise<PricePoint[]> {
   if (!env.FIREBASE_PROJECT_ID) return [];
   const docId = `${produto}_${estado || 'geral'}`;
@@ -257,10 +303,11 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const hojeStr = new Date().toISOString().slice(0, 10);
     const fimParteJaPassada = dataFim < hojeStr ? dataFim : new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
-    const [chuvaOpenMeteo, chuvaInmetResultado, precoHistorico] = await Promise.all([
+    const [chuvaOpenMeteo, chuvaInmetResultado, precoHistorico, precoAtualEFuturo] = await Promise.all([
       buscarChuvaDiaria(local.lat, local.lon, dataInicio, dataFim),
       dataInicio <= fimParteJaPassada ? buscarChuvaInmet(local.lat, local.lon, dataInicio, fimParteJaPassada) : Promise.resolve({ porDia: {}, estacaoUsada: null }),
       buscarHistoricoPreco(context.env, produto, estado),
+      buscarPrecoAtualEFuturo(url.origin, produto, estado),
     ]);
 
     // Funde as duas fontes de clima: INMET (estação real) tem
@@ -273,6 +320,24 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       : 'Open-Meteo';
 
     const precoPorDia = new Map(precoHistorico.map(p => [p.data, p.preco]));
+
+    // Preenche HOJE com o preço ao vivo, e os próximos 16 dias com o
+    // preço do contrato futuro B3 mais próximo — a única referência de
+    // "preço futuro" real que existe (mercado futuro de verdade, não
+    // estimativa fabricada). Só preenche o que ainda não tinha vindo
+    // do histórico gravado, e só dentro do período que o usuário pediu.
+    if (precoAtualEFuturo.hoje && !precoPorDia.has(precoAtualEFuturo.hoje.data)) {
+      precoPorDia.set(precoAtualEFuturo.hoje.data, precoAtualEFuturo.hoje.preco);
+    }
+    if (precoAtualEFuturo.futuro) {
+      for (let i = 1; i <= 16; i++) {
+        const dia = new Date(Date.now() + i * 86400000).toISOString().slice(0, 10);
+        if (dia >= dataInicio && dia <= dataFim && !precoPorDia.has(dia)) {
+          precoPorDia.set(dia, precoAtualEFuturo.futuro.preco);
+        }
+      }
+    }
+
     const todasDatas = gerarDatasNoIntervalo(dataInicio, dataFim);
 
     // Decide granularidade: mais de 31 dias no período -> agrupa por
@@ -312,16 +377,21 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     }
 
     const totalComPreco = pontos.filter(p => p.preco != null).length;
+    const fontePrecoUsada = [
+      precoAtualEFuturo.hoje ? 'preço ao vivo (hoje)' : null,
+      precoAtualEFuturo.futuro ? `contrato futuro B3 (${precoAtualEFuturo.futuro.vencimento}, próximos 16 dias)` : null,
+    ].filter(Boolean).join(' + ') || undefined;
 
     return new Response(JSON.stringify({
       produto, estado, cidade, local: local.nomeEncontrado,
       fonteClima: fonteClimaUsada,
+      fontePreco: fontePrecoUsada,
       granularidade: agruparPorMes ? 'mes' : 'dia',
       pontos,
       avisoPreco: totalComPreco === 0
-        ? 'Ainda não há preço histórico real gravado pra esse período — o histórico de preço começou a ser gravado recentemente e só cobre a partir de então. O clima mostrado é real e completo.'
+        ? 'Ainda não há preço histórico real gravado pra esse período — o histórico de preço começou a ser gravado recentemente. Hoje e os próximos 16 dias usam o preço ao vivo e o contrato futuro B3, quando disponíveis.'
         : totalComPreco < pontos.length
-        ? `Preço disponível em ${totalComPreco} de ${pontos.length} pontos do período — o restante ainda não tinha sido gravado no histórico.`
+        ? `Preço disponível em ${totalComPreco} de ${pontos.length} pontos do período — o restante ainda não tinha sido gravado no histórico (hoje e os próximos 16 dias usam preço ao vivo/futuro B3, quando disponíveis).`
         : undefined,
       fetchedAt: new Date().toISOString(),
     }), {
