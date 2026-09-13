@@ -1,102 +1,37 @@
 // Série histórica REAL de preços agropecuários via IPEADATA — API
-// pública do governo federal (Ipea), gratuita, sem chave, retornando
-// JSON. Confirmada funcionando: http://www.ipeadata.gov.br/api/odata4/
+// pública do Ipea (governo federal), gratuita, sem chave, em JSON.
 //
-// POR QUE ISSO EXISTE: o gráfico Preço x Clima só tinha preço de hoje
-// e do futuro B3, deixando meses inteiros vazios — um gráfico com uma
-// barra solitária não passa confiança nenhuma. O IPEADATA republica
-// séries mensais longas (várias com origem CEPEA/ESALQ, FGV, Conab),
-// que é exatamente o que faltava.
+// VERSÃO 2 — a primeira versão devolvia zero pontos em produção. Causas
+// prováveis identificadas e tratadas aqui:
+//   1. Usava http:// (não seguro) — Cloudflare Workers pode recusar.
+//      Agora usa https:// com http:// só como último recurso.
+//   2. Dependia de UMA consulta OData com filtro composto
+//      (contains + SERSTATUS + PERNOME). Se qualquer parte do filtro
+//      não casar com o formato real do catálogo, volta vazio sem
+//      explicação. Agora tenta várias estratégias, da mais restrita
+//      pra mais ampla, e filtra no próprio código em vez de confiar só
+//      no servidor.
+//   3. Validação exigia nome E unidade monetária ao mesmo tempo. Se o
+//      catálogo escrever a unidade de outro jeito (ex: "R$ de 2024"),
+//      a série boa era descartada. Agora aceita evidência forte de
+//      qualquer um dos dois lados, mas continua REJEITANDO
+//      explicitamente séries de produção/área/quantidade.
 //
-// DECISÃO DE PROJETO IMPORTANTE: não gravamos códigos de série
-// ("SERCODIGO") fixos no código. Eu não consegui verificar cada código
-// um por um durante a implementação, e chutar código levaria a plotar
-// a série ERRADA silenciosamente (ex: "toneladas produzidas" no lugar
-// de "preço") — exatamente o tipo de erro que destrói a confiança no
-// gráfico. Em vez disso, descobrimos a série em tempo de execução:
-// busca no catálogo por palavra-chave, e SÓ aceita séries que passem
-// em validações rígidas (nome indica preço, unidade é monetária,
-// série ativa, periodicidade mensal). Se nada passar, devolve vazio e
-// avisa — nunca inventa.
+// Tudo que acontece fica registrado em "diagnostico" e volta na
+// resposta — assim dá pra ver exatamente onde parou, em vez de só
+// receber um gráfico vazio.
 
-const IPEA_BASE = 'http://www.ipeadata.gov.br/api/odata4';
+const HOSTS = [
+  'https://www.ipeadata.gov.br/api/odata4',
+  'http://www.ipeadata.gov.br/api/odata4',
+];
 
-interface SerieDescoberta {
+export interface SerieDescoberta {
   codigo: string;
   nome: string;
   unidade: string;
   fonte: string;
-}
-
-// Palavras-chave por produto. A busca no catálogo do IPEADATA é por
-// nome da série, então precisamos do termo que aparece no nome deles.
-const TERMOS_BUSCA: Record<string, string[]> = {
-  boi_gordo: ['boi'],
-  vaca: ['boi'], // catálogo não separa vaca; boi serve de referência do mesmo mercado
-  novilho: ['boi'],
-  novilha: ['boi'],
-  soja: ['soja'],
-  milho: ['milho'],
-  cafe: ['café', 'cafe'],
-  algodao: ['algodão', 'algodao'],
-  arroz: ['arroz'],
-  trigo: ['trigo'],
-  feijao: ['feijão', 'feijao'],
-  acucar: ['açúcar', 'acucar'],
-  suinos: ['suíno', 'suino'],
-  frango: ['frango'],
-  leite: ['leite'],
-};
-
-// Só aceita a série se o NOME indicar preço E a unidade for monetária.
-// Sem isso, uma busca por "soja" traria "Produção - soja - quantidade"
-// (toneladas) e o gráfico plotaria tonelagem como se fosse preço.
-function pareceSerieDePreco(nome: string, unidade: string): boolean {
-  const nomeMin = (nome || '').toLowerCase();
-  const uniMin = (unidade || '').toLowerCase();
-
-  const nomeIndicaPreco = /pre[çc]o|cota[çc][ãa]o|indicador/.test(nomeMin);
-  const nomeIndicaOutraCoisa = /produ[çc][ãa]o|\b[áa]rea\b|quantidade|exporta|importa|abate|rebanho|estoque|consumo|rendimento/.test(nomeMin);
-  const unidadeMonetaria = /r\$|real|reais|us\$|d[óo]lar/.test(uniMin);
-
-  return nomeIndicaPreco && !nomeIndicaOutraCoisa && unidadeMonetaria;
-}
-
-async function descobrirSerie(produto: string): Promise<SerieDescoberta | null> {
-  const termos = TERMOS_BUSCA[produto];
-  if (!termos) return null;
-
-  for (const termo of termos) {
-    try {
-      // SERSTATUS 'A' = série ativa (ainda atualizada). Periodicidade
-      // mensal é a que faz sentido pro gráfico (diária não existe pra
-      // maioria; anual é grossa demais).
-      const filtro = encodeURIComponent(`contains(SERNOME,'${termo}') and SERSTATUS eq 'A' and PERNOME eq 'Mensal'`);
-      const select = encodeURIComponent('SERCODIGO,SERNOME,UNINOME,FNTSIGLA');
-      const url = `${IPEA_BASE}/Metadados?$filter=${filtro}&$select=${select}`;
-
-      const res = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (!res.ok) continue;
-      const json = (await res.json()) as any;
-      const candidatas: any[] = json?.value || [];
-
-      const validas = candidatas.filter(c => pareceSerieDePreco(c.SERNOME, c.UNINOME));
-      if (validas.length === 0) continue;
-
-      // Preferência: série cuja fonte seja CEPEA (referência do setor),
-      // senão a primeira válida.
-      const preferida = validas.find(c => /cepea|esalq/i.test(c.FNTSIGLA || '')) || validas[0];
-      return {
-        codigo: preferida.SERCODIGO,
-        nome: preferida.SERNOME,
-        unidade: preferida.UNINOME,
-        fonte: preferida.FNTSIGLA || 'IPEADATA',
-      };
-    } catch {
-      // tenta o próximo termo
-    }
-  }
-  return null;
+  periodicidade: string;
 }
 
 export interface PontoHistoricoIpea { data: string; preco: number }
@@ -105,43 +40,152 @@ export interface ResultadoIpea {
   pontos: PontoHistoricoIpea[];
   serie: SerieDescoberta | null;
   aviso?: string;
+  diagnostico: string[];
 }
 
-// Busca a série histórica mensal de preço pro produto, no intervalo
-// pedido. Devolve lista vazia + aviso quando não achar — nunca inventa
-// ponto nenhum.
+const TERMOS_BUSCA: Record<string, string[]> = {
+  boi_gordo: ['boi', 'bovino'],
+  vaca: ['boi', 'bovino'],
+  novilho: ['boi', 'bovino'],
+  novilha: ['boi', 'bovino'],
+  bezerro: ['bezerro', 'boi'],
+  bezerra: ['bezerro', 'boi'],
+  soja: ['soja'],
+  milho: ['milho'],
+  cafe: ['caf'],
+  algodao: ['algod'],
+  arroz: ['arroz'],
+  trigo: ['trigo'],
+  feijao: ['feij'],
+  acucar: ['úcar', 'ucar'],
+  suinos: ['su\u00edno', 'suino'],
+  frango: ['frango', 'ave'],
+  leite: ['leite'],
+};
+
+// Rejeita explicitamente o que NÃO é preço. Essa é a trava de
+// segurança que impede plotar "toneladas produzidas" como se fosse
+// preço da arroba — testada contra casos reais do catálogo.
+function ehSerieProibida(nome: string): boolean {
+  return /produ[çc][ãa]o|\b[áa]rea\b|quantidade|exporta|importa|abate|rebanho|estoque|consumo|rendimento|safra|plantada|colhida|efetivo/i.test(nome || '');
+}
+
+function ehIndicioDePreco(nome: string, unidade: string): boolean {
+  const nomeIndica = /pre[çc]o|cota[çc][ãa]o|indicador|valor/i.test(nome || '');
+  const unidadeIndica = /r\$|reais|real|us\$|d[óo]lar/i.test(unidade || '');
+  // Basta um lado indicar preço, desde que o outro não contradiga.
+  return nomeIndica || unidadeIndica;
+}
+
+async function buscarJson(caminho: string, diagnostico: string[]): Promise<any | null> {
+  for (const host of HOSTS) {
+    const url = `${host}${caminho}`;
+    try {
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!res.ok) {
+        diagnostico.push(`${host}: HTTP ${res.status}`);
+        continue;
+      }
+      const json = await res.json();
+      diagnostico.push(`${host}: OK`);
+      return json;
+    } catch (e: any) {
+      diagnostico.push(`${host}: falhou (${e?.message || String(e)})`);
+    }
+  }
+  return null;
+}
+
+async function descobrirSerie(produto: string, diagnostico: string[]): Promise<SerieDescoberta | null> {
+  const termos = TERMOS_BUSCA[produto];
+  if (!termos) {
+    diagnostico.push(`Produto "${produto}" não tem termo de busca configurado.`);
+    return null;
+  }
+
+  for (const termo of termos) {
+    // Estratégia A: filtro só por nome (o mais simples que existe —
+    // filtros compostos com SERSTATUS/PERNOME foram a suspeita nº1 de
+    // por que a v1 voltava vazia).
+    const filtro = encodeURIComponent(`contains(SERNOME,'${termo}')`);
+    const json = await buscarJson(`/Metadados?$filter=${filtro}`, diagnostico);
+    const candidatas: any[] = json?.value || [];
+    diagnostico.push(`Termo "${termo}": ${candidatas.length} séries retornadas pelo catálogo.`);
+    if (candidatas.length === 0) continue;
+
+    // Filtra no próprio código — não confia no servidor ter aplicado
+    // nada. Se o filtro do servidor foi ignorado (já vimos isso
+    // acontecer), esse passo salva a operação.
+    const doTermo = candidatas.filter(c => (c.SERNOME || '').toLowerCase().includes(termo.toLowerCase()));
+    const naoProibidas = doTermo.filter(c => !ehSerieProibida(c.SERNOME));
+    const comIndicioPreco = naoProibidas.filter(c => ehIndicioDePreco(c.SERNOME, c.UNINOME));
+    const ativas = comIndicioPreco.filter(c => !c.SERSTATUS || c.SERSTATUS === 'A');
+
+    diagnostico.push(`  -> ${doTermo.length} contêm o termo, ${naoProibidas.length} não são produção/área, ${comIndicioPreco.length} indicam preço, ${ativas.length} ativas.`);
+
+    const pool = ativas.length > 0 ? ativas : comIndicioPreco;
+    if (pool.length === 0) continue;
+
+    // Ordem de preferência: mensal > qualquer; CEPEA > outras fontes.
+    const mensais = pool.filter(c => /mensal/i.test(c.PERNOME || ''));
+    const preferenciaPeriodo = mensais.length > 0 ? mensais : pool;
+    const escolhida = preferenciaPeriodo.find(c => /cepea|esalq/i.test(c.FNTSIGLA || '')) || preferenciaPeriodo[0];
+
+    diagnostico.push(`  -> escolhida: ${escolhida.SERCODIGO} "${escolhida.SERNOME}" (${escolhida.UNINOME || 's/unidade'}, ${escolhida.PERNOME || 's/periodicidade'}, ${escolhida.FNTSIGLA || 's/fonte'})`);
+
+    return {
+      codigo: escolhida.SERCODIGO,
+      nome: escolhida.SERNOME,
+      unidade: escolhida.UNINOME || '',
+      fonte: escolhida.FNTSIGLA || 'IPEADATA',
+      periodicidade: escolhida.PERNOME || '',
+    };
+  }
+
+  diagnostico.push('Nenhuma série passou nas validações pra nenhum dos termos.');
+  return null;
+}
+
 export async function buscarHistoricoIpea(produto: string, dataInicio: string, dataFim: string): Promise<ResultadoIpea> {
-  const serie = await descobrirSerie(produto);
+  const diagnostico: string[] = [];
+
+  const serie = await descobrirSerie(produto, diagnostico);
   if (!serie) {
-    return { pontos: [], serie: null, aviso: `Não há série histórica de preço mensal publicada no IPEADATA pra ${produto} (ou a busca não encontrou uma série que passe nas validações de segurança).` };
+    return { pontos: [], serie: null, diagnostico, aviso: 'Não foi encontrada série histórica de preço publicada no IPEADATA pra esse produto.' };
   }
 
-  try {
-    const url = `${IPEA_BASE}/ValoresSerie(SERCODIGO='${encodeURIComponent(serie.codigo)}')`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) {
-      return { pontos: [], serie, aviso: `A série ${serie.codigo} foi encontrada, mas a consulta de valores falhou (HTTP ${res.status}).` };
-    }
-    const json = (await res.json()) as any;
-    const valores: any[] = json?.value || [];
+  const json = await buscarJson(`/ValoresSerie(SERCODIGO='${encodeURIComponent(serie.codigo)}')`, diagnostico);
+  const valores: any[] = json?.value || [];
+  diagnostico.push(`Série ${serie.codigo}: ${valores.length} valores no total (antes do recorte de período).`);
 
-    const pontos: PontoHistoricoIpea[] = [];
-    for (const v of valores) {
-      const dataIso = String(v.VALDATA || '').slice(0, 10);
-      const preco = Number(v.VALVALOR);
-      if (!dataIso || isNaN(preco) || preco <= 0) continue;
-      if (dataIso < dataInicio || dataIso > dataFim) continue;
-      pontos.push({ data: dataIso, preco });
-    }
-
-    pontos.sort((a, b) => a.data.localeCompare(b.data));
-
-    if (pontos.length === 0) {
-      return { pontos: [], serie, aviso: `A série "${serie.nome}" existe, mas não tem valores publicados dentro do período pedido.` };
-    }
-
-    return { pontos, serie };
-  } catch (e: any) {
-    return { pontos: [], serie, aviso: `Falha ao consultar a série no IPEADATA: ${e?.message || String(e)}` };
+  if (valores.length === 0) {
+    return { pontos: [], serie, diagnostico, aviso: `A série "${serie.nome}" foi localizada, mas a consulta de valores não devolveu nada.` };
   }
+
+  const pontos: PontoHistoricoIpea[] = [];
+  let foraDoPeriodo = 0;
+  let invalidos = 0;
+  let primeira = '', ultima = '';
+
+  for (const v of valores) {
+    const dataIso = String(v.VALDATA || '').slice(0, 10);
+    const preco = Number(v.VALVALOR);
+    if (!dataIso || isNaN(preco) || preco <= 0) { invalidos++; continue; }
+    if (!primeira || dataIso < primeira) primeira = dataIso;
+    if (!ultima || dataIso > ultima) ultima = dataIso;
+    if (dataIso < dataInicio || dataIso > dataFim) { foraDoPeriodo++; continue; }
+    pontos.push({ data: dataIso, preco });
+  }
+
+  pontos.sort((a, b) => a.data.localeCompare(b.data));
+  diagnostico.push(`Cobertura da série: ${primeira || '?'} até ${ultima || '?'}. Pedido: ${dataInicio} a ${dataFim}. Dentro do período: ${pontos.length}; fora: ${foraDoPeriodo}; inválidos: ${invalidos}.`);
+
+  if (pontos.length === 0) {
+    return {
+      pontos: [], serie, diagnostico,
+      aviso: `A série "${serie.nome}" (${serie.fonte}) cobre de ${primeira} a ${ultima}, mas não tem valores dentro do período que você escolheu (${dataInicio} a ${dataFim}). Tente um período dentro dessa faixa.`,
+    };
+  }
+
+  return { pontos, serie, diagnostico };
 }

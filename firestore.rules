@@ -469,7 +469,16 @@ service cloud.firestore {
       // um teste grátis) — nunca alterar status, gateway ou valores, isso é
       // reservado ao admin e ao webhook do gateway de pagamento (que usa
       // credenciais de servidor, não o SDK do cliente).
-      allow create: if isSignedIn() && request.auth.uid == uid;
+      // FALHA DE SEGURANCA REAL CORRIGIDA: antes era so
+      // "isSignedIn() && request.auth.uid == uid", sem validar NADA do
+      // conteudo. Como "create" vale quando o documento ainda nao
+      // existe, qualquer usuario novo podia criar a propria assinatura
+      // ja com plano pago e status ativo -- liberando acesso pago de
+      // graca. O comentario logo acima dizia que isso era proibido, mas
+      // a regra nao impunha. Agora impoe.
+      allow create: if isSignedIn() && request.auth.uid == uid
+        && incoming().status in ['Teste', 'Trial', 'Pendente', 'Inativa']
+        && (!('paid' in incoming()) || incoming().paid == false);
       // Atualização normal (mudar plano, valores, status para ativo etc.)
       // é reservada ao admin. Exceção: o próprio usuário pode CANCELAR a
       // própria assinatura (só mudar o status para "Cancelada", sem tocar

@@ -309,8 +309,17 @@ interface CardEstadoProps {
 }
 
 function CardEstado({ estado }: CardEstadoProps) {
-  const { userRole } = useFirebase();
-  const isAdmin = userRole === 'admin';
+  // BUG REAL CORRIGIDO: antes usava "userRole === 'admin'", mas TODO
+  // usuário recebe role 'admin' no próprio cadastro (é o dono da
+  // própria fazenda) — então o botão de Admin aparecia pra todo mundo,
+  // e quem clicasse levava "Missing or insufficient permissions",
+  // porque as regras do Firestore usam outro critério. Agora usa
+  // exatamente o MESMO critério das regras: o e-mail de administrador
+  // do sistema. Se essa lista mudar, tem que mudar nos dois lugares
+  // (aqui e em firestore.rules → isBootstrapAdminEmail).
+  const { user } = useFirebase();
+  const EMAILS_ADMIN_SISTEMA = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
+  const isAdmin = !!user?.email && EMAILS_ADMIN_SISTEMA.includes(user.email.toLowerCase());
   const [aberto, setAberto] = useState(false);
   const [produtos, setProdutos] = useState<ProdutoEncontrado[] | null>(null);
   const [loading, setLoading] = useState(false);
