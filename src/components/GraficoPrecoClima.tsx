@@ -113,7 +113,13 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
           <Tooltip contentStyle={{ fontSize: 11 }} formatter={(valor: any, nome: string) => [typeof valor === 'number' ? valor.toFixed(2) : valor, nome]} />
           <Legend wrapperStyle={{ fontSize: 10 }} />
           <Bar yAxisId="chuva" dataKey="chuvaMm" name="Chuva (mm)" fill="#60a5fa" radius={[3, 3, 0, 0]} maxBarSize={28}>
-            <LabelList dataKey="chuvaMm" position="top" style={{ fontSize: 9, fill: 'var(--text-secondary)' }} formatter={(v: number) => v ? v.toFixed(0) : ''} />
+            <LabelList dataKey="chuvaMm" position="top" style={{ fontSize: 9, fill: 'var(--text-secondary)' }} formatter={(v: number) => {
+              // Valores pequenos precisam de casa decimal: 0,5mm
+              // arredondado vira "1", o que exagera a chuva em mais de
+              // 100% — enganoso num gráfico que precisa passar confiança.
+              if (v == null) return '';
+              return v < 10 ? v.toFixed(1) : v.toFixed(0);
+            }} />
           </Bar>
           <Bar yAxisId="preco" dataKey="preco" name="Preço (R$)" fill="#34d399" radius={[3, 3, 0, 0]} maxBarSize={28}>
             <LabelList dataKey="preco" position="top" style={{ fontSize: 9, fill: 'var(--text-secondary)' }} formatter={(v: number) => v ? v.toFixed(0) : ''} />

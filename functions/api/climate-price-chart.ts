@@ -24,16 +24,97 @@ interface ChartPoint {
   preco: number | null;
 }
 
+// Coordenadas das capitais — usadas quando o usuário escolhe só o
+// ESTADO, sem cidade específica. Dado geográfico fixo (não muda), o
+// que evita depender de uma busca por nome que pode errar feio.
+//
+// BUG REAL E GRAVE CORRIGIDO: antes buscávamos o nome do estado na API
+// de geocodificação e pegávamos o primeiro resultado, sem conferir
+// nada. Resultado observado em produção: escolher "Mato Grosso"
+// retornava a CIDADE de Mato Grosso, na PARAÍBA (que existe!), e o
+// gráfico mostrava a chuva do sertão nordestino como se fosse do
+// Centro-Oeste — dado completamente errado, sem nenhum aviso.
+const CAPITAIS: Record<string, { lat: number; lon: number; nome: string }> = {
+  'Acre': { lat: -9.97, lon: -67.81, nome: 'Rio Branco' },
+  'Alagoas': { lat: -9.67, lon: -35.74, nome: 'Maceió' },
+  'Amapá': { lat: 0.03, lon: -51.07, nome: 'Macapá' },
+  'Amazonas': { lat: -3.12, lon: -60.02, nome: 'Manaus' },
+  'Bahia': { lat: -12.97, lon: -38.50, nome: 'Salvador' },
+  'Ceará': { lat: -3.72, lon: -38.54, nome: 'Fortaleza' },
+  'Distrito Federal': { lat: -15.78, lon: -47.93, nome: 'Brasília' },
+  'Espírito Santo': { lat: -20.32, lon: -40.34, nome: 'Vitória' },
+  'Goiás': { lat: -16.69, lon: -49.26, nome: 'Goiânia' },
+  'Maranhão': { lat: -2.53, lon: -44.30, nome: 'São Luís' },
+  'Mato Grosso': { lat: -15.60, lon: -56.10, nome: 'Cuiabá' },
+  'Mato Grosso do Sul': { lat: -20.44, lon: -54.65, nome: 'Campo Grande' },
+  'Minas Gerais': { lat: -19.92, lon: -43.94, nome: 'Belo Horizonte' },
+  'Pará': { lat: -1.46, lon: -48.50, nome: 'Belém' },
+  'Paraíba': { lat: -7.12, lon: -34.88, nome: 'João Pessoa' },
+  'Paraná': { lat: -25.43, lon: -49.27, nome: 'Curitiba' },
+  'Pernambuco': { lat: -8.05, lon: -34.88, nome: 'Recife' },
+  'Piauí': { lat: -5.09, lon: -42.80, nome: 'Teresina' },
+  'Rio de Janeiro': { lat: -22.91, lon: -43.17, nome: 'Rio de Janeiro' },
+  'Rio Grande do Norte': { lat: -5.79, lon: -35.21, nome: 'Natal' },
+  'Rio Grande do Sul': { lat: -30.03, lon: -51.23, nome: 'Porto Alegre' },
+  'Rondônia': { lat: -8.76, lon: -63.90, nome: 'Porto Velho' },
+  'Roraima': { lat: 2.82, lon: -60.67, nome: 'Boa Vista' },
+  'Santa Catarina': { lat: -27.59, lon: -48.55, nome: 'Florianópolis' },
+  'São Paulo': { lat: -23.55, lon: -46.63, nome: 'São Paulo' },
+  'Sergipe': { lat: -10.95, lon: -37.07, nome: 'Aracaju' },
+  'Tocantins': { lat: -10.18, lon: -48.33, nome: 'Palmas' },
+};
+
+function normalizar(texto: string): string {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
 async function geocodificar(cidade: string, estado: string): Promise<{ lat: number; lon: number; nomeEncontrado: string } | null> {
+  // Caso 1: sem cidade específica — usa a capital do estado direto, sem
+  // busca nenhuma. Zero risco de pegar uma cidade homônima em outro
+  // estado, que é exatamente o bug que aconteceu.
+  if (!cidade && estado && CAPITAIS[estado]) {
+    const cap = CAPITAIS[estado];
+    return { lat: cap.lat, lon: cap.lon, nomeEncontrado: `${cap.nome}, ${estado} (capital — referência do estado)` };
+  }
+
+  // Caso 2: cidade específica — busca por nome, mas AGORA valida que o
+  // resultado está mesmo no estado pedido. Pede vários resultados
+  // (count=10) justamente pra poder escolher o certo entre homônimos.
   const query = cidade || estado;
   if (!query) return null;
   try {
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&country=BR&count=1&language=pt`);
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&country=BR&count=10&language=pt`);
     if (!res.ok) return null;
     const data = (await res.json()) as any;
-    const first = data?.results?.[0];
-    if (!first) return null;
-    return { lat: first.latitude, lon: first.longitude, nomeEncontrado: `${first.name}${first.admin1 ? ', ' + first.admin1 : ''}` };
+    const resultados: any[] = data?.results || [];
+    if (resultados.length === 0) {
+      // Não achou a cidade — cai pra capital do estado, avisando que é
+      // aproximação, em vez de devolver um lugar errado em silêncio.
+      if (estado && CAPITAIS[estado]) {
+        const cap = CAPITAIS[estado];
+        return { lat: cap.lat, lon: cap.lon, nomeEncontrado: `${cap.nome}, ${estado} (cidade "${cidade}" não localizada — usando a capital)` };
+      }
+      return null;
+    }
+
+    // Se um estado foi informado, só aceita resultado DENTRO dele.
+    if (estado) {
+      const estadoNorm = normalizar(estado);
+      const noEstadoCerto = resultados.find(r => r.admin1 && normalizar(r.admin1) === estadoNorm);
+      if (noEstadoCerto) {
+        return { lat: noEstadoCerto.latitude, lon: noEstadoCerto.longitude, nomeEncontrado: `${noEstadoCerto.name}, ${noEstadoCerto.admin1}` };
+      }
+      // Nenhum resultado no estado pedido — usa a capital em vez de
+      // aceitar uma cidade homônima de outro estado.
+      if (CAPITAIS[estado]) {
+        const cap = CAPITAIS[estado];
+        return { lat: cap.lat, lon: cap.lon, nomeEncontrado: `${cap.nome}, ${estado} ("${cidade}" não encontrada nesse estado — usando a capital)` };
+      }
+      return null;
+    }
+
+    const primeiro = resultados[0];
+    return { lat: primeiro.latitude, lon: primeiro.longitude, nomeEncontrado: `${primeiro.name}${primeiro.admin1 ? ', ' + primeiro.admin1 : ''}` };
   } catch {
     return null;
   }
