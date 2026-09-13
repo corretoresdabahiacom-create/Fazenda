@@ -14,6 +14,7 @@
 // não tem essa limitação — o Open-Meteo tem histórico real de anos.
 
 import { firestoreGetDoc, GoogleServiceAccountEnv } from './_googleAuth';
+import { buscarHistoricoIpea } from './_ipeaHistorico';
 
 interface Env extends GoogleServiceAccountEnv {}
 
@@ -384,11 +385,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const hojeStr = new Date().toISOString().slice(0, 10);
     const fimParteJaPassada = dataFim < hojeStr ? dataFim : new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
-    const [chuvaOpenMeteo, chuvaInmetResultado, precoHistorico, precoAtualEFuturo] = await Promise.all([
+    const [chuvaOpenMeteo, chuvaInmetResultado, precoHistorico, precoAtualEFuturo, historicoIpea] = await Promise.all([
       buscarChuvaDiaria(local.lat, local.lon, dataInicio, dataFim),
       dataInicio <= fimParteJaPassada ? buscarChuvaInmet(local.lat, local.lon, dataInicio, fimParteJaPassada) : Promise.resolve({ porDia: {}, estacaoUsada: null }),
       buscarHistoricoPreco(context.env, produto, estado),
       buscarPrecoAtualEFuturo(url.origin, produto, estado),
+      buscarHistoricoIpea(produto, dataInicio, dataFim),
     ]);
 
     // Funde as duas fontes de clima: INMET (estação real) tem
@@ -400,7 +402,28 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       ? `INMET (${chuvaInmetResultado.estacaoUsada}) + Open-Meteo`
       : 'Open-Meteo';
 
-    const precoPorDia = new Map(precoHistorico.map(p => [p.data, p.preco]));
+    // CAMADAS DE PREÇO, da mais genérica pra mais específica (a última
+    // a escrever numa data é a que vale):
+    // 1. IPEADATA — série histórica mensal longa, preenche os meses
+    //    passados que antes ficavam completamente vazios. É o que
+    //    resolve o "1 de 21 pontos".
+    // 2. Histórico gravado localmente — mais específico do estado.
+    // 3. Preço ao vivo de hoje + futuro B3 pros próximos 16 dias.
+    const precoPorDia = new Map<string, number>();
+
+    for (const p of historicoIpea.pontos) {
+      // Série mensal: o IPEADATA marca o mês no dia 1. Espalha o valor
+      // por todos os dias daquele mês, senão a agregação mensal do
+      // gráfico veria um único dia e o resto vazio.
+      const [ano, mes] = p.data.split('-');
+      const diasNoMes = new Date(Number(ano), Number(mes), 0).getDate();
+      for (let d = 1; d <= diasNoMes; d++) {
+        const dia = `${ano}-${mes}-${String(d).padStart(2, '0')}`;
+        if (dia >= dataInicio && dia <= dataFim) precoPorDia.set(dia, p.preco);
+      }
+    }
+
+    for (const p of precoHistorico) precoPorDia.set(p.data, p.preco);
 
     // Preenche HOJE com o preço ao vivo, e os próximos 16 dias com o
     // preço do contrato futuro B3 mais próximo — a única referência de
@@ -459,20 +482,22 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     const totalComPreco = pontos.filter(p => p.preco != null).length;
     const fontePrecoUsada = [
+      historicoIpea.serie ? `${historicoIpea.serie.fonte} via IPEADATA ("${historicoIpea.serie.nome}", ${historicoIpea.serie.unidade})` : null,
       precoAtualEFuturo.hoje ? 'preço ao vivo (hoje)' : null,
-      precoAtualEFuturo.futuro ? `contrato futuro B3 (${precoAtualEFuturo.futuro.vencimento}, próximos 16 dias)` : null,
+      precoAtualEFuturo.futuro ? `contrato futuro B3 (${precoAtualEFuturo.futuro.vencimento})` : null,
     ].filter(Boolean).join(' + ') || undefined;
 
     return new Response(JSON.stringify({
       produto, estado, cidade, local: local.nomeEncontrado,
       fonteClima: fonteClimaUsada,
       fontePreco: fontePrecoUsada,
+      avisoIpea: historicoIpea.aviso,
       granularidade: agruparPorMes ? 'mes' : 'dia',
       pontos,
       avisoPreco: totalComPreco === 0
-        ? 'Ainda não há preço histórico real gravado pra esse período — o histórico de preço começou a ser gravado recentemente. Hoje e os próximos 16 dias usam o preço ao vivo e o contrato futuro B3, quando disponíveis.'
+        ? `Sem preço disponível pra esse período. ${historicoIpea.aviso || ''}`.trim()
         : totalComPreco < pontos.length
-        ? `Preço disponível em ${totalComPreco} de ${pontos.length} pontos do período — o restante ainda não tinha sido gravado no histórico (hoje e os próximos 16 dias usam preço ao vivo/futuro B3, quando disponíveis).`
+        ? `Preço disponível em ${totalComPreco} de ${pontos.length} pontos do período.`
         : undefined,
       fetchedAt: new Date().toISOString(),
     }), {
