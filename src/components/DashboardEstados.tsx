@@ -14,9 +14,10 @@
 // passar a impressão de que existe uma bandeira de verdade sendo usada.
 
 import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronRight, Edit3 } from 'lucide-react';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { ChevronDown, ChevronRight, Edit3, Plus, X, Save, Trash2 } from 'lucide-react';
+import { collection, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { useFirebase } from '../contexts/FirebaseContext';
 import '../styles/bandeirasEstados.css';
 
 const ESTADOS_UF: { nome: string; uf: string; cor: string }[] = [
@@ -55,6 +56,152 @@ const ESTADOS_UF: { nome: string; uf: string; cor: string }[] = [
 // original de 300x200.
 const TAMANHO_ICONE = 28;
 const ESCALA = TAMANHO_ICONE / 300;
+
+const ICONES_DISPONIVEIS = [
+  '🐂', '🐄', '🐮', '🐷', '🐑', '🐐', '🐔', '🌱', '🌾', '🌽', '🌿',
+  '☕', '🍇', '🍊', '🥛', '🧀', '🥚', '🍯', '📦',
+];
+
+// Formulário de administração, embutido direto no card do estado — só
+// aparece pra quem é Admin. Cria/edita/exclui produto + preço +
+// localização (praça/cidade) do estado deste card, tudo de uma vez,
+// nas mesmas coleções que o Painel Admin usa (mesmo dado, dois
+// lugares de acesso).
+interface FormularioAdminEstado {
+  precoId: string | null; // null = novo lançamento
+  produtoNome: string;
+  icone: string;
+  praca: string;
+  preco: string;
+  unidade: string;
+  prazoDias: number;
+  tipoNegocio: 'SIF' | 'FOB' | 'nao_informado';
+}
+
+function vazio(): FormularioAdminEstado {
+  return { precoId: null, produtoNome: '', icone: '📦', praca: '', preco: '', unidade: 'R$/@', prazoDias: 0, tipoNegocio: 'nao_informado' };
+}
+
+function PainelAdminDoEstado({ estadoNome, itensManuais, onFechar }: {
+  estadoNome: string;
+  itensManuais: { precoId: string; produtoId: string; produtoNome: string; icone: string; localizacaoId: string; praca: string; preco: number; unidade: string; prazoDias: number; tipoNegocio: string }[];
+  onFechar: () => void;
+}) {
+  const [form, setForm] = useState<FormularioAdminEstado>(vazio());
+  const [mostrarForm, setMostrarForm] = useState(false);
+  const [salvando, setSalvando] = useState(false);
+
+  async function salvar() {
+    if (!form.produtoNome.trim() || !form.praca.trim() || !form.preco) {
+      alert('Preencha produto, praça/cidade e preço.');
+      return;
+    }
+    setSalvando(true);
+    try {
+      const produtoId = `prod_${form.produtoNome.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+      await setDoc(doc(db, 'cotacoesManuais_produtos', produtoId), {
+        nome: form.produtoNome.trim(),
+        categoria: 'Pecuária',
+        icone: form.icone,
+      }, { merge: true });
+
+      const localizacaoId = `loc_${estadoNome.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${form.praca.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+      await setDoc(doc(db, 'cotacoesManuais_localizacoes', localizacaoId), {
+        pais: 'Brasil', estado: estadoNome, local: form.praca.trim(), tipoLocal: 'cidade',
+      }, { merge: true });
+
+      const precoId = form.precoId || `preco_${Date.now()}`;
+      const agora = new Date().toISOString();
+      await setDoc(doc(db, 'cotacoesManuais_precos', precoId), {
+        produtoId, localizacaoId,
+        preco: Number(form.preco), unidade: form.unidade, prazoDias: form.prazoDias, tipoNegocio: form.tipoNegocio,
+        dataCotacao: agora.slice(0, 10), atualizadoEm: agora,
+        criadoEm: form.precoId ? undefined : agora,
+      });
+
+      setForm(vazio());
+      setMostrarForm(false);
+    } catch (erro) {
+      console.error('Falha ao salvar cotação manual do estado:', erro);
+      alert('Não foi possível salvar — tente de novo.');
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  async function excluir(precoId: string) {
+    if (!confirm('Excluir esse preço?')) return;
+    await deleteDoc(doc(db, 'cotacoesManuais_precos', precoId));
+  }
+
+  function abrirEdicao(item: typeof itensManuais[number]) {
+    setForm({
+      precoId: item.precoId, produtoNome: item.produtoNome, icone: item.icone, praca: item.praca,
+      preco: String(item.preco), unidade: item.unidade, prazoDias: item.prazoDias,
+      tipoNegocio: item.tipoNegocio as FormularioAdminEstado['tipoNegocio'],
+    });
+    setMostrarForm(true);
+  }
+
+  return (
+    <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-800 rounded-xl p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold text-amber-800 dark:text-amber-300">🔧 Edição (só Admin) — {estadoNome}</p>
+        <button onClick={onFechar} className="text-amber-700 dark:text-amber-400"><X size={14} /></button>
+      </div>
+
+      {itensManuais.length > 0 && (
+        <div className="space-y-1">
+          {itensManuais.map(item => (
+            <div key={item.precoId} className="flex items-center justify-between bg-theme-card rounded-lg p-2 text-xs">
+              <span>{item.icone} {item.produtoNome} — {item.praca}: <strong>R$ {item.preco.toFixed(2)}</strong> {item.unidade} ({item.prazoDias === 0 ? 'à vista' : `${item.prazoDias}d`}{item.tipoNegocio !== 'nao_informado' ? `, ${item.tipoNegocio}` : ''})</span>
+              <div className="flex gap-1 shrink-0 ml-2">
+                <button onClick={() => abrirEdicao(item)} className="p-1 hover:bg-theme-secondary rounded"><Edit3 size={12} /></button>
+                <button onClick={() => excluir(item.precoId)} className="p-1 hover:bg-red-100 dark:hover:bg-red-950/40 text-red-500 rounded"><Trash2 size={12} /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!mostrarForm ? (
+        <button onClick={() => { setForm(vazio()); setMostrarForm(true); }} className="btn-primary text-xs px-3 py-1.5 w-full">
+          <Plus size={12} /> Adicionar produto/preço nesse estado
+        </button>
+      ) : (
+        <div className="bg-theme-card rounded-xl p-3 space-y-2">
+          <input value={form.produtoNome} onChange={e => setForm({ ...form, produtoNome: e.target.value })} placeholder="Nome do produto (ex: Boi Gordo)" className="w-full px-3 py-1.5 text-xs border border-theme rounded-lg bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
+          <div className="flex flex-wrap gap-1">
+            {ICONES_DISPONIVEIS.map(ic => (
+              <button key={ic} type="button" onClick={() => setForm({ ...form, icone: ic })} className={`w-7 h-7 rounded flex items-center justify-center text-sm ${form.icone === ic ? 'bg-[var(--primary)]/20 ring-1 ring-[var(--primary)]' : 'bg-theme-secondary'}`}>{ic}</button>
+            ))}
+          </div>
+          <input value={form.praca} onChange={e => setForm({ ...form, praca: e.target.value })} placeholder={`Praça/Cidade em ${estadoNome} (ex: Feira de Santana)`} className="w-full px-3 py-1.5 text-xs border border-theme rounded-lg bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
+          <div className="grid grid-cols-2 gap-2">
+            <input type="number" step="0.01" value={form.preco} onChange={e => setForm({ ...form, preco: e.target.value })} placeholder="Preço (R$)" className="px-3 py-1.5 text-xs border border-theme rounded-lg bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
+            <select value={form.unidade} onChange={e => setForm({ ...form, unidade: e.target.value })} className="px-3 py-1.5 text-xs border border-theme rounded-lg bg-theme-card text-theme-primary">
+              {['R$/@', 'R$/kg', 'R$/cabeça', 'R$/sc 60kg', 'R$/sc 50kg', 'R$/ton', 'R$/litro'].map(u => (
+                <option key={u} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{u}</option>
+              ))}
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <input type="number" value={form.prazoDias} onChange={e => setForm({ ...form, prazoDias: Number(e.target.value) })} placeholder="Prazo (dias, 0=à vista)" className="px-3 py-1.5 text-xs border border-theme rounded-lg bg-theme-card text-theme-primary placeholder:text-theme-secondary" />
+            <select value={form.tipoNegocio} onChange={e => setForm({ ...form, tipoNegocio: e.target.value as any })} className="px-3 py-1.5 text-xs border border-theme rounded-lg bg-theme-card text-theme-primary">
+              <option value="nao_informado" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Não informa</option>
+              <option value="SIF" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>SIF</option>
+              <option value="FOB" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>FOB</option>
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => setMostrarForm(false)} className="flex-1 py-1.5 text-xs rounded-lg border border-theme text-theme-secondary">Cancelar</button>
+            <button onClick={salvar} disabled={salvando} className="btn-primary flex-1 text-xs py-1.5"><Save size={12} /> {salvando ? 'Salvando...' : 'Salvar'}</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function SeloEstado({ uf }: { uf: string; cor?: string }) {
   return (
@@ -123,32 +270,48 @@ interface CardEstadoProps {
 }
 
 function CardEstado({ estado }: CardEstadoProps) {
+  const { userRole } = useFirebase();
+  const isAdmin = userRole === 'admin';
   const [aberto, setAberto] = useState(false);
   const [produtos, setProdutos] = useState<ProdutoEncontrado[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [produtoAberto, setProdutoAberto] = useState<string | null>(null);
   const [precosManuaisEstado, setPrecosManuaisEstado] = useState<ProdutoEncontrado[]>([]);
+  const [itensManuaisDetalhados, setItensManuaisDetalhados] = useState<any[]>([]);
+  const [mostrarAdmin, setMostrarAdmin] = useState(false);
 
   // Cotações manuais (Admin) — busca direto do Firestore, mesmo padrão
-  // já usado no Painel Admin, filtradas pro estado deste card.
+  // já usado no Painel Admin, filtradas pro estado deste card. Guarda
+  // tanto a versão resumida (pra lista de produtos) quanto a completa
+  // (pra edição do Admin, com id de cada peça pra poder editar/excluir).
   useEffect(() => {
     if (!aberto) return;
     const unsubs = [
       onSnapshot(collection(db, 'cotacoesManuais_localizacoes'), locSnap => {
         const locais = locSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
-        const idsDoEstado = new Set(locais.filter(l => l.estado === estado.nome).map(l => l.id));
+        const locaisDoEstado = new Map(locais.filter(l => l.estado === estado.nome).map(l => [l.id, l]));
         onSnapshot(collection(db, 'cotacoesManuais_precos'), precoSnap => {
           onSnapshot(collection(db, 'cotacoesManuais_produtos'), produtoSnap => {
             const produtosPorId = new Map(produtoSnap.docs.map(d => [d.id, d.data() as any]));
             const encontrados = new Map<string, ProdutoEncontrado>();
+            const detalhados: any[] = [];
             precoSnap.docs.forEach(d => {
               const p = d.data() as any;
-              if (idsDoEstado.has(p.localizacaoId)) {
+              const local = locaisDoEstado.get(p.localizacaoId);
+              if (local) {
                 const produto = produtosPorId.get(p.produtoId);
-                if (produto) encontrados.set(p.produtoId, { id: `manual_${p.produtoId}`, label: produto.nome, icone: produto.icone || '📦' });
+                if (produto) {
+                  encontrados.set(p.produtoId, { id: `manual_${p.produtoId}`, label: produto.nome, icone: produto.icone || '📦' });
+                  detalhados.push({
+                    precoId: d.id, produtoId: p.produtoId, produtoNome: produto.nome, icone: produto.icone || '📦',
+                    localizacaoId: p.localizacaoId, praca: local.local, preco: p.preco, unidade: p.unidade,
+                    prazoDias: p.prazoDias, tipoNegocio: p.tipoNegocio,
+                  });
+                }
               }
             });
             setPrecosManuaisEstado(Array.from(encontrados.values()));
+            setItensManuaisDetalhados(detalhados);
           });
         });
       }),
@@ -177,18 +340,24 @@ function CardEstado({ estado }: CardEstadoProps) {
         {aberto ? <ChevronDown size={16} className="text-theme-secondary shrink-0" /> : <ChevronRight size={16} className="text-theme-secondary shrink-0" />}
         <SeloEstado uf={estado.uf} cor={estado.cor} />
         <span className="font-bold text-theme-primary flex-1">{estado.nome}</span>
-        {estado.nome === 'Bahia' && (
-          <span className="text-[10px] font-bold text-[var(--primary)] flex items-center gap-1 px-2 py-1 rounded-lg border border-[var(--primary)]/30" title="Cadastre preço manual em: Painel Admin → Cotações Manuais">
-            <Edit3 size={11} /> Editável (Admin)
-          </span>
+        {isAdmin && aberto && (
+          <button
+            onClick={(e) => { e.stopPropagation(); setMostrarAdmin(!mostrarAdmin); }}
+            className={`text-[10px] font-bold flex items-center gap-1 px-2 py-1 rounded-lg border ${mostrarAdmin ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'text-[var(--primary)] border-[var(--primary)]/30'}`}
+          >
+            <Edit3 size={11} /> Admin
+          </button>
         )}
       </button>
 
       {aberto && (
         <div className="px-3.5 pb-3.5 space-y-1.5">
+          {isAdmin && mostrarAdmin && (
+            <PainelAdminDoEstado estadoNome={estado.nome} itensManuais={itensManuaisDetalhados} onFechar={() => setMostrarAdmin(false)} />
+          )}
           {loading && <p className="text-xs text-theme-secondary py-2">Verificando produtos disponíveis...</p>}
           {!loading && todosProdutos.length === 0 && (
-            <p className="text-xs text-theme-secondary italic py-2">Nenhum produto com dado real disponível pra {estado.nome} ainda.</p>
+            <p className="text-xs text-theme-secondary italic py-2">Nenhum produto com dado real disponível pra {estado.nome} ainda.{isAdmin ? ' Use o botão "Admin" acima pra cadastrar.' : ''}</p>
           )}
           {!loading && todosProdutos.map(p => (
             <div key={p.id} className="border border-theme rounded-xl overflow-hidden">
@@ -216,7 +385,7 @@ export default function DashboardEstados() {
     <div className="space-y-2">
       <h2 className="text-sm font-bold text-theme-primary">🗺️ Cotações por Estado</h2>
       <p className="text-[10px] text-theme-secondary">
-        Clique num estado pra ver os produtos com dado real disponível. Clique num produto pra ver o preço por praça, região ou cidade. Estados sem nenhum produto real aparecem como "sem dado disponível" — nunca inventamos um número. Bahia aceita cadastro manual pelo Painel Admin → Cotações Manuais.
+        Clique num estado pra ver os produtos com dado real disponível. Clique num produto pra ver o preço por praça, região ou cidade. Estados sem nenhum produto real aparecem como "sem dado disponível" — nunca inventamos um número. Administradores veem um botão "Admin" pra cadastrar preço direto em qualquer estado.
       </p>
       <div className="space-y-2">
         {ESTADOS_UF.map(estado => (

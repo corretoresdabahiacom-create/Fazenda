@@ -378,12 +378,20 @@ async function fetchB3Extras(): Promise<{ dolarFuturo: { valor: string; vencimen
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const cache = (caches as any).default;
-  const cacheKey = new Request('https://cache.internal/cambio-v4', context.request);
+  const cacheKey = new Request('https://cache.internal/cambio-v5', context.request);
   const forceRefresh = new URL(context.request.url).searchParams.has('debug');
 
+  // Protege a leitura do cache — se ela falhar por qualquer motivo, o
+  // pedido segue normalmente pra buscar os dados frescos, em vez de
+  // travar a função inteira sem devolver nenhum JSON (bug real
+  // suspeitado: essa leitura ficava fora do try/catch principal).
   if (!forceRefresh) {
-    const cached = await cache.match(cacheKey);
-    if (cached) return cached;
+    try {
+      const cached = await cache.match(cacheKey);
+      if (cached) return cached;
+    } catch (e) {
+      console.error('Falha ao ler cache do câmbio (seguindo sem cache):', e);
+    }
   }
 
   const debug: string[] = [];

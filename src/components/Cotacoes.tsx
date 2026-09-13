@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { isPriceAnomalous, extractNumber, findPriceCell } from '../lib/priceSanity';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import DashboardBahia from './DashboardBahia';
 import DashboardEstados from './DashboardEstados';
 import AlertasCotacoes from './AlertasCotacoes';
 import GraficoPrecoClima from './GraficoPrecoClima';
@@ -307,7 +306,6 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   const [regiao, setRegiao] = useState('');
   const [detectingLocal, setDetectingLocal] = useState(false);
   const [showAllCities, setShowAllCities] = useState(false);
-  const [showBahiaDashboard, setShowBahiaDashboard] = useState(false);
   const [showGrafico, setShowGrafico] = useState(false);
   const [locaisDisponiveis, setLocaisDisponiveis] = useState<any[]>([]);
 
@@ -626,12 +624,6 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         </div>
         <div className="flex gap-2 flex-wrap">
           <button
-            onClick={() => setShowBahiaDashboard(!showBahiaDashboard)}
-            className={`text-xs font-bold px-3 py-2 rounded-xl border ${showBahiaDashboard ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}
-          >
-            🗺️ {showBahiaDashboard ? 'Esconder Dashboard Bahia' : 'Ver Dashboard Bahia'}
-          </button>
-          <button
             onClick={() => setShowGrafico(!showGrafico)}
             className={`text-xs font-bold px-3 py-2 rounded-xl border ${showGrafico ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'border-theme text-theme-secondary'}`}
           >
@@ -640,19 +632,15 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         </div>
       </div>
 
-      {showBahiaDashboard && <DashboardBahia />}
       {showGrafico && <GraficoPrecoClima produto={produto} produtoLabel={produtoDef.label} estado={estado} cidade={cidade} />}
       <div>
         {cambioError && <p className="text-xs text-red-500 bg-red-50 dark:bg-red-950/30 rounded-xl p-2 mb-2">{cambioError}</p>}
-        <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Moedas</p>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-2">
+        <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Moedas e Ativos</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <CambioCard label="Dólar (USD)" entry={cambio?.usd ?? null} flag="🇺🇸" paisCodigo="us" decimals={4} />
           <CambioCard label="Euro (EUR)" entry={cambio?.eur ?? null} flag="🇪🇺" paisCodigo="eu" decimals={4} />
           <CambioCard label="Iene (JPY)" entry={cambio?.jpy ?? null} flag="🇯🇵" paisCodigo="jp" decimals={4} />
           <CambioCard label="Yuan (CNY)" entry={cambio?.cny ?? null} flag="🇨🇳" paisCodigo="cn" decimals={4} />
-        </div>
-        <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Outros ativos</p>
-        <div className="grid grid-cols-2 gap-2">
           <CambioCard label="Ouro (grama)" entry={cambio?.xau ?? null} flag="🥇" decimals={2} />
           <CambioCard label="Bitcoin (BTC)" entry={cambio?.btc ?? null} flag="₿" decimals={0} />
         </div>

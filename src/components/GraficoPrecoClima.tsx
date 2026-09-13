@@ -4,8 +4,8 @@
  */
 
 import { useEffect, useState } from 'react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { AlertTriangle } from 'lucide-react';
+import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
+import { AlertTriangle, Settings2 } from 'lucide-react';
 
 interface ChartPoint { label: string; data: string; chuvaMm: number | null; preco: number | null }
 interface ChartResponse {
@@ -18,6 +18,23 @@ interface Props {
   estado: string;
   cidade: string;
 }
+
+// Lista de produtos pra tela de configuração do gráfico — o usuário
+// escolhe explicitamente o que quer ver, em vez de herdar sem avisar o
+// que estava selecionado lá em cima na tela de Cotações.
+const PRODUTOS_GRAFICO = [
+  { id: 'boi_gordo', label: 'Boi Gordo' }, { id: 'vaca', label: 'Vaca' },
+  { id: 'novilho', label: 'Novilho' }, { id: 'novilha', label: 'Novilha' },
+  { id: 'soja', label: 'Soja' }, { id: 'milho', label: 'Milho' },
+  { id: 'cafe', label: 'Café' }, { id: 'algodao', label: 'Algodão' },
+];
+
+const ESTADOS_GRAFICO = [
+  'Acre', 'Alagoas', 'Amapá', 'Amazonas', 'Bahia', 'Ceará', 'Distrito Federal', 'Espírito Santo',
+  'Goiás', 'Maranhão', 'Mato Grosso', 'Mato Grosso do Sul', 'Minas Gerais', 'Pará', 'Paraíba',
+  'Paraná', 'Pernambuco', 'Piauí', 'Rio de Janeiro', 'Rio Grande do Norte', 'Rio Grande do Sul',
+  'Rondônia', 'Roraima', 'Santa Catarina', 'São Paulo', 'Sergipe', 'Tocantins',
+];
 
 function calcularTendencia(valores: (number | null)[]): (number | null)[] {
   const indices: number[] = [];
@@ -79,18 +96,22 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
           <p className="text-[10px] text-amber-800 dark:text-amber-300">{dados.avisoPreco}</p>
         </div>
       )}
-      <ResponsiveContainer width="100%" height={280}>
-        <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-          <XAxis dataKey="label" tick={{ fontSize: 10 }} />
-          <YAxis yAxisId="chuva" tick={{ fontSize: 10 }} label={{ value: 'mm', angle: -90, fontSize: 10 }} />
-          <YAxis yAxisId="preco" orientation="right" tick={{ fontSize: 10 }} label={{ value: 'R$', angle: 90, fontSize: 10 }} />
-          <Tooltip contentStyle={{ fontSize: 11 }} />
+      <ResponsiveContainer width="100%" height={340}>
+        <ComposedChart data={chartData} margin={{ top: 20, right: 5, left: -15, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
+          <XAxis dataKey="label" tick={{ fontSize: 10 }} interval={0} angle={chartData.length > 8 ? -35 : 0} textAnchor={chartData.length > 8 ? 'end' : 'middle'} height={chartData.length > 8 ? 45 : 25} />
+          <YAxis yAxisId="chuva" tick={{ fontSize: 10 }} label={{ value: 'mm de chuva', angle: -90, fontSize: 9, position: 'insideLeft' }} />
+          <YAxis yAxisId="preco" orientation="right" tick={{ fontSize: 10 }} label={{ value: 'R$', angle: 90, fontSize: 9, position: 'insideRight' }} />
+          <Tooltip contentStyle={{ fontSize: 11 }} formatter={(valor: any, nome: string) => [typeof valor === 'number' ? valor.toFixed(2) : valor, nome]} />
           <Legend wrapperStyle={{ fontSize: 10 }} />
-          <Bar yAxisId="chuva" dataKey="chuvaMm" name="Chuva (mm)" fill="#60a5fa" radius={[3, 3, 0, 0]} />
-          <Bar yAxisId="preco" dataKey="preco" name="Preço (R$)" fill="#34d399" radius={[3, 3, 0, 0]} />
-          <Line yAxisId="chuva" type="monotone" dataKey="chuvaTendencia" name="Tendência clima" stroke="#1d4ed8" strokeWidth={2} dot={false} strokeDasharray="4 2" />
-          <Line yAxisId="preco" type="monotone" dataKey="precoTendencia" name="Tendência preço" stroke="#047857" strokeWidth={2} dot={false} strokeDasharray="4 2" />
+          <Bar yAxisId="chuva" dataKey="chuvaMm" name="Chuva (mm)" fill="#60a5fa" radius={[3, 3, 0, 0]} maxBarSize={28}>
+            <LabelList dataKey="chuvaMm" position="top" style={{ fontSize: 9, fill: 'var(--text-secondary)' }} formatter={(v: number) => v ? v.toFixed(0) : ''} />
+          </Bar>
+          <Bar yAxisId="preco" dataKey="preco" name="Preço (R$)" fill="#34d399" radius={[3, 3, 0, 0]} maxBarSize={28}>
+            <LabelList dataKey="preco" position="top" style={{ fontSize: 9, fill: 'var(--text-secondary)' }} formatter={(v: number) => v ? v.toFixed(0) : ''} />
+          </Bar>
+          <Line yAxisId="chuva" type="monotone" dataKey="chuvaTendencia" name="Tendência clima" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 2 }} strokeDasharray="4 2" />
+          <Line yAxisId="preco" type="monotone" dataKey="precoTendencia" name="Tendência preço" stroke="#047857" strokeWidth={2} dot={{ r: 2 }} strokeDasharray="4 2" />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
@@ -101,42 +122,86 @@ export default function GraficoPrecoClima({ produto, produtoLabel, estado, cidad
   const anoAtual = new Date().getFullYear();
   const hoje = new Date();
   const daqui16Dias = new Date(hoje.getTime() + 16 * 86400000);
+  const dataFimMax = daqui16Dias.toISOString().slice(0, 10);
 
+  // Tela de configuração — o usuário escolhe explicitamente produto,
+  // estado e período antes de ver qualquer gráfico, em vez de herdar
+  // silenciosamente o que estava selecionado lá em cima em Cotações
+  // (causa real de confusão: a pessoa às vezes nem sabia o que o
+  // gráfico estava mostrando).
+  const [configConfirmada, setConfigConfirmada] = useState(false);
+  const [produtoEscolhido, setProdutoEscolhido] = useState(produto || 'boi_gordo');
+  const [estadoEscolhido, setEstadoEscolhido] = useState(estado || '');
   const [dataInicio, setDataInicio] = useState(`${anoAtual}-01-01`);
   const [dataFim, setDataFim] = useState(hoje.toISOString().slice(0, 10));
 
-  const dataFimMax = daqui16Dias.toISOString().slice(0, 10);
-
-  const inicioAnoPassado = dataInicio.replace(String(anoAtual), String(anoAtual - 1));
+  const inicioAnoPassado = dataInicio.replace(String(anoAtual), String(new Date(dataInicio).getFullYear() - 1));
   const fimAnoPassado = dataFim.replace(new RegExp(`^\\d{4}`), String(new Date(dataFim).getFullYear() - 1));
 
-  const atual = useChartData(produto, estado, cidade, dataInicio, dataFim);
-  const anoPassado = useChartData(produto, estado, cidade, inicioAnoPassado, fimAnoPassado);
+  const atual = useChartData(produtoEscolhido, estadoEscolhido, cidade, dataInicio, dataFim);
+  const anoPassado = useChartData(produtoEscolhido, estadoEscolhido, cidade, inicioAnoPassado, fimAnoPassado);
 
-  if (!estado && !cidade) {
-    return <p className="text-xs text-theme-secondary bg-theme-card border border-theme rounded-2xl p-4 shadow-theme">Escolha um estado ou cidade acima pra ver o gráfico de preço x clima.</p>;
+  const produtoLabelEscolhido = PRODUTOS_GRAFICO.find(p => p.id === produtoEscolhido)?.label || produtoLabel;
+
+  if (!configConfirmada) {
+    return (
+      <div className="bg-theme-card rounded-2xl border border-theme p-4 space-y-3 shadow-theme">
+        <div className="flex items-center gap-2">
+          <Settings2 size={16} className="text-theme-secondary" />
+          <h3 className="text-sm font-bold text-theme-primary">Configurar Gráfico Preço × Clima</h3>
+        </div>
+        <p className="text-[11px] text-theme-secondary">Escolha o produto, o estado e o período — o gráfico compara o preço com a chuva da região, e mostra o mesmo período do ano passado ao lado.</p>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">Produto</label>
+            <select value={produtoEscolhido} onChange={e => setProdutoEscolhido(e.target.value)} className="w-full text-xs border border-theme rounded-lg px-2 py-1.5 bg-theme-card text-theme-primary">
+              {PRODUTOS_GRAFICO.map(p => <option key={p.id} value={p.id} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{p.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">Estado</label>
+            <select value={estadoEscolhido} onChange={e => setEstadoEscolhido(e.target.value)} className="w-full text-xs border border-theme rounded-lg px-2 py-1.5 bg-theme-card text-theme-primary">
+              <option value="" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Selecione um estado</option>
+              {ESTADOS_GRAFICO.map(uf => <option key={uf} value={uf} style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>{uf}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">De</label>
+            <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="w-full text-xs border border-theme rounded-lg px-2 py-1.5 bg-theme-card text-theme-primary" />
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">Até</label>
+            <input type="date" value={dataFim} max={dataFimMax} onChange={e => setDataFim(e.target.value)} className="w-full text-xs border border-theme rounded-lg px-2 py-1.5 bg-theme-card text-theme-primary" />
+          </div>
+        </div>
+        <p className="text-[10px] text-theme-secondary">Previsão de clima disponível até {new Date(dataFimMax).toLocaleDateString('pt-BR')} (limite do Open-Meteo). Selecione só um mês pra ver o detalhe por dia.</p>
+
+        <button
+          onClick={() => { if (estadoEscolhido) setConfigConfirmada(true); else alert('Escolha um estado pra gerar o gráfico.'); }}
+          className="btn-primary w-full text-sm"
+        >
+          Gerar Gráfico
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-3">
-      <div className="bg-theme-card rounded-2xl border border-theme p-3 flex flex-wrap items-end gap-3 shadow-theme">
-        <div>
-          <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">De</label>
-          <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="text-xs border border-theme rounded-lg px-2 py-1.5" />
-        </div>
-        <div>
-          <label className="text-[10px] font-bold text-theme-secondary uppercase block mb-1">Até</label>
-          <input type="date" value={dataFim} max={dataFimMax} onChange={e => setDataFim(e.target.value)} className="text-xs border border-theme rounded-lg px-2 py-1.5" />
-        </div>
-        <p className="text-[10px] text-theme-secondary">Previsão de clima disponível até {new Date(dataFimMax).toLocaleDateString('pt-BR')} (limite de 16 dias à frente do Open-Meteo). Selecione só um mês pra ver o detalhe por dia.</p>
-      </div>
+      <button onClick={() => setConfigConfirmada(false)} className="text-xs font-bold text-[var(--primary)] flex items-center gap-1">
+        <Settings2 size={12} /> Alterar configuração ({produtoLabelEscolhido} — {estadoEscolhido})
+      </button>
 
       {atual.loading && <p className="text-xs text-theme-secondary text-center py-6">Montando o gráfico...</p>}
       {atual.error && <p className="text-xs text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3">{atual.error}</p>}
-      <GraficoIndividual titulo={`${produtoLabel} × Clima — período selecionado`} dados={atual.dados} />
+      <GraficoIndividual titulo={`${produtoLabelEscolhido} × Clima — período selecionado`} dados={atual.dados} />
 
       {anoPassado.error && <p className="text-xs text-theme-secondary">Não foi possível comparar com o ano passado agora.</p>}
-      <GraficoIndividual titulo={`${produtoLabel} × Clima — mesmo período, ano anterior`} dados={anoPassado.dados} />
+      <GraficoIndividual titulo={`${produtoLabelEscolhido} × Clima — mesmo período, ano anterior`} dados={anoPassado.dados} />
     </div>
   );
 }
