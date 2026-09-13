@@ -26,21 +26,20 @@ function toMMDDYYYY(d: Date): string {
   return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
 }
 
-async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY' | 'RUB', debug: string[]): Promise<CambioEntry | null> {
-  // Fonte principal: Frankfurter — API gratuita, sem chave, que rastreia
-  // as taxas de referência do Banco Central Europeu. Escolhida como
-  // principal para TODAS as moedas por ser uma chamada única e simples
-  // (sem a complexidade de tentar várias datas), reduzindo o risco de
-  // bugs que já afetaram a integração direta com o Banco Central do
-  // Brasil — e cobre Yuan e Rublo, que o BCB pode não ter.
+async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY', debug: string[]): Promise<CambioEntry | null> {
+  // Fonte principal: Frankfurter v2 — API gratuita, sem chave, que
+  // rastreia taxas de 98 bancos centrais/fontes oficiais. Migrado da v1
+  // (domínio .app) pra v2 (.dev) porque a documentação oficial confirma
+  // que a v1 está DEPRECIADA — o formato de resposta também mudou: v1
+  // tinha "rates.BRL" aninhado, v2 devolve "rate" direto no topo.
   try {
-    const res = await fetch(`https://api.frankfurter.app/latest?from=${moeda}&to=BRL`, {
+    const res = await fetch(`https://api.frankfurter.dev/v2/rate/${moeda.toLowerCase()}/brl`, {
       headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
     });
     if (res.ok) {
       const data = (await res.json()) as any;
-      const rate = data?.rates?.BRL;
-      if (rate) {
+      const rate = data?.rate;
+      if (rate > 0) {
         return {
           compra: Number((rate * 0.998).toFixed(4)),
           venda: Number(rate.toFixed(4)),
@@ -48,12 +47,12 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY' | 'RUB', debug: s
           atualizadoEm: data.date || new Date().toISOString(),
         };
       }
-      debug.push(`Frankfurter ${moeda}: resposta sem taxa BRL utilizável.`);
+      debug.push(`Frankfurter v2 ${moeda}: resposta sem "rate" utilizável (${JSON.stringify(data).slice(0, 150)}).`);
     } else {
-      debug.push(`Frankfurter ${moeda}: HTTP ${res.status}`);
+      debug.push(`Frankfurter v2 ${moeda}: HTTP ${res.status}`);
     }
   } catch (e: any) {
-    debug.push(`Frankfurter ${moeda}: ${e?.message || String(e)}`);
+    debug.push(`Frankfurter v2 ${moeda}: ${e?.message || String(e)}`);
   }
 
   // Reserva 1: Banco Central do Brasil (PTAX) — tenta os últimos 7 dias.

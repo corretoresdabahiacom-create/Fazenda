@@ -1,8 +1,11 @@
 // Endpoint de dados pro gráfico Preço x Clima pedido em Cotações.
 //
-// Busca clima REAL (Open-Meteo — geocodificação, previsão de até 16
-// dias, e histórico real de qualquer data passada) e cruza com o
-// histórico de preço já gravado no Firestore (ver quotes.ts).
+// Busca clima REAL de duas fontes: INMET (estação terrestre mais
+// próxima, dado observado de verdade — usado com prioridade pra
+// qualquer dia já passado) e Open-Meteo (modelo numérico — cobre onde
+// não há estação INMET por perto, e todo o período futuro, já que
+// estação não prevê o que ainda vai acontecer). Cruza com o histórico
+// de preço já gravado no Firestore (ver quotes.ts).
 //
 // LIMITAÇÃO HONESTA: o histórico de preço só começou a ser gravado
 // agora — não existe dado de preço real anterior a quando essa função
@@ -36,21 +39,31 @@ async function geocodificar(cidade: string, estado: string): Promise<{ lat: numb
   }
 }
 
-// Busca precipitação diária real — usa a API de previsão (até 16 dias à
-// frente) pra datas futuras, e a API de arquivo histórico (dados reais
-// de qualquer data passada) pra datas passadas. Combina as duas quando
-// o período pedido cruza o "hoje".
+// Busca precipitação diária real. BUG REAL ENCONTRADO E CORRIGIDO: a
+// API de arquivo histórico (archive-api) do Open-Meteo tem um atraso
+// documentado de 2 a 5 dias pra disponibilizar dado (usa o modelo
+// ERA5, que precisa de tempo de processamento) — pedir dados de
+// "ontem" ou "anteontem" nela frequentemente vinha vazio. A própria
+// documentação oficial recomenda usar a API de previsão com o
+// parâmetro "past_days" pra cobrir justamente esse intervalo recente
+// (ela também guarda o que já aconteceu, não só o que vai acontecer).
+// Nova estratégia: arquivo histórico pros dias mais antigos que 6 dias
+// atrás (dado já consolidado e confiável); API de previsão (com
+// past_days + forecast_days juntos, numa chamada só) pra tudo de 6
+// dias atrás em diante, incluindo o futuro.
 async function buscarChuvaDiaria(lat: number, lon: number, dataInicio: string, dataFim: string): Promise<Record<string, number>> {
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = new Date();
+  const hojeStr = hoje.toISOString().slice(0, 10);
+  const limiteArquivoConfiavel = new Date(hoje.getTime() - 6 * 86400000).toISOString().slice(0, 10);
   const resultado: Record<string, number> = {};
 
-  const precisaHistorico = dataInicio < hoje;
-  const precisaPrevisao = dataFim >= hoje;
+  const precisaArquivoAntigo = dataInicio < limiteArquivoConfiavel;
+  const precisaRecenteOuFuturo = dataFim >= limiteArquivoConfiavel;
 
-  if (precisaHistorico) {
-    const fimHistorico = dataFim < hoje ? dataFim : new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  if (precisaArquivoAntigo) {
+    const fimArquivo = dataFim < limiteArquivoConfiavel ? dataFim : new Date(new Date(limiteArquivoConfiavel).getTime() - 86400000).toISOString().slice(0, 10);
     try {
-      const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${dataInicio}&end_date=${fimHistorico}&daily=precipitation_sum&timezone=auto`;
+      const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${dataInicio}&end_date=${fimArquivo}&daily=precipitation_sum&timezone=auto`;
       const res = await fetch(url);
       if (res.ok) {
         const data = (await res.json()) as any;
@@ -58,15 +71,20 @@ async function buscarChuvaDiaria(lat: number, lon: number, dataInicio: string, d
         const chuva: number[] = data?.daily?.precipitation_sum || [];
         datas.forEach((d, i) => { resultado[d] = chuva[i] ?? 0; });
       }
-    } catch { /* segue sem histórico se falhar */ }
+    } catch { /* segue sem esse trecho se falhar */ }
   }
 
-  if (precisaPrevisao) {
-    // Open-Meteo permite no máximo 16 dias de previsão à frente — corta
-    // se o usuário pedir mais que isso, em vez de fingir que tem dado.
-    const diasAFrente = Math.min(16, Math.ceil((new Date(dataFim).getTime() - Date.now()) / 86400000) + 1);
+  if (precisaRecenteOuFuturo) {
+    // past_days cobre os últimos dias (incluindo os que o arquivo
+    // histórico ainda não processou), forecast_days cobre o futuro —
+    // pedidos juntos numa única chamada, já que a mesma API atende as
+    // duas pontas.
+    const diasPassadosNecessarios = Math.min(92, Math.max(0, Math.ceil((hoje.getTime() - new Date(dataInicio).getTime()) / 86400000)));
+    const diasFuturosNecessarios = dataFim > hojeStr
+      ? Math.min(16, Math.ceil((new Date(dataFim).getTime() - hoje.getTime()) / 86400000) + 1)
+      : 1;
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&timezone=auto&forecast_days=${Math.max(1, diasAFrente)}`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&timezone=auto&past_days=${diasPassadosNecessarios}&forecast_days=${diasFuturosNecessarios}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = (await res.json()) as any;
@@ -76,10 +94,117 @@ async function buscarChuvaDiaria(lat: number, lon: number, dataInicio: string, d
           if (d >= dataInicio && d <= dataFim) resultado[d] = chuva[i] ?? 0;
         });
       }
-    } catch { /* segue sem previsão se falhar */ }
+    } catch { /* segue sem esse trecho se falhar */ }
   }
 
   return resultado;
+}
+
+// ============================================================
+// INMET — Instituto Nacional de Meteorologia. Dados REAIS de estação
+// terrestre (não modelo numérico como o Open-Meteo), preferíveis pra
+// datas passadas quando uma estação próxima tiver leitura válida.
+//
+// Descoberto por pesquisa (a API não tem documentação oficial em
+// formato OpenAPI): endpoint /estacoes/T lista as estações automáticas
+// (código, nome, UF, latitude, longitude); /estacao/{inicio}/{fim}/
+// {codigo} devolve leituras HORÁRIAS (campo CHUVA em mm, "9999" ou
+// null quando o sensor falhou). A API RECUSA período maior que 6
+// meses numa chamada só — por isso quebramos em janelas de 180 dias.
+// ============================================================
+
+interface EstacaoInmet { codigo: string; nome: string; lat: number; lon: number }
+
+let cacheEstacoesInmet: EstacaoInmet[] | null = null;
+
+async function listarEstacoesInmet(): Promise<EstacaoInmet[]> {
+  if (cacheEstacoesInmet) return cacheEstacoesInmet;
+  try {
+    const res = await fetch('https://apitempo.inmet.gov.br/estacoes/T');
+    if (!res.ok) return [];
+    const data = (await res.json()) as any[];
+    cacheEstacoesInmet = data
+      .map(e => ({
+        codigo: String(e.CD_ESTACAO || '').trim(),
+        nome: String(e.DC_NOME || ''),
+        lat: Number(e.VL_LATITUDE),
+        lon: Number(e.VL_LONGITUDE),
+      }))
+      .filter(e => e.codigo && !isNaN(e.lat) && !isNaN(e.lon));
+    return cacheEstacoesInmet;
+  } catch {
+    return [];
+  }
+}
+
+function distanciaKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function estacaoInmetMaisProxima(lat: number, lon: number): Promise<{ codigo: string; nome: string; distanciaKm: number } | null> {
+  const estacoes = await listarEstacoesInmet();
+  if (estacoes.length === 0) return null;
+  let melhor: EstacaoInmet | null = null;
+  let menorDist = Infinity;
+  for (const e of estacoes) {
+    const d = distanciaKm(lat, lon, e.lat, e.lon);
+    if (d < menorDist) { menorDist = d; melhor = e; }
+  }
+  // Estação a mais de 150km não é confiável como representante do
+  // clima local — melhor não usar do que usar uma referência distante
+  // demais sem avisar.
+  if (!melhor || menorDist > 150) return null;
+  return { codigo: melhor.codigo, nome: melhor.nome, distanciaKm: Math.round(menorDist) };
+}
+
+function partirEmJanelasDe180Dias(inicio: string, fim: string): { inicio: string; fim: string }[] {
+  const janelas: { inicio: string; fim: string }[] = [];
+  let cursor = new Date(inicio + 'T00:00:00');
+  const fimData = new Date(fim + 'T00:00:00');
+  while (cursor <= fimData) {
+    const fimJanela = new Date(Math.min(cursor.getTime() + 179 * 86400000, fimData.getTime()));
+    janelas.push({ inicio: cursor.toISOString().slice(0, 10), fim: fimJanela.toISOString().slice(0, 10) });
+    cursor = new Date(fimJanela.getTime() + 86400000);
+  }
+  return janelas;
+}
+
+// Busca chuva REAL de estação INMET, agregando as leituras horárias em
+// total diário. Só cobre PASSADO (estação não "prevê" o futuro) — só
+// vale a pena chamar pra parte do período que já aconteceu.
+async function buscarChuvaInmet(lat: number, lon: number, dataInicio: string, dataFimPassado: string): Promise<{ porDia: Record<string, number>; estacaoUsada: string | null }> {
+  if (dataFimPassado < dataInicio) return { porDia: {}, estacaoUsada: null };
+  const estacao = await estacaoInmetMaisProxima(lat, lon);
+  if (!estacao) return { porDia: {}, estacaoUsada: null };
+
+  const porDia: Record<string, number> = {};
+  const janelas = partirEmJanelasDe180Dias(dataInicio, dataFimPassado);
+
+  for (const janela of janelas) {
+    try {
+      const url = `https://apitempo.inmet.gov.br/estacao/${janela.inicio}/${janela.fim}/${estacao.codigo}`;
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!res.ok) continue;
+      const leituras = (await res.json()) as any[];
+      if (!Array.isArray(leituras)) continue;
+      for (const leitura of leituras) {
+        const dia = String(leitura.DT_MEDICAO || '').slice(0, 10);
+        const chuvaTexto = leitura.CHUVA;
+        // "9999", null ou vazio marcam falha de sensor — nunca soma
+        // isso como se fosse chuva real (documentado pelo próprio INMET).
+        if (!dia || chuvaTexto == null || chuvaTexto === '9999' || chuvaTexto === '') continue;
+        const chuva = Number(chuvaTexto);
+        if (isNaN(chuva) || chuva < 0) continue;
+        porDia[dia] = (porDia[dia] || 0) + chuva;
+      }
+    } catch { /* essa janela falhou, segue pras outras */ }
+  }
+
+  return { porDia, estacaoUsada: `${estacao.nome} (INMET, a ${estacao.distanciaKm}km)` };
 }
 
 interface PricePoint { data: string; preco: number }
@@ -129,10 +254,23 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       });
     }
 
-    const [chuvaPorDia, precoHistorico] = await Promise.all([
+    const hojeStr = new Date().toISOString().slice(0, 10);
+    const fimParteJaPassada = dataFim < hojeStr ? dataFim : new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+    const [chuvaOpenMeteo, chuvaInmetResultado, precoHistorico] = await Promise.all([
       buscarChuvaDiaria(local.lat, local.lon, dataInicio, dataFim),
+      dataInicio <= fimParteJaPassada ? buscarChuvaInmet(local.lat, local.lon, dataInicio, fimParteJaPassada) : Promise.resolve({ porDia: {}, estacaoUsada: null }),
       buscarHistoricoPreco(context.env, produto, estado),
     ]);
+
+    // Funde as duas fontes de clima: INMET (estação real) tem
+    // prioridade pros dias que ela cobriu, porque é observação de
+    // verdade, não modelo numérico — Open-Meteo preenche o resto
+    // (futuro, e qualquer dia sem estação próxima o suficiente).
+    const chuvaPorDia: Record<string, number> = { ...chuvaOpenMeteo, ...chuvaInmetResultado.porDia };
+    const fonteClimaUsada = chuvaInmetResultado.estacaoUsada
+      ? `INMET (${chuvaInmetResultado.estacaoUsada}) + Open-Meteo`
+      : 'Open-Meteo';
 
     const precoPorDia = new Map(precoHistorico.map(p => [p.data, p.preco]));
     const todasDatas = gerarDatasNoIntervalo(dataInicio, dataFim);
@@ -177,6 +315,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     return new Response(JSON.stringify({
       produto, estado, cidade, local: local.nomeEncontrado,
+      fonteClima: fonteClimaUsada,
       granularidade: agruparPorMes ? 'mes' : 'dia',
       pontos,
       avisoPreco: totalComPreco === 0

@@ -48,7 +48,12 @@ function duasAnosAPartirDeHoje(): Date {
   return d;
 }
 
-export default function HistoricoPrecoPessoal() {
+interface Props {
+  dataInicio?: string;
+  dataFim?: string;
+}
+
+export default function HistoricoPrecoPessoal({ dataInicio, dataFim }: Props) {
   const [config, setConfig] = useState<ConfigPessoal | null | undefined>(undefined);
   const [pontos, setPontos] = useState<PontoPessoal[]>([]);
   const [mostrarConfig, setMostrarConfig] = useState(false);
@@ -59,6 +64,13 @@ export default function HistoricoPrecoPessoal() {
   const [salvando, setSalvando] = useState(false);
 
   const uid = auth.currentUser?.uid;
+
+  // Bug real corrigido: a lista mostrava TODOS os lançamentos, sem
+  // respeitar o período escolhido lá em cima no gráfico — agora só
+  // exibe (e soma/organiza) o que cai dentro de "De" e "Até".
+  const pontosNoPeriodo = (dataInicio && dataFim)
+    ? pontos.filter(p => p.data >= dataInicio && p.data <= dataFim)
+    : pontos;
 
   useEffect(() => {
     if (!uid) { setConfig(null); return; }
@@ -191,8 +203,12 @@ export default function HistoricoPrecoPessoal() {
             {config.produtoId === 'boi_gordo' && <span className="block text-[10px] mt-0.5">Boi Gordo costuma variar toda semana (até 4x/mês) — lance um ponto por vez que atualizar.</span>}
           </p>
 
-          {pontos.length === 0 && <p className="text-xs text-theme-secondary italic">Nenhum preço lançado ainda.</p>}
-          {pontos.map(p => (
+          {pontosNoPeriodo.length === 0 && (
+            <p className="text-xs text-theme-secondary italic">
+              {pontos.length > 0 ? 'Nenhum lançamento seu cai dentro do período selecionado acima.' : 'Nenhum preço lançado ainda.'}
+            </p>
+          )}
+          {pontosNoPeriodo.map(p => (
             <div key={p.id} className="flex items-center justify-between bg-theme-secondary rounded-lg p-2 text-xs">
               <span>{new Date(p.data + 'T00:00:00').toLocaleDateString('pt-BR')}: <strong>R$ {p.preco.toFixed(2)}</strong></span>
               <div className="flex gap-1">
