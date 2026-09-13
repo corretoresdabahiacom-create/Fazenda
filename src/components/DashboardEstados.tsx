@@ -250,7 +250,10 @@ interface ProdutoEncontrado { id: string; label: string; icone: string }
 // Detalhe de um produto — busca o preço real por praça/região/cidade
 // daquele estado, usando o mesmo endpoint unificado já testado em
 // Cotações.
-function DetalheProduto({ produtoId, produtoLabel, estado }: { produtoId: string; produtoLabel: string; estado: string }) {
+function DetalheProduto({ produtoId, produtoLabel, estado, itensManuaisDoProduto }: {
+  produtoId: string; produtoLabel: string; estado: string;
+  itensManuaisDoProduto?: { praca: string; preco: number; unidade: string }[];
+}) {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -263,8 +266,16 @@ function DetalheProduto({ produtoId, produtoLabel, estado }: { produtoId: string
       .finally(() => setLoading(false));
   }, [produtoId, estado]);
 
+  // Preços lançados pelo Admin entram na MESMA tabela do produto,
+  // sempre no topo, identificados como "Pesquisa in loco" — junto com
+  // os preços automáticos, não separado em outro lugar.
+  const linhasManuais = (itensManuaisDoProduto || []).map(item => ({
+    marketPlace: item.praca, price: item.preco, unit: item.unidade, source: 'Pesquisa in loco', __manual: true,
+  }));
+  const todasLinhas = [...linhasManuais, ...quotes];
+
   if (loading) return <p className="text-xs text-theme-secondary p-3">Buscando preço real...</p>;
-  if (quotes.length === 0) return <p className="text-xs text-theme-secondary p-3 italic">Sem detalhe por praça/cidade disponível pra {produtoLabel} em {estado} no momento.</p>;
+  if (todasLinhas.length === 0) return <p className="text-xs text-theme-secondary p-3 italic">Sem detalhe por praça/cidade disponível pra {produtoLabel} em {estado} no momento.</p>;
 
   return (
     <div className="bg-theme-secondary rounded-xl overflow-hidden">
@@ -277,8 +288,8 @@ function DetalheProduto({ produtoId, produtoLabel, estado }: { produtoId: string
           </tr>
         </thead>
         <tbody>
-          {quotes.map((q, i) => (
-            <tr key={i} className="border-b border-theme last:border-0">
+          {todasLinhas.map((q, i) => (
+            <tr key={i} className={`border-b border-theme last:border-0 ${(q as any).__manual ? 'bg-[var(--primary)]/5' : ''}`}>
               <td className="p-2 text-theme-primary font-semibold">{q.marketPlace || q.municipality || q.region || estado}</td>
               <td className="p-2 text-theme-primary font-bold">R$ {q.price?.toFixed(2)} <span className="font-normal text-theme-secondary">{q.unit}</span></td>
               <td className="p-2 text-theme-secondary">{q.source}</td>
@@ -361,7 +372,13 @@ function CardEstado({ estado }: CardEstadoProps) {
     }
   }
 
-  const todosProdutos = [...(produtos || []), ...precosManuaisEstado];
+  // Um produto pode ter fonte automática E lançamento manual do Admin
+  // ao mesmo tempo — nesse caso aparece só UMA vez na lista (a versão
+  // automática, se existir), já que o detalhe (DetalheProduto) já junta
+  // as duas fontes na mesma tabela de qualquer forma.
+  const idsAutomaticos = new Set((produtos || []).map(p => p.id));
+  const manuaisSemDuplicar = precosManuaisEstado.filter(p => !idsAutomaticos.has(p.id.replace('manual_', '')));
+  const todosProdutos = [...(produtos || []), ...manuaisSemDuplicar];
 
   return (
     <div className="bg-theme-card rounded-2xl border border-theme shadow-theme overflow-hidden">
@@ -416,7 +433,12 @@ function CardEstado({ estado }: CardEstadoProps) {
                 </button>
               </div>
               {produtoAberto === p.id && (
-                <DetalheProduto produtoId={p.id.replace('manual_', '')} produtoLabel={p.label} estado={estado.nome} />
+                <DetalheProduto
+                  produtoId={p.id.replace('manual_', '')}
+                  produtoLabel={p.label}
+                  estado={estado.nome}
+                  itensManuaisDoProduto={itensManuaisDetalhados.filter(item => item.produtoId === p.id.replace('manual_', ''))}
+                />
               )}
             </div>
             );
