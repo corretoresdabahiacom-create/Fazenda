@@ -13,9 +13,9 @@
 // sigla do estado como substituto honesto, documentado aqui pra não
 // passar a impressão de que existe uma bandeira de verdade sendo usada.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ChevronDown, ChevronRight, Edit3, Plus, X, Save, Trash2 } from 'lucide-react';
-import { collection, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useFirebase } from '../contexts/FirebaseContext';
 import '../styles/bandeirasEstados.css';
@@ -318,6 +318,7 @@ function CardEstado({ estado }: CardEstadoProps) {
   const [precosManuaisEstado, setPrecosManuaisEstado] = useState<ProdutoEncontrado[]>([]);
   const [itensManuaisDetalhados, setItensManuaisDetalhados] = useState<any[]>([]);
   const [mostrarAdmin, setMostrarAdmin] = useState(false);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
   const [produtoParaEditar, setProdutoParaEditar] = useState<any>(null);
 
   // Cotações manuais (Admin) — busca direto do Firestore, mesmo padrão
@@ -326,37 +327,63 @@ function CardEstado({ estado }: CardEstadoProps) {
   // (pra edição do Admin, com id de cada peça pra poder editar/excluir).
   useEffect(() => {
     if (!aberto) return;
-    const unsubs = [
-      onSnapshot(collection(db, 'cotacoesManuais_localizacoes'), locSnap => {
-        const locais = locSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
-        const locaisDoEstado = new Map(locais.filter(l => l.estado === estado.nome).map(l => [l.id, l]));
-        onSnapshot(collection(db, 'cotacoesManuais_precos'), precoSnap => {
-          onSnapshot(collection(db, 'cotacoesManuais_produtos'), produtoSnap => {
-            const produtosPorId = new Map(produtoSnap.docs.map(d => [d.id, d.data() as any]));
-            const encontrados = new Map<string, ProdutoEncontrado>();
-            const detalhados: any[] = [];
-            precoSnap.docs.forEach(d => {
-              const p = d.data() as any;
-              const local = locaisDoEstado.get(p.localizacaoId);
-              if (local) {
-                const produto = produtosPorId.get(p.produtoId);
-                if (produto) {
-                  encontrados.set(p.produtoId, { id: `manual_${p.produtoId}`, label: produto.nome, icone: produto.icone || '📦' });
-                  detalhados.push({
-                    precoId: d.id, produtoId: p.produtoId, produtoNome: produto.nome, icone: produto.icone || '📦',
-                    localizacaoId: p.localizacaoId, praca: local.local, preco: p.preco, unidade: p.unidade,
-                    prazoDias: p.prazoDias, tipoNegocio: p.tipoNegocio,
-                  });
-                }
-              }
-            });
-            setPrecosManuaisEstado(Array.from(encontrados.values()));
-            setItensManuaisDetalhados(detalhados);
-          });
+    let cancelado = false;
+
+    // Bug real corrigido: antes isso era onSnapshot dentro de
+    // onSnapshot dentro de onSnapshot (3 níveis), guardando só a
+    // função de cancelar do mais externo — os listeners internos
+    // ficavam se acumulando a cada atualização, sem nunca serem
+    // desligados de verdade. Agora: produtos e localizações mudam
+    // raramente, então busca uma vez só (getDocs); só o preço (que o
+    // Admin pode alterar a qualquer momento) usa onSnapshot de verdade,
+    // um nível só, fácil de cancelar.
+    async function carregarEEscutar() {
+      const [locSnap, produtoSnap] = await Promise.all([
+        getDocs(collection(db, 'cotacoesManuais_localizacoes')),
+        getDocs(collection(db, 'cotacoesManuais_produtos')),
+      ]);
+      if (cancelado) return;
+
+      const locaisDoEstado = new Map(
+        locSnap.docs
+          .map(d => ({ id: d.id, ...d.data() as any }))
+          .filter(l => l.estado === estado.nome)
+          .map(l => [l.id, l])
+      );
+      const produtosPorId = new Map(produtoSnap.docs.map(d => [d.id, d.data() as any]));
+
+      const unsubPrecos = onSnapshot(collection(db, 'cotacoesManuais_precos'), precoSnap => {
+        const encontrados = new Map<string, ProdutoEncontrado>();
+        const detalhados: any[] = [];
+        precoSnap.docs.forEach(d => {
+          const p = d.data() as any;
+          const local = locaisDoEstado.get(p.localizacaoId);
+          if (local) {
+            const produto = produtosPorId.get(p.produtoId);
+            if (produto) {
+              encontrados.set(p.produtoId, { id: `manual_${p.produtoId}`, label: produto.nome, icone: produto.icone || '📦' });
+              detalhados.push({
+                precoId: d.id, produtoId: p.produtoId, produtoNome: produto.nome, icone: produto.icone || '📦',
+                localizacaoId: p.localizacaoId, praca: local.local, preco: p.preco, unidade: p.unidade,
+                prazoDias: p.prazoDias, tipoNegocio: p.tipoNegocio,
+              });
+            }
+          }
         });
-      }),
-    ];
-    return () => unsubs.forEach(u => u());
+        setPrecosManuaisEstado(Array.from(encontrados.values()));
+        setItensManuaisDetalhados(detalhados);
+      }, erro => {
+        console.error('Falha ao escutar cotacoesManuais_precos:', erro);
+      });
+
+      unsubscribeRef.current = unsubPrecos;
+    }
+
+    carregarEEscutar();
+    return () => {
+      cancelado = true;
+      if (unsubscribeRef.current) unsubscribeRef.current();
+    };
   }, [aberto, estado.nome]);
 
   function toggle() {
