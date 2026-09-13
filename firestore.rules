@@ -522,5 +522,73 @@ service cloud.firestore {
       // pelo backend (Service Account), nunca pelo app do cliente.
       allow get, list, create, update, delete: if isBootstrapAdminEmail();
     }
+
+    // -------------------------------------------------------------------------
+    // COTAÇÕES MANUAIS (Admin) — coleções de nível superior porque
+    // alimentam o Dashboard por Estado de TODOS os usuários (leitura
+    // pública dentro do app), mas só o Admin pode criar/editar/excluir.
+    // BUG REAL CORRIGIDO: essas 3 coleções nunca tinham sido adicionadas
+    // aqui — caíam na regra padrão "nega tudo", causando "Missing or
+    // insufficient permissions" mesmo pro Admin tentando salvar.
+    // -------------------------------------------------------------------------
+
+    match /cotacoesManuais_produtos/{id} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isBootstrapAdminEmail();
+    }
+
+    match /cotacoesManuais_localizacoes/{id} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isBootstrapAdminEmail();
+    }
+
+    match /cotacoesManuais_precos/{id} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isBootstrapAdminEmail();
+    }
+
+    // -------------------------------------------------------------------------
+    // HISTÓRICO DE PREÇO PESSOAL — cada usuário guarda o histórico de UM
+    // produto, numa praça só, 100% privado (só ele lê/escreve o próprio).
+    // Diferente das coleções acima: aqui é o usuário comum criando os
+    // próprios pontos, não o Admin cuidando de um catálogo compartilhado.
+    // -------------------------------------------------------------------------
+
+    function isValidPrecoPessoalConfig(data) {
+      return data.produtoId is string && data.produtoId.size() <= 100
+          && data.produtoNome is string && data.produtoNome.size() <= 100
+          && data.praca is string && data.praca.size() <= 150
+          && data.estado is string && data.estado.size() <= 100;
+    }
+
+    function isValidPrecoPessoalPonto(data) {
+      return data.preco is number && data.preco > 0
+          && data.data is string
+          && data.criadoEm is string
+          // Aplica o limite de retenção de 2 anos também na escrita —
+          // ninguém consegue criar um ponto com data de expiração maior
+          // que 2 anos a partir de agora, mesmo manipulando a chamada.
+          && (!('expireAt' in data) || data.expireAt is timestamp);
+    }
+
+    match /users/{userId}/precoPessoal/config {
+      allow get: if isOwner(userId);
+      // Só pode criar a configuração (produto+praça) se ainda não existir
+      // uma — trava o "só um produto, uma praça por assinatura" também
+      // no servidor, não só na tela.
+      allow create: if canWrite(userId) && isValidPrecoPessoalConfig(incoming());
+      // Só pode "editar" a config pra realmente trocar de produto/praça
+      // se apagar os pontos antigos primeiro (a tela cuida disso antes
+      // de chamar update) — aqui só valida o formato.
+      allow update: if canWrite(userId) && isValidPrecoPessoalConfig(incoming());
+      allow delete: if canWrite(userId);
+    }
+
+    match /users/{userId}/precoPessoal/pontos/itens/{pontoId} {
+      allow list, get: if isOwner(userId);
+      allow create: if canWrite(userId) && isValidId(pontoId) && isValidPrecoPessoalPonto(incoming());
+      allow update: if canWrite(userId) && isValidPrecoPessoalPonto(incoming());
+      allow delete: if canWrite(userId);
+    }
   }
 }

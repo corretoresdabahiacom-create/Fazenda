@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
 import { AlertTriangle, Settings2 } from 'lucide-react';
+import HistoricoPrecoPessoal from './HistoricoPrecoPessoal';
 
 interface ChartPoint { label: string; data: string; chuvaMm: number | null; preco: number | null }
 interface ChartResponse {
@@ -202,6 +203,8 @@ export default function GraficoPrecoClima({ produto, produtoLabel, estado, cidad
 
       {anoPassado.error && <p className="text-xs text-theme-secondary">Não foi possível comparar com o ano passado agora.</p>}
       <GraficoIndividual titulo={`${produtoLabelEscolhido} × Clima — mesmo período, ano anterior`} dados={anoPassado.dados} />
+
+      <HistoricoPrecoPessoal />
     </div>
   );
 }
