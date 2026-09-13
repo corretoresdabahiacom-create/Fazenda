@@ -139,13 +139,13 @@ function CardEstado({ estado }: CardEstadoProps) {
         const idsDoEstado = new Set(locais.filter(l => l.estado === estado.nome).map(l => l.id));
         onSnapshot(collection(db, 'cotacoesManuais_precos'), precoSnap => {
           onSnapshot(collection(db, 'cotacoesManuais_produtos'), produtoSnap => {
-            const produtosPorId = new Map(produtoSnap.docs.map(d => [d.id, (d.data() as any).nome]));
+            const produtosPorId = new Map(produtoSnap.docs.map(d => [d.id, d.data() as any]));
             const encontrados = new Map<string, ProdutoEncontrado>();
             precoSnap.docs.forEach(d => {
               const p = d.data() as any;
               if (idsDoEstado.has(p.localizacaoId)) {
-                const nome = produtosPorId.get(p.produtoId);
-                if (nome) encontrados.set(p.produtoId, { id: `manual_${p.produtoId}`, label: nome, icone: '✍️' });
+                const produto = produtosPorId.get(p.produtoId);
+                if (produto) encontrados.set(p.produtoId, { id: `manual_${p.produtoId}`, label: produto.nome, icone: produto.icone || '📦' });
               }
             });
             setPrecosManuaisEstado(Array.from(encontrados.values()));

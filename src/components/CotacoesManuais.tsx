@@ -18,6 +18,7 @@ export interface ProdutoManual {
   id: string;
   nome: string;
   categoria: string; // "Pecuária", "Grãos", etc.
+  icone: string; // emoji representando o produto
 }
 
 export interface LocalizacaoManual {
@@ -43,13 +44,44 @@ export interface PrecoManual {
 }
 
 const PRODUTOS_PADRAO: Omit<ProdutoManual, 'id'>[] = [
-  { nome: 'Boi Gordo', categoria: 'Pecuária' },
-  { nome: 'Vaca', categoria: 'Pecuária' },
-  { nome: 'Novilho', categoria: 'Pecuária' },
-  { nome: 'Novilha', categoria: 'Pecuária' },
-  { nome: 'Bezerro', categoria: 'Pecuária' },
-  { nome: 'Bezerra', categoria: 'Pecuária' },
+  { nome: 'Boi Gordo', categoria: 'Pecuária', icone: '🐂' },
+  { nome: 'Vaca', categoria: 'Pecuária', icone: '🐄' },
+  { nome: 'Novilho', categoria: 'Pecuária', icone: '🐂' },
+  { nome: 'Novilha', categoria: 'Pecuária', icone: '🐮' },
+  { nome: 'Bezerro', categoria: 'Pecuária', icone: '🐮' },
+  { nome: 'Bezerra', categoria: 'Pecuária', icone: '🐮' },
 ];
+
+// Lista curada de emoji cobrindo os produtos agropecuários mais comuns
+// — inclusive pra produtos que não estão em nenhuma lista fixa do
+// sistema, já que o Admin pode cadastrar qualquer nome de produto.
+const ICONES_DISPONIVEIS = [
+  '🐂', '🐄', '🐮', '🐷', '🐖', '🐑', '🐐', '🐔', '🐓', '🐣', '🐴', '🐇',
+  '🌱', '🌾', '🌽', '🌿', '🍃', '🥔', '🥕', '🧅', '🍅', '🫘', '🫛',
+  '☕', '🍫', '🍇', '🍊', '🍋', '🍌', '🍎', '🍍', '🥭', '🥥', '🍈', '🍉',
+  '🥛', '🧀', '🥚', '🍯', '🧴', '🪵', '🧵', '🌻', '🎋', '🫚', '🧄',
+  '📦',
+];
+
+function SeletorIcone({ valor, onEscolher }: { valor: string; onEscolher: (icone: string) => void }) {
+  return (
+    <div>
+      <label className="text-xs font-bold text-theme-secondary block mb-1">Ícone</label>
+      <div className="flex flex-wrap gap-1.5 p-2 border border-theme rounded-xl bg-theme-secondary max-h-32 overflow-y-auto">
+        {ICONES_DISPONIVEIS.map(icone => (
+          <button
+            key={icone}
+            type="button"
+            onClick={() => onEscolher(icone)}
+            className={`text-lg w-9 h-9 rounded-lg flex items-center justify-center ${valor === icone ? 'bg-[var(--primary)]/20 ring-2 ring-[var(--primary)]' : 'bg-theme-card'}`}
+          >
+            {icone}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const UNIDADES_COMUNS = ['R$/@', 'R$/kg', 'R$/cabeça', 'R$/sc 60kg', 'R$/sc 50kg', 'R$/ton', 'R$/litro'];
 
@@ -157,14 +189,14 @@ function AbaLocalizacao({ localizacoes }: { localizacoes: LocalizacaoManual[] })
 // ---------------------------------------------------------------------
 function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
   const [editando, setEditando] = useState<ProdutoManual | null>(null);
-  const [form, setForm] = useState({ nome: '', categoria: 'Pecuária' });
+  const [form, setForm] = useState({ nome: '', categoria: 'Pecuária', icone: '📦' });
   const [mostrarForm, setMostrarForm] = useState(false);
 
   async function salvar() {
     if (!form.nome.trim()) return;
     const id = editando?.id || `prod_${Date.now()}`;
-    await setDoc(doc(db, 'cotacoesManuais_produtos', id), { nome: form.nome.trim(), categoria: form.categoria });
-    setForm({ nome: '', categoria: 'Pecuária' });
+    await setDoc(doc(db, 'cotacoesManuais_produtos', id), { nome: form.nome.trim(), categoria: form.categoria, icone: form.icone });
+    setForm({ nome: '', categoria: 'Pecuária', icone: '📦' });
     setEditando(null);
     setMostrarForm(false);
   }
@@ -176,7 +208,7 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
 
   function abrirEdicao(p: ProdutoManual) {
     setEditando(p);
-    setForm({ nome: p.nome, categoria: p.categoria });
+    setForm({ nome: p.nome, categoria: p.categoria, icone: p.icone || '📦' });
     setMostrarForm(true);
   }
 
@@ -197,7 +229,7 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
               Criar Boi/Vaca/Novilho/Novilha/Bezerro/Bezerra
             </button>
           )}
-          <button onClick={() => { setEditando(null); setForm({ nome: '', categoria: 'Pecuária' }); setMostrarForm(true); }} className="btn-primary text-xs px-3 py-2">
+          <button onClick={() => { setEditando(null); setForm({ nome: '', categoria: 'Pecuária', icone: '📦' }); setMostrarForm(true); }} className="btn-primary text-xs px-3 py-2">
             <Plus size={14} /> Novo Produto
           </button>
         </div>
@@ -225,6 +257,7 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
             <option style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Agricultura</option>
             <option style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}>Outro</option>
           </select>
+          <SeletorIcone valor={form.icone} onEscolher={icone => setForm({ ...form, icone })} />
           <button onClick={salvar} className="btn-primary w-full"><Save size={14} /> Salvar</button>
         </div>
       )}
@@ -233,9 +266,12 @@ function AbaProdutos({ produtos }: { produtos: ProdutoManual[] }) {
         {produtos.length === 0 && <p className="p-4 text-sm text-theme-secondary">Nenhum produto cadastrado ainda.</p>}
         {produtos.map(p => (
           <div key={p.id} className="flex items-center justify-between p-3 border-b border-theme last:border-0 bg-theme-card text-theme-primary">
-            <div>
-              <p className="font-semibold text-theme-primary">{p.nome}</p>
-              <p className="text-xs text-theme-secondary">{p.categoria}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{p.icone || '📦'}</span>
+              <div>
+                <p className="font-semibold text-theme-primary">{p.nome}</p>
+                <p className="text-xs text-theme-secondary">{p.categoria}</p>
+              </div>
             </div>
             <div className="flex gap-1">
               <button onClick={() => abrirEdicao(p)} className="p-2 hover:bg-theme-secondary text-theme-secondary rounded-xl"><Edit3 size={14} /></button>

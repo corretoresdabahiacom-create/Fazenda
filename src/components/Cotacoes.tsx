@@ -11,6 +11,7 @@ import DashboardBahia from './DashboardBahia';
 import DashboardEstados from './DashboardEstados';
 import AlertasCotacoes from './AlertasCotacoes';
 import GraficoPrecoClima from './GraficoPrecoClima';
+import 'flag-icons/css/flag-icons.min.css';
 import {
   TrendingUp, TrendingDown, Search, RefreshCw, ExternalLink, AlertTriangle, MapPin, Navigation, Globe,
 } from 'lucide-react';
@@ -216,11 +217,16 @@ function buildEstadosTable(tables: ParsedTable[]): { estado: string; valor: stri
   return Array.from(found.entries()).map(([estado, valor]) => ({ estado, valor }));
 }
 
-function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry: CambioEntry | null; flag: string; decimals?: number }) {
+function BandeiraPais({ codigo }: { codigo: string }) {
+  if (!codigo) return null;
+  return <span className={`fi fi-${codigo}`} style={{ width: '1.1em', height: '1.1em', borderRadius: '3px', display: 'inline-block', verticalAlign: 'middle', marginRight: 4 }} />;
+}
+
+function CambioCard({ label, entry, flag, paisCodigo, decimals = 4 }: { label: string; entry: CambioEntry | null; flag: string; paisCodigo?: string; decimals?: number }) {
   if (!entry) {
     return (
       <div className="bg-theme-card rounded-2xl border border-theme p-3 min-w-0 shadow-theme text-theme-primary">
-        <p className="text-[11px] text-theme-secondary truncate">{flag} {label}</p>
+        <p className="text-[11px] text-theme-secondary truncate">{paisCodigo ? <BandeiraPais codigo={paisCodigo} /> : flag} {label}</p>
         <p className="text-xs text-theme-secondary mt-1">Indisponível</p>
       </div>
     );
@@ -234,7 +240,7 @@ function CambioCard({ label, entry, flag, decimals = 4 }: { label: string; entry
   return (
     <div className="bg-theme-card rounded-2xl border border-theme p-3 min-w-0 overflow-hidden shadow-theme text-theme-primary">
       <div className="flex items-center justify-between mb-1.5 gap-1">
-        <p className="text-[11px] font-bold text-theme-secondary truncate">{flag} {label}</p>
+        <p className="text-[11px] font-bold text-theme-secondary truncate">{paisCodigo ? <BandeiraPais codigo={paisCodigo} /> : flag} {label}</p>
         {entry.variacaoPct !== 0 && (
           <span className={`text-[9px] font-bold flex items-center gap-0.5 shrink-0 ${isUp ? 'text-green-600' : 'text-red-500'}`}>
             {isUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />} {entry.variacaoPct}%
@@ -640,10 +646,10 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
         {cambioError && <p className="text-xs text-red-500 bg-red-50 dark:bg-red-950/30 rounded-xl p-2 mb-2">{cambioError}</p>}
         <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Moedas</p>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-2">
-          <CambioCard label="Dólar (USD)" entry={cambio?.usd ?? null} flag="🇺🇸" decimals={4} />
-          <CambioCard label="Euro (EUR)" entry={cambio?.eur ?? null} flag="🇪🇺" decimals={4} />
-          <CambioCard label="Iene (JPY)" entry={cambio?.jpy ?? null} flag="🇯🇵" decimals={4} />
-          <CambioCard label="Yuan (CNY)" entry={cambio?.cny ?? null} flag="🇨🇳" decimals={4} />
+          <CambioCard label="Dólar (USD)" entry={cambio?.usd ?? null} flag="🇺🇸" paisCodigo="us" decimals={4} />
+          <CambioCard label="Euro (EUR)" entry={cambio?.eur ?? null} flag="🇪🇺" paisCodigo="eu" decimals={4} />
+          <CambioCard label="Iene (JPY)" entry={cambio?.jpy ?? null} flag="🇯🇵" paisCodigo="jp" decimals={4} />
+          <CambioCard label="Yuan (CNY)" entry={cambio?.cny ?? null} flag="🇨🇳" paisCodigo="cn" decimals={4} />
         </div>
         <p className="text-[10px] font-bold text-theme-secondary uppercase mb-1.5">Outros ativos</p>
         <div className="grid grid-cols-2 gap-2">
