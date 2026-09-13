@@ -135,8 +135,8 @@ export default function GraficoPrecoClima({ produto, produtoLabel, estado, cidad
   const [dataInicio, setDataInicio] = useState(`${anoAtual}-01-01`);
   const [dataFim, setDataFim] = useState(hoje.toISOString().slice(0, 10));
 
-  const inicioAnoPassado = dataInicio.replace(String(anoAtual), String(new Date(dataInicio).getFullYear() - 1));
-  const fimAnoPassado = dataFim.replace(new RegExp(`^\\d{4}`), String(new Date(dataFim).getFullYear() - 1));
+  const inicioAnoPassado = dataInicio.replace(/^\d{4}/, String(new Date(dataInicio).getFullYear() - 1));
+  const fimAnoPassado = dataFim.replace(/^\d{4}/, String(new Date(dataFim).getFullYear() - 1));
 
   const atual = useChartData(produtoEscolhido, estadoEscolhido, cidade, dataInicio, dataFim);
   const anoPassado = useChartData(produtoEscolhido, estadoEscolhido, cidade, inicioAnoPassado, fimAnoPassado);

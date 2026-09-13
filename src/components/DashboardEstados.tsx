@@ -82,14 +82,34 @@ function vazio(): FormularioAdminEstado {
   return { precoId: null, produtoNome: '', icone: '📦', praca: '', preco: '', unidade: 'R$/@', prazoDias: 0, tipoNegocio: 'nao_informado' };
 }
 
-function PainelAdminDoEstado({ estadoNome, itensManuais, onFechar }: {
+function PainelAdminDoEstado({ estadoNome, itensManuais, abrirComProduto, onFechar }: {
   estadoNome: string;
   itensManuais: { precoId: string; produtoId: string; produtoNome: string; icone: string; localizacaoId: string; praca: string; preco: number; unidade: string; prazoDias: number; tipoNegocio: string }[];
+  abrirComProduto?: any;
   onFechar: () => void;
 }) {
   const [form, setForm] = useState<FormularioAdminEstado>(vazio());
   const [mostrarForm, setMostrarForm] = useState(false);
   const [salvando, setSalvando] = useState(false);
+
+  // Se veio um produto específico pra editar/preencher (clicou no
+  // lápis do produto na lista, não no botão geral "Admin"), já abre o
+  // formulário certo, pré-preenchido.
+  useEffect(() => {
+    if (!abrirComProduto) return;
+    if (abrirComProduto.precoId) {
+      // Editando um lançamento manual já existente
+      setForm({
+        precoId: abrirComProduto.precoId, produtoNome: abrirComProduto.produtoNome, icone: abrirComProduto.icone,
+        praca: abrirComProduto.praca, preco: String(abrirComProduto.preco), unidade: abrirComProduto.unidade,
+        prazoDias: abrirComProduto.prazoDias, tipoNegocio: abrirComProduto.tipoNegocio,
+      });
+    } else if (abrirComProduto.produtoNomeSugerido) {
+      // Produto automático sem cadastro manual ainda — só sugere o nome
+      setForm({ ...vazio(), produtoNome: abrirComProduto.produtoNomeSugerido });
+    }
+    setMostrarForm(true);
+  }, [abrirComProduto]);
 
   async function salvar() {
     if (!form.produtoNome.trim() || !form.praca.trim() || !form.preco) {
@@ -112,18 +132,26 @@ function PainelAdminDoEstado({ estadoNome, itensManuais, onFechar }: {
 
       const precoId = form.precoId || `preco_${Date.now()}`;
       const agora = new Date().toISOString();
-      await setDoc(doc(db, 'cotacoesManuais_precos', precoId), {
+      const dadosPreco: any = {
         produtoId, localizacaoId,
         preco: Number(form.preco), unidade: form.unidade, prazoDias: form.prazoDias, tipoNegocio: form.tipoNegocio,
         dataCotacao: agora.slice(0, 10), atualizadoEm: agora,
-        criadoEm: form.precoId ? undefined : agora,
-      });
+      };
+      // Bug real corrigido: "criadoEm: undefined" (ao editar) faz o
+      // Firestore rejeitar o setDoc inteiro — ele nunca aceita
+      // "undefined" como valor de campo. Em vez de mandar o campo com
+      // undefined, só inclui "criadoEm" quando for realmente um
+      // lançamento novo.
+      if (!form.precoId) dadosPreco.criadoEm = agora;
+      await setDoc(doc(db, 'cotacoesManuais_precos', precoId), dadosPreco, { merge: true });
 
       setForm(vazio());
       setMostrarForm(false);
-    } catch (erro) {
+    } catch (erro: any) {
       console.error('Falha ao salvar cotação manual do estado:', erro);
-      alert('Não foi possível salvar — tente de novo.');
+      // Mostra a mensagem real do Firestore (ex: permissão negada) em
+      // vez de um "tente de novo" genérico que não ajuda a diagnosticar.
+      alert('Não foi possível salvar: ' + (erro?.message || String(erro)));
     } finally {
       setSalvando(false);
     }
@@ -279,6 +307,7 @@ function CardEstado({ estado }: CardEstadoProps) {
   const [precosManuaisEstado, setPrecosManuaisEstado] = useState<ProdutoEncontrado[]>([]);
   const [itensManuaisDetalhados, setItensManuaisDetalhados] = useState<any[]>([]);
   const [mostrarAdmin, setMostrarAdmin] = useState(false);
+  const [produtoParaEditar, setProdutoParaEditar] = useState<any>(null);
 
   // Cotações manuais (Admin) — busca direto do Firestore, mesmo padrão
   // já usado no Painel Admin, filtradas pro estado deste card. Guarda
@@ -353,27 +382,45 @@ function CardEstado({ estado }: CardEstadoProps) {
       {aberto && (
         <div className="px-3.5 pb-3.5 space-y-1.5">
           {isAdmin && mostrarAdmin && (
-            <PainelAdminDoEstado estadoNome={estado.nome} itensManuais={itensManuaisDetalhados} onFechar={() => setMostrarAdmin(false)} />
+            <PainelAdminDoEstado
+              estadoNome={estado.nome}
+              itensManuais={itensManuaisDetalhados}
+              abrirComProduto={produtoParaEditar}
+              onFechar={() => { setMostrarAdmin(false); setProdutoParaEditar(null); }}
+            />
           )}
           {loading && <p className="text-xs text-theme-secondary py-2">Verificando produtos disponíveis...</p>}
           {!loading && todosProdutos.length === 0 && (
             <p className="text-xs text-theme-secondary italic py-2">Nenhum produto com dado real disponível pra {estado.nome} ainda.{isAdmin ? ' Use o botão "Admin" acima pra cadastrar.' : ''}</p>
           )}
-          {!loading && todosProdutos.map(p => (
+          {!loading && todosProdutos.map(p => {
+            const itemManualDoProduto = itensManuaisDetalhados.find(item => `manual_${item.produtoId}` === p.id);
+            return (
             <div key={p.id} className="border border-theme rounded-xl overflow-hidden">
-              <button
-                onClick={() => setProdutoAberto(produtoAberto === p.id ? null : p.id)}
-                className="w-full flex items-center gap-2 p-2.5 text-left bg-theme-secondary"
-              >
-                <span className="text-lg">{p.icone}</span>
-                <span className="text-sm font-semibold text-theme-primary flex-1">{p.label}</span>
-                {produtoAberto === p.id ? <ChevronDown size={14} className="text-theme-secondary" /> : <ChevronRight size={14} className="text-theme-secondary" />}
-              </button>
+              <div className="w-full flex items-center gap-2 p-2.5 bg-theme-secondary">
+                <button onClick={() => setProdutoAberto(produtoAberto === p.id ? null : p.id)} className="flex items-center gap-2 flex-1 text-left">
+                  <span className="text-lg">{p.icone}</span>
+                  <span className="text-sm font-semibold text-theme-primary flex-1">{p.label}</span>
+                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => { setProdutoParaEditar(itemManualDoProduto ? { ...itemManualDoProduto } : { produtoNomeSugerido: p.label }); setMostrarAdmin(true); }}
+                    className="p-1.5 rounded-lg text-[var(--primary)] hover:bg-[var(--primary)]/10"
+                    title={itemManualDoProduto ? 'Editar esse preço' : `Adicionar preço manual pra ${p.label}`}
+                  >
+                    <Edit3 size={13} />
+                  </button>
+                )}
+                <button onClick={() => setProdutoAberto(produtoAberto === p.id ? null : p.id)}>
+                  {produtoAberto === p.id ? <ChevronDown size={14} className="text-theme-secondary" /> : <ChevronRight size={14} className="text-theme-secondary" />}
+                </button>
+              </div>
               {produtoAberto === p.id && (
                 <DetalheProduto produtoId={p.id.replace('manual_', '')} produtoLabel={p.label} estado={estado.nome} />
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

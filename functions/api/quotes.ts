@@ -31,7 +31,14 @@ const HISTORY_THROTTLE_MS = 24 * 60 * 60 * 1000; // 1 dia
 const HISTORY_MAX_POINTS = 730; // 2 anos de pontos diários
 
 async function talvezGravarHistorico(env: GoogleServiceAccountEnv, produto: string, estado: string, quotes: MarketQuote[]) {
-  if (!env.FIREBASE_PROJECT_ID || !env.FIREBASE_CLIENT_EMAIL || !env.FIREBASE_PRIVATE_KEY) return; // não configurado — não quebra, só não grava
+  if (!env.FIREBASE_PROJECT_ID || !env.FIREBASE_CLIENT_EMAIL || !env.FIREBASE_PRIVATE_KEY) {
+    // Log alto de propósito: sem essas 3 variáveis configuradas no
+    // Cloudflare Pages, o histórico de preço nunca grava, mas isso
+    // ficava completamente silencioso antes — deixando o gráfico
+    // Preço x Clima sempre vazio sem nenhuma pista do motivo.
+    console.error('HISTÓRICO DE PREÇO NÃO GRAVADO: faltam variáveis FIREBASE_PROJECT_ID/FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY no ambiente do Cloudflare Pages.');
+    return;
+  }
   const principal = quotes.find(q => q.isAvailable);
   if (!principal) return;
 
