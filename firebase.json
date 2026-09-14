@@ -1,0 +1,9 @@
+{
+  "comentario": "IMPORTANTE: este app NAO usa o banco Firestore padrao. Ele usa um banco nomeado (veja VITE_FIREBASE_DATABASE_ID em src/lib/firebase.ts). Por isso o bloco 'firestore' abaixo e uma LISTA com o campo 'database' preenchido — sem isso, 'firebase deploy --only firestore:rules' publicaria as regras no banco padrao (que esta vazio), deixando o banco real sem as protecoes e sem resolver os erros de permissao.",
+  "firestore": [
+    {
+      "database": "ai-studio-2b3ac47a-8172-426f-a2a5-c848844ff479",
+      "rules": "firestore.rules"
+    }
+  ]
+}
