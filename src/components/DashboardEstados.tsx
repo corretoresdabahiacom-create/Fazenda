@@ -82,10 +82,12 @@ function vazio(): FormularioAdminEstado {
   return { precoId: null, produtoNome: '', icone: '📦', praca: '', preco: '', unidade: 'R$/@', prazoDias: 0, tipoNegocio: 'nao_informado' };
 }
 
-function PainelAdminDoEstado({ estadoNome, itensManuais, abrirComProduto, onFechar }: {
+function PainelAdminDoEstado({ estadoNome, itensManuais, abrirComProduto, emailLogado, emailEhAdmin, onFechar }: {
   estadoNome: string;
   itensManuais: { precoId: string; produtoId: string; produtoNome: string; icone: string; localizacaoId: string; praca: string; preco: number; unidade: string; prazoDias: number; tipoNegocio: string }[];
   abrirComProduto?: any;
+  emailLogado?: string | null;
+  emailEhAdmin?: boolean;
   onFechar: () => void;
 }) {
   const [form, setForm] = useState<FormularioAdminEstado>(vazio());
@@ -177,6 +179,16 @@ function PainelAdminDoEstado({ estadoNome, itensManuais, abrirComProduto, onFech
         <p className="text-xs font-bold text-amber-800 dark:text-amber-300">🔧 Edição (só Admin) — {estadoNome}</p>
         <button onClick={onFechar} className="text-amber-700 dark:text-amber-400"><X size={14} /></button>
       </div>
+
+      {/* Diagnóstico de permissão: mostra com QUAL e-mail o app está
+          logado e se ele bate com a lista de administradores das regras
+          do Firestore. Sem isso, um erro de permissão só aparece depois
+          de preencher o formulário todo, sem dizer o motivo. */}
+      <p className="text-[10px] text-amber-700 dark:text-amber-400 border-t border-amber-300 dark:border-amber-800 pt-1.5">
+        Logado como <strong>{emailLogado || '(sem e-mail)'}</strong> — {emailEhAdmin
+          ? 'autorizado a salvar ✅'
+          : 'NÃO está na lista de administradores das regras do Firestore, então o salvamento será recusado ❌'}
+      </p>
 
       {itensManuais.length > 0 && (
         <div className="space-y-1">
@@ -439,6 +451,8 @@ function CardEstado({ estado }: CardEstadoProps) {
               estadoNome={estado.nome}
               itensManuais={itensManuaisDetalhados}
               abrirComProduto={produtoParaEditar}
+              emailLogado={user?.email}
+              emailEhAdmin={isAdmin}
               onFechar={() => { setMostrarAdmin(false); setProdutoParaEditar(null); }}
             />
           )}
@@ -486,11 +500,28 @@ function CardEstado({ estado }: CardEstadoProps) {
 }
 
 export default function DashboardEstados() {
+  // DIAGNÓSTICO TEMPORÁRIO DE PERMISSÃO — a lista de administradores
+  // fica em DOIS lugares que precisam bater exatamente: aqui no app e
+  // em firestore.rules (função isBootstrapAdminEmail). Se o e-mail
+  // logado não estiver nos dois, o salvamento é recusado pelo servidor
+  // com "Missing or insufficient permissions". Esta linha mostra qual
+  // e-mail o app está usando de verdade, pra não precisar adivinhar.
+  // Pode ser removida depois que a permissão estiver confirmada.
+  const { user } = useFirebase();
+  const EMAILS_ADMIN = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
+  const emailLogado = user?.email || null;
+  const ehAdmin = !!emailLogado && EMAILS_ADMIN.includes(emailLogado.toLowerCase());
+
   return (
     <div className="space-y-2">
       <h2 className="text-sm font-bold text-theme-primary">🗺️ Cotações por Estado</h2>
       <p className="text-[10px] text-theme-secondary">
         Clique num estado pra ver os produtos com dado real disponível. Clique num produto pra ver o preço por praça, região ou cidade. Estados sem nenhum produto real aparecem como "sem dado disponível" — nunca inventamos um número. Administradores veem um botão "Admin" pra cadastrar preço direto em qualquer estado.
+      </p>
+      <p className={`text-[10px] rounded-lg px-2 py-1 ${ehAdmin ? 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-950/30' : 'text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30'}`}>
+        Sessão: <strong>{emailLogado || '(sem e-mail)'}</strong> — {ehAdmin
+          ? 'na lista de administradores, pode cadastrar preços.'
+          : 'fora da lista de administradores das regras do Firestore. O botão "Admin" não aparece e o salvamento seria recusado pelo servidor.'}
       </p>
       <div className="space-y-2">
         {ESTADOS_UF.map(estado => (
