@@ -16,7 +16,7 @@ import {
   PieChart,
   Pie
 } from 'recharts';
-import { TrendingUp, Users, Beef, AlertCircle, MapPin, CloudSun, Scan, Clock, ChevronRight as ChevronRightIcon, Coins, Scale, Sparkles, RefreshCw } from 'lucide-react';
+import { TrendingUp, Users, Beef, AlertCircle, MapPin, CloudSun, Scan, Clock, ChevronRight as ChevronRightIcon, Coins, Scale } from 'lucide-react';
 import { EmployeePayment, Expense, Animal, FarmTask, ExpenseType, FarmSettings, WeighingSheet, InventoryItem, AccountPayable, AccountReceivable, Talhao, IndividualAnimal, Machine, FarmDocument, Property } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -188,47 +188,6 @@ export default function Dashboard({
     return Object.entries(data).map(([name, values]) => ({ name, ...values }));
   }, [expenses, payments]);
 
-  // Intelligent Suggestion State
-  const [suggestion, setSuggestion] = useState<{
-    title: string;
-    advice: string;
-    priority: 'High' | 'Medium' | 'Low';
-    category: string;
-  } | null>(() => {
-    const cached = localStorage.getItem('gestao_fazenda_ai_suggestion');
-    return cached ? JSON.parse(cached) : null;
-  });
-  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
-  const [suggestionError, setSuggestionError] = useState<string | null>(null);
-
-  const fetchAISuggestion = useCallback(async (force = false) => {
-    if (!force && suggestion) return;
-    setLoadingSuggestion(true);
-    setSuggestionError(null);
-    try {
-      const response = await fetch('/api/generate-suggestion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inventory, tasks })
-      });
-      if (!response.ok) {
-        throw new Error(`Erro na API (${response.status})`);
-      }
-      const data = await response.json();
-      setSuggestion(data);
-      localStorage.setItem('gestao_fazenda_ai_suggestion', JSON.stringify(data));
-    } catch (err: any) {
-      console.error('Error generating AI technical advice:', err);
-      setSuggestionError(err.message || 'Falha ao conectar ao servidor de IA.');
-    } finally {
-      setLoadingSuggestion(false);
-    }
-  }, [inventory, tasks, suggestion]);
-
-  useEffect(() => {
-    fetchAISuggestion();
-  }, []);
-
   // Custo por Cabeça calculation (Operating cost per animal head)
   const costPerHeadMetrics = useMemo(() => {
     const activeAnimalsCount = animals.filter(a => !a.isSold).reduce((sum, a) => sum + (a.quantity || 0), 0);
@@ -371,86 +330,6 @@ export default function Dashboard({
             <div className="text-sm font-bold text-primary">{new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}</div>
           </div>
         </button>
-      </div>
-
-      {/* Sugestão Inteligente (AI Technical Advice) Card */}
-      <div className="bg-theme-secondary rounded-3xl border border-theme p-4 sm:p-6 shadow-theme relative overflow-hidden transition-all">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-10" />
-        
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className={`p-3.5 rounded-2xl shrink-0 ${
-              suggestion?.priority === 'High' ? 'bg-red-50 dark:bg-red-950/30 text-red-600' :
-              suggestion?.priority === 'Medium' ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600' :
-              'bg-primary/10 text-primary'
-            }`}>
-              {loadingSuggestion ? (
-                <RefreshCw size={24} className="animate-spin text-primary" />
-              ) : (
-                <Sparkles size={24} className="animate-pulse" />
-              )}
-            </div>
-            
-            <div className="space-y-1.5 flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] tracking-wider uppercase font-black px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-                  Sugestão Inteligente
-                </span>
-                {suggestion && (
-                  <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${
-                    suggestion.priority === 'High' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' :
-                    suggestion.priority === 'Medium' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300' :
-                    'bg-[var(--primary)]/10 text-theme-primary'
-                  }`}>
-                    Prioridade {suggestion.priority === 'High' ? 'Alta' : suggestion.priority === 'Medium' ? 'Média' : 'Baixa'}
-                  </span>
-                )}
-                {suggestion?.category && (
-                  <span className="text-[9px] uppercase bg-theme-secondary text-theme-primary px-2 py-0.5 rounded-full font-semibold">
-                    {suggestion.category}
-                  </span>
-                )}
-              </div>
-              
-              {loadingSuggestion ? (
-                <div className="space-y-2 py-1">
-                  <div className="h-4 bg-theme-secondary rounded-md w-1/3 animate-pulse" />
-                  <div className="h-3 bg-theme-secondary rounded-md w-full animate-pulse" />
-                  <div className="h-3 bg-theme-secondary rounded-md w-3/4 animate-pulse" />
-                </div>
-              ) : suggestionError ? (
-                <div>
-                  <h4 className="font-bold text-theme-primary text-sm">Não foi possível carregar o conselho</h4>
-                  <p className="text-xs text-theme-secondary mt-1">Conecte-se à internet ou certifique-se de que a API está ativa. {suggestionError}</p>
-                </div>
-              ) : suggestion ? (
-                <div>
-                  <h4 className="font-bold text-theme-primary text-base leading-tight">
-                    {suggestion.title}
-                  </h4>
-                  <p className="text-xs text-theme-secondary mt-2 leading-relaxed whitespace-pre-line">
-                    {suggestion.advice}
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <h4 className="font-bold text-theme-primary text-sm font-sans">Conselho diário ainda não gerado</h4>
-                  <p className="text-xs text-theme-secondary mt-1">Clique em 'Gerar Conselho' para analisar o estoque e obter sugestões.</p>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <button
-            onClick={() => fetchAISuggestion(true)}
-            disabled={loadingSuggestion}
-            className="btn-primary text-xs shrink-0 self-start md:self-auto"
-            id="btn-refresh-suggestion"
-          >
-            <RefreshCw size={12} className={loadingSuggestion ? 'animate-spin' : ''} />
-            {loadingSuggestion ? 'Gerando...' : 'Atualizar Conselho'}
-          </button>
-        </div>
       </div>
 
       {/* AI Quick Actions */}

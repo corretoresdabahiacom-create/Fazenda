@@ -41,8 +41,35 @@ export interface ResultadoIpea {
   pontos: PontoHistoricoIpea[];
   serie: SerieDescoberta | null;
   aviso?: string;
+  /** Estado a que a série se refere, quando o nome dela indica um (ex: "... - PR"). */
+  ufDaSerie?: string | null;
   diagnostico: string[];
 }
+
+// PROBLEMA REAL ENCONTRADO EM PRODUÇÃO: a série de boi gordo que o
+// catálogo devolve é "Preço médio - recebido pelo agricultor - boi
+// gordo - arroba - PR" (Paraná, fonte Seab-PR). Não existe série
+// nacional equivalente no catálogo. Mostrar preço do Paraná pra quem
+// consultou a Bahia, sem avisar, seria enganoso — então detectamos a
+// UF no nome e deixamos isso explícito pra quem chama.
+const UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+
+function detectarUfDaSerie(nomeSerie: string): string | null {
+  // O padrão do catálogo é terminar com " - XX" quando a série é de um
+  // estado específico.
+  const m = (nomeSerie || '').trim().match(/-\s*([A-Z]{2})\s*$/);
+  if (m && UFS.includes(m[1])) return m[1];
+  return null;
+}
+
+const UF_PARA_NOME: Record<string, string> = {
+  AC: 'Acre', AL: 'Alagoas', AP: 'Amapá', AM: 'Amazonas', BA: 'Bahia', CE: 'Ceará',
+  DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão',
+  MT: 'Mato Grosso', MS: 'Mato Grosso do Sul', MG: 'Minas Gerais', PA: 'Pará',
+  PB: 'Paraíba', PR: 'Paraná', PE: 'Pernambuco', PI: 'Piauí', RJ: 'Rio de Janeiro',
+  RN: 'Rio Grande do Norte', RS: 'Rio Grande do Sul', RO: 'Rondônia', RR: 'Roraima',
+  SC: 'Santa Catarina', SP: 'São Paulo', SE: 'Sergipe', TO: 'Tocantins',
+};
 
 const TERMOS_BUSCA: Record<string, string[]> = {
   boi_gordo: ['boi', 'bovino'],
@@ -176,7 +203,7 @@ async function descobrirSerie(produto: string, diagnostico: string[]): Promise<S
   return null;
 }
 
-export async function buscarHistoricoIpea(produto: string, dataInicio: string, dataFim: string): Promise<ResultadoIpea> {
+export async function buscarHistoricoIpea(produto: string, dataInicio: string, dataFim: string, estadoPedido?: string): Promise<ResultadoIpea> {
   const diagnostico: string[] = [];
 
   const serie = await descobrirSerie(produto, diagnostico);
@@ -225,5 +252,17 @@ export async function buscarHistoricoIpea(produto: string, dataInicio: string, d
     };
   }
 
-  return { pontos, serie, diagnostico };
+  const ufDaSerie = detectarUfDaSerie(serie.nome);
+  let avisoDivergencia: string | undefined;
+  if (ufDaSerie) {
+    const nomeUf = UF_PARA_NOME[ufDaSerie] || ufDaSerie;
+    diagnostico.push(`Série é específica de ${nomeUf} (${ufDaSerie}).`);
+    if (estadoPedido && estadoPedido !== nomeUf) {
+      avisoDivergencia = `Atenção: a única série histórica pública encontrada pra esse produto é de ${nomeUf}, não de ${estadoPedido}. Serve como referência de tendência do mercado, mas o preço local pode ser diferente.`;
+    } else if (!estadoPedido) {
+      avisoDivergencia = `A série histórica usada é de ${nomeUf} — é a referência pública disponível pra esse produto.`;
+    }
+  }
+
+  return { pontos, serie, diagnostico, ufDaSerie, aviso: avisoDivergencia };
 }

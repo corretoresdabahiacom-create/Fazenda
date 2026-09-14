@@ -390,7 +390,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       dataInicio <= fimParteJaPassada ? buscarChuvaInmet(local.lat, local.lon, dataInicio, fimParteJaPassada) : Promise.resolve({ porDia: {}, estacaoUsada: null }),
       buscarHistoricoPreco(context.env, produto, estado),
       buscarPrecoAtualEFuturo(url.origin, produto, estado),
-      buscarHistoricoIpea(produto, dataInicio, dataFim),
+      buscarHistoricoIpea(produto, dataInicio, dataFim, estado),
     ]);
 
     // Funde as duas fontes de clima: INMET (estação real) tem
@@ -492,6 +492,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       fonteClima: fonteClimaUsada,
       fontePreco: fontePrecoUsada,
       avisoIpea: historicoIpea.aviso,
+      ufDaSerieHistorica: historicoIpea.ufDaSerie || null,
       granularidade: agruparPorMes ? 'mes' : 'dia',
       pontos,
       avisoPreco: totalComPreco === 0

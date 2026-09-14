@@ -10,7 +10,7 @@ import HistoricoPrecoPessoal from './HistoricoPrecoPessoal';
 
 interface ChartPoint { label: string; data: string; chuvaMm: number | null; preco: number | null }
 interface ChartResponse {
-  local: string; granularidade: 'mes' | 'dia'; pontos: ChartPoint[]; avisoPreco?: string; error?: string; fonteClima?: string; fontePreco?: string;
+  local: string; granularidade: 'mes' | 'dia'; pontos: ChartPoint[]; avisoPreco?: string; error?: string; fonteClima?: string; fontePreco?: string; avisoIpea?: string;
 }
 
 interface Props {
@@ -92,6 +92,12 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
       <p className="text-xs font-bold text-theme-primary mb-1">{titulo}</p>
       <p className="text-[10px] text-theme-secondary mb-1">{dados.local} · {dados.granularidade === 'mes' ? 'por mês' : 'por dia'} · clima via {dados.fonteClima || 'Open-Meteo'}</p>
       {dados.fontePreco && <p className="text-[10px] text-theme-secondary mb-3">Preço via {dados.fontePreco}</p>}
+      {dados.avisoIpea && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-2 mb-2 flex items-start gap-2">
+          <AlertTriangle size={12} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-[10px] text-amber-800 dark:text-amber-200">{dados.avisoIpea}</p>
+        </div>
+      )}
       {dados.avisoPreco && (
         <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-2 mb-3 flex items-start gap-2">
           <AlertTriangle size={12} className="text-amber-600 shrink-0 mt-0.5" />
