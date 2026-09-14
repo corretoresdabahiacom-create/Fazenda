@@ -29,7 +29,7 @@ export default function Maquinas(props: Props) {
         <p className="text-sm text-theme-secondary">Tratores, colheitadeiras, pulverizadores, caminhões — cadastro e manutenção.</p>
       </div>
 
-      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         <button onClick={() => setTab('cadastro')} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap ${tab === 'cadastro' ? 'bg-theme-card text-[var(--primary)] shadow-sm' : 'text-theme-secondary'}`}>
           <Tractor size={14} /> Cadastro
         </button>

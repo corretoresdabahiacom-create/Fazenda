@@ -69,7 +69,7 @@ export default function ConsultorRuralIA({
         }
       }
 
-      const result = await answerRuralQuestion(q, {
+      const contextoFazenda = {
         weather,
         accountsPayable,
         accountsReceivable,
@@ -82,9 +82,45 @@ export default function ConsultorRuralIA({
         machines,
         maintenanceRecords,
         inventory,
-      });
+      };
 
-      setMessages(prev => [...prev, { role: 'assistant', text: result.answer, basedOnRealData: result.basedOnRealData }]);
+      // FUNCIONALIDADE QUE ESTAVA DESCONECTADA: o endpoint
+      // /api/consultor-rural (IA de verdade, cruzando os dados reais da
+      // fazenda) existia pronto no projeto mas NUNCA era chamado — a
+      // tela usava só a lógica local de palavras-chave, que responde
+      // apenas os tópicos pré-programados. Agora a IA é o caminho
+      // principal; a lógica local vira reserva pra quando não houver
+      // chave de IA configurada, a chamada falhar, ou a resposta vier
+      // vazia. Assim nada quebra se a IA estiver fora do ar.
+      let respostaIA: string | null = null;
+      try {
+        const res = await fetch('/api/consultor-rural', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: q, context: contextoFazenda }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const texto = String(json?.answer || '').trim();
+          // O endpoint devolve HTTP 200 com um texto genérico de reserva
+          // ("Não consegui processar...") quando a IA falha ou não há
+          // chave configurada. Se aceitássemos isso como resposta
+          // válida, a lógica local (que resolve vários tópicos bem)
+          // nunca seria usada — o produtor receberia uma mensagem
+          // inútil no lugar de uma resposta de verdade.
+          const ehRespostaGenerica = /não consegui processar sua pergunta agora/i.test(texto);
+          if (texto && !ehRespostaGenerica) respostaIA = texto;
+        }
+      } catch {
+        // IA indisponível — segue pro caminho local, sem alarde.
+      }
+
+      if (respostaIA) {
+        setMessages(prev => [...prev, { role: 'assistant', text: respostaIA, basedOnRealData: true }]);
+      } else {
+        const result = await answerRuralQuestion(q, contextoFazenda);
+        setMessages(prev => [...prev, { role: 'assistant', text: result.answer, basedOnRealData: result.basedOnRealData }]);
+      }
     } finally {
       setLoading(false);
     }

@@ -46,7 +46,7 @@ export default function RHRural(props: Props) {
         <p className="text-sm text-theme-secondary">Equipes, escalas, treinamentos, EPIs e certificações. (Pagamentos continuam na tela "Funcionários".)</p>
       </div>
 
-      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         {TABS.map((t) => (
           <button
             key={t.id}

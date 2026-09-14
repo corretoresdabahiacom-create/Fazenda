@@ -469,7 +469,7 @@ export default function CotacoesManuais() {
         </p>
       </div>
 
-      <div className="flex gap-2 border-b border-theme bg-theme-card text-theme-primary">
+      <div className="flex gap-2 border-b border-theme bg-theme-card text-theme-primary overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         {[
           { id: 'precos' as const, label: `Preços (${precos.length})` },
           { id: 'produtos' as const, label: `Produtos (${produtos.length})` },

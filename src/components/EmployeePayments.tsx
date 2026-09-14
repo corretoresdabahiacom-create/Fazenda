@@ -193,7 +193,7 @@ export default function EmployeePayments({ payments, onAdd, onDelete }: Props) {
   return (
     <div className="space-y-6 legacy-light">
       {/* Tab Selectors */}
-      <div className="flex border-b border-theme gap-4 bg-theme-card text-theme-primary">
+      <div className="flex border-b border-theme gap-4 bg-theme-card text-theme-primary overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         <button 
           onClick={() => { setActiveTab('colaboradores'); setSearchTerm(''); }}
           className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'colaboradores' ? 'text-theme-primary' : 'text-theme-secondary hover:text-theme-primary'}`}

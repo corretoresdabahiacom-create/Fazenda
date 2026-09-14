@@ -259,3 +259,15 @@ html {
     padding-top: max(1rem, env(safe-area-inset-top));
   }
 }
+/* Esconde a barra de rolagem horizontal mantendo a rolagem funcional.
+   Usada nas barras de abas: no celular elas rolam de lado, mas uma
+   barra de rolagem visível ficaria feia sobre os botões.
+   ATENÇÃO: essa classe era usada em Animals.tsx mas nunca tinha sido
+   definida — não fazia efeito nenhum. */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Edge/IE */
+  scrollbar-width: none;      /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;              /* Chrome/Safari */
+}

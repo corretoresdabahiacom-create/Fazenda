@@ -64,7 +64,7 @@ export default function PecuariaProfissional(props: Props) {
         <p className="text-sm text-theme-secondary">Cadastro individual, reprodução, sanidade e produção leiteira.</p>
       </div>
 
-      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         {TABS.map((t) => (
           <button
             key={t.id}

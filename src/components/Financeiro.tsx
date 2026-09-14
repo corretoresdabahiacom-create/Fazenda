@@ -48,7 +48,7 @@ export default function Financeiro(props: Props) {
         <p className="text-sm text-theme-secondary">Contas a pagar, contas a receber, centros de custo e fluxo de caixa.</p>
       </div>
 
-      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         {TABS.map((t) => (
           <button
             key={t.id}

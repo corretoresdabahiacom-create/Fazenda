@@ -369,7 +369,7 @@ export default function WeighingWorksheet() {
   return (
     <div className="space-y-6 legacy-light">
       {/* View Selector Headers */}
-      <div className="flex border-b border-theme gap-4 mb-4 bg-theme-card text-theme-primary">
+      <div className="flex border-b border-theme gap-4 mb-4 bg-theme-card text-theme-primary overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         <button 
           onClick={() => setActiveTab('sheets')}
           className={`pb-3 font-semibold text-sm transition-all relative ${

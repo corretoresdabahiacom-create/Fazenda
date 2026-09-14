@@ -94,7 +94,7 @@ export default function AdminPanel({ adminEmail }: { adminEmail: string }) {
         <p className="text-[11px] text-theme-secondary">Logado como {adminEmail} — visível só para administradores do sistema.</p>
       </div>
 
-      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 bg-theme-secondary p-1 rounded-xl overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         {TABS.map((t) => (
           <button
             key={t.id}

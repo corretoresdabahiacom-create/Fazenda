@@ -167,7 +167,7 @@ export default function Expenses({ expenses, onAdd, onDelete }: Props) {
   return (
     <div className="space-y-6 legacy-light">
       {/* Tabs */}
-      <div className="flex border-b border-theme gap-4 bg-theme-card text-theme-primary">
+      <div className="flex border-b border-theme gap-4 bg-theme-card text-theme-primary overflow-x-auto scrollbar-hide [&>*]:shrink-0">
         <button 
           onClick={() => { setActiveTab('variaveis'); setSearchTerm(''); }}
           className={`pb-3 font-bold text-sm transition-all relative ${activeTab === 'variaveis' ? 'text-theme-primary' : 'text-theme-secondary hover:text-theme-primary'}`}
