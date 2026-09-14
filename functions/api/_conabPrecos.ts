@@ -310,3 +310,116 @@ export async function buscarHistoricoConab(
 
   return { pontos, urlUsada: arquivo.url, produtoEncontrado, unidade, diagnostico };
 }
+
+
+// ---------------------------------------------------------------------
+// COBERTURA POR ESTADO — responde "quais estados a CONAB cobre para
+// este produto?". Serve pra saber, sem adivinhar, onde o gráfico vai
+// usar dado do estado certo e onde vai cair na fonte de reserva
+// (IPEADATA/Paraná) com aviso.
+// ---------------------------------------------------------------------
+
+export interface CoberturaUf {
+  uf: string;
+  estado: string;
+  pontos: number;
+  primeiroMes: string;
+  ultimoMes: string;
+  precoMaisRecente: number;
+}
+
+export interface ResultadoCobertura {
+  produtoBuscado: string;
+  nomeNoArquivo: string | null;
+  totalLinhas: number;
+  estadosCobertos: CoberturaUf[];
+  estadosSemDados: string[];
+  diagnostico: string[];
+}
+
+const NOME_POR_UF: Record<string, string> = Object.fromEntries(
+  Object.entries(UF_POR_NOME).map(([nome, uf]) => [uf, nome])
+);
+
+export async function coberturaPorEstado(produto: string): Promise<ResultadoCobertura> {
+  const diagnostico: string[] = [];
+  const termoProduto = TERMOS_PRODUTO[produto];
+
+  if (!termoProduto) {
+    return { produtoBuscado: produto, nomeNoArquivo: null, totalLinhas: 0, estadosCobertos: [], estadosSemDados: [], diagnostico: [`Produto "${produto}" não mapeado.`] };
+  }
+
+  const arquivo = await baixarArquivo(diagnostico);
+  if (!arquivo) {
+    return { produtoBuscado: produto, nomeNoArquivo: null, totalLinhas: 0, estadosCobertos: [], estadosSemDados: [], diagnostico };
+  }
+
+  const linhas = arquivo.texto.split(/\r?\n/).filter(l => l.trim());
+  const sep = detectarSeparador(linhas[0]);
+  const cabecalho = linhas[0].split(sep).map(h => h.trim().toLowerCase());
+  const acharColuna = (...termos: string[]) => cabecalho.findIndex(h => termos.some(t => h.includes(t)));
+
+  const colProduto = acharColuna('produto');
+  const colUf = acharColuna('uf', 'estado', 'sigla');
+  const colValor = acharColuna('preço', 'preco', 'valor');
+  const colAno = acharColuna('ano');
+  const colMes = acharColuna('mês', 'mes');
+
+  if (colProduto < 0 || colUf < 0 || colValor < 0 || colAno < 0 || colMes < 0) {
+    diagnostico.push('Não encontrei todas as colunas necessárias no cabeçalho.');
+    return { produtoBuscado: produto, nomeNoArquivo: null, totalLinhas: 0, estadosCobertos: [], estadosSemDados: [], diagnostico };
+  }
+
+  const porUf = new Map<string, { meses: string[]; ultimoValor: number; ultimoMes: string }>();
+  let nomeNoArquivo: string | null = null;
+  let totalLinhas = 0;
+
+  for (let i = 1; i < linhas.length; i++) {
+    const campos = linhas[i].split(sep);
+    if (campos.length <= Math.max(colProduto, colUf, colValor, colAno, colMes)) continue;
+
+    const nome = (campos[colProduto] || '').trim();
+    if (!termoProduto.test(nome)) continue;
+    totalLinhas++;
+    if (!nomeNoArquivo) nomeNoArquivo = nome;
+
+    const uf = (campos[colUf] || '').trim().toUpperCase();
+    if (!uf) continue;
+
+    const ano = (campos[colAno] || '').trim();
+    const mesBruto = (campos[colMes] || '').trim();
+    const mes = /^\d+$/.test(mesBruto) ? String(Number(mesBruto)).padStart(2, '0') : '';
+    if (!/^\d{4}$/.test(ano) || !mes) continue;
+    const anoMes = `${ano}-${mes}`;
+
+    const bruto = normalizarNumero(campos[colValor]);
+    if (isNaN(bruto) || bruto <= 0) continue;
+    const preco = PRODUTOS_EM_ARROBA.has(produto) ? bruto * KG_POR_ARROBA : bruto;
+
+    if (!porUf.has(uf)) porUf.set(uf, { meses: [], ultimoValor: preco, ultimoMes: anoMes });
+    const reg = porUf.get(uf)!;
+    reg.meses.push(anoMes);
+    if (anoMes > reg.ultimoMes) { reg.ultimoMes = anoMes; reg.ultimoValor = preco; }
+  }
+
+  const estadosCobertos: CoberturaUf[] = Array.from(porUf.entries())
+    .map(([uf, reg]) => {
+      const ordenados = reg.meses.slice().sort();
+      return {
+        uf,
+        estado: NOME_POR_UF[uf] || uf,
+        pontos: reg.meses.length,
+        primeiroMes: ordenados[0],
+        ultimoMes: ordenados[ordenados.length - 1],
+        precoMaisRecente: Number(reg.ultimoValor.toFixed(2)),
+      };
+    })
+    .sort((a, b) => a.estado.localeCompare(b.estado));
+
+  const cobertos = new Set(estadosCobertos.map(e => e.estado));
+  const estadosSemDados = Object.keys(UF_POR_NOME).filter(nome => !cobertos.has(nome)).sort();
+
+  diagnostico.push(`Produto "${nomeNoArquivo}": ${totalLinhas} linhas, ${estadosCobertos.length} estado(s) com dado.`);
+
+  return { produtoBuscado: produto, nomeNoArquivo, totalLinhas, estadosCobertos, estadosSemDados, diagnostico };
+}
