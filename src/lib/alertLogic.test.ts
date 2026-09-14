@@ -117,3 +117,26 @@ describe('detectDivergence — não confunde à vista com futuro (bug real repor
     expect(result.hasDivergence).toBe(true);
   });
 });
+
+describe('detectDivergence — não confunde diferença REGIONAL com erro de dado', () => {
+  it('preço nacional vs preço de estado não deve ser tratado como divergência de fonte', () => {
+    // Cenário real: indicador nacional Cepea (apurado em SP) vs preço
+    // físico da Bahia. Uma diferença de ~5% entre praças é NORMAL no
+    // mercado de boi — não é erro de dado. Quem monta a lista deve
+    // filtrar por escopo ANTES de comparar; este teste documenta o
+    // motivo, comparando só o que é do mesmo estado.
+    const soDaBahia = [
+      { source: 'Datagro', price: 334.17, currency: 'BRL' as const, priceType: 'indicador' },
+    ];
+    // Uma fonte só = nada pra comparar = nenhum alerta falso.
+    expect(detectDivergence(soDaBahia).hasDivergence).toBe(false);
+  });
+
+  it('duas fontes do MESMO escopo com diferença grande continuam gerando alerta', () => {
+    const mesmaPraca = [
+      { source: 'Fonte A', price: 334.17, currency: 'BRL' as const, priceType: 'indicador' },
+      { source: 'Fonte B', price: 180.00, currency: 'BRL' as const, priceType: 'indicador' },
+    ];
+    expect(detectDivergence(mesmaPraca).hasDivergence).toBe(true);
+  });
+});

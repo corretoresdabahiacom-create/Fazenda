@@ -537,8 +537,17 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
   // Deriva o que os alertas precisam a partir do que JÁ foi buscado —
   // antes havia uma segunda chamada de API só pra isso, redundante com
   // locaisDisponiveis (que já tem tudo, sem filtro de estado).
+  // MESMO PADRÃO DE BUG ENCONTRADO NA TABELA DO ESTADO, CORRIGIDO AQUI
+  // TAMBÉM: antes isso incluía as cotações SEM estado (indicador
+  // nacional Cepea/ESALQ, futuro B3) junto com as do estado escolhido.
+  // O alerta de "divergência entre fontes" então comparava o indicador
+  // nacional de São Paulo (~R$349) com o preço da Bahia (~R$334) e
+  // acusava divergência — quando na verdade é diferença regional
+  // NORMAL de mercado, não erro de dado. Alerta falso corrói a
+  // confiança em todos os outros alertas. Agora, com estado escolhido,
+  // só compara cotações daquele mesmo estado.
   const quotesResponse = {
-    quotes: estado ? locaisDisponiveis.filter(q => q.state === estado || !q.state) : locaisDisponiveis,
+    quotes: estado ? locaisDisponiveis.filter(q => q.state === estado) : locaisDisponiveis,
     semCotacaoDisponivel: 0, // já filtrado no backend antes de chegar aqui — nenhuma linha sem preço passa
   };
 
