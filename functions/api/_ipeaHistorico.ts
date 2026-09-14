@@ -32,6 +32,7 @@ export interface SerieDescoberta {
   unidade: string;
   fonte: string;
   periodicidade: string;
+  base: string; // "Macroeconômico" | "Regional" | "Social"
 }
 
 export interface PontoHistoricoIpea { data: string; preco: number }
@@ -96,6 +97,27 @@ async function buscarJson(caminho: string, diagnostico: string[]): Promise<any |
   return null;
 }
 
+// DESCOBERTA VIA CAMINHO SIMPLES — o diagnóstico em produção provou
+// que QUALQUER consulta com parâmetro OData ($filter, $select) é
+// recusada por esse servidor (HTTP 400/500), mas o caminho puro
+// /Metadados responde normalmente. Então paramos de brigar com o
+// $filter: baixamos o catálogo uma vez, filtramos aqui no código, e
+// guardamos em cache no módulo (a lista de séries muda raramente, e o
+// cache evita repetir o download pesado a cada consulta).
+let cacheCatalogo: any[] | null = null;
+
+async function carregarCatalogo(diagnostico: string[]): Promise<any[]> {
+  if (cacheCatalogo) {
+    diagnostico.push(`Catálogo já em cache (${cacheCatalogo.length} séries).`);
+    return cacheCatalogo;
+  }
+  const json = await buscarJson('/Metadados', diagnostico);
+  const lista: any[] = json?.value || [];
+  diagnostico.push(`Catálogo baixado: ${lista.length} séries.`);
+  if (lista.length > 0) cacheCatalogo = lista;
+  return lista;
+}
+
 async function descobrirSerie(produto: string, diagnostico: string[]): Promise<SerieDescoberta | null> {
   const termos = TERMOS_BUSCA[produto];
   if (!termos) {
@@ -103,53 +125,40 @@ async function descobrirSerie(produto: string, diagnostico: string[]): Promise<S
     return null;
   }
 
+  const catalogo = await carregarCatalogo(diagnostico);
+  if (catalogo.length === 0) {
+    diagnostico.push('Não foi possível baixar o catálogo do IPEADATA.');
+    return null;
+  }
+
   for (const termo of termos) {
-    // CAUSA DO HTTP 400 IDENTIFICADA PELO DIAGNÓSTICO: a v2 usava
-    // encodeURIComponent no filtro inteiro, o que transforma a vírgula
-    // de contains(SERNOME,'boi') em %2C — e o servidor OData do
-    // IPEADATA rejeita a consulta com 400. Vírgula e parênteses são
-    // caracteres LEGAIS numa query string, então a forma certa é
-    // montar a URL crua. Tentamos as duas formas, na ordem, e também
-    // uma terceira via $select (payload pequeno, filtro feito aqui no
-    // código) — se qualquer uma responder, seguimos com ela.
-    const tentativas = [
-      { nome: 'filtro cru', caminho: `/Metadados?$filter=contains(SERNOME,'${termo}')` },
-      { nome: 'filtro codificado', caminho: `/Metadados?$filter=${encodeURIComponent(`contains(SERNOME,'${termo}')`)}` },
-      { nome: 'catálogo enxuto (filtro no código)', caminho: `/Metadados?$select=SERCODIGO,SERNOME,UNINOME,PERNOME,FNTSIGLA,SERSTATUS` },
-    ];
-
-    let json: any = null;
-    for (const t of tentativas) {
-      diagnostico.push(`Tentando estratégia "${t.nome}" para o termo "${termo}"...`);
-      json = await buscarJson(t.caminho, diagnostico);
-      if (json?.value?.length > 0) {
-        diagnostico.push(`  -> estratégia "${t.nome}" funcionou.`);
-        break;
-      }
-      json = null;
-    }
-
-    const candidatas: any[] = json?.value || [];
-    diagnostico.push(`Termo "${termo}": ${candidatas.length} séries retornadas pelo catálogo.`);
-    if (candidatas.length === 0) continue;
-
-    // Filtra no próprio código — não confia no servidor ter aplicado
-    // nada. Se o filtro do servidor foi ignorado (já vimos isso
-    // acontecer), esse passo salva a operação.
-    const doTermo = candidatas.filter(c => (c.SERNOME || '').toLowerCase().includes(termo.toLowerCase()));
+    const doTermo = catalogo.filter(c => (c.SERNOME || '').toLowerCase().includes(termo.toLowerCase()));
     const naoProibidas = doTermo.filter(c => !ehSerieProibida(c.SERNOME));
     const comIndicioPreco = naoProibidas.filter(c => ehIndicioDePreco(c.SERNOME, c.UNINOME));
     const ativas = comIndicioPreco.filter(c => !c.SERSTATUS || c.SERSTATUS === 'A');
 
-    diagnostico.push(`  -> ${doTermo.length} contêm o termo, ${naoProibidas.length} não são produção/área, ${comIndicioPreco.length} indicam preço, ${ativas.length} ativas.`);
+    diagnostico.push(`Termo "${termo}": ${doTermo.length} contêm o termo, ${naoProibidas.length} não são produção/área, ${comIndicioPreco.length} indicam preço, ${ativas.length} ativas.`);
 
     const pool = ativas.length > 0 ? ativas : comIndicioPreco;
     if (pool.length === 0) continue;
 
-    // Ordem de preferência: mensal > qualquer; CEPEA > outras fontes.
+    // Mostra as primeiras candidatas no diagnóstico — se a escolha
+    // sair errada, dá pra ver o que mais havia disponível.
+    diagnostico.push(`  candidatas: ${pool.slice(0, 5).map((c: any) => `${c.SERCODIGO} "${c.SERNOME}" (${c.UNINOME || 's/un'})`).join(' | ')}`);
+
     const mensais = pool.filter(c => /mensal/i.test(c.PERNOME || ''));
     const preferenciaPeriodo = mensais.length > 0 ? mensais : pool;
-    const escolhida = preferenciaPeriodo.find(c => /cepea|esalq/i.test(c.FNTSIGLA || '')) || preferenciaPeriodo[0];
+
+    // PREFERÊNCIA POR SÉRIE MACROECONÔMICA — a documentação oficial
+    // explica que séries Regionais/Sociais têm um valor POR TERRITÓRIO
+    // (cada município, cada estado) na mesma resposta. Pegar tudo junto
+    // misturaria dezenas de lugares diferentes no mesmo gráfico, dando
+    // um número sem sentido. As macroeconômicas têm um valor por data,
+    // que é exatamente o que o gráfico precisa.
+    const macro = preferenciaPeriodo.filter(c => /macro/i.test(c.BASNOME || ''));
+    const preferenciaBase = macro.length > 0 ? macro : preferenciaPeriodo;
+
+    const escolhida = preferenciaBase.find(c => /cepea|esalq/i.test(c.FNTSIGLA || '')) || preferenciaBase[0];
 
     diagnostico.push(`  -> escolhida: ${escolhida.SERCODIGO} "${escolhida.SERNOME}" (${escolhida.UNINOME || 's/unidade'}, ${escolhida.PERNOME || 's/periodicidade'}, ${escolhida.FNTSIGLA || 's/fonte'})`);
 
@@ -159,6 +168,7 @@ async function descobrirSerie(produto: string, diagnostico: string[]): Promise<S
       unidade: escolhida.UNINOME || '',
       fonte: escolhida.FNTSIGLA || 'IPEADATA',
       periodicidade: escolhida.PERNOME || '',
+      base: escolhida.BASNOME || '',
     };
   }
 
@@ -187,7 +197,15 @@ export async function buscarHistoricoIpea(produto: string, dataInicio: string, d
   let invalidos = 0;
   let primeira = '', ultima = '';
 
+  let descartadosPorTerritorio = 0;
   for (const v of valores) {
+    // Série regional/social traz um valor por território. Só aceitamos
+    // o agregado nacional (NIVNOME vazio nas macroeconômicas, ou
+    // "Brasil" nas regionais) — sem isso, o mesmo mês apareceria
+    // dezenas de vezes, uma por município, e o gráfico viraria ruído.
+    const nivel = String(v.NIVNOME || '').trim();
+    if (nivel !== '' && nivel.toLowerCase() !== 'brasil') { descartadosPorTerritorio++; continue; }
+
     const dataIso = String(v.VALDATA || '').slice(0, 10);
     const preco = Number(v.VALVALOR);
     if (!dataIso || isNaN(preco) || preco <= 0) { invalidos++; continue; }
@@ -198,7 +216,7 @@ export async function buscarHistoricoIpea(produto: string, dataInicio: string, d
   }
 
   pontos.sort((a, b) => a.data.localeCompare(b.data));
-  diagnostico.push(`Cobertura da série: ${primeira || '?'} até ${ultima || '?'}. Pedido: ${dataInicio} a ${dataFim}. Dentro do período: ${pontos.length}; fora: ${foraDoPeriodo}; inválidos: ${invalidos}.`);
+  diagnostico.push(`Cobertura da série: ${primeira || '?'} até ${ultima || '?'}. Pedido: ${dataInicio} a ${dataFim}. Dentro do período: ${pontos.length}; fora: ${foraDoPeriodo}; inválidos: ${invalidos}; descartados por serem de outro território: ${descartadosPorTerritorio}.`);
 
   if (pontos.length === 0) {
     return {
