@@ -41,22 +41,49 @@ export interface ResultadoConab {
 
 // Termos que identificam o produto no arquivo da CONAB. O arquivo tem
 // 130+ produtos, então precisamos casar pelo nome.
+// NOMENCLATURA REAL DA CONAB — descoberta pelo diagnóstico, não
+// chutada. O arquivo usa nomes curtos e em MAIÚSCULAS ("BOI", não "BOI
+// GORDO"), e mistura produtos agrícolas com INSUMOS (adubos como
+// "10-10-10", defensivos como "ABAMECTIN", mão de obra como
+// "ADMINISTRADOR RURAL"). Por isso os padrões abaixo são ANCORADOS
+// (^...$): um padrão frouxo como /boi/ casaria com insumos que
+// contenham essas letras, e plotaríamos preço de adubo como se fosse
+// preço de boi.
 const TERMOS_PRODUTO: Record<string, RegExp> = {
-  boi_gordo: /boi\s*gordo/i,
-  vaca: /vaca\s*gorda/i,
-  novilho: /novilh|garrote/i,
-  novilha: /novilha/i,
-  bezerro: /bezerro/i,
-  bezerra: /bezerra/i,
-  soja: /\bsoja\b/i,
-  milho: /\bmilho\b/i,
-  cafe: /\bcaf[eé]\b/i,
-  algodao: /algod[ãa]o/i,
-  arroz: /\barroz\b/i,
-  feijao: /feij[ãa]o/i,
-  trigo: /\btrigo\b/i,
-  sorgo: /\bsorgo\b/i,
-  leite: /\bleite\b/i,
+  boi_gordo: /^boi$/i,
+  vaca: /^vaca$/i,
+  novilho: /^(novilho|garrote)$/i,
+  novilha: /^novilha$/i,
+  bezerro: /^bezerro$/i,
+  bezerra: /^bezerra$/i,
+  soja: /^soja$/i,
+  milho: /^milho$/i,
+  cafe: /^caf[eé]/i,
+  algodao: /^algodao em pluma$/i,
+  arroz: /^arroz/i,
+  feijao: /^feijao/i,
+  trigo: /^trigo$/i,
+  sorgo: /^sorgo$/i,
+  leite: /^leite$/i,
+  acucar: /^acucar$/i,
+};
+
+// O arquivo dá o preço em R$/KG (coluna "valor_produto_kg"), mas o
+// mercado de bovinos negocia em R$/ARROBA. Sem converter, o gráfico
+// misturaria ~R$23 (histórico) com ~R$350 (preço atual) e ficaria
+// ilegível. 1 arroba = 15 kg — a mesma conversão que a Planilha de
+// Pesagem do app já usa.
+const PRODUTOS_EM_ARROBA = new Set(['boi_gordo', 'vaca', 'novilho', 'novilha']);
+const KG_POR_ARROBA = 15;
+
+// Faixa plausível DEPOIS da conversão. Serve de rede de segurança
+// contra premissa errada de unidade — mesma ideia já usada em
+// _marketQuote.ts.
+const FAIXAS_PLAUSIVEIS: Record<string, [number, number]> = {
+  boi_gordo: [100, 700], vaca: [80, 650], novilho: [80, 650], novilha: [80, 650],
+  soja: [40, 300], milho: [10, 150], cafe: [200, 4000], algodao: [1, 40],
+  arroz: [20, 200], feijao: [1, 30], trigo: [15, 200], sorgo: [10, 120],
+  leite: [0.5, 8], acucar: [0.5, 10],
 };
 
 const UF_POR_NOME: Record<string, string> = {
@@ -194,6 +221,8 @@ export async function buscarHistoricoConab(
   // casa, o diagnóstico só diz "não achei" — sem dizer o que EXISTE,
   // deixando a correção no chute.
   const nomesDistintos = new Set<string>();
+  const amostraBruta: string[] = [];
+  let forasDaFaixa = 0;
   // Busca frouxa: pega a primeira palavra significativa do termo pra
   // achar nomes parecidos (ex: "boi" acha "BOI GORDO VIVO").
   const palavraChave = (produto.split('_')[0] || '').toLowerCase();
@@ -212,7 +241,7 @@ export async function buscarHistoricoConab(
     linhasDaUf++;
 
     if (!produtoEncontrado) produtoEncontrado = nomeProduto;
-    if (!unidade && colUnidade >= 0) unidade = (campos[colUnidade] || '').trim();
+    if (!unidade) unidade = PRODUTOS_EM_ARROBA.has(produto) ? 'R$/@ (convertido de R$/kg)' : 'R$/kg';
 
     // Monta a data a partir de ano+mês ou de uma coluna de data.
     let dataIso: string | null = null;
@@ -235,14 +264,32 @@ export async function buscarHistoricoConab(
     if (!dataIso) continue;
     if (dataIso < dataInicio || dataIso > dataFim) continue;
 
-    const preco = normalizarNumero(campos[colValor]);
-    if (isNaN(preco) || preco <= 0) continue;
+    const precoBruto = normalizarNumero(campos[colValor]);
+    if (isNaN(precoBruto) || precoBruto <= 0) continue;
+
+    if (amostraBruta.length < 3) amostraBruta.push(`${dataIso}: ${precoBruto}`);
+
+    // Converte kg -> arroba nos bovinos. NÃO confio cegamente na
+    // conversão: o arquivo não diz se o peso é vivo ou de carcaça, e
+    // essa diferença daria quase o dobro. Por isso validamos contra a
+    // faixa plausível do produto — se o resultado cair fora, é sinal de
+    // que a premissa está errada, e preferimos descartar a mostrar um
+    // número que parece certo mas não é.
+    const preco = PRODUTOS_EM_ARROBA.has(produto) ? precoBruto * KG_POR_ARROBA : precoBruto;
+    const faixa = FAIXAS_PLAUSIVEIS[produto];
+    if (faixa && (preco < faixa[0] || preco > faixa[1])) {
+      forasDaFaixa++;
+      continue;
+    }
 
     pontos.push({ data: dataIso, preco });
   }
 
   pontos.sort((a, b) => a.data.localeCompare(b.data));
-  diagnostico.push(`Linhas do produto: ${linhasDoProduto}; dessas, na UF ${uf}: ${linhasDaUf}; dentro do período: ${pontos.length}.`);
+  diagnostico.push(`Linhas do produto: ${linhasDoProduto}; dessas, na UF ${uf}: ${linhasDaUf}; dentro do período: ${pontos.length}; descartadas por ficarem fora da faixa plausível após conversão: ${forasDaFaixa}.`);
+  if (amostraBruta.length > 0) {
+    diagnostico.push(`Valores BRUTOS do arquivo (antes de qualquer conversão): ${amostraBruta.join(' | ')}${PRODUTOS_EM_ARROBA.has(produto) ? ` — multiplicados por ${KG_POR_ARROBA} para virar R$/arroba` : ''}.`);
+  }
 
   const todosNomes = Array.from(nomesDistintos).sort();
   const parecidos = palavraChave
