@@ -27,6 +27,8 @@ export const onRequestGet: PagesFunction = async (context) => {
     primeirosPontos: r.pontos.slice(0, 5),
     ultimosPontos: r.pontos.slice(-5),
     aviso: r.aviso,
+    produtosParecidos: r.produtosParecidos,
+    amostraDeProdutosNoArquivo: r.produtosNoArquivo,
     diagnosticoPassoAPasso: r.diagnostico,
   }, null, 2), {
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },

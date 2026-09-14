@@ -32,6 +32,11 @@ export interface ResultadoConab {
   unidade: string | null;
   diagnostico: string[];
   aviso?: string;
+  /** Nomes de produto que existem no arquivo — usado pra descobrir a
+   *  nomenclatura real da CONAB quando a busca não casa. */
+  produtosNoArquivo?: string[];
+  /** Nomes que lembram o produto procurado (busca frouxa). */
+  produtosParecidos?: string[];
 }
 
 // Termos que identificam o produto no arquivo da CONAB. O arquivo tem
@@ -185,12 +190,20 @@ export async function buscarHistoricoConab(
   let unidade: string | null = null;
   let linhasDoProduto = 0;
   let linhasDaUf = 0;
+  // Coleta a nomenclatura real do arquivo. Sem isso, quando a busca não
+  // casa, o diagnóstico só diz "não achei" — sem dizer o que EXISTE,
+  // deixando a correção no chute.
+  const nomesDistintos = new Set<string>();
+  // Busca frouxa: pega a primeira palavra significativa do termo pra
+  // achar nomes parecidos (ex: "boi" acha "BOI GORDO VIVO").
+  const palavraChave = (produto.split('_')[0] || '').toLowerCase();
 
   for (let i = 1; i < linhas.length; i++) {
     const campos = linhas[i].split(sep);
     if (campos.length <= Math.max(colProduto, colUf, colValor)) continue;
 
     const nomeProduto = (campos[colProduto] || '').trim();
+    if (nomeProduto && nomesDistintos.size < 400) nomesDistintos.add(nomeProduto);
     if (!termoProduto.test(nomeProduto)) continue;
     linhasDoProduto++;
 
@@ -231,11 +244,19 @@ export async function buscarHistoricoConab(
   pontos.sort((a, b) => a.data.localeCompare(b.data));
   diagnostico.push(`Linhas do produto: ${linhasDoProduto}; dessas, na UF ${uf}: ${linhasDaUf}; dentro do período: ${pontos.length}.`);
 
+  const todosNomes = Array.from(nomesDistintos).sort();
+  const parecidos = palavraChave
+    ? todosNomes.filter(n => n.toLowerCase().includes(palavraChave))
+    : [];
+  diagnostico.push(`Produtos distintos no arquivo: ${todosNomes.length}. Parecidos com "${palavraChave}": ${parecidos.length}.`);
+
   if (pontos.length === 0) {
     return {
       pontos: [], urlUsada: arquivo.url, produtoEncontrado, unidade, diagnostico,
+      produtosNoArquivo: todosNomes.slice(0, 120),
+      produtosParecidos: parecidos,
       aviso: linhasDoProduto === 0
-        ? `O arquivo da CONAB não tem nenhuma linha do produto procurado.`
+        ? `O arquivo da CONAB não tem produto com esse nome. Veja "produtosParecidos" e "produtosNoArquivo" pra descobrir a nomenclatura usada pela CONAB.`
         : `A CONAB tem o produto, mas nenhum registro em ${estado} dentro do período pedido.`,
     };
   }
