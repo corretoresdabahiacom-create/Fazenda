@@ -13,9 +13,9 @@
 // sigla do estado como substituto honesto, documentado aqui pra não
 // passar a impressão de que existe uma bandeira de verdade sendo usada.
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, Edit3, Plus, X, Save, Trash2 } from 'lucide-react';
-import { collection, onSnapshot, doc, setDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useFirebase } from '../contexts/FirebaseContext';
 import '../styles/bandeirasEstados.css';
@@ -287,14 +287,26 @@ function DetalheProduto({ produtoId, produtoLabel, estado, itensManuaisDoProduto
   itensManuaisDoProduto?: { praca: string; preco: number; unidade: string; criadoEm?: string | null; atualizadoEm?: string | null }[];
 }) {
   const [quotes, setQuotes] = useState<any[]>([]);
+  const [quotesNacionais, setQuotesNacionais] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     fetch(`/api/quotes?product=${produtoId}&state=${encodeURIComponent(estado)}`)
       .then(res => res.json())
-      .then(json => setQuotes(json.quotes || []))
-      .catch(() => setQuotes([]))
+      .then(json => {
+        // RISCO DE ATRIBUIÇÃO CORRIGIDO: antes usávamos "json.quotes",
+        // que junta o preço REGIONAL do estado com referências
+        // NACIONAIS (Cepea/Esalq, futuro B3) e INTERNACIONAIS (Boi no
+        // Mundo). Na tabela da Bahia apareciam linhas como
+        // "11/09/2026 — Cepea/Esalq" e "China — Scot" na coluna
+        // "Praça/Cidade/Região", como se fossem preços baianos. Agora
+        // separamos: o que é do estado fica em cima, e o que é
+        // referência nacional/internacional vem depois, rotulado.
+        setQuotes(json.quotesRegionais || []);
+        setQuotesNacionais(json.quotesNacionais || []);
+      })
+      .catch(() => { setQuotes([]); setQuotesNacionais([]); })
       .finally(() => setLoading(false));
   }, [produtoId, estado]);
 
@@ -313,7 +325,14 @@ function DetalheProduto({ produtoId, produtoLabel, estado, itensManuaisDoProduto
       __manual: true,
     };
   });
-  const todasLinhas = [...linhasManuais, ...quotes];
+  // Nacionais/internacionais entram DEPOIS das regionais e com o
+  // escopo explícito na coluna de local, pra ninguém ler um indicador
+  // nacional como se fosse o preço da praça daquele estado.
+  const linhasNacionais = quotesNacionais.map(q => ({
+    ...q,
+    __escopoAmplo: true,
+  }));
+  const todasLinhas = [...linhasManuais, ...quotes, ...linhasNacionais];
 
   if (loading) return <p className="text-xs text-theme-secondary p-3">Buscando preço real...</p>;
   if (todasLinhas.length === 0) return <p className="text-xs text-theme-secondary p-3 italic">Sem detalhe por praça/cidade disponível pra {produtoLabel} em {estado} no momento.</p>;
@@ -331,7 +350,14 @@ function DetalheProduto({ produtoId, produtoLabel, estado, itensManuaisDoProduto
         <tbody>
           {todasLinhas.map((q, i) => (
             <tr key={i} className={`border-b border-theme last:border-0 ${(q as any).__manual ? 'bg-[var(--primary)]/5' : ''}`}>
-              <td className="p-2 text-theme-primary font-semibold">{q.marketPlace || q.municipality || q.region || estado}</td>
+              <td className="p-2 text-theme-primary font-semibold">
+                {(q as any).__escopoAmplo ? (
+                  <span className="text-theme-secondary font-normal italic">
+                    Referência {q.sourceKind === 'internacional' ? 'internacional' : 'nacional'}
+                    {q.marketPlace || q.municipality ? ` (${q.marketPlace || q.municipality})` : ''}
+                  </span>
+                ) : (q.marketPlace || q.municipality || q.region || estado)}
+              </td>
               <td className="p-2 text-theme-primary font-bold">R$ {q.price?.toFixed(2)} <span className="font-normal text-theme-secondary">{q.unit}</span></td>
               <td className="p-2 text-theme-secondary">{q.source}</td>
             </tr>
@@ -368,79 +394,75 @@ function CardEstado({ estado }: CardEstadoProps) {
   const [precosManuaisEstado, setPrecosManuaisEstado] = useState<ProdutoEncontrado[]>([]);
   const [itensManuaisDetalhados, setItensManuaisDetalhados] = useState<any[]>([]);
   const [mostrarAdmin, setMostrarAdmin] = useState(false);
-  const unsubscribeRef = useRef<(() => void) | null>(null);
   const [produtoParaEditar, setProdutoParaEditar] = useState<any>(null);
 
   // Cotações manuais (Admin) — busca direto do Firestore, mesmo padrão
   // já usado no Painel Admin, filtradas pro estado deste card. Guarda
   // tanto a versão resumida (pra lista de produtos) quanto a completa
   // (pra edição do Admin, com id de cada peça pra poder editar/excluir).
+  // BUG REAL CORRIGIDO (segunda vez, causa diferente): ao consertar o
+  // vazamento de listeners aninhados, eu troquei produtos e
+  // localizações de onSnapshot (ao vivo) para getDocs (uma vez só).
+  // Isso criou um bug novo: ao cadastrar uma PRAÇA NOVA, ela não
+  // existia na lista já carregada, e o preço era descartado em
+  // silêncio por não achar a localização — exatamente o sintoma de
+  // "salvei mas não aparece na tabela".
+  //
+  // Solução correta: três listeners PARALELOS (não aninhados), cada um
+  // com seu próprio cancelamento. Assim fica tudo ao vivo E sem
+  // vazamento — os dois problemas resolvidos ao mesmo tempo.
+  const [locaisBrutos, setLocaisBrutos] = useState<any[]>([]);
+  const [produtosBrutos, setProdutosBrutos] = useState<any[]>([]);
+  const [precosBrutos, setPrecosBrutos] = useState<any[]>([]);
+
   useEffect(() => {
     if (!aberto) return;
-    let cancelado = false;
+    const cancelamentos = [
+      onSnapshot(collection(db, 'cotacoesManuais_localizacoes'),
+        s => setLocaisBrutos(s.docs.map(d => ({ id: d.id, ...d.data() as any }))),
+        e => console.error('Falha ao escutar localizações:', e)),
+      onSnapshot(collection(db, 'cotacoesManuais_produtos'),
+        s => setProdutosBrutos(s.docs.map(d => ({ id: d.id, ...d.data() as any }))),
+        e => console.error('Falha ao escutar produtos:', e)),
+      onSnapshot(collection(db, 'cotacoesManuais_precos'),
+        s => setPrecosBrutos(s.docs.map(d => ({ id: d.id, ...d.data() as any }))),
+        e => console.error('Falha ao escutar preços:', e)),
+    ];
+    return () => cancelamentos.forEach(cancelar => cancelar());
+  }, [aberto]);
 
-    // Bug real corrigido: antes isso era onSnapshot dentro de
-    // onSnapshot dentro de onSnapshot (3 níveis), guardando só a
-    // função de cancelar do mais externo — os listeners internos
-    // ficavam se acumulando a cada atualização, sem nunca serem
-    // desligados de verdade. Agora: produtos e localizações mudam
-    // raramente, então busca uma vez só (getDocs); só o preço (que o
-    // Admin pode alterar a qualquer momento) usa onSnapshot de verdade,
-    // um nível só, fácil de cancelar.
-    async function carregarEEscutar() {
-      const [locSnap, produtoSnap] = await Promise.all([
-        getDocs(collection(db, 'cotacoesManuais_localizacoes')),
-        getDocs(collection(db, 'cotacoesManuais_produtos')),
-      ]);
-      if (cancelado) return;
+  // Combina as três fontes sempre que qualquer uma mudar.
+  useEffect(() => {
+    const locaisDoEstado = new Map<string, any>(
+      locaisBrutos.filter(l => l.estado === estado.nome).map(l => [l.id as string, l])
+    );
+    const produtosPorId = new Map<string, any>(produtosBrutos.map(p => [p.id as string, p]));
 
-      const locaisDoEstado = new Map(
-        locSnap.docs
-          .map(d => ({ id: d.id, ...d.data() as any }))
-          .filter(l => l.estado === estado.nome)
-          .map(l => [l.id, l])
-      );
-      const produtosPorId = new Map(produtoSnap.docs.map(d => [d.id, d.data() as any]));
+    const encontrados = new Map<string, ProdutoEncontrado>();
+    const detalhados: any[] = [];
 
-      const unsubPrecos = onSnapshot(collection(db, 'cotacoesManuais_precos'), precoSnap => {
-        const encontrados = new Map<string, ProdutoEncontrado>();
-        const detalhados: any[] = [];
-        precoSnap.docs.forEach(d => {
-          const p = d.data() as any;
-          const local = locaisDoEstado.get(p.localizacaoId);
-          if (local) {
-            const produto = produtosPorId.get(p.produtoId);
-            if (produto) {
-              // Normaliza o identificador na LEITURA, a partir do nome do
-              // produto. Assim os preços salvos ANTES desta correção
-              // (que usavam "prod_boi_gordo" no lugar de "boi_gordo")
-              // continuam aparecendo, sem precisar recadastrar nada.
-              const idNormalizado = idCanonicoDoProduto(produto.nome);
-              encontrados.set(idNormalizado, { id: `manual_${idNormalizado}`, label: produto.nome, icone: produto.icone || '📦' });
-              detalhados.push({
-                precoId: d.id, produtoId: idNormalizado, produtoNome: produto.nome, icone: produto.icone || '📦',
-                localizacaoId: p.localizacaoId, praca: local.local, preco: p.preco, unidade: p.unidade,
-                prazoDias: p.prazoDias, tipoNegocio: p.tipoNegocio,
-                criadoEm: p.criadoEm || null, atualizadoEm: p.atualizadoEm || null,
-              });
-            }
-          }
-        });
-        setPrecosManuaisEstado(Array.from(encontrados.values()));
-        setItensManuaisDetalhados(detalhados);
-      }, erro => {
-        console.error('Falha ao escutar cotacoesManuais_precos:', erro);
+    for (const p of precosBrutos) {
+      const local = locaisDoEstado.get(p.localizacaoId);
+      if (!local) continue;
+      const produto = produtosPorId.get(p.produtoId);
+      if (!produto) continue;
+
+      // Normaliza o identificador na leitura, a partir do nome do
+      // produto — faz os preços salvos com o id antigo
+      // ("prod_boi_gordo") continuarem aparecendo.
+      const idNormalizado = idCanonicoDoProduto(produto.nome);
+      encontrados.set(idNormalizado, { id: `manual_${idNormalizado}`, label: produto.nome, icone: produto.icone || '📦' });
+      detalhados.push({
+        precoId: p.id, produtoId: idNormalizado, produtoNome: produto.nome, icone: produto.icone || '📦',
+        localizacaoId: p.localizacaoId, praca: local.local, preco: p.preco, unidade: p.unidade,
+        prazoDias: p.prazoDias, tipoNegocio: p.tipoNegocio,
+        criadoEm: p.criadoEm || null, atualizadoEm: p.atualizadoEm || null,
       });
-
-      unsubscribeRef.current = unsubPrecos;
     }
 
-    carregarEEscutar();
-    return () => {
-      cancelado = true;
-      if (unsubscribeRef.current) unsubscribeRef.current();
-    };
-  }, [aberto, estado.nome]);
+    setPrecosManuaisEstado(Array.from(encontrados.values()));
+    setItensManuaisDetalhados(detalhados);
+  }, [locaisBrutos, produtosBrutos, precosBrutos, estado.nome]);
 
   function toggle() {
     const novoEstado = !aberto;
