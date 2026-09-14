@@ -57,6 +57,37 @@ const ESTADOS_UF: { nome: string; uf: string; cor: string }[] = [
 const TAMANHO_ICONE = 28;
 const ESCALA = TAMANHO_ICONE / 300;
 
+// BUG REAL CORRIGIDO: o formulário do Admin gerava o identificador do
+// produto a partir do nome digitado (ex: "Boi Gordo" -> "prod_boi_gordo"),
+// mas o sistema usa identificadores canônicos ("boi_gordo"). Como os
+// dois nunca batiam, o preço salvo ficava "órfão": aparecia na lista de
+// edição do Admin, mas NUNCA entrava na tabela do produto que o usuário
+// vê. Este mapa liga o nome digitado ao identificador que o resto do
+// app já usa, para o preço manual cair na mesma tabela dos automáticos.
+const NOME_PARA_ID_CANONICO: Record<string, string> = {
+  'boi gordo': 'boi_gordo', 'boi': 'boi_gordo',
+  'vaca': 'vaca', 'vaca gorda': 'vaca',
+  'novilho': 'novilho', 'garrote': 'novilho',
+  'novilha': 'novilha',
+  'bezerro': 'bezerro', 'bezerra': 'bezerra',
+  'soja': 'soja', 'milho': 'milho', 'sorgo': 'sorgo',
+  'algodao': 'algodao', 'algodão': 'algodao',
+  'cafe': 'cafe', 'café': 'cafe',
+  'arroz': 'arroz', 'feijao': 'feijao', 'feijão': 'feijao',
+  'trigo': 'trigo', 'acucar': 'acucar', 'açúcar': 'acucar',
+  'suino': 'suinos', 'suíno': 'suinos', 'suinos': 'suinos', 'suínos': 'suinos',
+  'frango': 'frango', 'leite': 'leite', 'ovos': 'ovos', 'laranja': 'laranja',
+};
+
+function idCanonicoDoProduto(nome: string): string {
+  const limpo = nome.trim().toLowerCase();
+  const canonico = NOME_PARA_ID_CANONICO[limpo];
+  if (canonico) return canonico;
+  // Produto fora da lista conhecida (o Admin pode cadastrar qualquer
+  // coisa): cria um id próprio, sem colidir com os canônicos.
+  return `prod_${limpo.replace(/[^a-z0-9]+/g, '_')}`;
+}
+
 const ICONES_DISPONIVEIS = [
   '🐂', '🐄', '🐮', '🐷', '🐑', '🐐', '🐔', '🌱', '🌾', '🌽', '🌿',
   '☕', '🍇', '🍊', '🥛', '🧀', '🥚', '🍯', '📦',
@@ -118,7 +149,7 @@ function PainelAdminDoEstado({ estadoNome, itensManuais, abrirComProduto, onFech
     }
     setSalvando(true);
     try {
-      const produtoId = `prod_${form.produtoNome.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+      const produtoId = idCanonicoDoProduto(form.produtoNome);
       await setDoc(doc(db, 'cotacoesManuais_produtos', produtoId), {
         nome: form.produtoNome.trim(),
         categoria: 'Pecuária',
@@ -380,9 +411,14 @@ function CardEstado({ estado }: CardEstadoProps) {
           if (local) {
             const produto = produtosPorId.get(p.produtoId);
             if (produto) {
-              encontrados.set(p.produtoId, { id: `manual_${p.produtoId}`, label: produto.nome, icone: produto.icone || '📦' });
+              // Normaliza o identificador na LEITURA, a partir do nome do
+              // produto. Assim os preços salvos ANTES desta correção
+              // (que usavam "prod_boi_gordo" no lugar de "boi_gordo")
+              // continuam aparecendo, sem precisar recadastrar nada.
+              const idNormalizado = idCanonicoDoProduto(produto.nome);
+              encontrados.set(idNormalizado, { id: `manual_${idNormalizado}`, label: produto.nome, icone: produto.icone || '📦' });
               detalhados.push({
-                precoId: d.id, produtoId: p.produtoId, produtoNome: produto.nome, icone: produto.icone || '📦',
+                precoId: d.id, produtoId: idNormalizado, produtoNome: produto.nome, icone: produto.icone || '📦',
                 localizacaoId: p.localizacaoId, praca: local.local, preco: p.preco, unidade: p.unidade,
                 prazoDias: p.prazoDias, tipoNegocio: p.tipoNegocio,
                 criadoEm: p.criadoEm || null, atualizadoEm: p.atualizadoEm || null,
