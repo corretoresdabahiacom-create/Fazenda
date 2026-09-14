@@ -58,10 +58,18 @@ const TERMOS_PRODUTO: Record<string, RegExp> = {
   bezerra: /^bezerra$/i,
   soja: /^soja$/i,
   milho: /^milho$/i,
-  cafe: /^caf[eé]/i,
+  // PADRÕES FECHADOS: antes eram abertos no fim (/^arroz/, /^feijao/,
+  // /^cafe/) e casavam com VÁRIAS variedades ao mesmo tempo — "ARROZ EM
+  // CASCA" (grão do produtor) somado com "ARROZ BENEFICIADO"
+  // (empacotado), que têm preços 4x diferentes. O resultado eram
+  // variações absurdas entre estados (Ceará R$1,31 vs Paraíba R$5,99),
+  // que pareciam diferença regional mas eram produtos distintos
+  // misturados. Fechados até sabermos o nome exato de cada variedade
+  // (use /api/diagnostico-conab-variantes pra descobrir).
+  cafe: /^cafe$/i,
   algodao: /^algodao em pluma$/i,
-  arroz: /^arroz/i,
-  feijao: /^feijao/i,
+  arroz: /^arroz$/i,
+  feijao: /^feijao$/i,
   trigo: /^trigo$/i,
   sorgo: /^sorgo$/i,
   leite: /^leite$/i,
@@ -422,4 +430,72 @@ export async function coberturaPorEstado(produto: string): Promise<ResultadoCobe
   diagnostico.push(`Produto "${nomeNoArquivo}": ${totalLinhas} linhas, ${estadosCobertos.length} estado(s) com dado.`);
 
   return { produtoBuscado: produto, nomeNoArquivo, totalLinhas, estadosCobertos, estadosSemDados, diagnostico };
+}
+
+
+// ---------------------------------------------------------------------
+// VARIEDADES DE UM PRODUTO — lista todos os nomes do arquivo que
+// começam com um termo, com quantas linhas e a faixa de preço de cada
+// um.
+//
+// POR QUE EXISTE: padrões abertos no fim (ex: /^arroz/) casam com
+// "ARROZ EM CASCA" (grão bruto do produtor) E "ARROZ BENEFICIADO"
+// (empacotado), que têm preços 4x diferentes. Somar os dois no mesmo
+// gráfico produz números sem sentido — foi exatamente o que aconteceu
+// com arroz, feijão e café. Este diagnóstico mostra as variedades pra
+// escolher a certa em vez de adivinhar.
+// ---------------------------------------------------------------------
+
+export interface VarianteProduto {
+  nome: string;
+  linhas: number;
+  precoMin: number;
+  precoMax: number;
+  ufs: number;
+}
+
+export async function listarVariantes(termo: string): Promise<{ variantes: VarianteProduto[]; diagnostico: string[] }> {
+  const diagnostico: string[] = [];
+  const arquivo = await baixarArquivo(diagnostico);
+  if (!arquivo) return { variantes: [], diagnostico };
+
+  const linhas = arquivo.texto.split(/\r?\n/).filter(l => l.trim());
+  const sep = detectarSeparador(linhas[0]);
+  const cab = linhas[0].split(sep).map(h => h.trim().toLowerCase());
+  const achar = (...t: string[]) => cab.findIndex(h => t.some(x => h.includes(x)));
+  const colProduto = achar('produto');
+  const colUf = achar('uf', 'estado', 'sigla');
+  const colValor = achar('preço', 'preco', 'valor');
+  if (colProduto < 0 || colValor < 0) return { variantes: [], diagnostico: [...diagnostico, 'Colunas não encontradas.'] };
+
+  const termoBaixo = termo.toLowerCase();
+  const mapa = new Map<string, { linhas: number; min: number; max: number; ufs: Set<string> }>();
+
+  for (let i = 1; i < linhas.length; i++) {
+    const campos = linhas[i].split(sep);
+    const nome = (campos[colProduto] || '').trim();
+    if (!nome.toLowerCase().includes(termoBaixo)) continue;
+    const valor = normalizarNumero(campos[colValor]);
+    if (isNaN(valor) || valor <= 0) continue;
+    const uf = (campos[colUf] || '').trim().toUpperCase();
+
+    if (!mapa.has(nome)) mapa.set(nome, { linhas: 0, min: valor, max: valor, ufs: new Set() });
+    const r = mapa.get(nome)!;
+    r.linhas++;
+    if (valor < r.min) r.min = valor;
+    if (valor > r.max) r.max = valor;
+    if (uf) r.ufs.add(uf);
+  }
+
+  const variantes = Array.from(mapa.entries())
+    .map(([nome, r]) => ({
+      nome, linhas: r.linhas,
+      precoMin: Number(r.min.toFixed(2)),
+      precoMax: Number(r.max.toFixed(2)),
+      ufs: r.ufs.size,
+    }))
+    .sort((a, b) => b.linhas - a.linhas);
+
+  diagnostico.push(`Termo "${termo}": ${variantes.length} variedade(s) distinta(s) no arquivo.`);
+  return { variantes, diagnostico };
 }
