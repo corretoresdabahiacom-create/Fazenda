@@ -79,7 +79,12 @@ import { enablePushNotifications } from './lib/pushNotifications';
 import MinhaAssinatura from './components/MinhaAssinatura';
 import SalesPage from './components/SalesPage';
 import { db } from './lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+
+// Versão dos Termos aceita pelo usuário. Ao alterar o texto dos Termos
+// de forma relevante, incremente aqui — assim dá pra saber qual versão
+// cada usuário aceitou, e pedir novo aceite se necessário.
+const VERSAO_DOS_TERMOS = '2026-09-14';
 import WeighingWorksheet from './components/WeighingWorksheet';
 import NutritionCalculator from './components/NutritionCalculator';
 import { NotificationService } from './utils/notificationService';
@@ -349,6 +354,26 @@ export default function App() {
 
   // Login Screen
   if (!user) {
+    // FALHA JURÍDICA REAL CORRIGIDA: o aceite dos Termos era exigido no
+    // login, mas vivia SÓ na memória da tela (useState) — sumia ao
+    // fechar a página. Na prática não havia prova nenhuma de que o
+    // usuário aceitou, quando aceitou, nem qual versão. Isso importa
+    // porque o app cobra assinatura recorrente e os próprios Termos
+    // preveem atualização. Agora o aceite é gravado no perfil do
+    // usuário, com data/hora e versão.
+    const registrarAceiteDosTermos = async (uid: string) => {
+      try {
+        await setDoc(doc(db, 'userDirectory', uid), {
+          termosAceitos: true,
+          termosAceitosEm: new Date().toISOString(),
+          termosVersao: VERSAO_DOS_TERMOS,
+        }, { merge: true });
+      } catch (erro) {
+        // Nunca bloqueia o login por falha ao registrar — só avisa.
+        console.error('Não foi possível registrar o aceite dos Termos:', erro);
+      }
+    };
+
     const handleGoogleLoginClick = async () => {
       if (!acceptedTerms) {
         setLoginError('Você deve aceitar os Termos e Condições de Uso para entrar com Google.');
@@ -358,7 +383,9 @@ export default function App() {
       setIsLoggingIn(true);
       setLoginError(null);
       try {
-        await loginWithGoogle();
+        const credencial: any = await loginWithGoogle();
+        const uid = credencial?.user?.uid;
+        if (uid) await registrarAceiteDosTermos(uid);
       } catch (error: any) {
         console.error("Google login failed", error);
         setLoginError(error.message || 'Houve um erro no login pelo Google. Verifique sua rede ou tente novamente.');
@@ -405,11 +432,14 @@ export default function App() {
               setIsLoggingIn(true);
               setLoginError(null);
               try {
+                let credencial: any;
                 if (isRegistering) {
-                  await registerWithEmail(email, password);
+                  credencial = await registerWithEmail(email, password);
                 } else {
-                  await loginWithEmail(email, password);
+                  credencial = await loginWithEmail(email, password);
                 }
+                const uidLogado = credencial?.user?.uid;
+                if (uidLogado) await registrarAceiteDosTermos(uidLogado);
               } catch (error: any) {
                 console.error("Auth action failed", error);
                 setLoginError(error.message || 'Erro ao realizar a operação de acesso.');
