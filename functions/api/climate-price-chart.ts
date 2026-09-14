@@ -15,6 +15,7 @@
 
 import { firestoreGetDoc, GoogleServiceAccountEnv } from './_googleAuth';
 import { buscarHistoricoIpea } from './_ipeaHistorico';
+import { buscarHistoricoConab } from './_conabPrecos';
 
 interface Env extends GoogleServiceAccountEnv {}
 
@@ -385,12 +386,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const hojeStr = new Date().toISOString().slice(0, 10);
     const fimParteJaPassada = dataFim < hojeStr ? dataFim : new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
-    const [chuvaOpenMeteo, chuvaInmetResultado, precoHistorico, precoAtualEFuturo, historicoIpea] = await Promise.all([
+    const [chuvaOpenMeteo, chuvaInmetResultado, precoHistorico, precoAtualEFuturo, historicoIpea, historicoConab] = await Promise.all([
       buscarChuvaDiaria(local.lat, local.lon, dataInicio, dataFim),
       dataInicio <= fimParteJaPassada ? buscarChuvaInmet(local.lat, local.lon, dataInicio, fimParteJaPassada) : Promise.resolve({ porDia: {}, estacaoUsada: null }),
       buscarHistoricoPreco(context.env, produto, estado),
       buscarPrecoAtualEFuturo(url.origin, produto, estado),
       buscarHistoricoIpea(produto, dataInicio, dataFim, estado),
+      estado ? buscarHistoricoConab(produto, estado, dataInicio, dataFim) : Promise.resolve(null),
     ]);
 
     // Funde as duas fontes de clima: INMET (estação real) tem
@@ -411,7 +413,17 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     // 3. Preço ao vivo de hoje + futuro B3 pros próximos 16 dias.
     const precoPorDia = new Map<string, number>();
 
-    for (const p of historicoIpea.pontos) {
+    // PRIORIDADE DE FONTE HISTÓRICA:
+    // 1º CONAB — pesquisa de preço DO ESTADO consultado. É a fonte
+    //    correta, resolve o problema de mostrar preço de outro estado.
+    // 2º IPEADATA — só entra onde a CONAB não tiver dado. Como a série
+    //    dele é do Paraná, fica claramente identificada como referência
+    //    de tendência (o aviso na tela explica isso ao usuário).
+    const pontosHistoricos = (historicoConab && historicoConab.pontos.length > 0)
+      ? historicoConab.pontos
+      : historicoIpea.pontos;
+
+    for (const p of pontosHistoricos) {
       // Série mensal: o IPEADATA marca o mês no dia 1. Espalha o valor
       // por todos os dias daquele mês, senão a agregação mensal do
       // gráfico veria um único dia e o resto vazio.
@@ -482,7 +494,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     const totalComPreco = pontos.filter(p => p.preco != null).length;
     const fontePrecoUsada = [
-      historicoIpea.serie ? `${historicoIpea.serie.fonte} via IPEADATA ("${historicoIpea.serie.nome}", ${historicoIpea.serie.unidade})` : null,
+      (historicoConab && historicoConab.pontos.length > 0)
+        ? `CONAB — pesquisa de preço em ${estado}${historicoConab.produtoEncontrado ? ` ("${historicoConab.produtoEncontrado}")` : ''}${historicoConab.unidade ? `, ${historicoConab.unidade}` : ''}`
+        : (historicoIpea.serie ? `${historicoIpea.serie.fonte} via IPEADATA ("${historicoIpea.serie.nome}", ${historicoIpea.serie.unidade})` : null),
       precoAtualEFuturo.hoje ? 'preço ao vivo (hoje)' : null,
       precoAtualEFuturo.futuro ? `contrato futuro B3 (${precoAtualEFuturo.futuro.vencimento})` : null,
     ].filter(Boolean).join(' + ') || undefined;
@@ -491,7 +505,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       produto, estado, cidade, local: local.nomeEncontrado,
       fonteClima: fonteClimaUsada,
       fontePreco: fontePrecoUsada,
-      avisoIpea: historicoIpea.aviso,
+      avisoIpea: (historicoConab && historicoConab.pontos.length > 0) ? undefined : historicoIpea.aviso,
+      avisoConab: historicoConab?.aviso,
       ufDaSerieHistorica: historicoIpea.ufDaSerie || null,
       granularidade: agruparPorMes ? 'mes' : 'dia',
       pontos,
