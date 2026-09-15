@@ -29,6 +29,20 @@ const PRODUCT_SLUGS: Record<string, string> = {
   ovos: 'ovos',
   mandioca: 'mandioca',
   frutas: 'frutas',
+
+  // CATEGORIAS ACRESCENTADAS — todos os slugs foram conferidos na
+  // página de índice do Notícias Agrícolas (não são chutes), e cada um
+  // traz dado real de uma fonte diferente:
+  legumes: 'legumes',            // Tomate e outros, via Ceasas (Campinas, BH, Ceagesp)
+  verduras: 'verduras',          // Repolho e outros, via Ceasas
+  latex: 'latex',                // Borracha natural, fonte IEA (oficial de SP)
+  silvicultura: 'silvicultura',  // Resina de pinus, fonte Aresb (associação do setor)
+  mercado_financeiro: 'mercado-financeiro', // Juros futuros B3 — referência pra custo de capital
+  // Safras & Mercado é consultoria PAGA que o Notícias Agrícolas
+  // republica de graça: preços de mercado físico por praça, com
+  // referências que nenhuma outra fonte do app cobre (ex: caroço de
+  // algodão na Bahia, café conilon em Vitória, trigo em Cristalina).
+  mercado_fisico: 'mercado-fisico-safras-e-mercado',
 };
 
 // Contratos futuros internacionais de referência (via Yahoo Finance,

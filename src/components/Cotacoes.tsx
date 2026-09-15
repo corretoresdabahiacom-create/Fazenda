@@ -78,6 +78,13 @@ const PRODUCTS: ProductDef[] = [
   { id: 'ovos', label: 'Ovos', backendKey: 'ovos' },
   { id: 'mandioca', label: 'Mandioca', backendKey: 'mandioca' },
   { id: 'frutas', label: 'Frutas (Manga, Limão e outras)', backendKey: 'frutas' },
+  // Categorias novas — slugs conferidos na página do Notícias Agrícolas.
+  { id: 'legumes', label: 'Legumes (Tomate e outros)', backendKey: 'legumes' },
+  { id: 'verduras', label: 'Verduras (Repolho e outras)', backendKey: 'verduras' },
+  { id: 'latex', label: 'Látex / Borracha Natural', backendKey: 'latex' },
+  { id: 'silvicultura', label: 'Silvicultura (Resina de Pinus)', backendKey: 'silvicultura' },
+  { id: 'mercado_fisico', label: 'Mercado Físico (Safras & Mercado)', backendKey: 'mercado_fisico' },
+  { id: 'mercado_financeiro', label: 'Juros Futuros (B3)', backendKey: 'mercado_financeiro' },
 ];
 
 const PAISES = ['Brasil'];
