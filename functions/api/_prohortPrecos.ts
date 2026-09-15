@@ -65,14 +65,27 @@ export interface ResultadoProhort {
 // cacheamos o arquivo (era o que estourava antes) — cacheamos só o
 // resultado já filtrado.
 
+// O MENSAL vem primeiro: é bem menor que o diário e já resolve a
+// maioria das consultas. O diário só entra se o mensal falhar.
 const CANDIDATOS_VALIDOS = [
-  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortDiario.txt',
   'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortMensal.txt',
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortDiario.txt',
 ];
 
 // Teto de linhas casadas — evita que uma busca ampla (ex: termo vazio)
 // acumule memória de novo pelo outro lado.
-const MAXIMO_DE_LINHAS = 4000;
+const MAXIMO_DE_LINHAS = 600;
+
+// ERRO 1102 (limite de tempo do Worker) CORRIGIDO: ler em fluxo
+// resolveu a memória, mas percorrer o arquivo INTEIRO — são milhões de
+// linhas de preços diários — estoura o tempo de processamento.
+//
+// Duas travas resolvem: paramos assim que juntamos linhas suficientes
+// (a maioria das consultas é de um produto só), e há um teto absoluto
+// de linhas percorridas que limita o custo mesmo quando o produto não
+// aparece. Ao atingir qualquer uma delas, cancelamos o download em vez
+// de esperar terminar.
+const ORCAMENTO_DE_LINHAS = 250000;
 
 interface ResultadoStream {
   cabecalho: string[];
@@ -111,6 +124,7 @@ async function lerEmFluxo(
   const nomesVistos = new Set<string>();
   let totalLidas = 0;
   let primeira = true;
+  let pararCedo = false;
 
   while (true) {
     const { done, value } = await leitor.read();
@@ -139,9 +153,21 @@ async function lerEmFluxo(
       if (!nome) continue;
       if (nomesVistos.size < 200) nomesVistos.add(nome);
 
-      if (casaProduto(nome) && linhasCasadas.length < MAXIMO_DE_LINHAS) {
+      if (casaProduto(nome)) {
         linhasCasadas.push(campos);
       }
+
+      // Parada antecipada: já temos o bastante, ou já gastamos o
+      // orçamento de leitura. Cancelar o fluxo interrompe o download.
+      if (linhasCasadas.length >= MAXIMO_DE_LINHAS || totalLidas >= ORCAMENTO_DE_LINHAS) {
+        pararCedo = true;
+        break;
+      }
+    }
+
+    if (pararCedo) {
+      try { await leitor.cancel(); } catch { /* fluxo já encerrado */ }
+      break;
     }
   }
 
@@ -155,7 +181,12 @@ async function lerEmFluxo(
     }
   }
 
-  diagnostico.push(`${url}: OK em fluxo — ${totalLidas} linhas lidas, ${linhasCasadas.length} casaram.`);
+  diagnostico.push(
+    `${url}: OK em fluxo — ${totalLidas} linhas lidas, ${linhasCasadas.length} casaram.` +
+    (pararCedo
+      ? ` (leitura interrompida cedo: ${linhasCasadas.length >= MAXIMO_DE_LINHAS ? 'já havia resultados suficientes' : 'orçamento de linhas esgotado'} — o arquivo é grande demais pra percorrer inteiro dentro do tempo do servidor)`
+      : ' (arquivo lido até o fim)')
+  );
   return { cabecalho, separador, linhasCasadas, nomesVistos, totalLidas, url };
 }
 
