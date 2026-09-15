@@ -85,6 +85,12 @@ const PRODUCTS: ProductDef[] = [
   { id: 'silvicultura', label: 'Silvicultura (Resina de Pinus)', backendKey: 'silvicultura' },
   { id: 'mercado_fisico', label: 'Mercado Físico (Safras & Mercado)', backendKey: 'mercado_fisico' },
   { id: 'mercado_financeiro', label: 'Juros Futuros (B3)', backendKey: 'mercado_financeiro' },
+  // Produtos com série histórica da CONAB em 21 a 27 estados, todos com
+  // preço de produtor confirmado no catálogo real do arquivo.
+  { id: 'banana', label: 'Banana', backendKey: 'frutas' },
+  { id: 'tomate', label: 'Tomate', backendKey: 'legumes' },
+  { id: 'mandioca_raiz', label: 'Mandioca (raiz)', backendKey: 'mandioca' },
+  { id: 'mandioca_farinha', label: 'Farinha de Mandioca', backendKey: 'mandioca' },
 ];
 
 const PAISES = ['Brasil'];

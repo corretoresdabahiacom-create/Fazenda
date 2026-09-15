@@ -72,7 +72,24 @@ const TERMOS_PRODUTO: Record<string, RegExp> = {
   feijao: /^feijao$/i,
   trigo: /^trigo$/i,
   sorgo: /^sorgo$/i,
-  leite: /^leite$/i,
+
+  // NOMES CONFERIDOS NO CATÁLOGO REAL DO ARQUIVO (1.173 produtos).
+  // Bug encontrado: o padrão de leite era /^leite$/i, mas a CONAB
+  // chama de "LEITE DE VACA" — nunca casava com nada, e o leite ficava
+  // silenciosamente sem dado nenhum.
+  leite: /^leite de vaca$/i,
+
+  // Produtos novos, todos com preço de produtor confirmado e cobertura
+  // ampla — os números entre parênteses são as UFs com amostra boa.
+  banana: /^banana$/i,                          // 27 UF
+  tomate: /^tomate$/i,                          // 27 UF
+  mandioca_raiz: /^raiz de mandioca$/i,         // 22 UF
+  mandioca_farinha: /^farinha de mandioca$/i,   // 21 UF
+
+  // ACUCAR e os demais abaixo NÃO têm preço de produtor no arquivo —
+  // são preços de atacado/varejo. Ficam disponíveis, mas o rótulo
+  // precisa deixar claro que não é o que o produtor recebe (o aviso
+  // automático de nível cuida disso).
   acucar: /^acucar$/i,
 
   // FERTILIZANTES — o arquivo da CONAB traz dezenas deles. As fórmulas
@@ -128,6 +145,9 @@ const FAIXAS_PLAUSIVEIS: Record<string, [number, number]> = {
   soja: [40, 300], milho: [10, 150], cafe: [200, 4000], algodao: [1, 40],
   arroz: [20, 200], feijao: [1, 30], trigo: [15, 200], sorgo: [10, 120],
   leite: [0.5, 8], acucar: [0.5, 10],
+  // Faixas dos produtos novos, calibradas pelo que o catálogo mostrou.
+  banana: [0.2, 15], tomate: [0.5, 16],
+  mandioca_raiz: [0.1, 8], mandioca_farinha: [1, 22],
   // Fertilizante em R$/kg: adubo formulado costuma ficar entre R$1 e
   // R$10/kg; calcário é bem mais barato.
   fert_npk_10_10_10: [0.5, 15], fert_npk_20_05_20: [0.5, 15],

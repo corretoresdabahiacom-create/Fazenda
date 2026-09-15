@@ -19,13 +19,21 @@
 // comissão, frete e embalagem) nem o preço de supermercado. Isso vai
 // explicitado no rótulo, pra ninguém confundir.
 
+// CANDIDATOS AGORA BEM FUNDAMENTADOS: a própria página de downloads da
+// CONAB lista os arquivos disponíveis, e entre eles estão "Prohort
+// Diário" e "Prohort Mensal". Aplicando a mesma convenção de nome do
+// arquivo que JÁ funciona (PrecosMensalUF.txt — sem espaços, sem
+// acento, cada palavra capitalizada), estes viram os candidatos mais
+// prováveis. Os antigos ficam no fim como reserva.
 const CANDIDATOS_PROHORT = [
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortDiario.txt',
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortMensal.txt',
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortDiário.txt',
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/prohort-diario.txt',
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortDiario.csv',
+  // Reserva: nomes que chutei antes de conhecer a lista oficial.
   'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosDiariosCeasa.txt',
-  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortPrecos.txt',
-  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosHortigranjeiros.txt',
   'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosCeasa.txt',
-  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/SisPRD.txt',
-  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecoDiarioCeasa.txt',
 ];
 
 export interface PrecoHortifruti {
