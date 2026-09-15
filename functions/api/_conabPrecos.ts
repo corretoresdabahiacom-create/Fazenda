@@ -626,3 +626,121 @@ export async function listarVariantes(termo: string): Promise<{ variantes: Varia
   diagnostico.push(`Termo "${termo}": ${variantes.length} variedade(s) distinta(s) no arquivo.`);
   return { variantes, diagnostico };
 }
+
+
+// ---------------------------------------------------------------------
+// CATÁLOGO COMPLETO DO ARQUIVO — lista TODOS os produtos existentes,
+// com cobertura por estado, faixa de preço e níveis de comercialização.
+//
+// POR QUE EXISTE: expandir o leque de produtos exige saber o nome EXATO
+// que a CONAB usa. Adivinhar não funciona — "BOI GORDO" na verdade é
+// "BOI", e padrões abertos misturaram variedades e níveis de mercado.
+// Este catálogo devolve a lista real, com dados suficientes pra decidir
+// o que vale incluir (e o que descartar por amostra insuficiente),
+// numa única consulta.
+// ---------------------------------------------------------------------
+
+export interface ItemCatalogo {
+  nome: string;
+  classificacao: string;
+  linhas: number;
+  estados: number;
+  estadosComAmostraBoa: number;
+  precoMin: number;
+  precoMax: number;
+  niveis: string[];
+  temNivelProdutor: boolean;
+  ultimoMes: string;
+}
+
+export async function catalogoCompleto(filtroClassificacao?: string): Promise<{
+  total: number;
+  itens: ItemCatalogo[];
+  classificacoesDisponiveis: string[];
+  diagnostico: string[];
+}> {
+  const diagnostico: string[] = [];
+  const arquivo = await baixarArquivo(diagnostico);
+  if (!arquivo) return { total: 0, itens: [], classificacoesDisponiveis: [], diagnostico };
+
+  const linhas = arquivo.texto.split(/\r?\n/).filter(l => l.trim());
+  const sep = detectarSeparador(linhas[0]);
+  const cab = linhas[0].split(sep).map(h => h.trim().toLowerCase());
+  const achar = (...t: string[]) => cab.findIndex(h => t.some(x => h.includes(x)));
+
+  const cProduto = achar('produto');
+  const cClasse = achar('classificao', 'classifica');
+  const cUf = achar('uf', 'estado', 'sigla');
+  const cValor = achar('preço', 'preco', 'valor');
+  const cAno = achar('ano');
+  const cMes = achar('mês', 'mes');
+  const cNivel = achar('nivel_comercializacao', 'nivel', 'comercializacao');
+
+  if (cProduto < 0 || cValor < 0) {
+    diagnostico.push('Colunas essenciais não encontradas.');
+    return { total: 0, itens: [], classificacoesDisponiveis: [], diagnostico };
+  }
+
+  interface Acumulador {
+    classificacao: string;
+    linhas: number;
+    porUf: Map<string, number>;
+    min: number;
+    max: number;
+    niveis: Set<string>;
+    ultimoMes: string;
+  }
+  const mapa = new Map<string, Acumulador>();
+  const classes = new Set<string>();
+
+  for (let i = 1; i < linhas.length; i++) {
+    const campos = linhas[i].split(sep);
+    const nome = (campos[cProduto] || '').trim();
+    if (!nome) continue;
+
+    const classe = cClasse >= 0 ? (campos[cClasse] || '').trim() : '';
+    if (classe) classes.add(classe);
+    if (filtroClassificacao && classe.toLowerCase() !== filtroClassificacao.toLowerCase()) continue;
+
+    const valor = normalizarNumero(campos[cValor]);
+    if (isNaN(valor) || valor <= 0) continue;
+
+    const uf = cUf >= 0 ? (campos[cUf] || '').trim().toUpperCase() : '';
+    const nivel = cNivel >= 0 ? (campos[cNivel] || '').trim() : '';
+    const ano = cAno >= 0 ? (campos[cAno] || '').trim() : '';
+    const mesBruto = cMes >= 0 ? (campos[cMes] || '').trim() : '';
+    const mes = /^\d+$/.test(mesBruto) ? String(Number(mesBruto)).padStart(2, '0') : '';
+    const anoMes = /^\d{4}$/.test(ano) && mes ? `${ano}-${mes}` : '';
+
+    if (!mapa.has(nome)) {
+      mapa.set(nome, { classificacao: classe, linhas: 0, porUf: new Map(), min: valor, max: valor, niveis: new Set(), ultimoMes: '' });
+    }
+    const a = mapa.get(nome)!;
+    a.linhas++;
+    if (valor < a.min) a.min = valor;
+    if (valor > a.max) a.max = valor;
+    if (nivel) a.niveis.add(nivel);
+    if (uf) a.porUf.set(uf, (a.porUf.get(uf) || 0) + 1);
+    if (anoMes > a.ultimoMes) a.ultimoMes = anoMes;
+  }
+
+  const itens: ItemCatalogo[] = Array.from(mapa.entries())
+    .map(([nome, a]) => ({
+      nome,
+      classificacao: a.classificacao,
+      linhas: a.linhas,
+      estados: a.porUf.size,
+      // Quantos estados têm amostra suficiente pra virar série confiável.
+      estadosComAmostraBoa: Array.from(a.porUf.values()).filter(n => n >= MINIMO_DE_PONTOS).length,
+      precoMin: Number(a.min.toFixed(2)),
+      precoMax: Number(a.max.toFixed(2)),
+      niveis: Array.from(a.niveis),
+      temNivelProdutor: Array.from(a.niveis).some(n => /produtor|produ[çc][ãa]o|lavoura/i.test(n)),
+      ultimoMes: a.ultimoMes,
+    }))
+    // Ordena pelo que é mais útil: cobertura ampla primeiro.
+    .sort((a, b) => b.estadosComAmostraBoa - a.estadosComAmostraBoa || b.linhas - a.linhas);
+
+  diagnostico.push(`Catálogo: ${itens.length} produtos distintos.`);
+  return { total: itens.length, itens, classificacoesDisponiveis: Array.from(classes).sort(), diagnostico };
+}
