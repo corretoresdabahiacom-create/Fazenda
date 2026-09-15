@@ -205,8 +205,9 @@ export async function buscarHistoricoConab(
   const colMes = acharColuna('mês', 'mes');
   const colData = acharColuna('data', 'período', 'periodo');
   const colUnidade = acharColuna('unidade', 'unid');
+  const colNivel = acharColuna('nivel_comercializacao', 'nivel', 'comercializacao');
 
-  diagnostico.push(`Índices: produto=${colProduto}, uf=${colUf}, valor=${colValor}, ano=${colAno}, mes=${colMes}, data=${colData}, unidade=${colUnidade}`);
+  diagnostico.push(`Índices: produto=${colProduto}, uf=${colUf}, valor=${colValor}, ano=${colAno}, mes=${colMes}, data=${colData}, unidade=${colUnidade}, nivel=${colNivel}`);
 
   if (colProduto < 0 || colUf < 0 || colValor < 0) {
     return {
@@ -231,6 +232,15 @@ export async function buscarHistoricoConab(
   const nomesDistintos = new Set<string>();
   const amostraBruta: string[] = [];
   let forasDaFaixa = 0;
+  let descartadosPorNivel = 0;
+  const niveisVistos = new Set<string>();
+  // Cesta alternativa: se NENHUMA linha for do nível "produtor",
+  // preferimos mostrar outro nível (avisando) do que deixar o gráfico
+  // vazio. Zerar o dado por excesso de rigor seria pior que mostrar
+  // preço de atacado identificado como tal.
+  const pontosOutroNivel: PontoConab[] = [];
+  let nivelAlternativoUsado: string | null = null;
+  let nivelDaLinhaAtual: string | null = null;
   // Busca frouxa: pega a primeira palavra significativa do termo pra
   // achar nomes parecidos (ex: "boi" acha "BOI GORDO VIVO").
   const palavraChave = (produto.split('_')[0] || '').toLowerCase();
@@ -247,6 +257,29 @@ export async function buscarHistoricoConab(
     const ufLinha = (campos[colUf] || '').trim().toUpperCase();
     if (ufLinha !== uf) continue;
     linhasDaUf++;
+
+    // CAUSA RAIZ DAS VARIAÇÕES ABSURDAS ENTRE ESTADOS: o mesmo produto
+    // aparece em NÍVEIS DE COMERCIALIZAÇÃO diferentes (produtor,
+    // atacado, varejo). Arroz a R$1,31/kg no produtor e R$5,99/kg no
+    // varejo não é diferença regional — é a margem da cadeia. Somar os
+    // dois dava spreads de 4x que pareciam erro de dado.
+    //
+    // O usuário deste app é PRODUTOR: o preço que importa é o que ele
+    // recebe. Filtramos por esse nível; se a linha não disser o nível,
+    // aceitamos (melhor ter o dado do que descartar por omissão).
+    const nivelLinha = colNivel >= 0 ? (campos[colNivel] || '').trim() : '';
+    if (nivelLinha) {
+      niveisVistos.add(nivelLinha);
+      const ehProdutor = /produtor|produ[çc][ãa]o|lavoura|porta.?da.?fazenda/i.test(nivelLinha);
+      if (!ehProdutor) {
+        descartadosPorNivel++;
+        nivelDaLinhaAtual = nivelLinha; // guarda pra cesta alternativa
+      } else {
+        nivelDaLinhaAtual = null;
+      }
+    } else {
+      nivelDaLinhaAtual = null;
+    }
 
     if (!produtoEncontrado) produtoEncontrado = nomeProduto;
     if (!unidade) unidade = PRODUTOS_EM_ARROBA.has(produto) ? 'R$/@ (convertido de R$/kg)' : 'R$/kg';
@@ -290,13 +323,29 @@ export async function buscarHistoricoConab(
       continue;
     }
 
-    pontos.push({ data: dataIso, preco });
+    if (nivelDaLinhaAtual) {
+      pontosOutroNivel.push({ data: dataIso, preco });
+      if (!nivelAlternativoUsado) nivelAlternativoUsado = nivelDaLinhaAtual;
+    } else {
+      pontos.push({ data: dataIso, preco });
+    }
   }
 
   pontos.sort((a, b) => a.data.localeCompare(b.data));
   diagnostico.push(`Linhas do produto: ${linhasDoProduto}; dessas, na UF ${uf}: ${linhasDaUf}; dentro do período: ${pontos.length}; descartadas por ficarem fora da faixa plausível após conversão: ${forasDaFaixa}.`);
+  if (niveisVistos.size > 0) {
+    diagnostico.push(`Níveis de comercialização encontrados para esse produto/UF: ${Array.from(niveisVistos).join(' | ')}. Descartados por não serem do produtor: ${descartadosPorNivel}.`);
+  }
   if (amostraBruta.length > 0) {
     diagnostico.push(`Valores BRUTOS do arquivo (antes de qualquer conversão): ${amostraBruta.join(' | ')}${PRODUTOS_EM_ARROBA.has(produto) ? ` — multiplicados por ${KG_POR_ARROBA} para virar R$/arroba` : ''}.`);
+  }
+
+  // Se não houve nenhum preço de produtor, cai pra outro nível avisando.
+  let avisoNivel: string | undefined;
+  if (pontos.length === 0 && pontosOutroNivel.length > 0) {
+    pontos.push(...pontosOutroNivel);
+    avisoNivel = `A CONAB não publica preço de produtor pra esse produto em ${estado} — os valores mostrados são do nível "${nivelAlternativoUsado}", que costuma ser mais alto que o recebido pelo produtor.`;
+    diagnostico.push(`Sem preço de produtor; usando nível "${nivelAlternativoUsado}" (${pontosOutroNivel.length} pontos).`);
   }
 
   const todosNomes = Array.from(nomesDistintos).sort();
@@ -316,7 +365,7 @@ export async function buscarHistoricoConab(
     };
   }
 
-  return { pontos, urlUsada: arquivo.url, produtoEncontrado, unidade, diagnostico };
+  return { pontos, urlUsada: arquivo.url, produtoEncontrado, unidade, diagnostico, aviso: avisoNivel };
 }
 
 
