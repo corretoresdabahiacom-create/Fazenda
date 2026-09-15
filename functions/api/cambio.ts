@@ -26,6 +26,51 @@ function toMMDDYYYY(d: Date): string {
   return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
 }
 
+// Variação de 24h de um par de moedas. A Frankfurter devolve só a taxa
+// do dia, sem comparativo — por isso a variação ficava fixada em zero e
+// a seta de alta/baixa NUNCA aparecia nos cards de moeda (só no
+// petróleo, que já usava o Yahoo).
+//
+// Buscamos a variação no Yahoo Finance, a mesma fonte já usada aqui
+// para ouro e petróleo. Misturar fontes para o PERCENTUAL é seguro: a
+// variação percentual de um par é praticamente idêntica entre
+// provedores, porque é uma razão entre dois preços do mesmo par — não
+// um valor absoluto que dependa da fonte.
+async function fetchVariacao24h(tickerYahoo: string, debug: string[]): Promise<number> {
+  try {
+    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${tickerYahoo}`, {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (!res.ok) {
+      debug.push(`Variação ${tickerYahoo}: HTTP ${res.status}`);
+      return 0;
+    }
+    const data = (await res.json()) as any;
+    const meta = data?.chart?.result?.[0]?.meta;
+    const atual = meta?.regularMarketPrice;
+    const anterior = meta?.chartPreviousClose;
+    if (!(atual > 0) || !(anterior > 0)) {
+      debug.push(`Variação ${tickerYahoo}: resposta sem preços comparáveis.`);
+      return 0;
+    }
+    const pct = ((atual - anterior) / anterior) * 100;
+    // Variação diária acima de 20% num par de moedas é quase certamente
+    // erro de leitura, não movimento real de mercado.
+    if (!isFinite(pct) || Math.abs(pct) > 20) {
+      debug.push(`Variação ${tickerYahoo}: ${pct.toFixed(2)}% fora da faixa plausível — ignorada.`);
+      return 0;
+    }
+    return Number(pct.toFixed(2));
+  } catch (e: any) {
+    debug.push(`Variação ${tickerYahoo}: ${e?.message || String(e)}`);
+    return 0;
+  }
+}
+
+const TICKER_YAHOO_POR_MOEDA: Record<string, string> = {
+  USD: 'USDBRL=X', EUR: 'EURBRL=X', JPY: 'JPYBRL=X', CNY: 'CNYBRL=X',
+};
+
 async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY', debug: string[]): Promise<CambioEntry | null> {
   // Fonte principal: Frankfurter v2 — API gratuita, sem chave, que
   // rastreia taxas de 98 bancos centrais/fontes oficiais. Migrado da v1
@@ -40,10 +85,12 @@ async function fetchMoeda(moeda: 'USD' | 'EUR' | 'JPY' | 'CNY', debug: string[])
       const data = (await res.json()) as any;
       const rate = data?.rate;
       if (rate > 0) {
+        const ticker = TICKER_YAHOO_POR_MOEDA[moeda];
+        const variacaoPct = ticker ? await fetchVariacao24h(ticker, debug) : 0;
         return {
           compra: Number((rate * 0.998).toFixed(4)),
           venda: Number(rate.toFixed(4)),
-          variacaoPct: 0,
+          variacaoPct,
           atualizadoEm: data.date || new Date().toISOString(),
         };
       }
@@ -137,10 +184,19 @@ async function fetchBitcoin(usdBrl: CambioEntry | null, debug: string[]): Promis
       const data = (await res.json()) as any[];
       const entry = data?.[0];
       if (entry?.last) {
+        // A API do Mercado Bitcoin já devolve a abertura das últimas 24h
+        // ("open"), então dá pra calcular a variação sem outra chamada.
+        const atual = Number(entry.last);
+        const abertura = Number(entry.open);
+        const variacaoPct = abertura > 0
+          ? Number((((atual - abertura) / abertura) * 100).toFixed(2))
+          : 0;
         return {
           compra: Number(entry.buy || entry.last),
           venda: Number(entry.sell || entry.last),
-          variacaoPct: 0,
+          // Bitcoin oscila mais que moeda, mas acima de 50% num dia é
+          // quase certamente erro de leitura.
+          variacaoPct: isFinite(variacaoPct) && Math.abs(variacaoPct) <= 50 ? variacaoPct : 0,
           atualizadoEm: new Date().toISOString(),
         };
       }
@@ -237,14 +293,21 @@ async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | nul
       });
       if (res.ok) {
         const data = (await res.json()) as any;
-        const usdPerOz = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        const metaOuro = data?.chart?.result?.[0]?.meta;
+        const usdPerOz = metaOuro?.regularMarketPrice;
         if (usdPerOz > 0) {
           const usdPerGram = usdPerOz / GRAMS_PER_TROY_OUNCE;
           const brlPerGram = usdPerGram * usdBrl.venda;
+          // A própria resposta do Yahoo já traz o fechamento anterior —
+          // não precisa de outra chamada pra calcular a variação.
+          const anteriorOz = metaOuro?.chartPreviousClose;
+          const variacaoPct = anteriorOz > 0
+            ? Number((((usdPerOz - anteriorOz) / anteriorOz) * 100).toFixed(2))
+            : 0;
           return {
             compra: Number((brlPerGram * 0.98).toFixed(2)),
             venda: Number(brlPerGram.toFixed(2)),
-            variacaoPct: 0,
+            variacaoPct: Math.abs(variacaoPct) <= 20 ? variacaoPct : 0,
             atualizadoEm: new Date().toISOString(),
           };
         }

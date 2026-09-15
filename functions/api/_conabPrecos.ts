@@ -111,6 +111,12 @@ function ehInsumo(produto: string): boolean {
 // misturaria ~R$23 (histórico) com ~R$350 (preço atual) e ficaria
 // ilegível. 1 arroba = 15 kg — a mesma conversão que a Planilha de
 // Pesagem do app já usa.
+// Série com pouquíssimos pontos não é referência confiável: a Paraíba
+// tinha arroz a R$0,76 com apenas 3 registros, e Sergipe feijão com 2.
+// Um número frágil exibido com a mesma confiança de um robusto engana
+// mais do que ajuda — melhor não mostrar e dizer por quê.
+const MINIMO_DE_PONTOS = 6;
+
 const PRODUTOS_EM_ARROBA = new Set(['boi_gordo', 'vaca', 'novilho', 'novilha']);
 const KG_POR_ARROBA = 15;
 
@@ -394,6 +400,15 @@ export async function buscarHistoricoConab(
     diagnostico.push(`Sem preço de produtor; usando nível "${nivelAlternativoUsado}" (${pontosOutroNivel.length} pontos).`);
   }
 
+  // Corte por amostra insuficiente — ver MINIMO_DE_PONTOS.
+  if (pontos.length > 0 && pontos.length < MINIMO_DE_PONTOS) {
+    diagnostico.push(`Apenas ${pontos.length} ponto(s) — abaixo do mínimo de ${MINIMO_DE_PONTOS}. Série descartada por amostra insuficiente.`);
+    return {
+      pontos: [], urlUsada: arquivo.url, produtoEncontrado, unidade, diagnostico,
+      aviso: `A CONAB tem só ${pontos.length} registro(s) desse produto em ${estado} no período — amostra pequena demais pra servir de referência, então preferimos não exibir.`,
+    };
+  }
+
   const todosNomes = Array.from(nomesDistintos).sort();
   const parecidos = palavraChave
     ? todosNomes.filter(n => n.toLowerCase().includes(palavraChave))
@@ -519,6 +534,7 @@ export async function coberturaPorEstado(produto: string): Promise<ResultadoCobe
   }
 
   const estadosCobertos: CoberturaUf[] = Array.from(porUf.entries())
+    .filter(([, reg]) => reg.meses.length >= MINIMO_DE_PONTOS)
     .map(([uf, reg]) => {
       const ordenados = reg.meses.slice().sort();
       return {
