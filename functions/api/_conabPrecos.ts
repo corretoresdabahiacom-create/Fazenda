@@ -74,7 +74,37 @@ const TERMOS_PRODUTO: Record<string, RegExp> = {
   sorgo: /^sorgo$/i,
   leite: /^leite$/i,
   acucar: /^acucar$/i,
+
+  // FERTILIZANTES — o arquivo da CONAB traz dezenas deles. As fórmulas
+  // NPK têm formato inconfundível (três números de dois dígitos
+  // separados por hífen: "10-10-10", "04-14-08"), o que permite um
+  // padrão seguro, sem risco de casar com outra coisa. Os fertilizantes
+  // simples entram por nome exato.
+  //
+  // ATENÇÃO À UNIDADE: fertilizante é insumo, não produto — o preço é
+  // o que o produtor PAGA, não o que recebe. Por isso NÃO passam pelo
+  // filtro de "preço recebido pelo produtor"; ver tratamento especial
+  // em ehInsumo() abaixo.
+  fert_npk_10_10_10: /^10-10-10$/,
+  fert_npk_20_05_20: /^20-05-20$/,
+  fert_npk_08_28_16: /^08-28-16$/,
+  fert_npk_04_14_08: /^04-14-08$/,
+  fert_npk_00_20_20: /^00-20-20$/,
+  fert_ureia: /^ureia$/i,
+  fert_superfosfato_simples: /^superfosfato simples$/i,
+  fert_superfosfato_triplo: /^superfosfato triplo$/i,
+  fert_cloreto_potassio: /^cloreto de pot[áa]ssio$/i,
+  fert_map: /^map$/i,
+  fert_calcario: /^calc[áa]rio$/i,
 };
+
+// Insumos (o produtor COMPRA) x produtos (o produtor VENDE). A
+// distinção importa porque o filtro de "preço recebido pelo produtor"
+// só faz sentido para o que ele vende — num insumo, o preço relevante
+// é justamente o de venda ao produtor.
+function ehInsumo(produto: string): boolean {
+  return produto.startsWith('fert_');
+}
 
 // O arquivo dá o preço em R$/KG (coluna "valor_produto_kg"), mas o
 // mercado de bovinos negocia em R$/ARROBA. Sem converter, o gráfico
@@ -92,6 +122,14 @@ const FAIXAS_PLAUSIVEIS: Record<string, [number, number]> = {
   soja: [40, 300], milho: [10, 150], cafe: [200, 4000], algodao: [1, 40],
   arroz: [20, 200], feijao: [1, 30], trigo: [15, 200], sorgo: [10, 120],
   leite: [0.5, 8], acucar: [0.5, 10],
+  // Fertilizante em R$/kg: adubo formulado costuma ficar entre R$1 e
+  // R$10/kg; calcário é bem mais barato.
+  fert_npk_10_10_10: [0.5, 15], fert_npk_20_05_20: [0.5, 15],
+  fert_npk_08_28_16: [0.5, 15], fert_npk_04_14_08: [0.5, 15],
+  fert_npk_00_20_20: [0.5, 15], fert_ureia: [0.5, 15],
+  fert_superfosfato_simples: [0.2, 12], fert_superfosfato_triplo: [0.5, 15],
+  fert_cloreto_potassio: [0.5, 15], fert_map: [0.5, 20],
+  fert_calcario: [0.02, 3],
 };
 
 const UF_POR_NOME: Record<string, string> = {
@@ -119,7 +157,15 @@ async function baixarArquivo(diagnostico: string[]): Promise<{ texto: string; ur
         diagnostico.push(`${url}: HTTP ${res.status}`);
         continue;
       }
-      const texto = await res.text();
+      // BUG REAL DE CODIFICAÇÃO: o arquivo da CONAB é Latin-1
+      // (ISO-8859-1), não UTF-8. Lendo com res.text() os acentos viram
+      // "�" — o diagnóstico mostrou "PRE�O RECEBIDO P/ PRODUTOR" em vez
+      // de "PREÇO". Deu sorte de "PRODUTOR" não ter acento, senão o
+      // filtro de nível teria falhado sem aviso. Com fertilizantes
+      // ("POTÁSSIO", "SUPERFOSFATO") isso quebraria de verdade.
+      // Solução: ler os bytes crus e decodificar como Latin-1.
+      const bytes = await res.arrayBuffer();
+      const texto = new TextDecoder('iso-8859-1').decode(bytes);
       // Uma página de erro HTML também volta com 200 em alguns portais —
       // conferimos que o conteúdo parece mesmo dado tabular.
       if (/^\s*<(!doctype|html)/i.test(texto)) {
@@ -268,7 +314,7 @@ export async function buscarHistoricoConab(
     // recebe. Filtramos por esse nível; se a linha não disser o nível,
     // aceitamos (melhor ter o dado do que descartar por omissão).
     const nivelLinha = colNivel >= 0 ? (campos[colNivel] || '').trim() : '';
-    if (nivelLinha) {
+    if (nivelLinha && !ehInsumo(produto)) {
       niveisVistos.add(nivelLinha);
       const ehProdutor = /produtor|produ[çc][ãa]o|lavoura|porta.?da.?fazenda/i.test(nivelLinha);
       if (!ehProdutor) {
