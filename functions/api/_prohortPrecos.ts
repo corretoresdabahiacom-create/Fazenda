@@ -53,53 +53,141 @@ export interface ResultadoProhort {
   aviso?: string;
 }
 
-let cacheProhort: { texto: string; url: string } | null = null;
+// LEITURA EM FLUXO — o diagnóstico provou que ProhortDiario.txt e
+// ProhortMensal.txt EXISTEM (os outros candidatos deram 404), mas
+// estouram a memória do Worker: "Memory limit exceeded before EOF".
+// São preços diários de 40 CEASAs acumulados, então o arquivo é grande
+// demais pra carregar inteiro.
+//
+// Solução: ler o corpo da resposta como fluxo e processar LINHA A
+// LINHA, guardando só o que interessa e descartando o resto na hora.
+// Assim a memória usada não depende do tamanho do arquivo. Também não
+// cacheamos o arquivo (era o que estourava antes) — cacheamos só o
+// resultado já filtrado.
 
-async function baixar(diagnostico: string[]): Promise<{ texto: string; url: string } | null> {
-  if (cacheProhort) {
-    diagnostico.push(`Arquivo já em cache (${cacheProhort.texto.length} caracteres).`);
-    return cacheProhort;
+const CANDIDATOS_VALIDOS = [
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortDiario.txt',
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/ProhortMensal.txt',
+];
+
+// Teto de linhas casadas — evita que uma busca ampla (ex: termo vazio)
+// acumule memória de novo pelo outro lado.
+const MAXIMO_DE_LINHAS = 4000;
+
+interface ResultadoStream {
+  cabecalho: string[];
+  separador: string;
+  linhasCasadas: string[][];
+  nomesVistos: Set<string>;
+  totalLidas: number;
+  url: string;
+}
+
+async function lerEmFluxo(
+  url: string,
+  casaProduto: (nome: string) => boolean,
+  indiceProdutoRef: { valor: number },
+  diagnostico: string[],
+): Promise<ResultadoStream | null> {
+  const res = await fetch(url, { headers: { Accept: 'text/csv,text/plain,*/*' } });
+  if (!res.ok) {
+    diagnostico.push(`${url}: HTTP ${res.status}`);
+    return null;
   }
-  for (const url of CANDIDATOS_PROHORT) {
-    try {
-      const res = await fetch(url, { headers: { Accept: 'text/csv,text/plain,*/*' } });
-      if (!res.ok) { diagnostico.push(`${url}: HTTP ${res.status}`); continue; }
-      const bytes = await res.arrayBuffer();
-      // Mesmo cuidado do outro arquivo da CONAB: é Latin-1, não UTF-8.
-      const texto = new TextDecoder('iso-8859-1').decode(bytes);
-      if (/^\s*<(!doctype|html)/i.test(texto)) {
-        diagnostico.push(`${url}: devolveu HTML (página de erro), não dados.`);
+  if (!res.body) {
+    diagnostico.push(`${url}: resposta sem corpo legível.`);
+    return null;
+  }
+
+  const leitor = res.body.getReader();
+  // O arquivo da CONAB é Latin-1 (descoberto no outro arquivo deles);
+  // stream:true mantém o estado entre pedaços, pra não cortar caractere
+  // no meio.
+  const decodificador = new TextDecoder('iso-8859-1');
+  let sobra = '';
+  let cabecalho: string[] = [];
+  let separador = ';';
+  const linhasCasadas: string[][] = [];
+  const nomesVistos = new Set<string>();
+  let totalLidas = 0;
+  let primeira = true;
+
+  while (true) {
+    const { done, value } = await leitor.read();
+    if (done) break;
+
+    sobra += decodificador.decode(value, { stream: true });
+    const partes = sobra.split(/\r?\n/);
+    // A última parte pode estar incompleta — guarda pro próximo pedaço.
+    sobra = partes.pop() || '';
+
+    for (const linha of partes) {
+      if (!linha.trim()) continue;
+
+      if (primeira) {
+        separador = [';', '\t', ','].reduce((m, s) =>
+          linha.split(s).length > linha.split(m).length ? s : m, ';');
+        cabecalho = linha.split(separador).map(h => h.trim().toLowerCase());
+        indiceProdutoRef.valor = cabecalho.findIndex(h => h.includes('produto') || h.includes('descricao'));
+        primeira = false;
         continue;
       }
-      if (texto.length < 100) { diagnostico.push(`${url}: resposta curta demais.`); continue; }
-      diagnostico.push(`${url}: OK — ${texto.length} caracteres.`);
-      cacheProhort = { texto, url };
-      return cacheProhort;
-    } catch (e: any) {
-      diagnostico.push(`${url}: falhou (${e?.message || String(e)}).`);
+
+      totalLidas++;
+      const campos = linha.split(separador);
+      const nome = (campos[indiceProdutoRef.valor] || '').trim();
+      if (!nome) continue;
+      if (nomesVistos.size < 200) nomesVistos.add(nome);
+
+      if (casaProduto(nome) && linhasCasadas.length < MAXIMO_DE_LINHAS) {
+        linhasCasadas.push(campos);
+      }
     }
   }
-  return null;
+
+  // Processa o que sobrou sem quebra de linha no fim do arquivo.
+  if (sobra.trim() && !primeira) {
+    totalLidas++;
+    const campos = sobra.split(separador);
+    const nome = (campos[indiceProdutoRef.valor] || '').trim();
+    if (nome && casaProduto(nome) && linhasCasadas.length < MAXIMO_DE_LINHAS) {
+      linhasCasadas.push(campos);
+    }
+  }
+
+  diagnostico.push(`${url}: OK em fluxo — ${totalLidas} linhas lidas, ${linhasCasadas.length} casaram.`);
+  return { cabecalho, separador, linhasCasadas, nomesVistos, totalLidas, url };
 }
 
 export async function buscarHortifruti(termoProduto: string, uf?: string): Promise<ResultadoProhort> {
   const diagnostico: string[] = [];
-  const arquivo = await baixar(diagnostico);
-  if (!arquivo) {
+  const termo = termoProduto.trim().toLowerCase();
+  const casaProduto = (nome: string) => !termo || nome.toLowerCase().includes(termo);
+  const indiceProdutoRef = { valor: -1 };
+
+  let stream: ResultadoStream | null = null;
+  for (const url of CANDIDATOS_VALIDOS) {
+    try {
+      stream = await lerEmFluxo(url, casaProduto, indiceProdutoRef, diagnostico);
+      if (stream && stream.cabecalho.length > 1) break;
+      stream = null;
+    } catch (e: any) {
+      diagnostico.push(`${url}: falhou (${e?.message || String(e)}).`);
+    }
+  }
+
+  if (!stream) {
     return {
       precos: [], urlUsada: null, produtosDisponiveis: [], diagnostico,
-      aviso: 'Nenhum dos endereços candidatos do PROHORT respondeu com arquivo de dados. Veja o diagnóstico pra saber o que cada um devolveu.',
+      aviso: 'Não foi possível ler o arquivo do PROHORT. Veja o diagnóstico pra saber o que cada endereço devolveu.',
     };
   }
 
-  const linhas = arquivo.texto.split(/\r?\n/).filter(l => l.trim());
-  const sep = [';', '\t', ','].reduce((m, s) =>
-    linhas[0].split(s).length > linhas[0].split(m).length ? s : m, ';');
-  const cab = linhas[0].split(sep).map(h => h.trim().toLowerCase());
-  diagnostico.push(`Separador: "${sep === '\t' ? 'TAB' : sep}". Colunas: ${cab.join(' | ')}`);
-
+  const cab = stream.cabecalho;
+  diagnostico.push(`Colunas: ${cab.join(' | ')}`);
   const achar = (...t: string[]) => cab.findIndex(h => t.some(x => h.includes(x)));
-  const cProduto = achar('produto', 'descricao');
+
+  const cProduto = indiceProdutoRef.valor;
   const cCeasa = achar('ceasa', 'central', 'entreposto', 'mercado');
   const cUf = achar('uf', 'estado', 'sigla');
   const cData = achar('data', 'dia');
@@ -108,38 +196,39 @@ export async function buscarHortifruti(termoProduto: string, uf?: string): Promi
 
   if (cProduto < 0 || cValor < 0) {
     return {
-      precos: [], urlUsada: arquivo.url, produtosDisponiveis: [], diagnostico,
-      aviso: 'Arquivo baixado, mas não encontrei as colunas de produto e preço. Veja as colunas listadas no diagnóstico.',
+      precos: [], urlUsada: stream.url,
+      produtosDisponiveis: Array.from(stream.nomesVistos).sort().slice(0, 120),
+      diagnostico,
+      aviso: 'Arquivo lido, mas não encontrei as colunas de produto e preço. Veja as colunas no diagnóstico.',
     };
   }
 
-  const termo = termoProduto.trim().toLowerCase();
   const precos: PrecoHortifruti[] = [];
-  const disponiveis = new Set<string>();
-
-  for (let i = 1; i < linhas.length; i++) {
-    const c = linhas[i].split(sep);
-    const nome = (c[cProduto] || '').trim();
-    if (!nome) continue;
-    if (disponiveis.size < 200) disponiveis.add(nome);
-    if (termo && !nome.toLowerCase().includes(termo)) continue;
-
-    const ufLinha = cUf >= 0 ? (c[cUf] || '').trim().toUpperCase() : '';
+  for (const campos of stream.linhasCasadas) {
+    const ufLinha = cUf >= 0 ? (campos[cUf] || '').trim().toUpperCase() : '';
     if (uf && ufLinha && ufLinha !== uf.toUpperCase()) continue;
 
-    const valor = Number((c[cValor] || '').trim().replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
+    const valor = Number((campos[cValor] || '').trim().replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
     if (isNaN(valor) || valor <= 0) continue;
 
     precos.push({
-      produto: nome,
-      ceasa: cCeasa >= 0 ? (c[cCeasa] || '').trim() : '',
+      produto: (campos[cProduto] || '').trim(),
+      ceasa: cCeasa >= 0 ? (campos[cCeasa] || '').trim() : '',
       uf: ufLinha,
-      data: cData >= 0 ? (c[cData] || '').trim() : '',
+      data: cData >= 0 ? (campos[cData] || '').trim() : '',
       preco: valor,
-      unidade: cUnidade >= 0 ? (c[cUnidade] || '').trim() : 'R$/kg',
+      unidade: cUnidade >= 0 ? (campos[cUnidade] || '').trim() : 'R$/kg',
     });
   }
 
-  diagnostico.push(`Produtos distintos no arquivo: ${disponiveis.size}. Casaram com "${termoProduto}": ${precos.length}.`);
-  return { precos, urlUsada: arquivo.url, produtosDisponiveis: Array.from(disponiveis).sort().slice(0, 120), diagnostico };
+  // Mais recente primeiro — o produtor quer o preço de hoje.
+  precos.sort((a, b) => (b.data || '').localeCompare(a.data || ''));
+
+  diagnostico.push(`Após filtro de UF e validação de preço: ${precos.length} registros.`);
+  return {
+    precos,
+    urlUsada: stream.url,
+    produtosDisponiveis: Array.from(stream.nomesVistos).sort().slice(0, 120),
+    diagnostico,
+  };
 }
