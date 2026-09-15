@@ -335,7 +335,20 @@ function DetalheProduto({ produtoId, produtoLabel, estado, itensManuaisDoProduto
   const todasLinhas = [...linhasManuais, ...quotes, ...linhasNacionais];
 
   if (loading) return <p className="text-xs text-theme-secondary p-3">Buscando preço real...</p>;
-  if (todasLinhas.length === 0) return <p className="text-xs text-theme-secondary p-3 italic">Sem detalhe por praça/cidade disponível pra {produtoLabel} em {estado} no momento.</p>;
+  if (todasLinhas.length === 0) {
+    return (
+      <div className="p-3 space-y-1">
+        <p className="text-xs text-theme-secondary italic">
+          Nenhuma fonte publica preço de {produtoLabel} em {estado}.
+        </p>
+        <p className="text-[10px] text-theme-secondary">
+          O produto aparece na lista porque alguma fonte o cobre em outros estados — mas
+          nenhuma delas pesquisa preço aqui. Preferimos dizer isso a mostrar o preço de
+          outro estado como se fosse daqui.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-theme-secondary rounded-xl overflow-hidden">
@@ -513,7 +526,26 @@ function CardEstado({ estado }: CardEstadoProps) {
           )}
           {loading && <p className="text-xs text-theme-secondary py-2">Verificando produtos disponíveis...</p>}
           {!loading && todosProdutos.length === 0 && (
-            <p className="text-xs text-theme-secondary italic py-2">Nenhum produto com dado real disponível pra {estado.nome} ainda.{isAdmin ? ' Use o botão "Admin" acima pra cadastrar.' : ''}</p>
+            <div className="py-2 space-y-1.5">
+              <p className="text-xs text-theme-secondary italic">
+                Nenhuma fonte pública publica cotação pra {estado.nome} no momento.
+              </p>
+              {/* Explicar o MOTIVO importa pra credibilidade: o usuário
+                  precisa saber que é limite da fonte, não falha do app.
+                  As coberturas abaixo vieram dos diagnósticos que
+                  rodamos contra os arquivos reais de cada fonte. */}
+              <p className="text-[10px] text-theme-secondary">
+                Isso é limitação das fontes, não do aplicativo. Hoje o Boi Gordo só é publicado
+                em 9 estados pela CONAB e 20 pela Scot Consultoria; grãos como arroz, feijão,
+                café e milho têm cobertura nos 27 estados. Quando alguma fonte passar a publicar
+                pra cá, aparece aqui automaticamente.
+              </p>
+              {isAdmin && (
+                <p className="text-[10px] text-[var(--primary)] font-semibold">
+                  Como administrador, você pode cadastrar um preço pesquisado localmente pelo botão "Admin" acima.
+                </p>
+              )}
+            </div>
           )}
           {!loading && todosProdutos.map(p => {
             const itemManualDoProduto = itensManuaisDetalhados.find(item => `manual_${item.produtoId}` === p.id);
