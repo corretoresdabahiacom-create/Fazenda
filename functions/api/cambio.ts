@@ -375,6 +375,67 @@ async function fetchB3Extras(): Promise<{ dolarFuturo: { valor: string; vencimen
   }
 }
 
+// PETRÓLEO — dois tipos, como o mercado trabalha:
+//   Brent (BZ=F): referência do Mar do Norte, usada na Europa/Ásia e
+//     base do preço que a Petrobras pratica no Brasil.
+//   WTI (CL=F): referência americana, negociada em Nova York.
+// Os dois andam juntos mas têm preços diferentes, e acompanhar a
+// diferença entre eles é prática comum no agro (diesel é custo grande
+// no transporte de safra e no maquinário).
+//
+// Yahoo Finance é a mesma fonte já usada para o ouro e os futuros
+// agrícolas neste projeto — testada e sem bloqueio por automação.
+async function fetchPetroleo(
+  ticker: string,
+  nome: string,
+  usdBrl: CambioEntry | null,
+  debug: string[],
+): Promise<CambioEntry | null> {
+  if (!usdBrl) {
+    debug.push(`${nome}: sem cotação do dólar, não dá pra converter pra reais.`);
+    return null;
+  }
+  try {
+    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}`, {
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'application/json' },
+    });
+    if (!res.ok) {
+      debug.push(`Yahoo Finance ${ticker}: HTTP ${res.status}`);
+      return null;
+    }
+    const data = (await res.json()) as any;
+    const meta = data?.chart?.result?.[0]?.meta;
+    const usdPorBarril = meta?.regularMarketPrice;
+    if (!(usdPorBarril > 0)) {
+      debug.push(`Yahoo Finance ${ticker}: resposta sem preço utilizável.`);
+      return null;
+    }
+
+    // Faixa de sanidade: petróleo fora de US$ 10–250 o barril é quase
+    // certamente erro de leitura, não movimento de mercado.
+    if (usdPorBarril < 10 || usdPorBarril > 250) {
+      debug.push(`Yahoo Finance ${ticker}: US$ ${usdPorBarril} está fora da faixa plausível — descartado.`);
+      return null;
+    }
+
+    const anterior = meta?.chartPreviousClose;
+    const variacaoPct = anterior > 0
+      ? Number((((usdPorBarril - anterior) / anterior) * 100).toFixed(2))
+      : 0;
+
+    const brlPorBarril = usdPorBarril * usdBrl.venda;
+    return {
+      compra: Number((brlPorBarril * 0.998).toFixed(2)),
+      venda: Number(brlPorBarril.toFixed(2)),
+      variacaoPct,
+      atualizadoEm: new Date().toISOString(),
+    };
+  } catch (e: any) {
+    debug.push(`Yahoo Finance ${ticker}: ${e?.message || String(e)}`);
+    return null;
+  }
+}
+
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const cache = (caches as any).default;
   const cacheKey = new Request('https://cache.internal/cambio-v5', context.request);
@@ -404,13 +465,15 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       fetchB3Extras(),
     ]);
 
-    const [btc, xau] = await Promise.all([
+    const [btc, xau, brent, wti] = await Promise.all([
       fetchBitcoin(usd, debug),
       fetchGold(usd, b3Extras.ouroFuturoBrl, debug),
+      fetchPetroleo('BZ=F', 'Petróleo Brent', usd, debug),
+      fetchPetroleo('CL=F', 'Petróleo WTI', usd, debug),
     ]);
 
     const response = new Response(JSON.stringify({
-      usd, eur, jpy, cny, xau, btc,
+      usd, eur, jpy, cny, xau, btc, brent, wti,
       dolarFuturoB3: b3Extras.dolarFuturo,
       fonte: 'Banco Central do Brasil (PTAX oficial) — Bitcoin via Mercado Bitcoin, Ouro via B3/Stooq, Dólar Futuro via B3/Notícias Agrícolas',
       debug: debug.length > 0 ? debug : undefined,

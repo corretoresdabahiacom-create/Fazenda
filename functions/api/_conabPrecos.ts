@@ -421,6 +421,11 @@ export async function coberturaPorEstado(produto: string): Promise<ResultadoCobe
   const colValor = acharColuna('preço', 'preco', 'valor');
   const colAno = acharColuna('ano');
   const colMes = acharColuna('mês', 'mes');
+  // FALHA MINHA CORRIGIDA: o filtro de nível de comercialização foi
+  // aplicado só na busca principal, não aqui. Como o diagnóstico de
+  // cobertura usa ESTA função, ele mostrava dados não filtrados — e o
+  // teste da correção deu falso negativo.
+  const colNivel = acharColuna('nivel_comercializacao', 'nivel', 'comercializacao');
 
   if (colProduto < 0 || colUf < 0 || colValor < 0 || colAno < 0 || colMes < 0) {
     diagnostico.push('Não encontrei todas as colunas necessárias no cabeçalho.');
@@ -428,6 +433,7 @@ export async function coberturaPorEstado(produto: string): Promise<ResultadoCobe
   }
 
   const porUf = new Map<string, { meses: string[]; ultimoValor: number; ultimoMes: string }>();
+  const niveisVistos = new Set<string>();
   let nomeNoArquivo: string | null = null;
   let totalLinhas = 0;
 
@@ -442,6 +448,13 @@ export async function coberturaPorEstado(produto: string): Promise<ResultadoCobe
 
     const uf = (campos[colUf] || '').trim().toUpperCase();
     if (!uf) continue;
+
+    // Mesmo critério da busca principal: só nível de produtor.
+    const nivelLinha = colNivel >= 0 ? (campos[colNivel] || '').trim() : '';
+    if (nivelLinha) {
+      niveisVistos.add(nivelLinha);
+      if (!/produtor|produ[çc][ãa]o|lavoura|porta.?da.?fazenda/i.test(nivelLinha)) continue;
+    }
 
     const ano = (campos[colAno] || '').trim();
     const mesBruto = (campos[colMes] || '').trim();
@@ -477,6 +490,9 @@ export async function coberturaPorEstado(produto: string): Promise<ResultadoCobe
   const estadosSemDados = Object.keys(UF_POR_NOME).filter(nome => !cobertos.has(nome)).sort();
 
   diagnostico.push(`Produto "${nomeNoArquivo}": ${totalLinhas} linhas, ${estadosCobertos.length} estado(s) com dado.`);
+  if (niveisVistos.size > 0) {
+    diagnostico.push(`Níveis de comercialização no arquivo: ${Array.from(niveisVistos).join(' | ')} — só o de produtor foi contado.`);
+  }
 
   return { produtoBuscado: produto, nomeNoArquivo, totalLinhas, estadosCobertos, estadosSemDados, diagnostico };
 }

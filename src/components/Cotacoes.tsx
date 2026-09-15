@@ -151,6 +151,7 @@ interface CambioData {
   usd: CambioEntry | null; eur: CambioEntry | null; jpy: CambioEntry | null;
   cny: CambioEntry | null; rub: CambioEntry | null;
   xau: CambioEntry | null; btc: CambioEntry | null;
+  brent: CambioEntry | null; wti: CambioEntry | null;
   dolarFuturoB3: { valor: string; vencimento: string } | null;
   debug?: string[];
 }
@@ -652,6 +653,8 @@ export default function Cotacoes({ defaultRegion }: { defaultRegion?: string }) 
           <CambioCard label="Yuan (CNY)" entry={cambio?.cny ?? null} flag="🇨🇳" paisCodigo="cn" decimals={4} />
           <CambioCard label="Ouro (grama)" entry={cambio?.xau ?? null} flag="🥇" decimals={2} />
           <CambioCard label="Bitcoin (BTC)" entry={cambio?.btc ?? null} flag="₿" decimals={0} />
+          <CambioCard label="Petróleo Brent (barril)" entry={cambio?.brent ?? null} flag="🛢️" decimals={2} />
+          <CambioCard label="Petróleo WTI (barril)" entry={cambio?.wti ?? null} flag="🛢️" decimals={2} />
         </div>
         {cambio?.dolarFuturoB3 && (
           <div className="mt-2 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between">
