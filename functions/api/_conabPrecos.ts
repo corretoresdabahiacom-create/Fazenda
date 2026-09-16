@@ -764,3 +764,112 @@ export async function catalogoCompleto(filtroClassificacao?: string): Promise<{
   diagnostico.push(`Catálogo: ${itens.length} produtos distintos.`);
   return { total: itens.length, itens, classificacoesDisponiveis: Array.from(classes).sort(), diagnostico };
 }
+
+
+// ---------------------------------------------------------------------
+// PRODUTOS DISPONÍVEIS EM UM ESTADO — responde "o que posso oferecer
+// para quem está na Bahia?".
+//
+// POR QUE EXISTE: o catálogo geral filtra por número de estados, o que
+// esconde produtos REGIONAIS. Um produto pesquisado só na Bahia e em
+// Sergipe some de um filtro "20+ estados", mas é justamente o que
+// interessa para o produtor baiano. Esta função olha por estado.
+// ---------------------------------------------------------------------
+
+export interface ProdutoNoEstado {
+  nome: string;
+  pontos: number;
+  precoMin: number;
+  precoMax: number;
+  precoMaisRecente: number;
+  ultimoMes: string;
+  temNivelProdutor: boolean;
+  niveis: string[];
+}
+
+export async function produtosDoEstado(uf: string): Promise<{
+  uf: string;
+  total: number;
+  produtos: ProdutoNoEstado[];
+  diagnostico: string[];
+}> {
+  const diagnostico: string[] = [];
+  const arquivo = await baixarArquivo(diagnostico);
+  if (!arquivo) return { uf, total: 0, produtos: [], diagnostico };
+
+  const linhas = arquivo.texto.split(/\r?\n/).filter(l => l.trim());
+  const sep = detectarSeparador(linhas[0]);
+  const cab = linhas[0].split(sep).map(h => h.trim().toLowerCase());
+  const achar = (...t: string[]) => cab.findIndex(h => t.some(x => h.includes(x)));
+
+  const cProduto = achar('produto');
+  const cUf = achar('uf', 'estado', 'sigla');
+  const cValor = achar('preço', 'preco', 'valor');
+  const cAno = achar('ano');
+  const cMes = achar('mês', 'mes');
+  const cNivel = achar('nivel_comercializacao', 'nivel', 'comercializacao');
+
+  if (cProduto < 0 || cUf < 0 || cValor < 0) {
+    diagnostico.push('Colunas essenciais não encontradas.');
+    return { uf, total: 0, produtos: [], diagnostico };
+  }
+
+  const alvo = uf.trim().toUpperCase();
+  interface Acc {
+    pontos: number; min: number; max: number;
+    ultimoMes: string; ultimoValor: number;
+    niveis: Set<string>;
+  }
+  const mapa = new Map<string, Acc>();
+
+  for (let i = 1; i < linhas.length; i++) {
+    const campos = linhas[i].split(sep);
+    if ((campos[cUf] || '').trim().toUpperCase() !== alvo) continue;
+
+    const nome = (campos[cProduto] || '').trim();
+    if (!nome) continue;
+
+    const valor = normalizarNumero(campos[cValor]);
+    if (isNaN(valor) || valor <= 0) continue;
+
+    const nivel = cNivel >= 0 ? (campos[cNivel] || '').trim() : '';
+    // Só conta o nível de produtor — é o preço que interessa a quem
+    // vende. Sem esse recorte, atacado e varejo inflariam a contagem e
+    // distorceriam a faixa de preço (foi o que gerou spreads de 4x).
+    if (nivel && !/produtor|produ[çc][ãa]o|lavoura/i.test(nivel)) continue;
+
+    const ano = cAno >= 0 ? (campos[cAno] || '').trim() : '';
+    const mesBruto = cMes >= 0 ? (campos[cMes] || '').trim() : '';
+    const mes = /^\d+$/.test(mesBruto) ? String(Number(mesBruto)).padStart(2, '0') : '';
+    const anoMes = /^\d{4}$/.test(ano) && mes ? `${ano}-${mes}` : '';
+
+    if (!mapa.has(nome)) {
+      mapa.set(nome, { pontos: 0, min: valor, max: valor, ultimoMes: '', ultimoValor: valor, niveis: new Set() });
+    }
+    const a = mapa.get(nome)!;
+    a.pontos++;
+    if (valor < a.min) a.min = valor;
+    if (valor > a.max) a.max = valor;
+    if (nivel) a.niveis.add(nivel);
+    if (anoMes > a.ultimoMes) { a.ultimoMes = anoMes; a.ultimoValor = valor; }
+  }
+
+  const produtos: ProdutoNoEstado[] = Array.from(mapa.entries())
+    // Mesmo corte de amostra usado no resto: série curta demais não
+    // vira referência confiável.
+    .filter(([, a]) => a.pontos >= MINIMO_DE_PONTOS)
+    .map(([nome, a]) => ({
+      nome,
+      pontos: a.pontos,
+      precoMin: Number(a.min.toFixed(2)),
+      precoMax: Number(a.max.toFixed(2)),
+      precoMaisRecente: Number(a.ultimoValor.toFixed(2)),
+      ultimoMes: a.ultimoMes,
+      temNivelProdutor: a.niveis.size > 0,
+      niveis: Array.from(a.niveis),
+    }))
+    .sort((a, b) => b.pontos - a.pontos);
+
+  diagnostico.push(`${alvo}: ${produtos.length} produtos com preço de produtor e amostra de ${MINIMO_DE_PONTOS}+ pontos.`);
+  return { uf: alvo, total: produtos.length, produtos, diagnostico };
+}
