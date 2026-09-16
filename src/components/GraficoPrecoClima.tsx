@@ -23,11 +23,29 @@ interface Props {
 // Lista de produtos pra tela de configuração do gráfico — o usuário
 // escolhe explicitamente o que quer ver, em vez de herdar sem avisar o
 // que estava selecionado lá em cima na tela de Cotações.
+// LISTA ALINHADA COM A COBERTURA REAL. Os números vieram do catálogo
+// do arquivo da CONAB (1.173 produtos), não de estimativa. Cada rótulo
+// mostra em quantos estados existe série histórica, pra pessoa escolher
+// sabendo o que vai encontrar.
+//
+// Removidos de propósito: Vaca, Novilho e Novilha. O catálogo mostrou
+// cobertura ZERO na CONAB pra esses três — ofertá-los faria o gráfico
+// cair na série do Paraná e mostrar preço de outro estado. Melhor não
+// oferecer do que oferecer algo que engana.
 const PRODUTOS_GRAFICO = [
-  { id: 'boi_gordo', label: 'Boi Gordo' }, { id: 'vaca', label: 'Vaca' },
-  { id: 'novilho', label: 'Novilho' }, { id: 'novilha', label: 'Novilha' },
-  { id: 'soja', label: 'Soja' }, { id: 'milho', label: 'Milho' },
-  { id: 'cafe', label: 'Café' }, { id: 'algodao', label: 'Algodão' },
+  { id: 'milho', label: 'Milho (27 estados)' },
+  { id: 'cafe', label: 'Café (27 estados)' },
+  { id: 'arroz', label: 'Arroz (27 estados)' },
+  { id: 'feijao', label: 'Feijão (27 estados)' },
+  { id: 'leite', label: 'Leite (27 estados)' },
+  { id: 'banana', label: 'Banana (27 estados)' },
+  { id: 'tomate', label: 'Tomate (27 estados)' },
+  { id: 'mandioca_raiz', label: 'Mandioca — raiz (22 estados)' },
+  { id: 'mandioca_farinha', label: 'Farinha de Mandioca (21 estados)' },
+  { id: 'soja', label: 'Soja (17 estados)' },
+  { id: 'boi_gordo', label: 'Boi Gordo (9 estados)' },
+  { id: 'algodao', label: 'Algodão (9 estados)' },
+  { id: 'trigo', label: 'Trigo (8 estados)' },
 ];
 
 const ESTADOS_GRAFICO = [
