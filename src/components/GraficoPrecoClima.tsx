@@ -46,6 +46,44 @@ const PRODUTOS_GRAFICO = [
   { id: 'boi_gordo', label: 'Boi Gordo (9 estados)' },
   { id: 'algodao', label: 'Algodão (9 estados)' },
   { id: 'trigo', label: 'Trigo (8 estados)' },
+
+  // PRODUTOS DO LEVANTAMENTO POR ESTADO. A contagem entre parênteses é
+  // o número de estados onde eu confirmei o produto no levantamento —
+  // pode existir em outros que não apareceram na amostra, mas prefiro
+  // informar a menor certa do que uma estimativa otimista.
+  // Pecuária
+  { id: 'frango', label: 'Frango' },
+  { id: 'suinos', label: 'Suíno' },
+  { id: 'ovos', label: 'Ovos de Galinha' },
+  { id: 'leite_cabra', label: 'Leite de Cabra' },
+  { id: 'mel', label: 'Mel de Abelha' },
+  // Frutas
+  { id: 'manga', label: 'Manga' },
+  { id: 'maracuja', label: 'Maracujá' },
+  { id: 'uva', label: 'Uva' },
+  { id: 'laranja', label: 'Laranja' },
+  { id: 'umbu', label: 'Umbu' },
+  // Raízes e hortaliças
+  { id: 'batata', label: 'Batata' },
+  { id: 'batata_doce', label: 'Batata-doce' },
+  { id: 'cebola', label: 'Cebola' },
+  { id: 'alho', label: 'Alho' },
+  { id: 'inhame', label: 'Inhame' },
+  // Fibras e extrativismo
+  { id: 'sisal', label: 'Sisal' },
+  { id: 'piacava', label: 'Piaçava' },
+  { id: 'borracha', label: 'Borracha Natural' },
+  { id: 'caroco_algodao', label: 'Caroço de Algodão' },
+  { id: 'mamona', label: 'Mamona em Baga' },
+  // Valor agregado
+  { id: 'cacau', label: 'Cacau Cultivado' },
+  { id: 'pimenta_reino', label: 'Pimenta do Reino' },
+  { id: 'castanha_caju', label: 'Castanha de Caju' },
+  { id: 'guarana', label: 'Guaraná' },
+  { id: 'amendoim', label: 'Amendoim' },
+  { id: 'baru', label: 'Amêndoa de Baru' },
+  { id: 'cana_de_acucar', label: 'Cana-de-açúcar' },
+  { id: 'sorgo', label: 'Sorgo Granífero' },
 ];
 
 const ESTADOS_GRAFICO = [

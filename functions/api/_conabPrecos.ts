@@ -71,7 +71,8 @@ const TERMOS_PRODUTO: Record<string, RegExp> = {
   arroz: /^arroz$/i,
   feijao: /^feijao$/i,
   trigo: /^trigo$/i,
-  sorgo: /^sorgo$/i,
+  // Nome real conferido: a CONAB usa "SORGO GRANIFERO", não "SORGO".
+  sorgo: /^sorgo granifero$/i,
 
   // NOMES CONFERIDOS NO CATÁLOGO REAL DO ARQUIVO (1.173 produtos).
   // Bug encontrado: o padrão de leite era /^leite$/i, mas a CONAB
@@ -90,7 +91,54 @@ const TERMOS_PRODUTO: Record<string, RegExp> = {
   // são preços de atacado/varejo. Ficam disponíveis, mas o rótulo
   // precisa deixar claro que não é o que o produtor recebe (o aviso
   // automático de nível cuida disso).
+  // "ACUCAR" no arquivo é o produto industrializado, SEM preço de
+  // produtor. O que o produtor vende é a CANA — nome real abaixo.
+  cana_de_acucar: /^cana de acucar$/i,
   acucar: /^acucar$/i,
+
+  // ===== PRODUTOS CONFERIDOS NO LEVANTAMENTO POR ESTADO =====
+  // Todos com preço de produtor e amostra de 6+ pontos. Deliberadamente
+  // EXCLUÍDOS: trator, colheitadeira, pulverizador, grade, pá
+  // carregadeira, semeadeira (máquinas); diarista, transporte, análise
+  // de laboratório (serviços); ureia, cloreto de potássio, glifosato e
+  // sementes (insumos cujas faixas no arquivo vão de R$3 a R$218,
+  // sinal claro de unidades misturadas — incluí-los daria número errado).
+
+  // Pecuária
+  frango: /^frango$/i,
+  suinos: /^suino$/i,
+  ovos: /^ovos de galinha$/i,
+  leite_cabra: /^leite de cabra$/i,
+  mel: /^mel de abelha$/i,
+
+  // Fibras e extrativismo
+  sisal: /^sisal$/i,
+  piacava: /^piacava$/i,
+  borracha: /^borracha natural$/i,
+  caroco_algodao: /^caroco de algodao$/i,
+  mamona: /^mamona em baga$/i,
+
+  // Frutas
+  manga: /^manga$/i,
+  maracuja: /^maracuja$/i,
+  uva: /^uva$/i,
+  laranja: /^laranja$/i,
+  umbu: /^umbu$/i,
+
+  // Raízes, tubérculos e hortaliças
+  batata: /^batata$/i,
+  batata_doce: /^batata-doce$/i,
+  cebola: /^cebola$/i,
+  alho: /^alho$/i,
+  inhame: /^inhame$/i,
+
+  // Outros de valor agregado
+  cacau: /^cacau cultivado$/i,
+  pimenta_reino: /^pimenta do reino$/i,
+  castanha_caju: /^castanha de caju$/i,
+  guarana: /^guarana$/i,
+  amendoim: /^amendoim$/i,
+  baru: /^amendoa de baru$/i,
 
   // FERTILIZANTES — o arquivo da CONAB traz dezenas deles. As fórmulas
   // NPK têm formato inconfundível (três números de dois dígitos
@@ -148,6 +196,23 @@ const FAIXAS_PLAUSIVEIS: Record<string, [number, number]> = {
   // Faixas dos produtos novos, calibradas pelo que o catálogo mostrou.
   banana: [0.2, 15], tomate: [0.5, 16],
   mandioca_raiz: [0.1, 8], mandioca_farinha: [1, 22],
+
+  // Faixas calibradas pelos valores REAIS observados no levantamento
+  // por estado, com folga pra variação de mercado. Servem de rede
+  // contra erro de unidade — se o arquivo mudar de kg pra saca, o
+  // valor sai da faixa e é descartado em vez de virar número errado.
+  frango: [1, 20], suinos: [1, 25], ovos: [0.1, 2],
+  leite_cabra: [1, 15], mel: [3, 50],
+  sisal: [0.5, 20], piacava: [0.5, 20], borracha: [1, 20],
+  caroco_algodao: [0.2, 6], mamona: [0.5, 15],
+  manga: [0.2, 15], maracuja: [0.5, 20], uva: [1, 30],
+  laranja: [0.05, 5], umbu: [0.3, 12],
+  batata: [0.3, 15], batata_doce: [0.1, 8],
+  cebola: [0.1, 12], alho: [3, 45], inhame: [1, 25],
+  cacau: [3, 60], pimenta_reino: [5, 80],
+  castanha_caju: [0.5, 25], guarana: [5, 90],
+  amendoim: [0.5, 15], baru: [10, 150],
+  cana_de_acucar: [0.02, 1],
   // Fertilizante em R$/kg: adubo formulado costuma ficar entre R$1 e
   // R$10/kg; calcário é bem mais barato.
   fert_npk_10_10_10: [0.5, 15], fert_npk_20_05_20: [0.5, 15],
