@@ -15,7 +15,13 @@
 // exatamente o que aconteceu com cada um. O endpoint
 // /api/diagnostico-conab mostra esse relatório.
 
+// A CONAB publica preços em periodicidades diferentes. A página de
+// downloads lista "Preços agropecuários Semanal UF" e "Mensal UF".
+// Tentamos o SEMANAL primeiro: o mensal estava entregando dado com
+// meses de atraso (café parado em fev/2026 quando já era setembro),
+// justamente a defasagem que o usuário notou no preço da vaca.
 const CANDIDATOS_URL = [
+  'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosSemanalUF.txt',
   'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosMensalUF.txt',
   'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosMensalUf.txt',
   'https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosMensalUF.csv',
@@ -494,6 +500,24 @@ export async function buscarHistoricoConab(
     };
   }
 
+  // AVISO DE DEFASAGEM: cada produto no arquivo da CONAB tem sua
+  // própria data de última atualização — café estava parado em
+  // fevereiro enquanto outros iam até agosto. Apresentar um preço de
+  // meses atrás como se fosse atual é enganoso, então medimos a idade
+  // do dado mais recente e avisamos quando passa de 60 dias.
+  let avisoDefasagem: string | undefined;
+  if (pontos.length > 0) {
+    const maisRecente = pontos[pontos.length - 1].data;
+    const diasDeAtraso = Math.floor(
+      (Date.now() - new Date(maisRecente + 'T00:00:00Z').getTime()) / 86400000
+    );
+    diagnostico.push(`Dado mais recente: ${maisRecente} (${diasDeAtraso} dias atrás).`);
+    if (diasDeAtraso > 60) {
+      const meses = Math.floor(diasDeAtraso / 30);
+      avisoDefasagem = `Atenção: a CONAB não atualiza esse produto em ${estado} desde ${maisRecente} — cerca de ${meses} ${meses === 1 ? 'mês' : 'meses'} atrás. Use como referência histórica, não como preço de hoje.`;
+    }
+  }
+
   const todosNomes = Array.from(nomesDistintos).sort();
   const parecidos = palavraChave
     ? todosNomes.filter(n => n.toLowerCase().includes(palavraChave))
@@ -511,7 +535,12 @@ export async function buscarHistoricoConab(
     };
   }
 
-  return { pontos, urlUsada: arquivo.url, produtoEncontrado, unidade, diagnostico, aviso: avisoNivel };
+  // Os dois avisos podem coexistir (nível alternativo E dado velho).
+  const avisos = [avisoNivel, avisoDefasagem].filter(Boolean);
+  return {
+    pontos, urlUsada: arquivo.url, produtoEncontrado, unidade, diagnostico,
+    aviso: avisos.length > 0 ? avisos.join(' ') : undefined,
+  };
 }
 
 
