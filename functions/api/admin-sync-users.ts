@@ -6,11 +6,10 @@
 //
 // Só o e-mail de bootstrap admin pode chamar este endpoint.
 
-import { getGoogleAccessToken, firestoreMergeDoc, firestoreGetDoc, verifyFirebaseIdToken, GoogleServiceAccountEnv } from './_googleAuth';
+import { getGoogleAccessToken, firestoreMergeDoc, firestoreGetDoc, requireAdmin, GoogleServiceAccountEnv } from './_googleAuth';
 
 interface Env extends GoogleServiceAccountEnv {}
 
-const BOOTSTRAP_ADMIN_EMAILS = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
@@ -23,15 +22,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
 
-    const authHeader = request.headers.get('Authorization') || '';
-    const idToken = authHeader.replace(/^Bearer\s+/i, '');
-    const verified = await verifyFirebaseIdToken(idToken, env.FIREBASE_PROJECT_ID);
-    if (!verified?.email || !BOOTSTRAP_ADMIN_EMAILS.includes(verified.email.toLowerCase())) {
-      return new Response(JSON.stringify({ error: 'Não autorizado.' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    const auth = await requireAdmin(request, env);
+    if (auth instanceof Response) return auth;
 
     const accessToken = await getGoogleAccessToken(env, 'https://www.googleapis.com/auth/identitytoolkit');
 

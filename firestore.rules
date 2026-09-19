@@ -34,9 +34,15 @@ service cloud.firestore {
     // VALIDATION HELPERS
     // -------------------------------------------------------------------------
 
+    // Mesma lista de shared/adminEmails.ts — mude nos dois lugares.
+    // Exige e-mail verificado: sem isso, qualquer pessoa poderia criar uma
+    // conta com senha usando um destes e-mails e virar admin.
+    // "admin@fazenda.com.br" foi removido (senha dele estava no código público).
     function isBootstrapAdminEmail() {
-      return isSignedIn() && request.auth.token.email.lower() in
-        ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
+      return isSignedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in
+          ['admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
     }
 
     function isValidUser(data) {
@@ -476,17 +482,23 @@ service cloud.firestore {
       // ja com plano pago e status ativo -- liberando acesso pago de
       // graca. O comentario logo acima dizia que isso era proibido, mas
       // a regra nao impunha. Agora impoe.
+      // customPrice (valor negociado do Agro Total) é lido pelo servidor
+      // na hora do checkout — por isso só o admin pode gravá-lo.
       allow create: if isSignedIn() && request.auth.uid == uid
         && incoming().status in ['Teste', 'Trial', 'Pendente', 'Inativa']
-        && (!('paid' in incoming()) || incoming().paid == false);
+        && (!('paid' in incoming()) || incoming().paid == false)
+        && !('customPrice' in incoming());
       // Atualização normal (mudar plano, valores, status para ativo etc.)
       // é reservada ao admin. Exceção: o próprio usuário pode CANCELAR a
       // própria assinatura (só mudar o status para "Cancelada", sem tocar
       // em plano, gateway ou histórico de pagamento).
+      // No cancelamento só o status (e datas de controle) pode mudar —
+      // antes dava para mudar customPrice, gateway etc. junto.
       allow update: if isBootstrapAdminEmail() || (
         isSignedIn() && request.auth.uid == uid &&
         incoming().status == 'Cancelada' &&
-        incoming().plan == resource.data.plan
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'updatedAt', 'cancelledAt', 'canceledAt'])
       );
       allow delete: if isBootstrapAdminEmail();
     }

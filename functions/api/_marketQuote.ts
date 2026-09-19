@@ -357,3 +357,41 @@ export function normalizeBoiMundo(data: any, productId: string, productLabel: st
     };
   });
 }
+
+// ---- Unidade canônica ----
+// As fontes escrevem a unidade de jeitos diferentes ("R$/@", "@",
+// "Saca 60kg", "sc 60 kg", "R$/kg", "US$/@"...). Para não misturar numa
+// mesma série preços em arroba com preços em saca ou em kg (o que
+// aparecia no gráfico como quedas/saltos falsos de dezenas de vezes),
+// toda série de histórico passa a guardar esta chave canônica e só junta
+// pontos com a mesma chave. "?" = unidade não identificada.
+export function unidadeCanonica(unit: string | null | undefined, currency: string | null | undefined = 'BRL'): string {
+  const u = String(unit || '').toLowerCase().replace(/\s+/g, ' ');
+  const moeda = /us\$|usd|d[óo]lar/.test(u) || currency === 'USD' ? 'USD' : 'BRL';
+  let medida = '?';
+  if (/@|arroba/.test(u)) medida = '@';
+  else if (/sa(c|ca)\b|sc\b|saca|60 ?kg/.test(u)) medida = 'saca60';
+  else if (/\bton|\/t\b/.test(u)) medida = 't';
+  else if (/litro|\/l\b|\blt\b/.test(u)) medida = 'l';
+  else if (/d[úu]zia|dz/.test(u)) medida = 'dz';
+  else if (/\bkg\b|quilo/.test(u)) medida = 'kg';
+  else if (/cx|caixa/.test(u)) medida = 'cx';
+  return `${moeda}/${medida}`;
+}
+
+export interface PontoHistorico { data: string; preco: number; unidade?: string; fonte?: string }
+
+/**
+ * Com `referencia`: mantém só os pontos exatamente nessa unidade canônica
+ * (pontos antigos sem unidade gravada ficam de fora).
+ * Sem referência: usa a unidade do ponto mais recente que tenha unidade.
+ * Se nenhum ponto tiver unidade (histórico antigo), devolve tudo — não há
+ * como separar.
+ */
+export function filtrarPorUnidade<T extends { unidade?: string }>(pontos: T[], referencia?: string | null): { pontos: T[]; unidade: string | null } {
+  if (referencia) return { pontos: pontos.filter(p => p.unidade === referencia), unidade: referencia };
+  const comUnidade = pontos.filter(p => p.unidade);
+  if (comUnidade.length === 0) return { pontos, unidade: null };
+  const ref = referencia || comUnidade[comUnidade.length - 1].unidade!;
+  return { pontos: pontos.filter(p => p.unidade === ref), unidade: ref };
+}

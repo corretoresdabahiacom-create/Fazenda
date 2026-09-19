@@ -1,6 +1,8 @@
+import { requireUser } from './_googleAuth';
 import { generateText } from "./aiClient";
 
 interface Env {
+  FIREBASE_PROJECT_ID?: string;
   GEMINI_API_KEY?: string;
   OPENAI_API_KEY?: string;
   ANTHROPIC_API_KEY?: string;
@@ -16,6 +18,10 @@ interface Env {
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const { request, env } = context;
+    // Só usuários logados (ou só admin) — sem isso, qualquer pessoa na
+    // internet podia chamar este endpoint e gastar a cota paga das APIs.
+    const auth = await requireUser(request, env);
+    if (auth instanceof Response) return auth;
     const { size, grassTypes, animalTypes, objective } = await request.json() as { 
       size?: number; 
       grassTypes?: string[]; 
@@ -23,7 +29,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       objective?: string; 
     };
 
-    if (!size || !grassTypes || !animalTypes || !objective) {
+    if (!size || !Array.isArray(grassTypes) || grassTypes.length === 0 || !animalTypes || !objective
+      || typeof size !== 'number' || !Number.isFinite(size) || size <= 0 || size > 100000) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
@@ -62,7 +69,22 @@ Format your response strictly as a JSON object matching this schema:
 
     const parsedResult = await generateText(payloadPrompt, fallbackResponseTemplate, env);
 
-    return new Response(JSON.stringify(parsedResult), {
+    // Checagem de sanidade da resposta da IA. Todo o resto do app tem
+    // faixas de plausibilidade; aqui o número ia direto para a tela.
+    // Limites generosos: até 12 cab/ha nas águas (bezerros em capim de
+    // alta produção, rotacionado) e até 5 cab/ha na seca, e a seca nunca
+    // acima das águas. Fora disso, usa o cálculo conservador de reserva.
+    const fallback = JSON.parse(fallbackResponseTemplate);
+    const aguas = Math.round(Number((parsedResult as any)?.capacityAguas));
+    const seca = Math.round(Number((parsedResult as any)?.capacitySeca));
+    const plausivel = Number.isFinite(aguas) && Number.isFinite(seca)
+      && aguas >= 0 && seca >= 0
+      && aguas <= size * 12 && seca <= size * 5 && seca <= aguas;
+    const resultado = plausivel
+      ? { ...(parsedResult as any), capacityAguas: aguas, capacitySeca: seca }
+      : { ...fallback, justification: `${fallback.justification} (A estimativa automática veio fora da faixa plausível e foi substituída por este cálculo conservador.)` };
+
+    return new Response(JSON.stringify(resultado), {
       headers: { "Content-Type": "application/json" }
     });
   } catch (error: any) {

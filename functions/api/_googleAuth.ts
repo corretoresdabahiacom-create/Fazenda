@@ -1,3 +1,5 @@
+import firebaseAppletConfig from '../../firebase-applet-config.json';
+import { isAdminEmail } from '../../shared/adminEmails';
 // Assina uma credencial de servidor do Google (JWT) e troca por um token
 // de acesso — usado tanto para mandar notificação push (Firebase Cloud
 // Messaging) quanto para gravar direto no Firestore a partir de uma
@@ -177,7 +179,7 @@ function toFirestoreValue(value: any): any {
 // verificação, qualquer pessoa poderia chamar os endpoints de criação de
 // assinatura fingindo ser outro usuário, só informando um uid arbitrário
 // no corpo da requisição.
-export async function verifyFirebaseIdToken(idToken: string, projectId: string): Promise<{ uid: string; email?: string } | null> {
+export async function verifyFirebaseIdToken(idToken: string, projectId: string): Promise<{ uid: string; email?: string; email_verified?: boolean } | null> {
   try {
     const [headerB64, payloadB64, signatureB64] = idToken.split('.');
     if (!headerB64 || !payloadB64 || !signatureB64) return null;
@@ -210,9 +212,48 @@ export async function verifyFirebaseIdToken(idToken: string, projectId: string):
     const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', publicKey, signature, signedData);
     if (!valid) return null;
 
-    return { uid: payload.sub, email: payload.email };
+    return { uid: payload.sub, email: payload.email, email_verified: payload.email_verified === true };
   } catch {
     return null;
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// Guardas de autenticação reutilizáveis pelos endpoints.
+// ---------------------------------------------------------------------------
+
+
+export type VerifiedUser = { uid: string; email?: string; email_verified?: boolean };
+
+const jsonError = (status: number, error: string) =>
+  new Response(JSON.stringify({ error }), { status, headers: { 'Content-Type': 'application/json' } });
+
+/**
+ * Exige um ID token válido do Firebase no header Authorization.
+ * Devolve o usuário verificado, ou uma Response 401 pronta para retornar.
+ * O projectId não é segredo: se a variável FIREBASE_PROJECT_ID não estiver
+ * configurada, usa o do firebase-applet-config.json (o mesmo do app).
+ */
+export async function requireUser(
+  request: Request,
+  env: { FIREBASE_PROJECT_ID?: string },
+): Promise<VerifiedUser | Response> {
+  const projectId = env.FIREBASE_PROJECT_ID || firebaseAppletConfig.projectId;
+  const idToken = (request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  if (!idToken) return jsonError(401, 'Faça login para usar este recurso.');
+  const verified = await verifyFirebaseIdToken(idToken, projectId);
+  if (!verified) return jsonError(401, 'Sessão inválida ou expirada. Entre novamente.');
+  return verified;
+}
+
+/** Igual a requireUser, mas só deixa passar administradores do sistema. */
+export async function requireAdmin(
+  request: Request,
+  env: { FIREBASE_PROJECT_ID?: string },
+): Promise<VerifiedUser | Response> {
+  const result = await requireUser(request, env);
+  if (result instanceof Response) return result;
+  if (!isAdminEmail(result.email, result.email_verified)) return jsonError(403, 'Não autorizado.');
+  return result;
+}

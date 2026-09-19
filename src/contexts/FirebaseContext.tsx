@@ -380,14 +380,6 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [weighingSheets, setWeighingSheets] = useState<WeighingSheet[]>([]);
   const [settings, setSettings] = useState<FarmSettings>({ farmName: '', city: '' });
 
-  // Lista de e-mails usada só para "semear" os primeiros administradores,
-  // na primeiríssima vez que cada um faz login. A partir daí, o papel do
-  // usuário passa a viver só no Firestore (campo "role" em users/{uid}) —
-  // nunca mais é recalculado a partir do e-mail. Antes desta correção,
-  // QUALQUER conta nova virava admin automaticamente; agora o padrão
-  // seguro para contas novas é "user".
-  const BOOTSTRAP_ADMIN_EMAILS = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
-
   // Sincroniza o índice de usuários (para o Painel Admin listar contas) e
   // garante que toda conta tenha um registro de assinatura — começando em
   // "Teste" na primeira vez. Roda em paralelo ao resolveUserRole, sem
@@ -502,99 +494,29 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const loginWithEmail = async (email: string, pass: string) => {
     setLoading(true);
-    const cleanedEmail = email.trim().toLowerCase();
-    
-    if (cleanedEmail === 'admin@fazenda.com.br' && pass === 'admin2130') {
-      try {
-        let u;
-        try {
-          const credential = await signInWithEmailAndPassword(auth, cleanedEmail, pass);
-          u = credential.user;
-        } catch (signInErr: any) {
-          if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
-            const credential = await createUserWithEmailAndPassword(auth, cleanedEmail, pass);
-            u = credential.user;
-          } else {
-            throw signInErr;
-          }
-        }
-        setUser(u);
-        const role = await resolveUserRole(u);
-        syncUserDirectoryAndSubscription(u);
-        setUserRole(role);
-        localStorage.setItem('gestao_fazenda_user_role', role);
-        setIsDemoMode(false);
-        localStorage.removeItem('gestao_fazenda_is_demo');
-        localStorage.removeItem('gestao_fazenda_custom_user');
-        setLoading(false);
-      } catch (err: any) {
-        setLoading(false);
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-          throw new Error('E-mail ou senha incorretos.');
-        } else if (err.code === 'auth/invalid-email') {
-          throw new Error('Formato de e-mail inválido.');
-        } else {
-          throw new Error(err.message || 'Erro ao realizar login.');
-        }
-      }
-    } else if (cleanedEmail === 'usuario@fazenda.com.br' && pass === 'usuario123') {
-      try {
-        let u;
-        try {
-          const credential = await signInWithEmailAndPassword(auth, cleanedEmail, pass);
-          u = credential.user;
-        } catch (signInErr: any) {
-          if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
-            const credential = await createUserWithEmailAndPassword(auth, cleanedEmail, pass);
-            u = credential.user;
-          } else {
-            throw signInErr;
-          }
-        }
-        setUser(u);
-        const role = await resolveUserRole(u);
-        syncUserDirectoryAndSubscription(u);
-        setUserRole(role);
-        localStorage.setItem('gestao_fazenda_user_role', role);
-        setIsDemoMode(false);
-        localStorage.removeItem('gestao_fazenda_is_demo');
-        localStorage.removeItem('gestao_fazenda_custom_user');
-        setLoading(false);
-      } catch (err: any) {
-        setLoading(false);
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-          throw new Error('E-mail ou senha incorretos.');
-        } else if (err.code === 'auth/invalid-email') {
-          throw new Error('Formato de e-mail inválido.');
-        } else {
-          throw new Error(err.message || 'Erro ao realizar login.');
-        }
-      }
-    } else {
-      try {
-        const credential = await signInWithEmailAndPassword(auth, email, pass);
-        console.log('LOGIN OK');
-        console.log('UID:', credential.user.uid);
-        console.log('EMAIL:', credential.user.email);
-        const u = credential.user;
-        setUser(u);
-        const defaultRole = await resolveUserRole(u);
-        syncUserDirectoryAndSubscription(u);
-        setUserRole(defaultRole);
-        localStorage.setItem('gestao_fazenda_user_role', defaultRole);
-        setIsDemoMode(false);
-        localStorage.removeItem('gestao_fazenda_is_demo');
-        localStorage.removeItem('gestao_fazenda_custom_user');
-        setLoading(false);
-      } catch (err: any) {
-        setLoading(false);
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-          throw new Error('E-mail ou senha incorretos.');
-        } else if (err.code === 'auth/invalid-email') {
-          throw new Error('Formato de e-mail inválido.');
-        } else {
-          throw new Error(err.message || 'Erro ao realizar login.');
-        }
+    // Sem atalhos de login com senha fixa no código: toda conta passa pelo
+    // Firebase Auth normalmente. (Havia contas admin/usuario com senha
+    // embutida aqui, visíveis no bundle público — removidas.)
+    try {
+      const credential = await signInWithEmailAndPassword(auth, email, pass);
+      const u = credential.user;
+      setUser(u);
+      const defaultRole = await resolveUserRole(u);
+      syncUserDirectoryAndSubscription(u);
+      setUserRole(defaultRole);
+      localStorage.setItem('gestao_fazenda_user_role', defaultRole);
+      setIsDemoMode(false);
+      localStorage.removeItem('gestao_fazenda_is_demo');
+      localStorage.removeItem('gestao_fazenda_custom_user');
+      setLoading(false);
+    } catch (err: any) {
+      setLoading(false);
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        throw new Error('E-mail ou senha incorretos.');
+      } else if (err.code === 'auth/invalid-email') {
+        throw new Error('Formato de e-mail inválido.');
+      } else {
+        throw new Error(err.message || 'Erro ao realizar login.');
       }
     }
   };

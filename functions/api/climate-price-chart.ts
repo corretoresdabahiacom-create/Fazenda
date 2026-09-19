@@ -16,6 +16,7 @@
 import { firestoreGetDoc, GoogleServiceAccountEnv } from './_googleAuth';
 import { buscarHistoricoIpea } from './_ipeaHistorico';
 import { buscarHistoricoConab } from './_conabPrecos';
+import { unidadeCanonica, filtrarPorUnidade } from './_marketQuote';
 
 interface Env extends GoogleServiceAccountEnv {}
 
@@ -290,7 +291,7 @@ async function buscarChuvaInmet(lat: number, lon: number, dataInicio: string, da
   return { porDia, estacaoUsada: `${estacao.nome} (INMET, a ${estacao.distanciaKm}km)` };
 }
 
-interface PricePoint { data: string; preco: number }
+interface PricePoint { data: string; preco: number; unidade?: string }
 
 // Busca o preço de HOJE (fonte ao vivo, mesma usada em Cotações) e o
 // preço do contrato futuro B3 mais próximo do vencimento — que é o
@@ -311,7 +312,7 @@ async function buscarPrecoAtualEFuturo(origin: string, produto: string, estado: 
       const json = (await res.json()) as any;
       const melhor = (json.quotesRegionais?.[0] || json.quotes?.[0]);
       if (melhor?.price > 0) {
-        hoje = { data: new Date().toISOString().slice(0, 10), preco: melhor.price };
+        hoje = { data: new Date().toISOString().slice(0, 10), preco: melhor.price, unidade: unidadeCanonica(melhor.unit, melhor.currency) };
       }
     }
   } catch { /* segue sem preço de hoje se falhar */ }
@@ -344,7 +345,9 @@ async function buscarHistoricoPreco(env: Env, produto: string, estado: string): 
   try {
     const doc = await firestoreGetDoc(env, 'priceHistory', docId);
     const pontos: any[] = Array.isArray(doc?.pontos) ? doc.pontos : [];
-    return pontos.map(p => ({ data: String(p.data).slice(0, 10), preco: Number(p.preco) })).filter(p => !isNaN(p.preco));
+    return pontos
+      .map(p => ({ data: String(p.data).slice(0, 10), preco: Number(p.preco), unidade: p.unidade ? String(p.unidade) : undefined }))
+      .filter(p => !isNaN(p.preco));
   } catch {
     return [];
   }
@@ -419,9 +422,30 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     // 2º IPEADATA — só entra onde a CONAB não tiver dado. Como a série
     //    dele é do Paraná, fica claramente identificada como referência
     //    de tendência (o aviso na tela explica isso ao usuário).
-    const pontosHistoricos = (historicoConab && historicoConab.pontos.length > 0)
-      ? historicoConab.pontos
+    const usandoConab = !!(historicoConab && historicoConab.pontos.length > 0);
+    const pontosHistoricos = usandoConab
+      ? historicoConab!.pontos
       : historicoIpea.pontos;
+
+    // Unidade de referência do gráfico. O eixo é um só, então tudo que
+    // entra nele precisa estar na mesma unidade: a da série oficial
+    // (CONAB/IPEA) quando existir; senão, a do histórico gravado.
+    // Pontos em outra unidade (ex: saca x arroba x kg, BRL x USD) ficam
+    // de fora em vez de aparecerem como saltos falsos de preço.
+    let unidadeReferencia: string | null = null;
+    if (usandoConab) unidadeReferencia = unidadeCanonica(historicoConab!.unidade);
+    else if (historicoIpea.pontos.length > 0 && historicoIpea.serie?.unidade) unidadeReferencia = unidadeCanonica(historicoIpea.serie.unidade);
+    if (unidadeReferencia?.endsWith('/?')) unidadeReferencia = null;
+    const temSerieOficial = pontosHistoricos.length > 0;
+    const historicoGravado = filtrarPorUnidade(precoHistorico, unidadeReferencia);
+    // Série oficial sem unidade identificável: não arrisca misturar com o
+    // histórico gravado (que pode estar em outra unidade).
+    const precoHistoricoCompativel = temSerieOficial && !unidadeReferencia ? [] : historicoGravado.pontos;
+    if (!unidadeReferencia) unidadeReferencia = historicoGravado.unidade;
+    const hojeCompativel = precoAtualEFuturo.hoje
+      && (!unidadeReferencia || precoAtualEFuturo.hoje.unidade === unidadeReferencia)
+      && !(temSerieOficial && !unidadeReferencia)
+      ? precoAtualEFuturo.hoje : null;
 
     for (const p of pontosHistoricos) {
       // Série mensal: o IPEADATA marca o mês no dia 1. Espalha o valor
@@ -435,21 +459,28 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       }
     }
 
-    for (const p of precoHistorico) precoPorDia.set(p.data, p.preco);
+    for (const p of precoHistoricoCompativel) precoPorDia.set(p.data, p.preco);
 
     // Preenche HOJE com o preço ao vivo, e os próximos 16 dias com o
     // preço do contrato futuro B3 mais próximo — a única referência de
     // "preço futuro" real que existe (mercado futuro de verdade, não
     // estimativa fabricada). Só preenche o que ainda não tinha vindo
     // do histórico gravado, e só dentro do período que o usuário pediu.
-    if (precoAtualEFuturo.hoje && !precoPorDia.has(precoAtualEFuturo.hoje.data)) {
-      precoPorDia.set(precoAtualEFuturo.hoje.data, precoAtualEFuturo.hoje.preco);
+    if (hojeCompativel && !precoPorDia.has(hojeCompativel.data)) {
+      precoPorDia.set(hojeCompativel.data, hojeCompativel.preco);
     }
-    if (precoAtualEFuturo.futuro) {
+    // O contrato futuro B3 não informa unidade de forma confiável. Só entra
+    // se o valor for compatível com o último preço da série (±50%); uma
+    // diferença maior indica outra unidade (arroba x saca x kg, R$ x US$).
+    const ultimoPrecoSerie = [...precoPorDia.entries()].sort((a, b) => a[0].localeCompare(b[0])).pop()?.[1];
+    const futuroCompativel = precoAtualEFuturo.futuro
+      && (ultimoPrecoSerie == null || Math.abs(precoAtualEFuturo.futuro.preco / ultimoPrecoSerie - 1) <= 0.5)
+      ? precoAtualEFuturo.futuro : null;
+    if (futuroCompativel) {
       for (let i = 1; i <= 16; i++) {
         const dia = new Date(Date.now() + i * 86400000).toISOString().slice(0, 10);
         if (dia >= dataInicio && dia <= dataFim && !precoPorDia.has(dia)) {
-          precoPorDia.set(dia, precoAtualEFuturo.futuro.preco);
+          precoPorDia.set(dia, futuroCompativel.preco);
         }
       }
     }
@@ -497,14 +528,15 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       (historicoConab && historicoConab.pontos.length > 0)
         ? `CONAB — pesquisa de preço em ${estado}${historicoConab.produtoEncontrado ? ` ("${historicoConab.produtoEncontrado}")` : ''}${historicoConab.unidade ? `, ${historicoConab.unidade}` : ''}`
         : (historicoIpea.serie ? `${historicoIpea.serie.fonte} via IPEADATA ("${historicoIpea.serie.nome}", ${historicoIpea.serie.unidade})` : null),
-      precoAtualEFuturo.hoje ? 'preço ao vivo (hoje)' : null,
-      precoAtualEFuturo.futuro ? `contrato futuro B3 (${precoAtualEFuturo.futuro.vencimento})` : null,
+      hojeCompativel ? 'preço ao vivo (hoje)' : null,
+      futuroCompativel ? `contrato futuro B3 (${futuroCompativel.vencimento})` : null,
     ].filter(Boolean).join(' + ') || undefined;
 
     return new Response(JSON.stringify({
       produto, estado, cidade, local: local.nomeEncontrado,
       fonteClima: fonteClimaUsada,
       fontePreco: fontePrecoUsada,
+      unidadePreco: unidadeReferencia,
       avisoIpea: (historicoConab && historicoConab.pontos.length > 0) ? undefined : historicoIpea.aviso,
       avisoConab: historicoConab?.aviso,
       ufDaSerieHistorica: historicoIpea.ufDaSerie || null,

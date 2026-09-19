@@ -2,6 +2,7 @@
 // (necessárias pro histórico de preço gravar) estão configuradas no
 // ambiente do Cloudflare Pages — sem nunca expor o valor delas, só se
 // existem ou não. Acesse /api/diagnostico-firebase pra verificar.
+import { exigirTokenDiagnostico } from './_diagnosticoGuard';
 
 interface Env {
   FIREBASE_PROJECT_ID?: string;
@@ -10,6 +11,8 @@ interface Env {
 }
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
+  const bloqueio = exigirTokenDiagnostico(context.request, context.env);
+  if (bloqueio) return bloqueio;
   const status = {
     FIREBASE_PROJECT_ID: !!context.env.FIREBASE_PROJECT_ID,
     FIREBASE_CLIENT_EMAIL: !!context.env.FIREBASE_CLIENT_EMAIL,

@@ -5,9 +5,12 @@
 //   /api/diagnostico-conab-variantes?termo=arroz
 //   /api/diagnostico-conab-variantes?termo=arroz,feijao,cafe
 
+import { exigirTokenDiagnostico } from './_diagnosticoGuard';
 import { listarVariantes } from './_conabPrecos';
 
 export const onRequestGet: PagesFunction = async (context) => {
+  const bloqueio = exigirTokenDiagnostico(context.request, context.env);
+  if (bloqueio) return bloqueio;
   const url = new URL(context.request.url);
   const termos = (url.searchParams.get('termo') || 'arroz').split(',').map(t => t.trim()).filter(Boolean);
 

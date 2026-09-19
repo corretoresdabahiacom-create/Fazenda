@@ -10,7 +10,16 @@ import HistoricoPrecoPessoal from './HistoricoPrecoPessoal';
 
 interface ChartPoint { label: string; data: string; chuvaMm: number | null; preco: number | null }
 interface ChartResponse {
-  local: string; granularidade: 'mes' | 'dia'; pontos: ChartPoint[]; avisoPreco?: string; error?: string; fonteClima?: string; fontePreco?: string; avisoIpea?: string;
+  local: string; granularidade: 'mes' | 'dia'; pontos: ChartPoint[]; avisoPreco?: string; error?: string; fonteClima?: string; fontePreco?: string; avisoIpea?: string; unidadePreco?: string | null;
+}
+
+// "BRL/@" -> "R$/@", "USD/saca60" -> "US$/saca 60kg", "BRL/?" -> "R$"
+function rotuloUnidade(u?: string | null): string {
+  if (!u) return 'R$';
+  const [moeda, medida] = u.split('/');
+  const simbolo = moeda === 'USD' ? 'US$' : 'R$';
+  const nomes: Record<string, string> = { '@': '@', saca60: 'saca 60kg', kg: 'kg', t: 't', l: 'litro', dz: 'dúzia', cx: 'caixa' };
+  return medida && nomes[medida] ? `${simbolo}/${nomes[medida]}` : simbolo;
 }
 
 interface Props {
@@ -172,7 +181,7 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
             height={chartData.length > 8 ? 55 : 25}
           />
           <YAxis yAxisId="chuva" tick={{ fontSize: 10 }} label={{ value: 'mm de chuva', angle: -90, fontSize: 9, position: 'insideLeft' }} />
-          <YAxis yAxisId="preco" orientation="right" tick={{ fontSize: 10 }} label={{ value: 'R$', angle: 90, fontSize: 9, position: 'insideRight' }} />
+          <YAxis yAxisId="preco" orientation="right" tick={{ fontSize: 10 }} label={{ value: rotuloUnidade(dados.unidadePreco), angle: 90, fontSize: 9, position: 'insideRight' }} />
           <Tooltip contentStyle={{ fontSize: 11 }} formatter={(valor: any, nome: string) => [typeof valor === 'number' ? valor.toFixed(2) : valor, nome]} />
           <Legend wrapperStyle={{ fontSize: 10 }} />
           <Bar yAxisId="chuva" dataKey="chuvaMm" name="Chuva (mm)" fill="#60a5fa" radius={[3, 3, 0, 0]} maxBarSize={28}>
@@ -184,7 +193,7 @@ function GraficoIndividual({ titulo, dados }: { titulo: string; dados: ChartResp
               return v < 10 ? v.toFixed(1) : v.toFixed(0);
             }} />
           </Bar>
-          <Bar yAxisId="preco" dataKey="preco" name="Preço (R$)" fill="#34d399" radius={[3, 3, 0, 0]} maxBarSize={28}>
+          <Bar yAxisId="preco" dataKey="preco" name={`Preço (${rotuloUnidade(dados.unidadePreco)})`} fill="#34d399" radius={[3, 3, 0, 0]} maxBarSize={28}>
             <LabelList dataKey="preco" position="top" style={{ fontSize: 9, fill: 'var(--text-secondary)' }} formatter={(v: number) => v ? v.toFixed(0) : ''} />
           </Bar>
           <Line yAxisId="chuva" type="monotone" dataKey="chuvaTendencia" name="Tendência clima" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 2 }} strokeDasharray="4 2" />

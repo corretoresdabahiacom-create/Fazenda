@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { Camera, X, Check, Loader2, RefreshCw, AlertCircle, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { authFetch } from '../lib/authFetch';
 
 interface Props {
   onResult: (result: any) => void;
@@ -89,7 +90,7 @@ export default function AIAnalyzer({ onResult, onClose, type, title }: Props) {
 
     try {
       const endpoint = type === 'animals' ? '/api/analyze-animals' : '/api/analyze-pasture';
-      const response = await fetch(endpoint, {
+      const response = await authFetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: capturedImage }),

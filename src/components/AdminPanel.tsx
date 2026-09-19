@@ -19,6 +19,7 @@ import {
 import { format } from 'date-fns';
 import { compressImageIfNeeded, fileToDataUrl } from '../lib/imageCompression';
 import CotacoesManuais from './CotacoesManuais';
+import { authFetch } from '../lib/authFetch';
 
 type Tab = 'visao_geral' | 'usuarios' | 'notificacoes' | 'anuncios' | 'despesas' | 'fontes_cotacoes' | 'cotacoes_manuais';
 
@@ -440,7 +441,7 @@ function NotificacoesTab({ notifications, users, adminEmail }: {
       setFeedback({ type: 'warning', text: `Aviso salvo e vai aparecer dentro do app para ${targetUsers.length} usuário(s) — mas nenhum deles tem notificação push configurada no celular ainda, então só o push mesmo não foi enviado.` });
     } else {
       try {
-        const res = await fetch('/api/send-push', {
+        const res = await authFetch('/api/send-push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tokens, title: item.title, body: item.message }),

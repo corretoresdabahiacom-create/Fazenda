@@ -16,6 +16,7 @@ import {
   MarketQuote,
   normalizeNoticiasAgricolas, normalizeIeaSp, normalizeIncaperEs,
   normalizeEpagriSc, normalizeAiba, normalizeTradingEconomics, normalizeBoiMundo,
+  unidadeCanonica,
 } from './_marketQuote';
 import { firestoreGetDoc, firestoreMergeDoc, GoogleServiceAccountEnv } from './_googleAuth';
 
@@ -39,8 +40,8 @@ async function talvezGravarHistorico(env: GoogleServiceAccountEnv, produto: stri
     console.error('HISTÓRICO DE PREÇO NÃO GRAVADO: faltam variáveis FIREBASE_PROJECT_ID/FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY no ambiente do Cloudflare Pages.');
     return;
   }
-  const principal = quotes.find(q => q.isAvailable);
-  if (!principal) return;
+  const disponiveis = quotes.filter(q => q.isAvailable && q.price != null);
+  if (disponiveis.length === 0) return;
 
   const docId = `${produto}_${estado || 'geral'}`;
   try {
@@ -49,7 +50,39 @@ async function talvezGravarHistorico(env: GoogleServiceAccountEnv, produto: stri
     if (Date.now() - ultimaGravacao < HISTORY_THROTTLE_MS) return; // já gravou hoje, não grava de novo
 
     const pontos: any[] = Array.isArray(existente?.pontos) ? existente.pontos : [];
-    pontos.push({ preco: principal.price, fonte: principal.source, data: new Date().toISOString() });
+
+    // Escolha da cotação que entra no histórico. ANTES: a primeira fonte
+    // disponível do dia — se a fonte de ontem (ex: AIBA, R$/saca) caísse
+    // e hoje respondesse outra (ex: em R$/kg ou US$), a série "despencava"
+    // dezenas de vezes sem nenhuma mudança real de preço. AGORA:
+    //  1) mantém a MESMA unidade canônica da série já gravada;
+    //  2) dentro dela, prefere a mesma fonte do último ponto;
+    //  3) série nova: prefere BRL com unidade identificada.
+    // Se nenhuma cotação de hoje estiver na unidade da série, não grava.
+    const ultimo = [...pontos].reverse().find(p => p?.unidade);
+    let principal: MarketQuote | undefined;
+    if (ultimo) {
+      const mesmaUnidade = disponiveis.filter(q => unidadeCanonica(q.unit, q.currency) === ultimo.unidade);
+      principal = mesmaUnidade.find(q => q.source === ultimo.fonte) || mesmaUnidade[0];
+    }
+    // Se a unidade da série sumiu de todas as fontes há mais de 14 dias,
+    // começa um trecho novo na unidade disponível (a leitura mostra só a
+    // unidade mais recente, então os trechos nunca se misturam no gráfico).
+    const ultimoMs = ultimo ? new Date(ultimo.data).getTime() : 0;
+    if (ultimo && !principal && Date.now() - ultimoMs < 14 * 86400000) return;
+    if (!principal) {
+      principal = disponiveis.find(q => q.currency === 'BRL' && !unidadeCanonica(q.unit, q.currency).endsWith('/?'))
+        || disponiveis.find(q => q.currency === 'BRL')
+        || disponiveis[0];
+    }
+
+    pontos.push({
+      preco: principal.price,
+      fonte: principal.source,
+      unidade: unidadeCanonica(principal.unit, principal.currency),
+      unidadeOriginal: principal.unit,
+      data: new Date().toISOString(),
+    });
     // Mantém só os últimos 2 anos de pontos (evita o documento crescer sem limite).
     const pontosLimitados = pontos.slice(-HISTORY_MAX_POINTS);
 

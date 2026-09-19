@@ -8,6 +8,7 @@
 // por um endpoint separado e explícito em vez disso.
 
 import { firestoreGetDoc, GoogleServiceAccountEnv } from './_googleAuth';
+import { filtrarPorUnidade } from './_marketQuote';
 
 interface Env extends GoogleServiceAccountEnv {}
 
@@ -33,10 +34,15 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const docId = `${produto}_${state || 'geral'}`;
     const doc = await firestoreGetDoc(context.env, 'priceHistory', docId);
 
+    // Devolve só pontos numa mesma unidade (a do ponto mais recente) —
+    // nunca uma série que mistura arroba, saca e kg.
+    const { pontos, unidade } = filtrarPorUnidade(Array.isArray(doc?.pontos) ? doc.pontos : []);
+
     return new Response(JSON.stringify({
       product: produto,
       state: state || null,
-      pontos: doc?.pontos || [],
+      unidade,
+      pontos,
       ultimaGravacao: doc?.ultimaGravacao || null,
       aviso: !doc ? 'Ainda não há histórico gravado pra essa combinação — grava automaticamente com o uso, no máximo 1x por hora.' : undefined,
     }), {

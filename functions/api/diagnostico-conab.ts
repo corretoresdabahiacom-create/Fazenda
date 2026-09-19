@@ -7,9 +7,12 @@
 // com a UF, e quantos pontos sobraram no período. Serve pra descobrir o
 // endereço correto do arquivo sem ficar chutando no escuro.
 
+import { exigirTokenDiagnostico } from './_diagnosticoGuard';
 import { buscarHistoricoConab } from './_conabPrecos';
 
 export const onRequestGet: PagesFunction = async (context) => {
+  const bloqueio = exigirTokenDiagnostico(context.request, context.env);
+  if (bloqueio) return bloqueio;
   const url = new URL(context.request.url);
   const produto = url.searchParams.get('produto') || 'boi_gordo';
   const estado = url.searchParams.get('estado') || 'Bahia';

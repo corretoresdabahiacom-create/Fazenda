@@ -8,9 +8,12 @@
 //   /api/diagnostico-conab-catalogo?classificacao=GRAO  -> por categoria
 //   /api/diagnostico-conab-catalogo?formato=resumo      -> lista enxuta
 
+import { exigirTokenDiagnostico } from './_diagnosticoGuard';
 import { catalogoCompleto } from './_conabPrecos';
 
 export const onRequestGet: PagesFunction = async (context) => {
+  const bloqueio = exigirTokenDiagnostico(context.request, context.env);
+  if (bloqueio) return bloqueio;
   const url = new URL(context.request.url);
   const classificacao = url.searchParams.get('classificacao') || undefined;
   const minEstados = Number(url.searchParams.get('minEstados') || '0');

@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
 import { CloudSun, Wind, Droplets } from 'lucide-react';
 import AIAnalyzer from './AIAnalyzer';
+import { authFetch } from '../lib/authFetch';
 
 interface Props {
   pastures: Pasture[];
@@ -108,7 +109,7 @@ export default function Pastures({ pastures, onAdd, onDelete, animals, settings 
     setCapacityJustification('Processando cálculos agronômicos baseados nas diretrizes brasileiras de pastoreio...');
 
     try {
-      const response = await fetch('/api/calculate-pasture-capacity', {
+      const response = await authFetch('/api/calculate-pasture-capacity', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

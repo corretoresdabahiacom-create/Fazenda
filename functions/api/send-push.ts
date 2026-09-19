@@ -10,13 +10,17 @@
 //   FIREBASE_CLIENT_EMAIL
 //   FIREBASE_PRIVATE_KEY  (colar com as quebras de linha como \n literal)
 
-import { getGoogleAccessToken, GoogleServiceAccountEnv } from './_googleAuth';
+import { getGoogleAccessToken, GoogleServiceAccountEnv, requireAdmin } from './_googleAuth';
 
 type Env = GoogleServiceAccountEnv;
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const { request, env } = context;
+    // Só administradores — antes qualquer pessoa podia disparar push
+    // usando a conta de serviço do Firebase.
+    const auth = await requireAdmin(request, env);
+    if (auth instanceof Response) return auth;
 
     if (!env.FIREBASE_PROJECT_ID || !env.FIREBASE_CLIENT_EMAIL || !env.FIREBASE_PRIVATE_KEY) {
       return new Response(

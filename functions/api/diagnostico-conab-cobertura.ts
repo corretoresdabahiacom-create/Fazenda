@@ -6,6 +6,7 @@
 // Vários:       /api/diagnostico-conab-cobertura?produto=boi_gordo,soja,milho
 // Todos:        /api/diagnostico-conab-cobertura?produto=todos
 
+import { exigirTokenDiagnostico } from './_diagnosticoGuard';
 import { coberturaPorEstado } from './_conabPrecos';
 
 const TODOS = [
@@ -14,6 +15,8 @@ const TODOS = [
 ];
 
 export const onRequestGet: PagesFunction = async (context) => {
+  const bloqueio = exigirTokenDiagnostico(context.request, context.env);
+  if (bloqueio) return bloqueio;
   const url = new URL(context.request.url);
   const pedido = url.searchParams.get('produto') || 'boi_gordo';
   const produtos = pedido === 'todos' ? TODOS : pedido.split(',').map(p => p.trim()).filter(Boolean);

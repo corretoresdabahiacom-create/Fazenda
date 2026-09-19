@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# backups do Firestore contêm dados de clientes — nunca versionar
+backup-firestore-*.json

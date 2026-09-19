@@ -7,12 +7,15 @@
 //   /api/diagnostico-conab-por-estado?uf=BA,SP,MT
 //   /api/diagnostico-conab-por-estado?uf=todos&formato=resumo
 
+import { exigirTokenDiagnostico } from './_diagnosticoGuard';
 import { produtosDoEstado } from './_conabPrecos';
 
 const PRIORITARIOS = ['BA', 'SP', 'MT', 'MS', 'SC'];
 const TODOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
 export const onRequestGet: PagesFunction = async (context) => {
+  const bloqueio = exigirTokenDiagnostico(context.request, context.env);
+  if (bloqueio) return bloqueio;
   const url = new URL(context.request.url);
   const pedido = url.searchParams.get('uf');
   const formato = url.searchParams.get('formato') || 'resumo';

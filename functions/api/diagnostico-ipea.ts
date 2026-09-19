@@ -7,9 +7,12 @@
 // diagnosticar por que o gráfico ficou sem preço, sem precisar
 // adivinhar.
 
+import { exigirTokenDiagnostico } from './_diagnosticoGuard';
 import { buscarHistoricoIpea } from './_ipeaHistorico';
 
 export const onRequestGet: PagesFunction = async (context) => {
+  const bloqueio = exigirTokenDiagnostico(context.request, context.env);
+  if (bloqueio) return bloqueio;
   const url = new URL(context.request.url);
   const produto = url.searchParams.get('produto') || 'boi_gordo';
   const inicio = url.searchParams.get('inicio') || '2025-01-01';

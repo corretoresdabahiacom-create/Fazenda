@@ -11,6 +11,7 @@ import {
 } from '../types';
 import { fetchWeatherSnapshot } from '../lib/weatherRules';
 import { answerRuralQuestion } from '../lib/ruralAdvisor';
+import { authFetch } from '../lib/authFetch';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -94,7 +95,7 @@ export default function ConsultorRuralIA({
       // vazia. Assim nada quebra se a IA estiver fora do ar.
       let respostaIA: string | null = null;
       try {
-        const res = await fetch('/api/consultor-rural', {
+        const res = await authFetch('/api/consultor-rural', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: q, context: contextoFazenda }),

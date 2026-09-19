@@ -13,18 +13,13 @@
 //   padrão é produção: "https://api-m.paypal.com")
 
 import { firestoreGetDoc, firestoreMergeDoc, verifyFirebaseIdToken, GoogleServiceAccountEnv } from './_googleAuth';
+import { resolverPrecoDoPlano } from './_planPrice';
 
 interface Env extends GoogleServiceAccountEnv {
   PAYPAL_CLIENT_ID?: string;
   PAYPAL_CLIENT_SECRET?: string;
   PAYPAL_API_BASE?: string;
 }
-
-const PLAN_PRICES: Record<string, number> = {
-  '1 Fazenda': 29.9,
-  '3 Fazendas': 49.9,
-  '5 Fazendas': 79.9,
-};
 
 async function getPaypalAccessToken(env: Env, apiBase: string): Promise<string> {
   const credentials = btoa(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_CLIENT_SECRET}`);
@@ -42,7 +37,11 @@ async function getPaypalAccessToken(env: Env, apiBase: string): Promise<string> 
 }
 
 async function getOrCreatePlanId(env: Env, apiBase: string, accessToken: string, plan: string, value: number): Promise<string> {
-  const cacheKey = plan.replace(/\s+/g, '_').toLowerCase();
+  // O plano do PayPal tem preço fixo. No Agro Total cada cliente tem um
+  // valor negociado, então a chave do cache inclui o valor — antes todos
+  // os clientes Agro Total reaproveitavam o plano (e o preço) do primeiro.
+  const base = plan.replace(/\s+/g, '_').toLowerCase();
+  const cacheKey = plan === 'Agro Total' ? `${base}_${value.toFixed(2).replace('.', '_')}` : base;
   const cached = await firestoreGetDoc(env, 'paymentConfigPaypal', cacheKey);
   if (cached?.planId) return cached.planId;
 
@@ -144,13 +143,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
 
-    const value = plan === 'Agro Total' ? customPrice : PLAN_PRICES[plan];
-    if (!value || value <= 0) {
-      return new Response(JSON.stringify({ error: 'Valor do plano inválido.' }), {
-        status: 400,
+    // Valor sempre decidido no servidor — customPrice do cliente é ignorado.
+    void customPrice;
+    const preco = await resolverPrecoDoPlano(env, uid, plan);
+    if ('error' in preco) {
+      return new Response(JSON.stringify({ error: preco.error }), {
+        status: preco.status,
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    const value = preco.value;
 
     const apiBase = env.PAYPAL_API_BASE || 'https://api-m.paypal.com';
     const accessToken = await getPaypalAccessToken(env, apiBase);

@@ -7,20 +7,12 @@
 //   MERCADOPAGO_ACCESS_TOKEN  (Suas integrações > credenciais de produção
 //   ou de teste, em https://www.mercadopago.com.br/developers/panel)
 
-import { verifyFirebaseIdToken } from './_googleAuth';
+import { verifyFirebaseIdToken, GoogleServiceAccountEnv } from './_googleAuth';
+import { resolverPrecoDoPlano } from './_planPrice';
 
-interface Env {
+interface Env extends Partial<GoogleServiceAccountEnv> {
   MERCADOPAGO_ACCESS_TOKEN?: string;
-  FIREBASE_PROJECT_ID?: string;
 }
-
-// Preços fixos dos planos — mantidos aqui em espelho de src/types.ts
-// (PLAN_PRICES), já que Functions não importam código do frontend.
-const PLAN_PRICES: Record<string, number> = {
-  '1 Fazenda': 29.9,
-  '3 Fazendas': 49.9,
-  '5 Fazendas': 79.9,
-};
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
@@ -61,13 +53,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
 
-    const value = plan === 'Agro Total' ? customPrice : PLAN_PRICES[plan];
-    if (!value || value <= 0) {
-      return new Response(JSON.stringify({ error: 'Valor do plano inválido.' }), {
-        status: 400,
+    // Valor sempre decidido no servidor — customPrice do cliente é ignorado.
+    void customPrice;
+    const preco = await resolverPrecoDoPlano(env, uid, plan);
+    if ('error' in preco) {
+      return new Response(JSON.stringify({ error: preco.error }), {
+        status: preco.status,
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    const value = preco.value;
 
     const backUrl = appUrl ? `${appUrl.replace(/\/$/, '')}/` : undefined;
 

@@ -140,3 +140,30 @@ describe('detectDivergence — não confunde diferença REGIONAL com erro de dad
     expect(detectDivergence(mesmaPraca).hasDivergence).toBe(true);
   });
 });
+
+describe('detectDivergence — grupos por tipo e unidade (auditoria)', () => {
+  it('cotação sem priceType não é comparada com "indicador"', () => {
+    const r = detectDivergence([
+      { source: 'A', price: 300, currency: 'BRL', priceType: 'indicador' },
+      { source: 'B', price: 400, currency: 'BRL' },
+    ]);
+    expect(r.hasDivergence).toBe(false);
+  });
+
+  it('não compara unidades diferentes', () => {
+    const r = detectDivergence([
+      { source: 'A', price: 130, currency: 'BRL', priceType: 'a_vista', unit: 'Saca 60kg' },
+      { source: 'B', price: 320, currency: 'BRL', priceType: 'a_vista', unit: 'R$/@' },
+    ]);
+    expect(r.hasDivergence).toBe(false);
+  });
+
+  it('grupo "indicador" com 1 item não esconde "a_vista" com 2', () => {
+    const r = detectDivergence([
+      { source: 'I', price: 300, currency: 'BRL', priceType: 'indicador' },
+      { source: 'A', price: 300, currency: 'BRL', priceType: 'a_vista' },
+      { source: 'B', price: 400, currency: 'BRL', priceType: 'a_vista' },
+    ]);
+    expect(r.hasDivergence).toBe(true);
+  });
+});

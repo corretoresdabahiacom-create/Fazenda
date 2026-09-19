@@ -11,6 +11,7 @@ import {
   isValidPrice, findPriceCell,
   normalizeNoticiasAgricolas, normalizeIeaSp, normalizeIncaperEs, normalizeEpagriSc,
   normalizeAiba, normalizeTradingEconomics, normalizeBoiMundo,
+  unidadeCanonica, filtrarPorUnidade,
 } from './_marketQuote';
 
 describe('Cenário 1: API retorna preço', () => {
@@ -292,5 +293,40 @@ describe('Bug real reportado em produção: Notícias Agrícolas comparado contr
     const result = normalizeNoticiasAgricolas(data, 'boi_gordo', 'Boi Gordo');
     expect(result).toHaveLength(1);
     expect(result[0].price).toBe(156);
+  });
+});
+
+describe('unidadeCanonica / filtrarPorUnidade (histórico sem misturar unidades)', () => {
+  it('reconhece as grafias comuns', () => {
+    expect(unidadeCanonica('R$/@')).toBe('BRL/@');
+    expect(unidadeCanonica('@')).toBe('BRL/@');
+    expect(unidadeCanonica('Saca 60kg')).toBe('BRL/saca60');
+    expect(unidadeCanonica('sc 60 kg')).toBe('BRL/saca60');
+    expect(unidadeCanonica('R$/kg')).toBe('BRL/kg');
+    expect(unidadeCanonica('US$/@', 'USD')).toBe('USD/@');
+    expect(unidadeCanonica('R$/@ (convertido de R$/kg)')).toBe('BRL/@');
+    expect(unidadeCanonica('R$')).toBe('BRL/?');
+  });
+
+  it('mantém só a unidade do ponto mais recente', () => {
+    const pontos = [
+      { data: '2026-01-01', preco: 130, unidade: 'BRL/saca60' },
+      { data: '2026-01-02', preco: 2.2, unidade: 'BRL/kg' },
+      { data: '2026-01-03', preco: 131, unidade: 'BRL/saca60' },
+    ];
+    const r = filtrarPorUnidade(pontos);
+    expect(r.unidade).toBe('BRL/saca60');
+    expect(r.pontos.map(p => p.preco)).toEqual([130, 131]);
+  });
+
+  it('com referência, descarta pontos antigos sem unidade', () => {
+    const r = filtrarPorUnidade([{ data: 'a', preco: 1 }, { data: 'b', preco: 2, unidade: 'BRL/@' }], 'BRL/@');
+    expect(r.pontos).toHaveLength(1);
+  });
+
+  it('histórico antigo sem unidade volta como estava', () => {
+    const r = filtrarPorUnidade([{ data: 'a', preco: 1 }, { data: 'b', preco: 2 }]);
+    expect(r.pontos).toHaveLength(2);
+    expect(r.unidade).toBeNull();
   });
 });

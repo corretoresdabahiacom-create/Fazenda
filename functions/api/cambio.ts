@@ -350,7 +350,8 @@ async function fetchGold(usdBrl: CambioEntry | null, ouroFuturoBrl: number | nul
   // Reserva 2: se a B3 (via Notícias Agrícolas) já trouxe um valor de
   // Ouro na mesma busca do Dólar Futuro, usa direto — já vem em reais.
   if (ouroFuturoBrl && ouroFuturoBrl > 0) {
-    return { compra: ouroFuturoBrl, venda: ouroFuturoBrl, variacaoPct: 0, atualizadoEm: new Date().toISOString() };
+    // Mesmo spread de compra (2%) aplicado nas outras fontes de ouro.
+    return { compra: Number((ouroFuturoBrl * 0.98).toFixed(2)), venda: ouroFuturoBrl, variacaoPct: 0, atualizadoEm: new Date().toISOString() };
   }
 
   if (!usdBrl) {

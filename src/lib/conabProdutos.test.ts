@@ -1,19 +1,9 @@
 import { describe, it, expect } from 'vitest';
 
-// Espelho dos padrões de _conabPrecos.ts. Duplicar aqui é intencional:
-// o arquivo original roda no Cloudflare Worker e não é importável no
-// ambiente de teste. O que importa é travar as REGRAS que descobrimos
-// na marra, pra não voltarem.
-const PADROES: Record<string, RegExp> = {
-  leite: /^leite de vaca$/i,
-  sorgo: /^sorgo granifero$/i,
-  cana_de_acucar: /^cana de acucar$/i,
-  boi_gordo: /^boi$/i,
-  algodao: /^algodao em pluma$/i,
-  borracha: /^borracha natural$/i,
-  batata: /^batata$/i,
-  batata_doce: /^batata-doce$/i,
-};
+// Importa os padrões REAIS de produção. Antes este arquivo tinha uma
+// cópia manual deles — uma regressão feita direto em _conabPrecos.ts não
+// era pega pelo teste.
+import { TERMOS_PRODUTO as PADROES, parseMesConab, parseDataConab } from '../../functions/api/_conabPrecos';
 
 describe('Nomes de produto da CONAB — conferidos no arquivo real', () => {
   it('leite casa com "LEITE DE VACA" e não com "LEITE"', () => {
@@ -79,5 +69,24 @@ describe('Máquinas e serviços ficam fora das cotações', () => {
         expect(padrao.test(item), `"${item}" casou indevidamente com ${chave}`).toBe(false);
       }
     }
+  });
+});
+
+describe('Datas e meses da CONAB', () => {
+  it('entende mês numérico e por extenso', () => {
+    expect(parseMesConab('3')).toBe('03');
+    expect(parseMesConab('03')).toBe('03');
+    expect(parseMesConab('mar')).toBe('03');
+    expect(parseMesConab('Março')).toBe('03');
+    expect(parseMesConab('13')).toBeNull();
+    expect(parseMesConab('')).toBeNull();
+  });
+
+  it('mantém o dia quando a data vem completa (arquivo semanal)', () => {
+    expect(parseDataConab('2026-08-17')).toBe('2026-08-17');
+    expect(parseDataConab('17/08/2026')).toBe('2026-08-17');
+    expect(parseDataConab('08/2026')).toBe('2026-08-01');
+    expect(parseDataConab('2026-08')).toBe('2026-08-01');
+    expect(parseDataConab('lixo')).toBeNull();
   });
 });

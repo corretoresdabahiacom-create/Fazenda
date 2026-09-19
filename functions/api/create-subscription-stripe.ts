@@ -5,18 +5,12 @@
 // Variável de ambiente necessária no Cloudflare Pages:
 //   STRIPE_SECRET_KEY  (Dashboard do Stripe > Developers > API keys)
 
-import { verifyFirebaseIdToken } from './_googleAuth';
+import { verifyFirebaseIdToken, GoogleServiceAccountEnv } from './_googleAuth';
+import { resolverPrecoDoPlano } from './_planPrice';
 
-interface Env {
+interface Env extends Partial<GoogleServiceAccountEnv> {
   STRIPE_SECRET_KEY?: string;
-  FIREBASE_PROJECT_ID?: string;
 }
-
-const PLAN_PRICES: Record<string, number> = {
-  '1 Fazenda': 29.9,
-  '3 Fazendas': 49.9,
-  '5 Fazendas': 79.9,
-};
 
 function toFormBody(obj: Record<string, any>, prefix = ''): string[] {
   const parts: string[] = [];
@@ -73,13 +67,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
 
-    const value = plan === 'Agro Total' ? customPrice : PLAN_PRICES[plan];
-    if (!value || value <= 0) {
-      return new Response(JSON.stringify({ error: 'Valor do plano inválido.' }), {
-        status: 400,
+    // Valor sempre decidido no servidor — customPrice do cliente é ignorado.
+    void customPrice;
+    const preco = await resolverPrecoDoPlano(env, uid, plan);
+    if ('error' in preco) {
+      return new Response(JSON.stringify({ error: preco.error }), {
+        status: preco.status,
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    const value = preco.value;
 
     const origin = appUrl ? appUrl.replace(/\/$/, '') : '';
 

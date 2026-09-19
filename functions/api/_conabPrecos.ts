@@ -55,7 +55,7 @@ export interface ResultadoConab {
 // (^...$): um padrão frouxo como /boi/ casaria com insumos que
 // contenham essas letras, e plotaríamos preço de adubo como se fosse
 // preço de boi.
-const TERMOS_PRODUTO: Record<string, RegExp> = {
+export const TERMOS_PRODUTO: Record<string, RegExp> = {
   boi_gordo: /^boi$/i,
   vaca: /^vaca$/i,
   novilho: /^(novilho|garrote)$/i,
@@ -300,6 +300,40 @@ function normalizarNumero(bruto: string): number {
   return Number(limpo);
 }
 
+// Mês da CONAB pode vir como número ("3", "03") ou texto ("mar", "Março").
+// Usado por TODAS as funções que leem o arquivo — antes só a série
+// principal entendia texto, e os diagnósticos/catálogos descartavam
+// essas linhas em silêncio.
+const MESES_CONAB: Record<string, string> = {
+  'jan': '01', 'fev': '02', 'mar': '03', 'abr': '04', 'mai': '05', 'jun': '06',
+  'jul': '07', 'ago': '08', 'set': '09', 'out': '10', 'nov': '11', 'dez': '12',
+};
+export function parseMesConab(bruto: string | undefined | null): string | null {
+  const m = String(bruto || '').trim().toLowerCase();
+  if (/^\d{1,2}$/.test(m)) {
+    const n = Number(m);
+    return n >= 1 && n <= 12 ? String(n).padStart(2, '0') : null;
+  }
+  return MESES_CONAB[m.normalize('NFD').replace(/[\u0300-\u036f]/g, '').slice(0, 3)] || null;
+}
+
+// Data completa quando a coluna trouxer o dia (arquivo SEMANAL); só
+// ano-mês vira dia 01. Antes, sempre que existiam colunas ano+mês elas
+// venciam, e toda semana do mês colapsava no dia 01 — o aviso de "dado
+// com mais de 60 dias" errava por até ~29 dias.
+export function parseDataConab(bruto: string | undefined | null): string | null {
+  const b = String(bruto || '').trim();
+  let m = b.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m = b.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+  m = b.match(/^(\d{4})-(\d{2})$/);
+  if (m) return `${m[1]}-${m[2]}-01`;
+  m = b.match(/^(\d{2})\/(\d{4})$/);
+  if (m) return `${m[2]}-${m[1]}-01`;
+  return null;
+}
+
 export async function buscarHistoricoConab(
   produto: string,
   estado: string,
@@ -359,11 +393,6 @@ export async function buscarHistoricoConab(
     };
   }
 
-  const MESES: Record<string, string> = {
-    'jan': '01', 'fev': '02', 'mar': '03', 'abr': '04', 'mai': '05', 'jun': '06',
-    'jul': '07', 'ago': '08', 'set': '09', 'out': '10', 'nov': '11', 'dez': '12',
-  };
-
   const pontos: PontoConab[] = [];
   let produtoEncontrado: string | null = null;
   let unidade: string | null = null;
@@ -381,8 +410,10 @@ export async function buscarHistoricoConab(
   // preferimos mostrar outro nível (avisando) do que deixar o gráfico
   // vazio. Zerar o dado por excesso de rigor seria pior que mostrar
   // preço de atacado identificado como tal.
-  const pontosOutroNivel: PontoConab[] = [];
-  let nivelAlternativoUsado: string | null = null;
+  // Um balde POR nível: antes todos os níveis não-produtor iam para a
+  // mesma lista (atacado + varejo misturados), recriando o "spread de
+  // 4x" que o filtro de nível existia para eliminar.
+  const pontosPorOutroNivel = new Map<string, PontoConab[]>();
   let nivelDaLinhaAtual: string | null = null;
   // Busca frouxa: pega a primeira palavra significativa do termo pra
   // achar nomes parecidos (ex: "boi" acha "BOI GORDO VIVO").
@@ -428,23 +459,20 @@ export async function buscarHistoricoConab(
     if (!unidade) unidade = PRODUTOS_EM_ARROBA.has(produto) ? 'R$/@ (convertido de R$/kg)' : 'R$/kg';
 
     // Monta a data a partir de ano+mês ou de uma coluna de data.
-    let dataIso: string | null = null;
+    // Data com dia (arquivo semanal) quando existir e for coerente com
+    // ano+mês; senão ano+mês (dia 01); senão a coluna de data.
+    // A checagem de coerência evita usar, por engano, uma coluna do tipo
+    // "data de atualização" no lugar da data da observação.
+    const daColunaData = colData >= 0 ? parseDataConab(campos[colData]) : null;
+    let doAnoMes: string | null = null;
     if (colAno >= 0 && colMes >= 0) {
       const ano = (campos[colAno] || '').trim();
-      const mesBruto = (campos[colMes] || '').trim().toLowerCase();
-      const mes = /^\d+$/.test(mesBruto)
-        ? String(Number(mesBruto)).padStart(2, '0')
-        : MESES[mesBruto.slice(0, 3)];
-      if (/^\d{4}$/.test(ano) && mes) dataIso = `${ano}-${mes}-01`;
-    } else if (colData >= 0) {
-      const bruto = (campos[colData] || '').trim();
-      const m1 = bruto.match(/^(\d{4})-(\d{2})/);
-      const m2 = bruto.match(/^(\d{2})\/(\d{4})$/);
-      const m3 = bruto.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      if (m1) dataIso = `${m1[1]}-${m1[2]}-01`;
-      else if (m2) dataIso = `${m2[2]}-${m2[1]}-01`;
-      else if (m3) dataIso = `${m3[3]}-${m3[2]}-01`;
+      const mes = parseMesConab(campos[colMes]);
+      if (/^\d{4}$/.test(ano) && mes) doAnoMes = `${ano}-${mes}-01`;
     }
+    let dataIso: string | null;
+    if (doAnoMes && daColunaData) dataIso = daColunaData.slice(0, 7) === doAnoMes.slice(0, 7) ? daColunaData : doAnoMes;
+    else dataIso = doAnoMes || daColunaData;
     if (!dataIso) continue;
     if (dataIso < dataInicio || dataIso > dataFim) continue;
 
@@ -467,8 +495,9 @@ export async function buscarHistoricoConab(
     }
 
     if (nivelDaLinhaAtual) {
-      pontosOutroNivel.push({ data: dataIso, preco });
-      if (!nivelAlternativoUsado) nivelAlternativoUsado = nivelDaLinhaAtual;
+      const balde = pontosPorOutroNivel.get(nivelDaLinhaAtual) || [];
+      balde.push({ data: dataIso, preco });
+      pontosPorOutroNivel.set(nivelDaLinhaAtual, balde);
     } else {
       pontos.push({ data: dataIso, preco });
     }
@@ -484,11 +513,34 @@ export async function buscarHistoricoConab(
   }
 
   // Se não houve nenhum preço de produtor, cai pra outro nível avisando.
+  // Escolhe UM nível só: o mais próximo do produtor (atacado antes de
+  // varejo) e, empatando, o com mais pontos.
   let avisoNivel: string | undefined;
-  if (pontos.length === 0 && pontosOutroNivel.length > 0) {
-    pontos.push(...pontosOutroNivel);
+  if (pontos.length === 0 && pontosPorOutroNivel.size > 0) {
+    const peso = (n: string) => (/atacad/i.test(n) ? 0 : /varej/i.test(n) ? 2 : 1);
+    const [nivelAlternativoUsado, pontosDoNivel] = [...pontosPorOutroNivel.entries()]
+      .sort((a, b) => peso(a[0]) - peso(b[0]) || b[1].length - a[1].length)[0];
+    pontos.push(...pontosDoNivel);
+    pontos.sort((a, b) => a.data.localeCompare(b.data));
     avisoNivel = `A CONAB não publica preço de produtor pra esse produto em ${estado} — os valores mostrados são do nível "${nivelAlternativoUsado}", que costuma ser mais alto que o recebido pelo produtor.`;
-    diagnostico.push(`Sem preço de produtor; usando nível "${nivelAlternativoUsado}" (${pontosOutroNivel.length} pontos).`);
+    diagnostico.push(`Sem preço de produtor; usando só o nível "${nivelAlternativoUsado}" (${pontosDoNivel.length} pontos). Outros níveis ignorados: ${[...pontosPorOutroNivel.keys()].filter(n => n !== nivelAlternativoUsado).join(' | ') || 'nenhum'}.`);
+  }
+
+  // Mais de um registro na mesma data (ex: várias praças do mesmo estado)
+  // vira a média daquela data, em vez de pontos repetidos.
+  if (pontos.length > 1) {
+    const porData = new Map<string, { soma: number; n: number }>();
+    for (const p of pontos) {
+      const acc = porData.get(p.data) || { soma: 0, n: 0 };
+      acc.soma += p.preco; acc.n++;
+      porData.set(p.data, acc);
+    }
+    if (porData.size < pontos.length) {
+      pontos.length = 0;
+      for (const [data, { soma, n }] of [...porData.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+        pontos.push({ data, preco: Math.round((soma / n) * 100) / 100 });
+      }
+    }
   }
 
   // Corte por amostra insuficiente — ver MINIMO_DE_PONTOS.
@@ -632,8 +684,7 @@ export async function coberturaPorEstado(produto: string): Promise<ResultadoCobe
     }
 
     const ano = (campos[colAno] || '').trim();
-    const mesBruto = (campos[colMes] || '').trim();
-    const mes = /^\d+$/.test(mesBruto) ? String(Number(mesBruto)).padStart(2, '0') : '';
+    const mes = parseMesConab(campos[colMes]) || '';
     if (!/^\d{4}$/.test(ano) || !mes) continue;
     const anoMes = `${ano}-${mes}`;
 
@@ -822,8 +873,7 @@ export async function catalogoCompleto(filtroClassificacao?: string): Promise<{
     const uf = cUf >= 0 ? (campos[cUf] || '').trim().toUpperCase() : '';
     const nivel = cNivel >= 0 ? (campos[cNivel] || '').trim() : '';
     const ano = cAno >= 0 ? (campos[cAno] || '').trim() : '';
-    const mesBruto = cMes >= 0 ? (campos[cMes] || '').trim() : '';
-    const mes = /^\d+$/.test(mesBruto) ? String(Number(mesBruto)).padStart(2, '0') : '';
+    const mes = cMes >= 0 ? (parseMesConab(campos[cMes]) || '') : '';
     const anoMes = /^\d{4}$/.test(ano) && mes ? `${ano}-${mes}` : '';
 
     if (!mapa.has(nome)) {
@@ -933,8 +983,7 @@ export async function produtosDoEstado(uf: string): Promise<{
     if (nivel && !/produtor|produ[çc][ãa]o|lavoura/i.test(nivel)) continue;
 
     const ano = cAno >= 0 ? (campos[cAno] || '').trim() : '';
-    const mesBruto = cMes >= 0 ? (campos[cMes] || '').trim() : '';
-    const mes = /^\d+$/.test(mesBruto) ? String(Number(mesBruto)).padStart(2, '0') : '';
+    const mes = cMes >= 0 ? (parseMesConab(campos[cMes]) || '') : '';
     const anoMes = /^\d{4}$/.test(ano) && mes ? `${ano}-${mes}` : '';
 
     if (!mapa.has(nome)) {

@@ -89,6 +89,7 @@ import WeighingWorksheet from './components/WeighingWorksheet';
 import NutritionCalculator from './components/NutritionCalculator';
 import { NotificationService } from './utils/notificationService';
 import { useFirebase } from './contexts/FirebaseContext';
+import { isAdminEmail } from '../shared/adminEmails';
 
 type View = 'dashboard' | 'payments' | 'expenses' | 'inventory' | 'animals' | 'pastures' | 'map' | 'tasks' | 'reports' | 'settings' | 'weighing' | 'nutrition';
 
@@ -727,8 +728,7 @@ export default function App() {
     { id: 'minha-assinatura', label: 'Minha Assinatura', icon: CreditCard },
   ];
 
-  const BOOTSTRAP_ADMIN_EMAILS_CLIENT = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
-  const isBootstrapAdmin = !!user?.email && BOOTSTRAP_ADMIN_EMAILS_CLIENT.includes(user.email.toLowerCase());
+  const isBootstrapAdmin = isAdminEmail(user?.email, user?.emailVerified);
   if (isBootstrapAdmin) {
     navItems.push({ id: 'admin-panel', label: 'Painel Admin', icon: ShieldAlert });
   }

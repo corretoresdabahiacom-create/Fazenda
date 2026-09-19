@@ -17,7 +17,7 @@
 // diagnóstico detalhada (nomes de abas, cabeçalhos, linhas de exemplo)
 // para ajuste fino caso a estrutura real seja diferente do esperado.
 
-import * as XLSX from 'xlsx';
+import { lerXlsx } from './_xlsxLite';
 
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
 const XLSX_URL = 'https://docweb.epagri.sc.gov.br/website_cepa/precos/Historico_precos_diario.xlsx';
@@ -33,15 +33,14 @@ function findColumn(headers: string[], patterns: RegExp[]): number {
 }
 
 function parseWorkbook(buffer: ArrayBuffer, debug: string[]): { rows: PrecoRow[]; sheetNames: string[]; headers: string[] } {
-  const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
-  const sheetNames = workbook.SheetNames;
+  const planilha = lerXlsx(buffer);
+  const sheetNames = planilha.abas;
   debug.push(`Abas encontradas: ${sheetNames.join(', ')}`);
 
   // Usa a primeira aba, ou uma que tenha "diari" no nome (mais provável
   // de ser a planilha certa em "Historico_precos_diario.xlsx").
   const sheetName = sheetNames.find(n => /diari/i.test(n)) || sheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
-  const json = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false }) as string[][];
+  const json = planilha.lerAba(sheetName).filter(l => l.some(c => c !== ''));
 
   if (json.length === 0) return { rows: [], sheetNames, headers: [] };
 

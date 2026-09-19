@@ -18,6 +18,7 @@ import { ChevronDown, ChevronRight, Edit3, Plus, X, Save, Trash2 } from 'lucide-
 import { collection, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useFirebase } from '../contexts/FirebaseContext';
+import { isAdminEmail } from '../../shared/adminEmails';
 import '../styles/bandeirasEstados.css';
 
 const ESTADOS_UF: { nome: string; uf: string; cor: string }[] = [
@@ -398,8 +399,7 @@ function CardEstado({ estado }: CardEstadoProps) {
   // do sistema. Se essa lista mudar, tem que mudar nos dois lugares
   // (aqui e em firestore.rules → isBootstrapAdminEmail).
   const { user } = useFirebase();
-  const EMAILS_ADMIN_SISTEMA = ['admin@fazenda.com.br', 'admmeuarmazem@gmail.com', 'arnaldolima.adv79@gmail.com'];
-  const isAdmin = !!user?.email && EMAILS_ADMIN_SISTEMA.includes(user.email.toLowerCase());
+  const isAdmin = isAdminEmail(user?.email, user?.emailVerified);
   const [aberto, setAberto] = useState(false);
   const [produtos, setProdutos] = useState<ProdutoEncontrado[] | null>(null);
   const [loading, setLoading] = useState(false);

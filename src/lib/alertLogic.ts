@@ -13,6 +13,7 @@ export interface SimpleQuote {
   currency: 'BRL' | 'USD';
   fetchedAt?: string;
   priceType?: string;
+  unit?: string;
 }
 
 export interface DivergenceResult {
@@ -32,18 +33,25 @@ export interface DivergenceResult {
 // (bug real reportado em produção).
 export function detectDivergence(quotes: SimpleQuote[]): DivergenceResult {
   const candidatos = quotes.filter(q => q.currency === 'BRL' && q.price != null && q.price > 0);
-  // Agrupa por priceType (tratando "sem tipo definido" como um grupo
-  // próprio) e só compara dentro do mesmo grupo.
+  // Agrupa por tipo de preço E unidade, e só compara dentro do mesmo
+  // grupo. Cotação sem tipo fica num grupo PRÓPRIO ("sem_tipo") — antes
+  // caía junto com "indicador", o que poderia reintroduzir o alerta falso
+  // futuro x à vista assim que surgisse uma fonte sem priceType. A
+  // unidade também separa: R$/@ contra R$/saca não é divergência.
+  const unidadeNorm = (u?: string) => String(u || '').toLowerCase().replace(/\s+/g, '');
   const grupos = new Map<string, SimpleQuote[]>();
   for (const q of candidatos) {
-    const chave = q.priceType || 'indicador';
+    const chave = `${q.priceType || 'sem_tipo'}|${unidadeNorm(q.unit)}`;
     if (!grupos.has(chave)) grupos.set(chave, []);
     grupos.get(chave)!.push(q);
   }
-  // Prioriza o grupo "indicador"/"a_vista" quando existir (é o que o
-  // usuário normalmente quer ver como "preço atual"); senão, usa
-  // qualquer grupo com 2+ itens.
-  const precosBRL = grupos.get('indicador') || grupos.get('a_vista') || Array.from(grupos.values()).find(g => g.length >= 2) || [];
+  // Prioriza "indicador", depois "a_vista", depois qualquer outro — mas
+  // só grupos com 2+ cotações (antes um grupo "indicador" com 1 item só
+  // escondia um grupo "a_vista" com várias).
+  const ordem = (chave: string) => (chave.startsWith('indicador|') ? 0 : chave.startsWith('a_vista|') ? 1 : 2);
+  const precosBRL = [...grupos.entries()]
+    .filter(([, g]) => g.length >= 2)
+    .sort((a, b) => ordem(a[0]) - ordem(b[0]))[0]?.[1] || [];
   if (precosBRL.length < 2) return { hasDivergence: false };
 
   const valores = precosBRL.map(p => p.price as number);

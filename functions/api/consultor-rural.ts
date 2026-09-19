@@ -1,6 +1,8 @@
+import { requireUser } from './_googleAuth';
 import { generateText } from "./aiClient";
 
 interface Env {
+  FIREBASE_PROJECT_ID?: string;
   GEMINI_API_KEY?: string;
   OPENAI_API_KEY?: string;
   ANTHROPIC_API_KEY?: string;
@@ -19,6 +21,10 @@ interface Env {
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const { request, env } = context;
+    // Só usuários logados (ou só admin) — sem isso, qualquer pessoa na
+    // internet podia chamar este endpoint e gastar a cota paga das APIs.
+    const auth = await requireUser(request, env);
+    if (auth instanceof Response) return auth;
     const { question, context: farmContext } = (await request.json()) as {
       question?: string;
       context?: Record<string, unknown>;
